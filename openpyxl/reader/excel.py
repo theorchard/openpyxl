@@ -69,7 +69,10 @@ def load_workbook(filename, use_iterators = False):
     except (BadZipfile, RuntimeError, IOError, ValueError), e:
         raise InvalidFileException(unicode(e))
     wb = Workbook()
-    wb._set_optimized_read()
+
+    if use_iterators:
+        wb._set_optimized_read()
+
     try:
         _load_workbook(wb, archive, filename, use_iterators)
     except KeyError, e:
