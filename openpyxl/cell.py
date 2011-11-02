@@ -144,7 +144,8 @@ class Cell(object):
                  '_data_type',
                  'parent',
                  'xf_index',
-                 '_hyperlink_rel')
+                 '_hyperlink_rel',
+                 '_shared_date')
 
     ERROR_CODES = {'#NULL!': 0,
                    '#DIV/0!': 1,
@@ -183,6 +184,7 @@ class Cell(object):
             self.value = value
         self.parent = worksheet
         self.xf_index = 0
+        self._shared_date = SharedDate(base_date=worksheet.parent.excel_base_date)
 
     @property
     def encoding(self):
@@ -301,7 +303,7 @@ class Cell(object):
         """Return the value, formatted as a date if needed"""
         value = self._value
         if self.is_date():
-            value = SharedDate().from_julian(value)
+            value = self._shared_date.from_julian(value)
         return value
 
     def _set_value(self, value):
