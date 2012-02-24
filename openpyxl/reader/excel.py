@@ -40,11 +40,23 @@ from openpyxl.reader.workbook import read_sheets_titles, read_named_ranges, \
 from openpyxl.reader.worksheet import read_worksheet
 from openpyxl.reader.iter_worksheet import unpack_worksheet
 
+def repair_central_directory(zipFile):
+    ''' trims trailing data from the central directory 
+    code taken from http://stackoverflow.com/a/7457686/570216, courtesy of Uri Cohen
+    '''
+    f = open(zipFile, 'r+b')
+    data = f.read()
+    pos = data.find('\x50\x4b\x05\x06') # End of central directory signature  
+    if (pos > 0):
+        f.seek(pos + 22)   # size of 'ZIP end of central directory record' 
+        f.truncate()
+        f.close()
+
 def load_workbook(filename, use_iterators=False):
     """Open the given filename and return the workbook
 
-    :param filename: the path to open
-    :type filename: string
+    :param filename: the path to open or a file-like object
+    :type filename: string or a file-like object open in binary mode c.f., :class:`zipfile.ZipFile`
 
     :param use_iterators: use lazy load for cells
     :type use_iterators: bool
@@ -66,6 +78,12 @@ def load_workbook(filename, use_iterators=False):
 
     try:
         archive = ZipFile(filename, 'r', ZIP_DEFLATED)
+    except BadZipfile:
+        try:
+            repair_central_directory(filename)
+            archive = ZipFile(filename, 'r', ZIP_DEFLATED)
+        except BadZipfile, e:
+            raise InvalidFileException(unicode(e))
     except (BadZipfile, RuntimeError, IOError, ValueError), e:
         raise InvalidFileException(unicode(e))
     wb = Workbook()
@@ -97,7 +115,7 @@ def _load_workbook(wb, archive, filename, use_iterators):
         string_table = {}
     style_table = read_style_table(archive.read(ARC_STYLE))
 
-    wb.properties.excel_base_date = read_excel_base_date(xml_source = archive.read(ARC_WORKBOOK))
+    wb.properties.excel_base_date = read_excel_base_date(xml_source=archive.read(ARC_WORKBOOK))
 
     # get worksheets
     wb.worksheets = []  # remove preset worksheet
