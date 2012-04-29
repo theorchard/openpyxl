@@ -65,6 +65,10 @@ def write_worksheet(worksheet, string_table, style_table):
     write_worksheet_mergecells(doc, worksheet)
     write_worksheet_hyperlinks(doc, worksheet)
 
+    options = worksheet.page_setup.options
+    if options:
+        tag(doc, 'printOptions', options)
+
     margins = worksheet.page_margins.margins
     if margins:
         tag(doc, 'pageMargins', margins)
@@ -72,6 +76,14 @@ def write_worksheet(worksheet, string_table, style_table):
     setup = worksheet.page_setup.setup
     if setup:
         tag(doc, 'pageSetup', setup)
+
+    if worksheet.header_footer.hasHeader() or worksheet.header_footer.hasFooter():
+        start_tag(doc, 'headerFooter')
+        if worksheet.header_footer.hasHeader():
+            tag(doc, 'oddHeader', None, worksheet.header_footer.getHeader())
+        if worksheet.header_footer.hasFooter():
+            tag(doc, 'oddFooter', None, worksheet.header_footer.getFooter())
+        end_tag(doc, 'headerFooter')
 
     if worksheet._charts:
         tag(doc, 'drawing', {'r:id':'rId1'})
