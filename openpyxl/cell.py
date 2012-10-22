@@ -145,7 +145,8 @@ class Cell(object):
                  'parent',
                  'xf_index',
                  '_hyperlink_rel',
-                 '_shared_date')
+                 '_shared_date',
+                 'merged')
 
     ERROR_CODES = {'#NULL!': 0,
                    '#DIV/0!': 1,
@@ -185,6 +186,7 @@ class Cell(object):
         self.parent = worksheet
         self.xf_index = 0
         self._shared_date = SharedDate(base_date=worksheet.parent.excel_base_date)
+        self.merged = False
 
     @property
     def encoding(self):
@@ -250,8 +252,10 @@ class Cell(object):
             data_type = self.TYPE_NUMERIC
         elif not isinstance(value, unicode) and self.RE_PATTERNS['numeric'].match(str(value)):
             data_type = self.TYPE_NUMERIC
-        elif value.strip() in self.ERROR_CODES:
-            data_type = self.TYPE_ERROR
+        elif isinstance(value, basestring) and value.strip() in self.ERROR_CODES:
+          data_type = self.TYPE_ERROR
+        elif isinstance(value, list):
+          data_type = self.TYPE_ERROR
         else:
             data_type = self.TYPE_STRING
         return data_type

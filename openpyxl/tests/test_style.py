@@ -31,6 +31,7 @@ import datetime
 from nose.tools import eq_, assert_false, ok_
 
 # package imports
+from openpyxl.reader.excel import load_workbook
 from openpyxl.tests.helper import DATADIR, assert_equals_file_content, get_xml
 from openpyxl.reader.style import read_style_table
 from openpyxl.workbook import Workbook
@@ -98,8 +99,11 @@ class TestStyleWriter(object):
         self.worksheet.cell('A1').style.font.bold = True
         w = StyleWriter(self.workbook)
         w._write_fonts()
-        eq_(get_xml(w._root), '<?xml version=\'1.0\' encoding=\'UTF-8\'?><styleSheet xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main"><fonts count="2"><font><sz val="11" /><color theme="1" /><name val="Calibri" /><family val="2" /><scheme val="minor" /></font><font><sz val="12" /><color rgb="FF000000" /><name val="Calibri" /><family val="2" /><b /><u val="none" /></font></fonts></styleSheet>')
+        eq_(get_xml(w._root), '<?xml version=\'1.0\' encoding=\'UTF-8\'?><styleSheet xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main"><fonts count="2"><font><sz val="11" /><color theme="1" /><name val="Calibri" /><family val="2" /><scheme val="minor" /></font><font><sz val="12" /><color rgb="FF000000" /><name val="Calibri" /><family val="2" /><b /></font></fonts></styleSheet>')
 
+    def test_fonts_with_underline(self):
+        self.worksheet.cell('A1').style.font.size = 12
+        self.worksheet.cell('A1').style.font.bold = True
         self.worksheet.cell('A1').style.font.underline = Font.UNDERLINE_SINGLE
         w = StyleWriter(self.workbook)
         w._write_fonts()
@@ -119,7 +123,7 @@ class TestStyleWriter(object):
         self.worksheet.cell('A1').style.borders.top.color.index = Color.DARKYELLOW
         w = StyleWriter(self.workbook)
         w._write_borders()
-        eq_(get_xml(w._root), '<?xml version=\'1.0\' encoding=\'UTF-8\'?><styleSheet xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main"><borders count="2"><border><left /><right /><top /><bottom /><diagonal /></border><border><left style="none"><color rgb="FF000000" /></left><right style="none"><color rgb="FF000000" /></right><top style="thin"><color rgb="FF808000" /></top><bottom style="none"><color rgb="FF000000" /></bottom><diagonal style="none"><color rgb="FF000000" /></diagonal></border></borders></styleSheet>')
+        eq_(get_xml(w._root), '<?xml version=\'1.0\' encoding=\'UTF-8\'?><styleSheet xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main"><borders count="2"><border><left /><right /><top /><bottom /><diagonal /></border><border><left /><right /><top style="thin"><color rgb="FF808000" /></top><bottom /><diagonal /></border></borders></styleSheet>')
 
     def test_write_cell_xfs_1(self):
 
@@ -130,7 +134,7 @@ class TestStyleWriter(object):
         w._write_cell_xfs(nft, ft, {}, {})
         xml = get_xml(w._root)
         ok_('applyFont="1"' in xml)
-        ok_('applyFillId="1"' not in xml)
+        ok_('applyFill="1"' not in xml)
         ok_('applyBorder="1"' not in xml)
         ok_('applyAlignment="1"' not in xml)
 
@@ -193,6 +197,55 @@ def test_read_style():
             style_table[1].number_format.format_code)
     eq_('yyyy-mm-dd', style_table[2].number_format.format_code)
 
+
+def test_read_complex_style():
+    reference_file = os.path.join(DATADIR, 'reader', 'complex-styles.xlsx')
+    wb = load_workbook(reference_file)
+    ws = wb.get_active_sheet()
+    eq_(ws.column_dimensions['A'].width, 31.1640625)
+    eq_(ws.cell('A2').style.font.name, 'Arial')
+    eq_(ws.cell('A2').style.font.size, '10')
+    eq_(ws.cell('A2').style.font.bold, False)
+    eq_(ws.cell('A2').style.font.italic, False)
+    eq_(ws.cell('A3').style.font.name, 'Arial')
+    eq_(ws.cell('A3').style.font.size, '12')
+    eq_(ws.cell('A3').style.font.bold, True)
+    eq_(ws.cell('A3').style.font.italic, False)
+    eq_(ws.cell('A4').style.font.name, 'Arial')
+    eq_(ws.cell('A4').style.font.size, '14')
+    eq_(ws.cell('A4').style.font.bold, False)
+    eq_(ws.cell('A4').style.font.italic, True)
+    eq_(ws.cell('A5').style.font.color.index, 'FF3300FF')
+    eq_(ws.cell('A6').style.font.color.index, 'theme:9:')
+    eq_(ws.cell('A7').style.fill.start_color.index, 'FFFFFF66')
+    eq_(ws.cell('A8').style.fill.start_color.index, 'theme:8:')
+    eq_(ws.cell('A9').style.alignment.horizontal,'left')
+    eq_(ws.cell('A10').style.alignment.horizontal,'right')
+    eq_(ws.cell('A11').style.alignment.horizontal,'center')
+    eq_(ws.cell('A12').style.alignment.vertical,'top')
+    eq_(ws.cell('A13').style.alignment.vertical,'center')
+    eq_(ws.cell('A14').style.alignment.vertical,'bottom')
+    eq_(ws.cell('A15').style.number_format._format_code,'0.00')
+    eq_(ws.cell('A16').style.number_format._format_code,'mm-dd-yy')
+    eq_(ws.cell('A17').style.number_format._format_code,'0.00%')
+    eq_('A18:B18' in ws._merged_cells, True)
+    eq_(ws.cell('B18').merged,True)
+    eq_(ws.cell('A19').style.borders.top.color.index,'FF006600')
+    eq_(ws.cell('A19').style.borders.bottom.color.index,'FF006600')
+    eq_(ws.cell('A19').style.borders.left.color.index,'FF006600')
+    eq_(ws.cell('A19').style.borders.right.color.index,'FF006600')
+    eq_(ws.cell('A21').style.borders.top.color.index,'theme:7:')
+    eq_(ws.cell('A21').style.borders.bottom.color.index,'theme:7:')
+    eq_(ws.cell('A21').style.borders.left.color.index,'theme:7:')
+    eq_(ws.cell('A21').style.borders.right.color.index,'theme:7:')
+    eq_(ws.cell('A23').style.fill.start_color.index,'FFCCCCFF')
+    eq_(ws.cell('A23').style.borders.top.color.index,'theme:6:')
+    eq_('A23:B24' in ws._merged_cells, True)
+    eq_(ws.cell('A24').merged,True)
+    eq_(ws.cell('B23').merged,True)
+    eq_(ws.cell('B24').merged,True)
+    eq_(ws.cell('A25').style.alignment.wrap_text,True)
+    eq_(ws.cell('A26').style.alignment.shrink_to_fit,True)
 
 def test_read_cell_style():
     reference_file = os.path.join(
