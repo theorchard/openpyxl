@@ -46,16 +46,15 @@ class NamedRange(object):
     str_format = unicode('%s!%s')
     repr_format = unicode('<%s "%s">')
 
-    def __init__(self, name, destinations):
+    def __init__(self, name, destinations, scope=None):
         self.name = name
         self.destinations = destinations
-        self.scope = None
+        self.scope = scope
 
     def __str__(self):
         return  ','.join([self.str_format % (sheet, name) for sheet, name in self.destinations])
 
     def __repr__(self):
-
         return  self.repr_format % (self.__class__.__name__, str(self))
 
 class NamedRangeContainingValue(object):
