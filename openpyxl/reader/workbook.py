@@ -85,13 +85,22 @@ def read_excel_base_date(xml_source):
     return CALENDAR_WINDOWS_1900
 
 
+# Mark Mikofski, 2013-06-03
+def read_content_types(xml_source):
+    """Read content types."""
+    root = fromstring(xml_source)
+    contents_root = root.findall(QName('http://schemas.openxmlformats.org/package/2006/content-types',
+            'Override').text)
+    for type in contents_root:
+        yield type.get('PartName'), type.get('ContentType')
+
 def read_sheets_titles(xml_source):
     """Read titles for all sheets."""
     root = fromstring(xml_source)
     titles_root = root.find(QName('http://schemas.openxmlformats.org/spreadsheetml/2006/main',
             'sheets').text)
 
-    return [sheet.get('name') for sheet in titles_root.getchildren()]
+    return [sheet.get('name') for sheet in list(titles_root)]
 
 def read_named_ranges(xml_source, workbook):
     """Read named ranges, excluding poorly defined ranges."""
@@ -101,7 +110,7 @@ def read_named_ranges(xml_source, workbook):
             'definedNames').text)
     if names_root is not None:
 
-        for name_node in names_root.getchildren():
+        for name_node in list(names_root):
             range_name = name_node.get('name')
 
             if name_node.get("hidden", '0') == '1':
