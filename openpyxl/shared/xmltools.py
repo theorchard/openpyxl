@@ -59,6 +59,7 @@ Shortcut functions taken from:
 """
 
 # Python stdlib imports
+import re
 from openpyxl import __name__ as prefix
 from openpyxl.shared.compat import OrderedDict
 from openpyxl.shared.compat.sax import XMLGenerator
