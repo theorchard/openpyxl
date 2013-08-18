@@ -32,6 +32,15 @@ from openpyxl.shared.compat import any
 
 
 class Color(namedtuple('Color', ('index',))):
+    """
+    Color option used in Font, Fill and Border
+
+    example::
+
+        Color(index='FF000000')
+        Color(index=Color.BLACK)
+
+    """
     BLACK = 'FF000000'
     WHITE = 'FFFFFFFF'
     RED = 'FFFF0000'
@@ -53,7 +62,16 @@ class Font(namedtuple('Font', ('name',
                                'underline',
                                'strikethrough',
                                'color'))):
-    """Font options used in styles."""
+    """ Font options used in styles.
+
+    example::
+
+        Font(name='Calibri', size=11, bold=False, italic=False,
+             superscript=False, subscript=False,
+             underline='none', strikethrough=False,
+             color=Color(index='FF000000'))
+
+    """
     UNDERLINE_NONE = 'none'
     UNDERLINE_DOUBLE = 'double'
     UNDERLINE_DOUBLE_ACCOUNTING = 'doubleAccounting'
@@ -81,7 +99,14 @@ class Fill(namedtuple('Fill', ('fill_type',
                                'rotation',
                                'start_color',
                                'end_color'))):
-    """Area fill patterns for use in styles."""
+    """Area fill patterns for use in styles.
+
+    example::
+
+        Fill(fill_type='none', rotation=0,
+             start_color=Color(index='FFFFFFFF'),
+             end_color=Color(index='FF000000'))
+    """
     FILL_NONE = 'none'
     FILL_SOLID = 'solid'
     FILL_GRADIENT_LINEAR = 'linear'
@@ -114,7 +139,12 @@ class Fill(namedtuple('Fill', ('fill_type',
 
 
 class Border(namedtuple('Border', ('border_style', 'color'))):
-    """Border options for use in styles."""
+    """Border options for use in styles.
+
+    example::
+
+        Border(border_style='none', color=Color(index='FF000000'))
+    """
     BORDER_NONE = 'none'
     BORDER_DASHDOT = 'dashDot'
     BORDER_DASHDOTDOT = 'dashDotDot'
@@ -146,7 +176,24 @@ class Borders(namedtuple('Borders', ('left',
                                      'inside',
                                      'vertical',
                                      'horizontal'))):
-    """Border positioning for use in styles."""
+    """Border positioning for use in styles.
+
+    example::
+
+        Borders(left=Border(border_style='none',
+                            color=Color(index='FF000000')),
+                right=Border(),
+                top=Border(),
+                bottom=Border(),
+                diagonal=Border(),
+                diagonal_direction=Borders.DIAGONAL_NONE,
+                all_borders=Border(),
+                outline=Border(),
+                inside=Border(),
+                vertical=Border(),
+                horizontal=Border())
+
+    """
     DIAGONAL_NONE = 0
     DIAGONAL_UP = 1
     DIAGONAL_DOWN = 2
@@ -169,7 +216,14 @@ class Alignment(namedtuple('Alignment', ('horizontal',
                                          'wrap_text',
                                          'shrink_to_fit',
                                          'indent'))):
-    """Alignment options for use in styles."""
+    """Alignment options for use in styles.
+
+    example::
+
+        Alignment(horizontal='general', vertical='bottom',
+                  text_rotation=0, wrap_text=False,
+                  shrink_to_fit=False, indent=0)
+    """
     HORIZONTAL_GENERAL = 'general'
     HORIZONTAL_LEFT = 'left'
     HORIZONTAL_RIGHT = 'right'
@@ -193,7 +247,12 @@ class Alignment(namedtuple('Alignment', ('horizontal',
 
 
 class NumberFormat(namedtuple('NumberFormat', ('format_code',))):
-    """Numer formatting for use in styles."""
+    """Numer formatting for use in styles.
+
+    example::
+
+        NumberFormat(format_code='General')
+    """
     FORMAT_GENERAL = 'General'
     FORMAT_TEXT = '@'
     FORMAT_NUMBER = '0'
@@ -305,7 +364,12 @@ class NumberFormat(namedtuple('NumberFormat', ('format_code',))):
 
 
 class Protection(namedtuple('Protection', ('locked', 'hidden'))):
-    """Protection options for use in styles."""
+    """Protection options for use in styles.
+
+    example::
+
+        Protection(locked='inherit', hidden='inherit')
+    """
     PROTECTION_INHERIT = 'inherit'
     PROTECTION_PROTECTED = 'protected'
     PROTECTION_UNPROTECTED = 'unprotected'
@@ -316,7 +380,56 @@ class Protection(namedtuple('Protection', ('locked', 'hidden'))):
 
 class Style(namedtuple('Style', ('font', 'fill', 'borders', 'alignment',
                                  'number_format', 'protection'))):
-    """Style object containing all formatting details."""
+    """Style object containing all formatting details.
+
+
+    examples::
+
+        Style(font=Font(size=12))
+
+    or::
+
+        Style(fill=Fill(start_color=Color(Color.YELLOW),
+                        end_color=Color(Color.WHITE)))
+
+    or everything at the same time::
+
+        Style(font=Font(name='Calibri',
+                        size=11, bold=False,
+                        italic=False, superscript=False,
+                        subscript=False, underline='none',
+                        strikethrough=False,
+                        color=Color(index='FF000000')),
+              fill=Fill(fill_type='none', rotation=0,
+                        start_color=Color(index='FFFFFFFF'),
+                        end_color=Color(index='FF000000')),
+              borders=Borders(left=Border(border_style='none',
+                                          color=Color(index='FF000000')),
+                              right=Border(border_style='none',
+                                           color=Color(index='FF000000')),
+                              top=Border(border_style='none',
+                                         color=Color(index='FF000000')),
+                              bottom=Border(border_style='none',
+                                            color=Color(index='FF000000')),
+                              diagonal=Border(border_style='none',
+                                              color=Color(index='FF000000')),
+                              diagonal_direction=0,
+                              all_borders=Border(border_style='none',
+                                                 color=Color(index='FF000000')),
+                              outline=Border(border_style='none',
+                                             color=Color(index='FF000000')),
+                              inside=Border(border_style='none',
+                                            color=Color(index='FF000000')),
+                              vertical=Border(border_style='none',
+                                              color=Color(index='FF000000')),
+                              horizontal=Border(border_style='none',
+                                                color=Color(index='FF000000'))),
+              alignment=Alignment(horizontal='general', vertical='bottom',
+                                  text_rotation=0, wrap_text=False,
+                                  shrink_to_fit=False, indent=0),
+              number_format=NumberFormat(format_code='General'),
+              protection=Protection(locked='inherit', hidden='inherit'))
+    """
 
     def __new__(cls, font=Font(),
                 fill=Fill(),
@@ -329,8 +442,8 @@ class Style(namedtuple('Style', ('font', 'fill', 'borders', 'alignment',
 
     def copy(self, **kwargs):
         """
-        returns a `openpyxl.style.Style` which inherits from the current style,
-        but takes alterations as kwargs.
+        returns a :class:`openpyxl.style.Style` which inherits from
+        the current style, but takes alterations as kwargs.
 
             >>> s = Style(font=Font(size=31))
             >>> s2 = s.copy(font=Font(bold=True))

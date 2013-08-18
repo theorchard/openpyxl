@@ -6,15 +6,10 @@ Write a workbook
 ::
 
     from openpyxl import Workbook
-
     from openpyxl.cell import get_column_letter
-
     wb = Workbook()
-
     dest_filename = r'empty_book.xlsx'
-
     ws = wb.worksheets[0]
-
     ws.title = "range names"
 
     for col_idx in xrange(1, 40):
@@ -23,11 +18,8 @@ Write a workbook
             ws.cell('%s%s'%(col, row)).value = '%s%s' % (col, row)
 
     ws = wb.create_sheet()
-
     ws.title = 'Pi'
-
     ws.cell('F5').value = 3.14
-
     wb.save(filename = dest_filename)
 
 Read an existing workbook
@@ -35,11 +27,8 @@ Read an existing workbook
 ::
 
     from openpyxl import load_workbook
-
     wb = load_workbook(filename = r'empty_book.xlsx')
-
     sheet_ranges = wb.get_sheet_by_name(name = 'range names')
-
     print sheet_ranges.cell('D18').value # D18
 
 
@@ -64,6 +53,19 @@ Using number formats
     print ws.cell('B1').value # returns 0.031400000000000004
 
     print ws.cell('B1').style.number_format.format_code # returns '0%'
+
+
+Using styles
+------------
+::
+
+    from openpyxl import Workbook
+    from openpyxl.styles import Style
+
+    wb = Workbook()
+    ws = wb.worksheets[0]
+
+    ws.cells('A1').style = Style(font=Font(size=12, bold=True))
 
 
 Inserting an image

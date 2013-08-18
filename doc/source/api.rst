@@ -19,10 +19,30 @@ Module :mod:`openpyxl.reader.iter_worksheet` -- Optimized reader
 .. autoclass:: openpyxl.reader.iter_worksheet.RawCell
     :members:
 
-Module :mod:`openpyxl.style` -- Worksheet Style
+Module :mod:`openpyxl.style` -- Individual Cell Style
 =============================================================
 
-.. autoclass:: openpyxl.cell.Style
+.. note::
+
+    Except :class:`openpyxl.style.Color` all the following styling objects
+    have a sensible default value for all their parameters, you only have to 
+    specify what you really need to define.
+
+.. autoclass:: openpyxl.style.Style
+       :members:
+.. autoclass:: openpyxl.style.Color
+       :members:
+.. autoclass:: openpyxl.style.Font
+       :members:
+.. autoclass:: openpyxl.style.Border
+       :members:
+.. autoclass:: openpyxl.style.Borders
+       :members:
+.. autoclass:: openpyxl.style.Alignment
+       :members:
+.. autoclass:: openpyxl.style.Fill
+       :members:
+.. autoclass:: openpyxl.style.Protection
        :members:
 
 Module :mod:`openpyxl.cell` -- Worksheet Cell
