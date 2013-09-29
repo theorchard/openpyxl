@@ -37,7 +37,7 @@ from openpyxl.tests.helper import (get_xml,
                                    )
 
 from openpyxl.shared.xmltools import Element
-from openpyxl.writer.charts import ChartWriter, LineChartWriter
+from openpyxl.writer.charts import ChartWriter, PieChartWriter, LineChartWriter
 from openpyxl.workbook import Workbook
 from openpyxl.chart import (Chart,
                             BarChart,
@@ -569,12 +569,15 @@ class TestPieChartWriter(object):
         """Setup a worksheet with one column of data and a pie chart"""
         wb = Workbook()
         ws = wb.get_active_sheet()
-        ws.title = 'data'
-        for i in range(10):
-            ws.cell(row=i, column=0).value = i
+        ws.title = 'Pie'
+        for i in range(1, 5):
+            ws.append([i])
         self.piechart = PieChart()
-        self.piechart.add_serie(Serie(Reference(ws, (0, 0), (10, 0))))
-        self.cw = ChartWriter(self.piechart)
+        values = Reference(ws, (0, 0), (9, 0))
+        series = Serie(values, labels=values)
+        self.piechart.add_serie(series)
+        ws.add_chart(self.piechart)
+        self.cw = PieChartWriter(self.piechart)
         self.root = Element('test')
 
     def test_write_chart(self):
@@ -586,6 +589,18 @@ class TestPieChartWriter(object):
             assert_true(tag in chart_tags, tag)
 
         assert_false('c:catAx' in chart_tags)
+        #print(self.cw.write())
+        #eq_(3,4)
+        
+    def test_serialised(self):
+        from openpyxl.tests.helper import DATADIR
+        import os
+        # compare self.cw.write() with piechart.xml
+        xml = self.cw.write()
+        pie = open(os.path.join(DATADIR, 'writer', 'expected', 'piechart.xml'))
+        compare_xml = pie.read()
+        pie.close()
+        assert_equals_string(xml, compare_xml)
 
 
 class TestLineChartWriter(object):
