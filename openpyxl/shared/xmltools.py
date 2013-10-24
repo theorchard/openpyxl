@@ -1,5 +1,3 @@
-# file openpyxl/shared/xmltools.py
-
 # Copyright (c) 2010-2011 openpyxl
 #
 # Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -23,6 +21,36 @@
 # @license: http://www.opensource.org/licenses/mit-license.php
 # @author: see AUTHORS file
 
+# register_namespace function under a different licence:
+# The ElementTree toolkit is
+#
+# Copyright (c) 1999-2008 by Fredrik Lundh
+#
+# By obtaining, using, and/or copying this software and/or its
+# associated documentation, you agree that you have read, understood,
+# and will comply with the following terms and conditions:
+#
+# Permission to use, copy, modify, and distribute this software and
+# its associated documentation for any purpose and without fee is
+# hereby granted, provided that the above copyright notice appears in
+# all copies, and that both that copyright notice and this permission
+# notice appear in supporting documentation, and that the name of
+# Secret Labs AB or the author not be used in advertising or publicity
+# pertaining to distribution of the software without specific, written
+# prior permission.
+#
+# SECRET LABS AB AND THE AUTHOR DISCLAIMS ALL WARRANTIES WITH REGARD
+# TO THIS SOFTWARE, INCLUDING ALL IMPLIED WARRANTIES OF MERCHANT-
+# ABILITY AND FITNESS.  IN NO EVENT SHALL SECRET LABS AB OR THE AUTHOR
+# BE LIABLE FOR ANY SPECIAL, INDIRECT OR CONSEQUENTIAL DAMAGES OR ANY
+# DAMAGES WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR PROFITS,
+# WHETHER IN AN ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS
+# ACTION, ARISING OUT OF OR IN CONNECTION WITH THE USE OR PERFORMANCE
+# OF THIS SOFTWARE.
+# --------------------------------------------------------------------
+# Licensed to PSF under a Contributor Agreement.
+# See http://www.python.org/psf/license for licensing details.
+
 """Shared xml tools.
 
 Shortcut functions taken from:
@@ -31,18 +59,17 @@ Shortcut functions taken from:
 """
 
 # Python stdlib imports
-from xml.sax.xmlreader import AttributesNSImpl
-from openpyxl.shared.compat.sax import XMLGenerator
-from openpyxl.shared.compat import OrderedDict
-try:
-    from xml.etree.ElementTree import ElementTree, Element, SubElement, \
-            QName, fromstring, tostring, register_namespace
-except ImportError:
-    from cElementTree import ElementTree, Element, SubElement, \
-            QName, fromstring, tostring, register_namespace
-
-# package imports
 from openpyxl import __name__ as prefix
+from openpyxl.shared.compat import OrderedDict
+from xml.sax.saxutils import XMLGenerator
+from xml.sax.xmlreader import AttributesNSImpl
+from xml.etree.ElementTree import (ElementTree, Element, SubElement, QName,
+                                       fromstring, tostring)
+
+try:
+    from xml.etree.ElementTree import register_namespace
+except:
+    from openpyxl.shared.compat.elementtree import register_namespace
 
 
 def get_document_content(xml_node):
