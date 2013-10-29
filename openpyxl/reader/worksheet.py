@@ -239,5 +239,5 @@ def read_worksheet(xml_source, parent, preset_title, string_table,
         ws = Worksheet(parent, preset_title)
         fast_parse(ws, xml_source, string_table, style_table)
     if keep_vba:
-    	ws.xml_source = xml_source
+        ws.xml_source = xml_source
     return ws
