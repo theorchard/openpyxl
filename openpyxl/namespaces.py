@@ -1,4 +1,5 @@
-# Copyright (c) 2010-2011 openpyxl
+# coding=UTF-8
+# Copyright (c) 2010-2013 openpyxl
 #
 # Permission is hereby granted, free of charge, to any person obtaining a copy
 # of this software and associated documentation files (the "Software"), to deal
@@ -21,16 +22,8 @@
 # @license: http://www.opensource.org/licenses/mit-license.php
 # @author: see AUTHORS file
 
-import tempfile
-import os
+# Namespace constants
 
-def NamedTemporaryFile(mode, suffix, prefix, delete=False):
-
-    try:
-        return tempfile.NamedTemporaryFile(mode=mode, suffix=suffix, prefix=prefix, delete=delete)
-    except TypeError:
-        handle, filename = tempfile.mkstemp(suffix=suffix, prefix=prefix)
-        os.close(handle)
-        fobj = open(filename, mode)
-
-        return fobj
+CHART_NS = {'xmlns:c':"http://schemas.openxmlformats.org/drawingml/2006/chart"}
+A_NS = {'xmlns:a':"http://schemas.openxmlformats.org/drawingml/2006/main"}
+REL_NS = {'xmlns:r':"http://schemas.openxmlformats.org/officeDocument/2006/relationships"}

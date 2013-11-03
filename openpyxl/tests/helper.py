@@ -1,7 +1,7 @@
 # file openpyxl/tests/helper.py
 
 # Copyright (c) 2010-2011 openpyxl
-# 
+#
 # Permission is hereby granted, free of charge, to any person obtaining a copy
 # of this software and associated documentation files (the "Software"), to deal
 # in the Software without restriction, including without limitation the rights
@@ -25,6 +25,7 @@
 
 # Python stdlib imports
 import os
+import sys
 import os.path
 import shutil
 import difflib
@@ -33,7 +34,7 @@ from tempfile import gettempdir
 from sys import version_info
 
 # package imports
-from openpyxl.shared.compat import BytesIO, unicode
+from openpyxl.shared.compat import BytesIO, unicode, StringIO
 from openpyxl.shared.xmltools import fromstring, ElementTree
 from openpyxl.shared.xmltools import pretty_indent
 
@@ -88,7 +89,7 @@ def assert_equals_file_content(reference_file, fixture, filetype = 'xml'):
     expected_lines = unicode(expected_content).split('\n')
     differences = list(difflib.unified_diff(expected_lines, fixture_lines))
     if differences:
-        temp = BytesIO()
+        temp = StringIO()
         pprint(differences, stream = temp)
         assert False, 'Differences found : %s' % temp.getvalue()
 
@@ -96,7 +97,7 @@ def get_xml(xml_node):
 
     io = BytesIO()
     if version_info[0] >= 3 and version_info[1] >= 2:
-        ElementTree(xml_node).write(io, encoding='UTF-8', xml_declaration=True)
+        ElementTree(xml_node).write(io, encoding='UTF-8', xml_declaration=False)
         ret = str(io.getvalue(), 'utf-8')
         ret = ret.replace('utf-8', 'UTF-8', 1)
     else:
@@ -104,3 +105,26 @@ def get_xml(xml_node):
         ret = io.getvalue()
     io.close()
     return ret.replace('\n', '')
+
+from lxml.doctestcompare import LXMLOutputChecker, PARSE_XML
+
+def compare_xml(generated, expected):
+    """Use doctest checking from lxml for comparing XML trees. Returns diff if the two are not the same"""
+    checker = LXMLOutputChecker()
+
+    class DummyDocTest():
+        pass
+
+    ob = DummyDocTest()
+    ob.want = generated
+
+    check = checker.check_output(generated, expected, PARSE_XML)
+    if check is False:
+        diff = checker.output_difference(ob, expected, PARSE_XML)
+        return diff
+
+def safe_iterator(node):
+    """Return an iterator that is compatible with Python 2.6"""
+    if sys.version_info < (2, 7):
+        return node.getiterator()
+    return node.iter()
