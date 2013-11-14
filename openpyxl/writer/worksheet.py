@@ -53,6 +53,7 @@ from openpyxl.shared.ooxml import (
     REL_NS
 )
 from openpyxl.shared.compat.itertools import iteritems, iterkeys
+from openpyxl.worksheet import ConditionalFormatting
 
 
 def row_sort(cell):
@@ -91,13 +92,56 @@ def write_worksheet(worksheet, string_table, style_table):
     tag(doc, 'dimension', {'ref': '%s' % worksheet.calculate_dimension()})
     write_worksheet_sheetviews(doc, worksheet)
     tag(doc, 'sheetFormatPr', {'defaultRowHeight': '15'})
-    write_worksheet_cols(doc, worksheet)
+    write_worksheet_cols(doc, worksheet, style_table)
     write_worksheet_data(doc, worksheet, string_table, style_table)
     if worksheet.auto_filter:
         tag(doc, 'autoFilter', {'ref': worksheet.auto_filter})
     write_worksheet_mergecells(doc, worksheet)
     write_worksheet_datavalidations(doc, worksheet)
     write_worksheet_hyperlinks(doc, worksheet)
+
+    for range_string, rules in worksheet.conditional_formatting.cf_rules.iteritems():
+        if not len(rules):
+            # Skip if there are no rules.  This is possible if a dataBar rule was read in and ignored.
+            continue
+        start_tag(doc, 'conditionalFormatting', {'sqref': range_string})
+        for rule in rules:
+            if rule['type'] == 'dataBar':
+                # Ignore - uses extLst tag which is currently unsupported.
+                continue
+            attr = {'type': rule['type']}
+            for rule_attr in ConditionalFormatting.rule_attributes:
+                if rule_attr in rule:
+                    attr[rule_attr] = str(rule[rule_attr])
+            start_tag(doc, 'cfRule', attr)
+            if 'formula' in rule:
+                for f in rule['formula']:
+                    tag(doc, 'formula', None, f)
+            if 'colorScale' in rule:
+                start_tag(doc, 'colorScale')
+                for cfvo in rule['colorScale']['cfvo']:
+                    tag(doc, 'cfvo', cfvo)
+                for color in rule['colorScale']['color']:
+                    if str(color.index).split(':')[0] == 'theme':  # strip prefix theme if marked as such
+                        if str(color.index).split(':')[2]:
+                            tag(doc, 'color', {'theme': str(color.index).split(':')[1],
+                                               'tint': str(color.index).split(':')[2]})
+                        else:
+                            tag(doc, 'color', {'theme': str(color.index).split(':')[1]})
+                    else:
+                        tag(doc, 'color', {'rgb': str(color.index)})
+                end_tag(doc, 'colorScale')
+            if 'iconSet' in rule:
+                iconAttr = {}
+                for icon_attr in ConditionalFormatting.icon_attributes:
+                    if icon_attr in rule['iconSet']:
+                        iconAttr[icon_attr] = rule['iconSet'][icon_attr]
+                start_tag(doc, 'iconSet', iconAttr)
+                for cfvo in rule['iconSet']['cfvo']:
+                    tag(doc, 'cfvo', cfvo)
+                end_tag(doc, 'iconSet')
+            end_tag(doc, 'cfRule')
+        end_tag(doc, 'conditionalFormatting')
 
     options = worksheet.page_setup.options
     if options:
@@ -137,9 +181,6 @@ def write_worksheet(worksheet, string_table, style_table):
         for b in breaks:
             tag(doc, 'brk', {'id': str(b), 'man': 'true', 'max': '16383', 'min': '0'})
         end_tag(doc, 'rowBreaks')
-
-
-
 
     end_tag(doc, 'worksheet')
     doc.endDocument()
@@ -181,19 +222,16 @@ def write_worksheet_sheetviews(doc, worksheet):
     end_tag(doc, 'sheetViews')
 
 
-def write_worksheet_cols(doc, worksheet):
+def write_worksheet_cols(doc, worksheet, style_table):
     """Write worksheet columns to xml."""
     if worksheet.column_dimensions:
         start_tag(doc, 'cols')
         for column_string, columndimension in \
                 iteritems(worksheet.column_dimensions):
             col_index = column_index_from_string(column_string)
-            col_def = {}
-            col_def['min'] = str(col_index)
-            col_def['max'] = str(col_index)
-            if columndimension.width != \
-                    worksheet.default_column_dimension.width:
-                col_def['customWidth'] = 'true'
+            col_def = {'min': str(col_index), 'max': str(col_index)}
+            if columndimension.width != -1:
+                col_def['customWidth'] = '1'
             if not columndimension.visible:
                 col_def['hidden'] = 'true'
             if columndimension.outline_level > 0:
@@ -203,7 +241,7 @@ def write_worksheet_cols(doc, worksheet):
             if columndimension.auto_size:
                 col_def['bestFit'] = 'true'
             if columndimension.style_index:
-                col_def['style'] = str(columndimension.style_index)
+                col_def['style'] = str(style_table[hash(columndimension.style_index)])
             if columndimension.width > 0:
                 col_def['width'] = str(columndimension.width)
             else:
@@ -252,7 +290,15 @@ def write_worksheet_data(doc, worksheet, string_table, style_table):
                 if cell.data_type == cell.TYPE_STRING:
                     tag(doc, 'v', body='%s' % string_table[value])
                 elif cell.data_type == cell.TYPE_FORMULA:
-                    tag(doc, 'f', body='%s' % value[1:])
+                    if coordinate in worksheet.formula_attributes:
+                        attr = worksheet.formula_attributes[coordinate]
+                        if 't' in attr and attr['t'] == 'shared' and 'ref' not in attr:
+                            # Don't write body for shared formula
+                            tag(doc, 'f', attr=attr)
+                        else:
+                            tag(doc, 'f', attr=attr, body='%s' % value[1:])
+                    else:
+                        tag(doc, 'f', body='%s' % value[1:])
                     tag(doc, 'v')
                 elif cell.data_type == cell.TYPE_NUMERIC:
                     if isinstance(value, (long, decimal.Decimal)):

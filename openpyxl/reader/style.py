@@ -27,24 +27,24 @@
 
 # package imports
 from openpyxl.shared.xmltools import fromstring
-from openpyxl.shared.ooxml import SHEET_MAIN_NS
 from openpyxl.shared.exc import MissingNumberFormat
-from openpyxl.style import Style, NumberFormat, Font, Fill, Borders, Protection
+from openpyxl.style import Style, NumberFormat, Font, Fill, Borders, Protection, Color
+from openpyxl.shared.ooxml import SHEET_MAIN_NS
 from copy import deepcopy
-
 
 def read_style_table(xml_source):
     """Read styles from the shared style table"""
-    table = {}
+    style_prop = {'table': {}}
     root = fromstring(xml_source)
     custom_num_formats = parse_custom_num_formats(root)
-    color_index = parse_color_index(root)
-    font_list = parse_fonts(root, color_index)
-    fill_list = parse_fills(root, color_index)
-    border_list = parse_borders(root, color_index)
+    style_prop['color_index'] = parse_color_index(root)
+    font_list = parse_fonts(root, style_prop['color_index'])
+    fill_list = parse_fills(root, style_prop['color_index'])
+    border_list = parse_borders(root, style_prop['color_index'])
+    style_prop['dxf_list'] = parse_dxfs(root, style_prop['color_index'])
     builtin_formats = NumberFormat._BUILTIN_FORMATS
     cell_xfs = root.find('{%s}cellXfs' % SHEET_MAIN_NS)
-    if cell_xfs is not None: # can happen on bad OOXML writers (e.g. Gnumeric)
+    if cell_xfs is not None:  # can happen on bad OOXML writers (e.g. Gnumeric)
         cell_xfs_nodes = cell_xfs.findall('{%s}xf' % SHEET_MAIN_NS)
         for index, cell_xfs_node in enumerate(cell_xfs_nodes):
             new_style = Style(static=True)
@@ -114,8 +114,8 @@ def read_style_table(xml_source):
                         else:
                             new_style.protection.hidden = Protection.PROTECTION_UNPROTECTED
 
-            table[index] = new_style
-    return table
+            style_prop['table'][index] = new_style
+    return style_prop
 
 def parse_custom_num_formats(root):
     """Read in custom numeric formatting rules from the shared style table"""
@@ -135,7 +135,7 @@ def parse_color_index(root):
     if colors is not None:
         indexedColors = colors.find('{%s}indexedColors' % SHEET_MAIN_NS)
         if indexedColors is not None:
-            color_nodes = indexedColors.findall('{%s}rgbColor')
+            color_nodes = indexedColors.findall('{%s}rgbColor' % SHEET_MAIN_NS)
             for color_node in color_nodes:
                 color_index.append(color_node.get('rgb'))
     if not color_index:
@@ -148,6 +148,41 @@ def parse_color_index(root):
                        'FF3366FF', 'FF33CCCC', 'FF99CC00', 'FFFFCC00', 'FFFF9900', 'FFFF6600', 'FF666699', 'FF969696',
                        'FF003366', 'FF339966', 'FF003300', 'FF333300', 'FF993300', 'FF993366', 'FF333399', 'FF333333']
     return color_index
+
+def parse_dxfs(root, color_index):
+    """Read in the dxfs effects - used by conditional formatting."""
+    dxf_list = []
+    dxfs = root.find('{%s}dxfs' % SHEET_MAIN_NS)
+    if dxfs is not None:
+        nodes = dxfs.findall('{%s}dxf' % SHEET_MAIN_NS)
+        for dxf in nodes:
+            dxf_item = {}
+            font_node = dxf.find('{%s}font' % SHEET_MAIN_NS)
+            if font_node is not None:
+                dxf_item['font'] = {}
+                dxf_item['font']['bold'] = True if len(font_node.findall('{%s}b' % SHEET_MAIN_NS)) else False
+                dxf_item['font']['italic'] = True if len(font_node.findall('{%s}i' % SHEET_MAIN_NS)) else False
+                if len(font_node.findall('{%s}u' % SHEET_MAIN_NS)):
+                    underline = font_node.find('{%s}u' % SHEET_MAIN_NS).get('val')
+                    dxf_item['font']['underline'] = underline if underline else 'single'
+                color = font_node.find('{%s}color' % SHEET_MAIN_NS)
+                if color is not None:
+                    dxf_item['font']['color'] = Color(Color.BLACK)
+                    if color.get('indexed') is not None and 0 <= int(color.get('indexed')) < len(color_index):
+                        dxf_item['font']['color'].index = color_index[int(color.get('indexed'))]
+                    elif color.get('theme') is not None:
+                        if color.get('tint') is not None:
+                            dxf_item['font']['color'] .index = 'theme:%s:%s' % (color.get('theme'), color.get('tint'))
+                        else:
+                            dxf_item['font']['color'] .index = 'theme:%s:' % color.get('theme') # prefix color with theme
+                    elif color.get('rgb'):
+                        dxf_item['font']['color'] .index = color.get('rgb')
+            fill_node = dxf.find('{%s}fill' % SHEET_MAIN_NS)
+            if fill_node is not None:
+                dxf_item['fill'] = parse_fills(dxf, color_index, True)
+                dxf_item['border'] = parse_borders(dxf, color_index, True)
+            dxf_list.append(dxf_item)
+    return dxf_list
 
 def parse_fonts(root, color_index):
     """Read in the fonts"""
@@ -178,10 +213,13 @@ def parse_fonts(root, color_index):
             font_list.append(font)
     return font_list
 
-def parse_fills(root, color_index):
+def parse_fills(root, color_index, skip_find=False):
     """Read in the list of fills"""
     fill_list = []
-    fills = root.find('{%s}fills' % SHEET_MAIN_NS)
+    if skip_find:
+        fills = root
+    else:
+        fills = root.find('{%s}fills' % SHEET_MAIN_NS)
     count = 0
     if fills is not None:
         fillNodes = fills.findall('{%s}fill' % SHEET_MAIN_NS)
@@ -225,10 +263,13 @@ def parse_fills(root, color_index):
                 fill_list.append(newFill)
     return fill_list
 
-def parse_borders(root, color_index):
+def parse_borders(root, color_index, skip_find=False):
     """Read in the boarders"""
     border_list = []
-    borders = root.find('{%s}borders' % SHEET_MAIN_NS)
+    if skip_find:
+        borders = root
+    else:
+        borders = root.find('{%s}borders' % SHEET_MAIN_NS)
     if borders is not None:
         boarderNodes = borders.findall('{%s}border' % SHEET_MAIN_NS)
         count = 0
