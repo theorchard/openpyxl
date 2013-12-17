@@ -32,10 +32,26 @@ from openpyxl.shared.xmltools import Element, SubElement
 from openpyxl.cell import absolute_coordinate
 from openpyxl.shared.xmltools import get_document_content
 from openpyxl.shared.ooxml import (
-    ARC_CORE, ARC_WORKBOOK, ARC_APP, ARC_THEME, ARC_STYLE, ARC_SHARED_STRINGS,
+    ARC_CORE,
+    ARC_WORKBOOK,
+    ARC_APP,
+    ARC_THEME,
+    ARC_STYLE,
+    ARC_SHARED_STRINGS,
     ARC_CONTENT_TYPES,
-    COREPROPS_NS, VTYPES_NS, XPROPS_NS, DCORE_NS, DCTERMS_NS, DCTERMS_PREFIX,
-    XSI_NS, XML_NS, SHEET_MAIN_NS, CONTYPES_NS, PKG_REL_NS, REL_NS)
+    COREPROPS_NS,
+    VTYPES_NS,
+    XPROPS_NS,
+    DCORE_NS,
+    DCTERMS_NS,
+    DCTERMS_PREFIX,
+    XSI_NS,
+    XML_NS,
+    SHEET_MAIN_NS,
+    CONTYPES_NS,
+    PKG_REL_NS,
+    REL_NS
+)
 from openpyxl.shared.xmltools import get_document_content, fromstring
 from openpyxl.shared.date_time import datetime_to_W3CDTF
 from openpyxl.namedrange import NamedRange, NamedRangeContainingValue
@@ -178,7 +194,7 @@ def write_root_rels(workbook):
 
 def write_workbook(workbook):
     """Write the core workbook xml."""
-    root = Element('{%s}workbook' % SHEET_MAIN_NS, {'{%s}space' % XML_NS: 'preserve'})
+    root = Element('{%s}workbook' % SHEET_MAIN_NS)
     SubElement(root, '{%s}fileVersion' % SHEET_MAIN_NS,
                {'appName': 'xl', 'lastEdited': '4', 'lowestEdited': '4', 'rupBuild': '4505'})
     SubElement(root, '{%s}workbookPr' % SHEET_MAIN_NS,

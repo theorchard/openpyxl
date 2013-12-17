@@ -22,7 +22,7 @@
 # @license: http://www.opensource.org/licenses/mit-license.php
 # @author: see AUTHORS file
 
-
+from openpyxl.shared.compat import iteritems
 from openpyxl.shared.ooxml import COMMENTS_NS, REL_NS, PKG_REL_NS, SHEET_MAIN_NS
 from openpyxl.shared.xmltools import Element, SubElement, get_document_content
 from openpyxl.cell import column_index_from_string
@@ -37,7 +37,7 @@ class CommentWriter(object):
 
         # get list of comments
         self.comments = []
-        for coord, cell in sheet._cells.iteritems():
+        for coord, cell in iteritems(sheet._cells):
             if cell.comment is not None:
                 self.comments.append(cell.comment)
 
@@ -77,9 +77,9 @@ class CommentWriter(object):
         shape_layout = SubElement(root, "{%s}shapelayout" % officens, {"{%s}ext" % vmlns: "edit"})
         SubElement(shape_layout, "{%s}idmap" % officens, {"{%s}ext" % vmlns: "edit", "data": "1"})
         shape_type=SubElement(root, "{%s}shapetype" % vmlns, {"id": "_x0000_t202",
-                                                               "coordsize": "21600,21600",
-                                                               "{%s}spt" % officens: "202",
-                                                               "path": "m,l,21600r21600,l21600,xe"})
+                                                              "coordsize": "21600,21600",
+                                                              "{%s}spt" % officens: "202",
+                                                              "path": "m,l,21600r21600,l21600,xe"})
         SubElement(shape_type, "{%s}stroke" % vmlns, {"joinstyle": "miter"})
         SubElement(shape_type, "{%s}path" % vmlns, {"gradientshapeok": "t",
                                                     "{%s}connecttype" % officens: "rect"})
@@ -90,8 +90,8 @@ class CommentWriter(object):
         return get_document_content(root)
 
     def _write_comment_shape(self, root, comment, idx):
-    	# get zero-indexed coordinates of the comment
-    	row = comment._parent.row - 1
+        # get zero-indexed coordinates of the comment
+        row = comment._parent.row - 1
         column = column_index_from_string(comment._parent.column) - 1
 
         attrs = {

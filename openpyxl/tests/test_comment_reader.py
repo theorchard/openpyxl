@@ -38,14 +38,14 @@ from openpyxl.shared.xmltools import fromstring
 from openpyxl.tests.helper import DATADIR
 
 def test_get_author_list():
-    xml = """<?xml version="1.0" encoding="UTF-8" standalone="yes"?><comments
+    xml = """<?xml version="1.0" standalone="yes"?><comments
     xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main"><authors>
     <author>Cuke</author><author>Not Cuke</author></authors><commentList>
     </commentList></comments>"""
     assert comments._get_author_list(fromstring(xml)) == ['Cuke', 'Not Cuke']
 
 def test_read_comments():
-    xml = """<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+    xml = """<?xml version="1.0" standalone="yes"?>
     <comments xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main"><authors>
     <author>Cuke</author><author>Not Cuke</author></authors><commentList><comment ref="A1"
     authorId="0" shapeId="0"><text><r><rPr><b/><sz val="9"/><color indexed="81"/><rFont

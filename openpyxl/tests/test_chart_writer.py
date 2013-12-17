@@ -17,23 +17,23 @@ from .helper import get_xml, DATADIR, compare_xml
 from .schema import chart_schema
 
 @pytest.fixture
-def bar_chart(ten_row_sheet, BarChart, Serie, Reference):
+def bar_chart(ten_row_sheet, BarChart, Series, Reference):
     ws = ten_row_sheet
     chart = BarChart()
     chart.title = "TITLE"
-    series = Serie(Reference(ws, (0, 0), (10, 0)))
+    series = Series(Reference(ws, (0, 0), (10, 0)))
     series.color = Color.GREEN
     chart.add_serie(series)
     return chart
 
 
-def test_write_serial(ten_row_sheet, LineChart, Serie, Reference, root_xml):
+def test_write_serial(ten_row_sheet, LineChart, Series, Reference, root_xml):
     ws = ten_row_sheet
     chart = LineChart()
     for idx, l in enumerate("ABCDEF"):
         ws.cell(row=idx, column=0).value = l
     ref = Reference(ws, (0, 0), (9, 0))
-    series = Serie(ref)
+    series = Series(ref)
     chart.add_serie(series)
     cw = BaseChartWriter(chart)
     cw._write_serial(cw.root, ref)
@@ -128,43 +128,43 @@ class TestChartWriter(object):
         diff = compare_xml(xml, expected)
         assert diff is None, diff
 
-    def test_write_no_ascii(self, ten_row_sheet, Serie, BarChart, Reference):
+    def test_write_no_ascii(self, ten_row_sheet, Series, BarChart, Reference):
         ws = ten_row_sheet
         ws.append(["D\xc3\xbcsseldorf"]*10)
-        serie = Serie(values=Reference(ws, (0,0), (0,9)),
-                      legend=Reference(ws, (1,0), (1,9))
+        serie = Series(values=Reference(ws, (0,0), (0,9)),
+                      title=(ws.cell(row=1, column=0).value)
                       )
         c = BarChart()
         c.add_serie(serie)
         cw = ChartWriter(c)
 
-    def test_label_no_number_format(self, ten_column_sheet, Reference, Serie, BarChart, root_xml):
+    def test_label_no_number_format(self, ten_column_sheet, Reference, Series, BarChart, root_xml):
         ws = ten_column_sheet
         for i in range(10):
             ws.append([i, i])
         labels = Reference(ws, (0,0), (0,9))
         values = Reference(ws, (0,0), (0,9))
-        serie = Serie(values=values, labels=labels)
+        serie = Series(values=values, labels=labels)
         c = BarChart()
         c.add_serie(serie)
         cw = BarChartWriter(c)
-        cw._write_serial(root_xml, c._series[0].labels)
+        cw._write_serial(root_xml, c.series[0].labels)
         expected = """<test xmlns:c="http://schemas.openxmlformats.org/drawingml/2006/chart"><c:numRef><c:f>'data'!$A$1:$J$1</c:f><c:numCache><c:formatCode>General</c:formatCode><c:ptCount val="10" /><c:pt idx="0"><c:v>0</c:v></c:pt><c:pt idx="1"><c:v>1</c:v></c:pt><c:pt idx="2"><c:v>2</c:v></c:pt><c:pt idx="3"><c:v>3</c:v></c:pt><c:pt idx="4"><c:v>4</c:v></c:pt><c:pt idx="5"><c:v>5</c:v></c:pt><c:pt idx="6"><c:v>6</c:v></c:pt><c:pt idx="7"><c:v>7</c:v></c:pt><c:pt idx="8"><c:v>8</c:v></c:pt><c:pt idx="9"><c:v>9</c:v></c:pt></c:numCache></c:numRef></test>"""
         xml = get_xml(root_xml)
         diff = compare_xml(xml, expected)
         assert diff is None, diff
 
-    def test_label_number_format(self, ten_column_sheet, Reference, Serie, BarChart):
+    def test_label_number_format(self, ten_column_sheet, Reference, Series, BarChart):
         ws = ten_column_sheet
         labels = Reference(ws, (0,0), (0,9))
         labels.number_format = 'd-mmm'
         values = Reference(ws, (0,0), (0,9))
-        serie = Serie(values=values, labels=labels)
+        serie = Series(values=values, labels=labels)
         c = BarChart()
         c.add_serie(serie)
         cw = BarChartWriter(c)
         root = Element('test')
-        cw._write_serial(root, c._series[0].labels)
+        cw._write_serial(root, c.series[0].labels)
 
         expected = """<test xmlns:c="http://schemas.openxmlformats.org/drawingml/2006/chart"><c:numRef><c:f>'data'!$A$1:$J$1</c:f><c:numCache><c:formatCode>d-mmm</c:formatCode><c:ptCount val="10" /><c:pt idx="0"><c:v>0</c:v></c:pt><c:pt idx="1"><c:v>1</c:v></c:pt><c:pt idx="2"><c:v>2</c:v></c:pt><c:pt idx="3"><c:v>3</c:v></c:pt><c:pt idx="4"><c:v>4</c:v></c:pt><c:pt idx="5"><c:v>5</c:v></c:pt><c:pt idx="6"><c:v>6</c:v></c:pt><c:pt idx="7"><c:v>7</c:v></c:pt><c:pt idx="8"><c:v>8</c:v></c:pt><c:pt idx="9"><c:v>9</c:v></c:pt></c:numCache></c:numRef></test>"""
 
@@ -173,13 +173,13 @@ class TestChartWriter(object):
         assert diff is None, diff
 
 @pytest.fixture()
-def scatter_chart(ws, ScatterChart, Reference, Serie):
+def scatter_chart(ws, ScatterChart, Reference, Series):
     ws.title = 'Scatter'
     for i in range(10):
         ws.cell(row=i, column=0).value = i
         ws.cell(row=i, column=1).value = i
     chart = ScatterChart()
-    chart.add_serie(Serie(Reference(ws, (0, 0), (10, 0)),
+    chart.add_serie(Series(Reference(ws, (0, 0), (10, 0)),
                                       xvalues=Reference(ws, (0, 1), (10, 1))))
     return chart
 
@@ -251,13 +251,13 @@ class TestScatterChartWriter(object):
 
 
 @pytest.fixture
-def pie_chart(ws, Reference, Serie, PieChart):
+def pie_chart(ws, Reference, Series, PieChart):
     ws.title = 'Pie'
     for i in range(1, 5):
         ws.append([i])
     chart = PieChart()
     values = Reference(ws, (0, 0), (9, 0))
-    series = Serie(values, labels=values)
+    series = Series(values, labels=values)
     chart.add_serie(series)
     return chart
 
@@ -292,12 +292,12 @@ class TestPieChartWriter(object):
 
 
 @pytest.fixture
-def line_chart(ws, Reference, Serie, LineChart):
+def line_chart(ws, Reference, Series, LineChart):
     ws.title = 'Line'
     for i in range(1, 5):
         ws.append([i])
     chart = LineChart()
-    chart.add_serie(Serie(Reference(ws, (0, 0), (4, 0))))
+    chart.add_serie(Series(Reference(ws, (0, 0), (4, 0))))
     return chart
 
 
@@ -329,12 +329,12 @@ class TestLineChartWriter(object):
 
 
 @pytest.fixture
-def bar_chart_2(ws, BarChart, Reference, Serie):
+def bar_chart_2(ws, BarChart, Reference, Series):
     ws.title = 'Numbers'
     for i in range(10):
         ws.append([i])
     chart = BarChart()
-    chart.add_serie(Serie(Reference(ws, (0, 0), (9, 0))))
+    chart.add_serie(Series(Reference(ws, (0, 0), (9, 0))))
     return chart
 
 

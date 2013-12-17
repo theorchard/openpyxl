@@ -35,6 +35,7 @@ from openpyxl.namedrange import NamedRange
 from openpyxl.shared.exc import ReadOnlyWorkbookException
 
 # test imports
+import pytest
 from nose.tools import eq_, with_setup, raises
 from openpyxl.tests.helper import TMPDIR, clean_tmpdir, make_tmpdir
 from openpyxl.tests.schema import validate_archive
@@ -62,10 +63,10 @@ def test_add_correct_sheet():
     wb.add_sheet(new_sheet)
     eq_(new_sheet, wb.worksheets[2])
 
-@raises(AssertionError)
 def test_add_incorrect_sheet():
     wb = Workbook()
-    wb.add_sheet("Test")
+    with pytest.raises(TypeError):
+        wb.add_sheet("Test")
 
 @raises(ReadOnlyWorkbookException)
 def test_create_sheet_readonly():
@@ -88,6 +89,38 @@ def test_get_sheet_by_name():
     new_sheet.title = title
     found_sheet = wb.get_sheet_by_name(title)
     eq_(new_sheet, found_sheet)
+
+
+def test_getitem(Workbook, Worksheet):
+    wb = Workbook()
+    ws = wb['Sheet']
+    assert isinstance(ws, Worksheet)
+    with pytest.raises(KeyError):
+        wb['NotThere']
+
+
+def test_delitem(Workbook):
+    wb = Workbook()
+    del wb['Sheet']
+    assert wb.worksheets == []
+
+
+def test_contains(Workbook):
+    wb = Workbook()
+    assert "Sheet" in wb
+    assert "NotThere" not in wb
+
+def test_iter(Workbook):
+    wb = Workbook()
+    for i, ws in enumerate(wb):
+        pass
+    assert i == 0
+    assert ws.title == "Sheet"
+
+
+def test_get_index():
+    wb = Workbook()
+    new_sheet = wb.create_sheet(0)
 
 
 def test_get_index():
@@ -225,8 +258,8 @@ def test_worksheet_class():
     assert isinstance(wb.worksheets[0], AlternativeWorksheet)
 
 
-@raises(AssertionError)
 def test_add_invalid_worksheet_class_instance():
     wb = Workbook()
     ws = AlternativeWorksheet(parent_workbook=wb)
-    wb.add_sheet(worksheet=ws)
+    with pytest.raises(TypeError):
+        wb.add_sheet(worksheet=ws)

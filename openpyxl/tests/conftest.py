@@ -17,6 +17,14 @@ def Workbook():
     from openpyxl import Workbook
     return Workbook
 
+
+@pytest.fixture
+def Worksheet():
+    """Worksheet Class"""
+    from openpyxl.worksheet import Worksheet
+    return Worksheet
+
+
 # Charts
 
 @pytest.fixture
@@ -76,10 +84,10 @@ def Reference():
 
 
 @pytest.fixture
-def Serie():
+def Series():
     """Serie class"""
-    from openpyxl.chart import Serie
-    return Serie
+    from openpyxl.chart import Series
+    return Series
 
 
 @pytest.fixture
