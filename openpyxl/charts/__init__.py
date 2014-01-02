@@ -20,20 +20,14 @@ from __future__ import absolute_import
 # THE SOFTWARE.
 #
 # @license: http://www.opensource.org/licenses/mit-license.php
-# @author: see AUTHORS file
+# @author: see AUTHORS filefrom __future__ import absolute_import
 
-import pytest
-
-from openpyxl.comments import Comment
-from openpyxl.workbook import Workbook
-from openpyxl.worksheet import Worksheet
-from openpyxl.cell import Cell
-
-def test_init():
-    wb = Workbook()
-    ws = Worksheet(wb)
-    c = Comment("text", "author")
-    ws.cell(coordinate="A1").comment = c
-    assert c._parent == ws.cell(coordinate="A1")
-    assert c.text == "text"
-    assert c.author == "author"
+from .legend import Legend
+from .reference import Reference
+from .series import Series
+from .chart import GraphChart
+from .bar import BarChart
+from .pie import PieChart
+from .line import LineChart
+from .scatter import ScatterChart
+from .error_bar import ErrorBar

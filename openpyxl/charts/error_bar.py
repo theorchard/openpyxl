@@ -22,18 +22,31 @@ from __future__ import absolute_import
 # @license: http://www.opensource.org/licenses/mit-license.php
 # @author: see AUTHORS file
 
-import pytest
+from .reference import Reference
 
-from openpyxl.comments import Comment
-from openpyxl.workbook import Workbook
-from openpyxl.worksheet import Worksheet
-from openpyxl.cell import Cell
 
-def test_init():
-    wb = Workbook()
-    ws = Worksheet(wb)
-    c = Comment("text", "author")
-    ws.cell(coordinate="A1").comment = c
-    assert c._parent == ws.cell(coordinate="A1")
-    assert c.text == "text"
-    assert c.author == "author"
+class ErrorBar(object):
+
+    PLUS = 1
+    MINUS = 2
+    PLUS_MINUS = 3
+
+    def __init__(self, _type, values):
+
+        self.type = _type
+        self.values = values
+
+    @property
+    def values(self):
+        """Return values from underlying reference"""
+        return self._values
+
+    @values.setter
+    def values(self, reference):
+        """Assign values from reference to serie"""
+        if reference is not None:
+            if not isinstance(reference, Reference):
+                raise TypeError("Errorbar values must be a Reference instance")
+            self._values = reference.values
+        else:
+            self._values = None
