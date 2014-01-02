@@ -22,18 +22,10 @@ from __future__ import absolute_import
 # @license: http://www.opensource.org/licenses/mit-license.php
 # @author: see AUTHORS file
 
-import pytest
 
-from openpyxl.comments import Comment
-from openpyxl.workbook import Workbook
-from openpyxl.worksheet import Worksheet
-from openpyxl.cell import Cell
+class Legend(object):
 
-def test_init():
-    wb = Workbook()
-    ws = Worksheet(wb)
-    c = Comment("text", "author")
-    ws.cell(coordinate="A1").comment = c
-    assert c._parent == ws.cell(coordinate="A1")
-    assert c.text == "text"
-    assert c.author == "author"
+    def __init__(self):
+
+        self.position = 'r'
+        self.layout = None
