@@ -377,7 +377,7 @@ class TestScatterChart(object):
 
 
 from openpyxl.charts.surface import SurfaceChart3D
-class TestSurface3DCharttWriter(object):
+class TestSurfaceChart3DWriter(object):
 
     def setUp(self):
 
