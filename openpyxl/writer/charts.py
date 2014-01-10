@@ -296,6 +296,27 @@ class LineChartWriter(BaseChartWriter):
         SubElement(subchart, '{%s}grouping' % CHART_NS, {'val':self.chart.GROUPING})
 
 
+class SurfaceChartWriter(BarChartWriter):
+
+    def _write_options(self, subchart):
+        """
+        subchart = SubElement(plot_area, 'c:surface3DChart')
+        """
+        pass
+
+
+    def _write_axis(self, plot_area, axis, label):
+        """
+        if chart.type <> Chart.SURFACE_3D_CHART:
+            SubElement(subchart, 'c:marker', {'val':'1'})
+        SubElement(subchart, 'c:axId', {'val':str(chart.x_axis.id)})
+        SubElement(subchart, 'c:axId', {'val':str(chart.y_axis.id)})
+        if chart.type == Chart.SURFACE_3D_CHART:
+            SubElement(subchart, 'c:axId', {'val':str(chart.z_axis.id)})
+        """
+        pass
+
+
 class BarChartWriter(LineChartWriter):
 
     def _write_options(self, subchart):
