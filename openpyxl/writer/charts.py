@@ -296,7 +296,7 @@ class LineChartWriter(BaseChartWriter):
         SubElement(subchart, '{%s}grouping' % CHART_NS, {'val':self.chart.GROUPING})
 
 
-class SurfaceChartWriter(BarChartWriter):
+class SurfaceChartWriter(LineChartWriter):
 
     def _write_options(self, subchart):
         """
