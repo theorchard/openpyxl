@@ -403,7 +403,7 @@ class TestSurface3DCharttWriter(object):
 
         self.cw._write_axis(self.root, self.chart.x_axis, 'c:catAx')
         xml = get_xml(self.root)
-        expected '<?xml version=\'1.0\' encoding=\'UTF-8\'?><test><c:catAx><c:axId val="60871424" /><c:scaling><c:orientation val="minMax" /></c:scaling><c:axPos val="b" /><c:tickLblPos val="nextTo" /><c:crossAx val="60873344" /><c:crosses val="autoZero" /><c:auto val="1" /><c:lblAlgn val="ctr" /><c:lblOffset val="100" /></c:catAx></test>'
+        expected = '<?xml version=\'1.0\' encoding=\'UTF-8\'?><test><c:catAx><c:axId val="60871424" /><c:scaling><c:orientation val="minMax" /></c:scaling><c:axPos val="b" /><c:tickLblPos val="nextTo" /><c:crossAx val="60873344" /><c:crosses val="autoZero" /><c:auto val="1" /><c:lblAlgn val="ctr" /><c:lblOffset val="100" /></c:catAx></test>'
         assert xml == expected
 
     def test_write_yaxis(self):
