@@ -1,4 +1,5 @@
-# Copyright (c) 2010-2011 openpyxl
+from __future__ import absolute_import
+# Copyright (c) 2010-2014 openpyxl
 #
 # Permission is hereby granted, free of charge, to any person obtaining a copy
 # of this software and associated documentation files (the "Software"), to deal
@@ -61,17 +62,58 @@ Shortcut functions taken from:
 # Python stdlib imports
 from xml.sax.saxutils import XMLGenerator
 from xml.sax.xmlreader import AttributesNSImpl
-from xml.etree.ElementTree import (ElementTree, Element, SubElement, QName,
-                                       fromstring, tostring)
+
 
 # compatibility
 from openpyxl.shared.compat import OrderedDict
-from openpyxl.shared.compat import register_namespace
 
 # package imports
+from openpyxl import LXML
+
+#LXML = False
+if LXML is True:
+    from lxml.etree import (
+    Element,
+    ElementTree,
+    SubElement,
+    QName,
+    fromstring,
+    tostring,
+    register_namespace,
+    )
+else:
+    from openpyxl.shared.compat import register_namespace
+    try:
+        from xml.etree.cElementTree import (
+        ElementTree,
+        Element,
+        SubElement,
+        QName,
+        fromstring,
+        tostring
+        )
+    except ImportError:
+        from xml.etree.ElementTree import (
+        ElementTree,
+        Element,
+        SubElement,
+        QName,
+        fromstring,
+        tostring
+        )
+
 from openpyxl.shared.ooxml import (
-    CHART_NS, DRAWING_NS, SHEET_MAIN_NS, REL_NS, VTYPES_NS,
-    COREPROPS_NS, DCTERMS_NS, DCTERMS_PREFIX)
+    CHART_NS,
+    DRAWING_NS,
+    SHEET_DRAWING_NS,
+    CHART_DRAWING_NS,
+    SHEET_MAIN_NS,
+    REL_NS,
+    VTYPES_NS,
+    COREPROPS_NS,
+    DCTERMS_NS,
+    DCTERMS_PREFIX
+)
 from openpyxl import __name__ as prefix
 
 
@@ -83,12 +125,13 @@ register_namespace('a', DRAWING_NS)
 register_namespace('s', SHEET_MAIN_NS)
 register_namespace('r', REL_NS)
 register_namespace('vt', VTYPES_NS)
-
+register_namespace('xdr', SHEET_DRAWING_NS)
+register_namespace('cdr', CHART_DRAWING_NS)
 
 def get_document_content(xml_node):
     """Print nicely formatted xml to a string."""
     pretty_indent(xml_node)
-    return tostring(xml_node, 'utf-8')
+    return tostring(xml_node, encoding='utf-8')
 
 
 def pretty_indent(elem, level=0):
@@ -141,3 +184,11 @@ def tag(doc, name, attr=None, body=None, namespace=None):
         attr = {}
     start_tag(doc, name, attr, body, namespace)
     end_tag(doc, name, namespace)
+
+
+def safe_iterator(node, tag=None):
+    """Return an iterator that is compatible with Python 2.6"""
+    if hasattr(node, "iter"):
+        return node.iter(tag)
+    else:
+        return node.getiterator(tag)

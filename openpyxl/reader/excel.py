@@ -1,6 +1,5 @@
-# file openpyxl/reader/excel.py
-
-# Copyright (c) 2010-2011 openpyxl
+from __future__ import absolute_import
+# Copyright (c) 2010-2014 openpyxl
 #
 # Permission is hereby granted, free of charge, to any person obtaining a copy
 # of this software and associated documentation files (the "Software"), to deal
@@ -31,29 +30,30 @@ from sys import exc_info
 import warnings
 
 # compatibility imports
-
-from openpyxl.shared.compat import file
+from openpyxl.shared.compat import unicode, file, StringIO
 
 # package imports
 from openpyxl.shared.exc import OpenModeError, InvalidFileException
-from openpyxl.shared.ooxml import (ARC_SHARED_STRINGS, ARC_CORE, ARC_WORKBOOK,
-                                   PACKAGE_WORKSHEETS, ARC_STYLE, ARC_THEME,
-                                   ARC_CONTENT_TYPES)
-from openpyxl.shared.compat import unicode, file, BytesIO, StringIO
+from openpyxl.shared.ooxml import (
+    ARC_SHARED_STRINGS,
+    ARC_CORE,
+    ARC_WORKBOOK,
+    ARC_STYLE,
+    ARC_THEME,
+    PACKAGE_XL,
+)
 from openpyxl.workbook import Workbook, DocumentProperties
 from openpyxl.reader.strings import read_string_table
 from openpyxl.reader.style import read_style_table
-from openpyxl.reader.workbook import (read_sheets_titles, read_named_ranges,
-        read_properties_core, read_excel_base_date, get_sheet_ids,
-        read_content_types)
+from openpyxl.reader.workbook import (
+    read_named_ranges,
+    read_properties_core,
+    read_excel_base_date,
+    detect_worksheets
+)
 from openpyxl.reader.worksheet import read_worksheet
-from openpyxl.reader.iter_worksheet import unpack_worksheet
+from openpyxl.reader.comments import read_comments, get_comments_file
 # Use exc_info for Python 2 compatibility with "except Exception[,/ as] e"
-
-
-VALID_WORKSHEET = "application/vnd.openxmlformats-officedocument.spreadsheetml.worksheet+xml"
-VALID_CHARTSHEET = "application/vnd.openxmlformats-officedocument.spreadsheetml.chartsheet+xml"
-WORK_OR_CHART_TYPE = [VALID_WORKSHEET, VALID_CHARTSHEET]
 
 
 CENTRAL_DIRECTORY_SIGNATURE = '\x50\x4b\x05\x06'
@@ -79,7 +79,7 @@ def repair_central_directory(zipFile, is_file_instance):
     return f
 
 
-def load_workbook(filename, use_iterators=False, keep_vba=False, guess_types=True):
+def load_workbook(filename, use_iterators=False, keep_vba=False, guess_types=True, data_only=False):
     """Open the given filename and return the workbook
 
     :param filename: the path to open or a file-like object
@@ -123,7 +123,7 @@ def load_workbook(filename, use_iterators=False, keep_vba=False, guess_types=Tru
     except (BadZipfile, RuntimeError, IOError, ValueError):
         e = exc_info()[1]
         raise InvalidFileException(unicode(e))
-    wb = Workbook(guess_types=guess_types)
+    wb = Workbook(guess_types=guess_types, data_only=data_only)
 
     if use_iterators:
         wb._set_optimized_read()
@@ -168,29 +168,36 @@ def _load_workbook(wb, archive, filename, use_iterators, keep_vba):
     except KeyError:
         assert wb.loaded_theme == None, "even though the theme information is missing there is a theme object ?"
 
-    style_table = read_style_table(archive.read(ARC_STYLE))
+    style_properties = read_style_table(archive.read(ARC_STYLE))
+    style_table = style_properties.pop('table')
+    wb.style_properties = style_properties
 
     wb.properties.excel_base_date = read_excel_base_date(xml_source=archive.read(ARC_WORKBOOK))
 
     # get worksheets
     wb.worksheets = []  # remove preset worksheet
-    content_types = read_content_types(archive.read(ARC_CONTENT_TYPES))
-    sheet_types = [(sheet, contyp) for sheet, contyp in content_types if contyp in WORK_OR_CHART_TYPE]
-    sheet_names = read_sheets_titles(archive.read(ARC_WORKBOOK))
-    worksheet_names = [worksheet for worksheet, sheet_type in zip(sheet_names, sheet_types) if sheet_type[1] == VALID_WORKSHEET]
-    for i, sheet_name in enumerate(worksheet_names):
-
-        sheet_codename = 'sheet%d.xml' % (i + 1)
-        worksheet_path = '%s/%s' % (PACKAGE_WORKSHEETS, sheet_codename)
-
+    for sheet in detect_worksheets(archive):
+        sheet_name = sheet['title']
+        worksheet_path = '%s/%s' % (PACKAGE_XL, sheet['path'])
         if not worksheet_path in valid_files:
             continue
 
         if not use_iterators:
-            new_ws = read_worksheet(archive.read(worksheet_path), wb, sheet_name, string_table, style_table, keep_vba=keep_vba)
+            new_ws = read_worksheet(archive.read(worksheet_path), wb,
+                                    sheet_name, string_table, style_table,
+                                    color_index=style_properties['color_index'],
+                                    keep_vba=keep_vba)
         else:
-            xml_source = unpack_worksheet(archive, worksheet_path)
-            new_ws = read_worksheet(xml_source, wb, sheet_name, string_table, style_table, filename, sheet_codename)
-        wb.add_sheet(new_ws, index=i)
+            new_ws = read_worksheet(None, wb, sheet_name, string_table,
+                                    style_table,
+                                    color_index=style_properties['color_index'],
+                                    workbook_name=filename,
+                                    worksheet_path=worksheet_path)
+        wb.add_sheet(new_ws)
+
+        # load comments into the worksheet cells
+        comments_file = get_comments_file(worksheet_path, archive, valid_files)
+        if comments_file is not None:
+            read_comments(new_ws, archive.read(comments_file))
 
     wb._named_ranges = read_named_ranges(archive.read(ARC_WORKBOOK), wb)

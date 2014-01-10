@@ -1,6 +1,4 @@
-# file openpyxl/__init__.py
-
-# Copyright (c) 2010-2011 openpyxl
+# Copyright (c) 2010-2014 openpyxl
 #
 # Permission is hereby granted, free of charge, to any person obtaining a copy
 # of this software and associated documentation files (the "Software"), to deal
@@ -25,6 +23,18 @@
 
 """Imports for the openpyxl package."""
 
+try:
+    from lxml import etree
+    LXML = True
+except ImportError:
+    LXML = False
+
+# Tests require lxml but openpyxl itself doesn't. Allow it to be overwritten by test configuration
+try:
+    from .tests import LXML
+except ImportError:
+    pass
+
 # package imports
 from openpyxl import cell
 from openpyxl import namedrange
@@ -34,6 +44,7 @@ from openpyxl import worksheet
 from openpyxl import reader
 from openpyxl import shared
 from openpyxl import writer
+from openpyxl import comments
 
 # shortcuts
 from openpyxl.workbook import Workbook
@@ -42,7 +53,7 @@ from openpyxl.reader.excel import load_workbook
 # constants
 
 __major__ = 1  # for major interface/format changes
-__minor__ = 8  # for minor interface/format changes
+__minor__ = 9  # for minor interface/format changes
 __release__ = 0  # for tweaks, bug-fixes, or development
 
 __version__ = '%d.%d.%d' % (__major__, __minor__, __release__)

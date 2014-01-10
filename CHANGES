@@ -1,10 +1,45 @@
-1.8.0 (unreleased)
+1.9.0 (unreleased)
+==================
+
+Minor changes
+-------------
+
+* All tests converted to pytest
+* Pyflakes used for static code analysis
+
+
+Bug fixes
+---------
+#137 - Workbooks with chartsheets
+
+
+1.8.0 (2013-12-31)
 ==================
 
 Compatibility
 -------------
 
 Support for Python 2.5 dropped.
+
+Major changes
+-------------
+
+* Support conditional formatting
+* Support lxml as backend
+* Support reading and writing comments
+* pytest as testrunner now required
+* Improvements in charts: new types, more reliable
+
+
+Minor changes
+-------------
+
+* load_workbook now accepts data_only to allow extracting values only from
+formulae. Default is false.
+* Images can now be anchored to cells
+* Docs updated
+* Provisional benchmarking
+* Added convenience methods for accessing worksheets and cells by key
 
 
 1.7.0 (2013-10-31)

@@ -1,6 +1,5 @@
-# file openpyxl/writer/workbook.py
-
-# Copyright (c) 2010-2011 openpyxl
+from __future__ import absolute_import
+# Copyright (c) 2010-2014 openpyxl
 #
 # Permission is hereby granted, free of charge, to any person obtaining a copy
 # of this software and associated documentation files (the "Software"), to deal
@@ -27,15 +26,32 @@
 
 # package imports
 
-from openpyxl.shared.compat import register_namespace
+#from openpyxl.shared.compat import register_namespace
 from openpyxl.shared.xmltools import Element, SubElement
 from openpyxl.cell import absolute_coordinate
-from openpyxl.shared.xmltools import get_document_content
 from openpyxl.shared.ooxml import (
-    ARC_CORE, ARC_WORKBOOK, ARC_APP, ARC_THEME, ARC_STYLE, ARC_SHARED_STRINGS,
+    ARC_CORE,
+    ARC_WORKBOOK,
+    ARC_APP,
+    ARC_THEME,
+    ARC_STYLE,
+    ARC_SHARED_STRINGS,
+    COREPROPS_NS,
+    VTYPES_NS,
+    XPROPS_NS,
+    DCORE_NS,
+    DCTERMS_NS,
+    DCTERMS_PREFIX,
+    XSI_NS,
+    SHEET_MAIN_NS,
+    CONTYPES_NS,
+    PKG_REL_NS,
+    CUSTOMUI_NS,
+    REL_NS,
+    ARC_CUSTOM_UI,
     ARC_CONTENT_TYPES,
-    COREPROPS_NS, VTYPES_NS, XPROPS_NS, DCORE_NS, DCTERMS_NS, DCTERMS_PREFIX,
-    XSI_NS, XML_NS, SHEET_MAIN_NS, CONTYPES_NS, PKG_REL_NS, REL_NS)
+    ARC_ROOT_RELS
+)
 from openpyxl.shared.xmltools import get_document_content, fromstring
 from openpyxl.shared.date_time import datetime_to_W3CDTF
 from openpyxl.namedrange import NamedRange, NamedRangeContainingValue
@@ -67,6 +83,7 @@ static_content_types_config = [
     ('Default', 'rels', 'application/vnd.openxmlformats-package.relationships+xml'),
     ('Default', 'xml', 'application/xml'),
     ('Default', 'png', 'image/png'),
+    ('Default', 'vml', 'application/vnd.openxmlformats-officedocument.vmlDrawing'),
 
     ('Override', ARC_WORKBOOK,
      'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet.main+xml'),
@@ -84,8 +101,7 @@ def write_content_types(workbook):
     seen = set()
     if workbook.vba_archive:
         root = fromstring(workbook.vba_archive.read(ARC_CONTENT_TYPES))
-        register_namespace('', 'http://schemas.openxmlformats.org/package/2006/content-types')
-        for elem in root.findall('{http://schemas.openxmlformats.org/package/2006/content-types}Override'):
+        for elem in root.findall('{%s}Override' % CONTYPES_NS):
             seen.add(elem.attrib['PartName'])
     else:
         root = Element('{%s}Types' % CONTYPES_NS)
@@ -101,27 +117,37 @@ def write_content_types(workbook):
 
     drawing_id = 1
     chart_id = 1
+    comments_id = 1
 
     for sheet_id, sheet in enumerate(workbook.worksheets):
-        SubElement(root, '{%s}Override' % CONTYPES_NS,
-                {'PartName': '/xl/worksheets/sheet%d.xml' % (sheet_id + 1),
+        name = '/xl/worksheets/sheet%d.xml' % (sheet_id + 1)
+        if name not in seen:
+            SubElement(root, '{%s}Override' % CONTYPES_NS, {'PartName': name,
                 'ContentType': 'application/vnd.openxmlformats-officedocument.spreadsheetml.worksheet+xml'})
         if sheet._charts or sheet._images:
-            SubElement(root, '{%s}Override' % CONTYPES_NS,
-                {'PartName' : '/xl/drawings/drawing%d.xml' % drawing_id,
+            name = '/xl/drawings/drawing%d.xml' % drawing_id
+            if name not in seen:
+                SubElement(root, '{%s}Override' % CONTYPES_NS, {'PartName' : name,
                 'ContentType' : 'application/vnd.openxmlformats-officedocument.drawing+xml'})
             drawing_id += 1
 
             for chart in sheet._charts:
-                SubElement(root, '{%s}Override' % CONTYPES_NS,
-                    {'PartName' : '/xl/charts/chart%d.xml' % chart_id,
+                name = '/xl/charts/chart%d.xml' % chart_id
+                if name not in seen:
+                    SubElement(root, '{%s}Override' % CONTYPES_NS, {'PartName' : name,
                     'ContentType' : 'application/vnd.openxmlformats-officedocument.drawingml.chart+xml'})
                 chart_id += 1
                 if chart._shapes:
-                    SubElement(root, '{%s}Override' % CONTYPES_NS,
-                        {'PartName' : '/xl/drawings/drawing%d.xml' % drawing_id,
+                    name = '/xl/drawings/drawing%d.xml' % drawing_id
+                    if name not in seen:
+                        SubElement(root, '{%s}Override' % CONTYPES_NS, {'PartName' : name,
                         'ContentType' : 'application/vnd.openxmlformats-officedocument.drawingml.chartshapes+xml'})
                     drawing_id += 1
+        if sheet._comment_count > 0:
+            SubElement(root, '{%s}Override' % CONTYPES_NS,
+                {'PartName': '/xl/comments%d.xml' % comments_id,
+                 'ContentType': 'application/vnd.openxmlformats-officedocument.spreadsheetml.comments+xml'})
+            comments_id += 1
 
     return get_document_content(root)
 
@@ -159,21 +185,32 @@ def write_properties_app(workbook):
 
 def write_root_rels(workbook):
     """Write the relationships xml."""
-    root = Element('{%s}Relationships' % PKG_REL_NS, {'xmlns':
-            'http://schemas.openxmlformats.org/package/2006/relationships'})
+    root = Element('{%s}Relationships' % PKG_REL_NS)
     relation_tag = '{%s}Relationship' % PKG_REL_NS
     SubElement(root, relation_tag, {'Id': 'rId1', 'Target': ARC_WORKBOOK,
-            'Type': 'http://schemas.openxmlformats.org/officeDocument/2006/relationships/officeDocument'})
+            'Type': '%s/officeDocument' % REL_NS})
     SubElement(root, relation_tag, {'Id': 'rId2', 'Target': ARC_CORE,
-            'Type': 'http://schemas.openxmlformats.org/package/2006/relationships/metadata/core-properties'})
+            'Type': '%s/metadata/core-properties' % PKG_REL_NS})
     SubElement(root, relation_tag, {'Id': 'rId3', 'Target': ARC_APP,
-            'Type': 'http://schemas.openxmlformats.org/officeDocument/2006/relationships/extended-properties'})
+            'Type': '%s/extended-properties' % REL_NS})
+    if workbook.vba_archive is not None:
+        # See if there was a customUI relation and reuse its id
+        arc = fromstring(workbook.vba_archive.read(ARC_ROOT_RELS))
+        rels = arc.findall(relation_tag)
+        rId = None
+        for rel in rels:
+                if rel.get('Target') == ARC_CUSTOM_UI:
+                        rId = rel.get('Id')
+                        break
+        if rId is not None:
+            SubElement(root, relation_tag, {'Id': rId, 'Target': ARC_CUSTOM_UI,
+                'Type': '%s' % CUSTOMUI_NS})
     return get_document_content(root)
 
 
 def write_workbook(workbook):
     """Write the core workbook xml."""
-    root = Element('{%s}workbook' % SHEET_MAIN_NS, {'{%s}space' % XML_NS: 'preserve'})
+    root = Element('{%s}workbook' % SHEET_MAIN_NS)
     SubElement(root, '{%s}fileVersion' % SHEET_MAIN_NS,
                {'appName': 'xl', 'lastEdited': '4', 'lowestEdited': '4', 'rupBuild': '4505'})
     SubElement(root, '{%s}workbookPr' % SHEET_MAIN_NS,
@@ -244,17 +281,17 @@ def write_workbook_rels(workbook):
     for i in range(1, len(workbook.worksheets) + 1):
         SubElement(root, '{%s}Relationship' % PKG_REL_NS,
                    {'Id': 'rId%d' % i, 'Target': 'worksheets/sheet%s.xml' % i,
-                    'Type': 'http://schemas.openxmlformats.org/officeDocument/2006/relationships/worksheet'})
+                    'Type': '%s/worksheet' % REL_NS})
     rid = len(workbook.worksheets) + 1
     SubElement(root, '{%s}Relationship' % PKG_REL_NS,
                {'Id': 'rId%d' % rid, 'Target': 'sharedStrings.xml',
-                'Type': 'http://schemas.openxmlformats.org/officeDocument/2006/relationships/sharedStrings'})
+                'Type': '%s/sharedStrings' % REL_NS})
     SubElement(root, '{%s}Relationship' % PKG_REL_NS,
                {'Id': 'rId%d' % (rid + 1), 'Target': 'styles.xml',
-                'Type': 'http://schemas.openxmlformats.org/officeDocument/2006/relationships/styles'})
+                'Type': '%s/styles' % REL_NS})
     SubElement(root, '{%s}Relationship' % PKG_REL_NS,
                {'Id': 'rId%d' % (rid + 2), 'Target': 'theme/theme1.xml',
-                'Type': 'http://schemas.openxmlformats.org/officeDocument/2006/relationships/theme'})
+                'Type': '%s/theme' % REL_NS})
     if workbook.vba_archive:
         SubElement(root, '{%s}Relationship' % PKG_REL_NS,
                    {'Id': 'rId%d' % (rid + 3), 'Target': 'vbaProject.bin',

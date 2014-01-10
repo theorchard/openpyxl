@@ -1,8 +1,5 @@
-# file openpyxl/worksheet.py
-from openpyxl.shared.units import points_to_pixels
-from openpyxl.shared import DEFAULT_COLUMN_WIDTH, DEFAULT_ROW_HEIGHT
-
-# Copyright (c) 2010-2011 openpyxl
+from __future__ import absolute_import
+# Copyright (c) 2010-2014 openpyxl
 #
 # Permission is hereby granted, free of charge, to any person obtaining a copy
 # of this software and associated documentation files (the "Software"), to deal
@@ -32,68 +29,75 @@ import re
 
 # package imports
 import openpyxl.cell
-from openpyxl.cell import coordinate_from_string, \
-    column_index_from_string, get_column_letter
-from openpyxl.shared.exc import SheetTitleException, \
-    InsufficientCoordinatesException, CellCoordinatesException, \
+from openpyxl.cell import (
+    coordinate_from_string,
+    column_index_from_string,
+    get_column_letter
+    )
+from openpyxl.shared.exc import (
+    SheetTitleException,
+    InsufficientCoordinatesException,
+    CellCoordinatesException,
     NamedRangeException
+    )
+from openpyxl.shared.units import points_to_pixels
+from openpyxl.shared import DEFAULT_COLUMN_WIDTH, DEFAULT_ROW_HEIGHT
 from openpyxl.shared.password_hasher import hash_password
-from openpyxl.style import Style, DEFAULTS as DEFAULTS_STYLE
-from openpyxl.drawing import Drawing
+from openpyxl.styles import Style, DEFAULTS as DEFAULTS_STYLE
+from openpyxl.styles.formatting import ConditionalFormatting
 from openpyxl.namedrange import NamedRangeContainingValue
 from openpyxl.shared.compat import OrderedDict, unicode, xrange, basestring
 from openpyxl.shared.compat.itertools import iteritems
 
 _DEFAULTS_STYLE_HASH = hash(DEFAULTS_STYLE)
 
-def flatten(results):
 
-    rows = []
+def flatten(results):
+    """Return cell values row-by-row"""
 
     for row in results:
+        yield(c.value for c in row)
 
-        cells = []
-
-        for cell in row:
-
-            cells.append(cell.value)
-
-        rows.append(tuple(cells))
-
-    return tuple(rows)
+from openpyxl.shared.ooxml import REL_NS, PKG_REL_NS
+from openpyxl.shared.xmltools import Element, SubElement, get_document_content
 
 
 class Relationship(object):
     """Represents many kinds of relationships."""
     # TODO: Use this object for workbook relationships as well as
     # worksheet relationships
-    TYPES = {
-        'hyperlink': 'http://schemas.openxmlformats.org/officeDocument/2006/relationships/hyperlink',
-        'drawing':'http://schemas.openxmlformats.org/officeDocument/2006/relationships/drawing',
-        'image':'http://schemas.openxmlformats.org/officeDocument/2006/relationships/drawing'
-        # 'worksheet': 'http://schemas.openxmlformats.org/officeDocument/2006/relationships/worksheet',
-        # 'sharedStrings': 'http://schemas.openxmlformats.org/officeDocument/2006/relationships/sharedStrings',
-        # 'styles': 'http://schemas.openxmlformats.org/officeDocument/2006/relationships/styles',
-        # 'theme': 'http://schemas.openxmlformats.org/officeDocument/2006/relationships/theme',
-    }
 
-    def __init__(self, rel_type):
+    TYPES = ("hyperlink", "drawing", "image")
+
+    def __init__(self, rel_type, target=None, target_mode=None, id=None):
         if rel_type not in self.TYPES:
             raise ValueError("Invalid relationship type %s" % rel_type)
-        self.type = self.TYPES[rel_type]
-        self.target = ""
-        self.target_mode = ""
-        self.id = ""
+        self.type = "%s/%s" % (REL_NS, rel_type)
+        self.target = target
+        self.target_mode = target_mode
+        self.id = id
+
+    def __repr__(self):
+        root = Element("{%s}Relationships" % PKG_REL_NS)
+        body = SubElement(root, "{%s}Relationship" % PKG_REL_NS, self.__dict__)
+        return get_document_content(root)
 
 
 class PageSetup(object):
     """Information about page layout for this sheet"""
-    valid_setup = ("orientation", "paperSize", "scale", "fitToPage", "fitToHeight", "fitToWidth", "firstPageNumber", "useFirstPageNumber")
+    valid_setup = ("orientation", "paperSize", "scale", "fitToPage",
+                   "fitToHeight", "fitToWidth", "firstPageNumber", "useFirstPageNumber")
     valid_options = ("horizontalCentered", "verticalCentered")
-
-    def __init__(self):
-        self.orientation = self.paperSize = self.scale = self.fitToPage = self.fitToHeight = self.fitToWidth = self.firstPageNumber = self.useFirstPageNumber = None
-        self.horizontalCentered = self.verticalCentered = None
+    orientation = None
+    paperSize = None
+    scale = None
+    fitToPage = None
+    fitToHeight = None
+    fitToWidth = None
+    firstPageNumber = None
+    useFirstPageNumber = None
+    horizontalCentered = None
+    verticalCentered = None
 
     @property
     def setup(self):
@@ -116,8 +120,7 @@ class PageSetup(object):
         for options_name in self.valid_options:
             options_value = getattr(self, options_name)
             if options_value is not None:
-                if options_name in ('horizontalCentered', 'verticalCentered') and options_value:
-                    optionsGroup[options_name] = '1'
+                optionsGroup[options_name] = '1'
 
         return optionsGroup
 
@@ -329,14 +332,22 @@ class ColumnDimension(object):
                  'collapsed',
                  'style_index',)
 
-    def __init__(self, index='A'):
+    def __init__(self,
+                 index='A',
+                 width=-1,
+                 auto_size=False,
+                 visible=True,
+                 outline_level=0,
+                 collapsed=False,
+                 style_index=0):
         self.column_index = index
-        self.width = -1
+        self.width = float(width)
         self.auto_size = False
-        self.visible = True
-        self.outline_level = 0
-        self.collapsed = False
-        self.style_index = 0
+        self.visible = visible
+        self.outline_level = int(outline_level)
+        self.collapsed = collapsed
+        self.style_index = style_index
+
 
 class PageMargins(object):
     """Information about page margins for view/print layouts."""
@@ -405,6 +416,8 @@ class Worksheet(object):
 
     """
     repr_format = unicode('<Worksheet "%s">')
+    bad_title_char_re = re.compile(r'[\\*?:/\[\]]')
+
 
     BREAK_NONE = 0
     BREAK_ROW = 1
@@ -439,12 +452,13 @@ class Worksheet(object):
         else:
             self.title = title
         self.row_dimensions = {}
-        self.column_dimensions = {}
+        self.column_dimensions = OrderedDict([])
         self.page_breaks = []
         self._cells = {}
         self._styles = {}
         self._charts = []
         self._images = []
+        self._comment_count = 0
         self._merged_cells = []
         self.relationships = []
         self._data_validations = []
@@ -465,8 +479,10 @@ class Worksheet(object):
         self._auto_filter = None
         self._freeze_panes = None
         self.paper_size = None
+        self.formula_attributes = {}
         self.orientation = None
         self.xml_source = None
+        self.conditional_formatting = ConditionalFormatting()
 
     def __repr__(self):
         return self.repr_format % self.title
@@ -483,7 +499,7 @@ class Worksheet(object):
         """Delete cells that are not storing a value."""
         delete_list = [coordinate for coordinate, cell in \
             iteritems(self._cells) if (not cell.merged and cell.value in ('', None) and \
-            (coordinate not in self._styles or
+            cell.comment is None and (coordinate not in self._styles or
             hash(cell.style) == _DEFAULTS_STYLE_HASH))]
         for coordinate in delete_list:
             del self._cells[coordinate]
@@ -492,50 +508,60 @@ class Worksheet(object):
         """Return an unordered list of the cells in this worksheet."""
         return self._cells.values()
 
-    def _set_title(self, value):
-        """Set a sheet title, ensuring it is valid."""
-        bad_title_char_re = re.compile(r'[\\*?:/\[\]]')
-        if bad_title_char_re.search(value):
+    @property
+    def title(self):
+        """Return the title for this sheet."""
+        return self._title
+
+    @title.setter
+    def title(self, value):
+        """Set a sheet title, ensuring it is valid.
+           Limited to 31 characters, no special characters."""
+        if self.bad_title_char_re.search(value):
             msg = 'Invalid character found in sheet title'
             raise SheetTitleException(msg)
 
         # check if sheet_name already exists
         # do this *before* length check
-        if self._parent.get_sheet_by_name(value):
-            # use name, but append with lowest possible integer
-            i = 1
-            while self._parent.get_sheet_by_name('%s%d' % (value, i)):
-                i += 1
-            value = '%s%d' % (value, i)
+        sheets = self._parent.get_sheet_names()
+        sheets = ",".join(sheets)
+        sheet_title_regex=re.compile("(?P<title>%s)(?P<count>\d?),?" % value)
+        matches = sheet_title_regex.findall(sheets)
+        if matches:
+            # use name, but append with the next highest integer
+            counts = [int(idx) for (t, idx) in matches if idx.isdigit()]
+            if counts:
+                highest = max(counts)
+            else:
+                highest = 0
+            value = "%s%d" % (value, highest+1)
+
         if len(value) > 31:
             msg = 'Maximum 31 characters allowed in sheet title'
             raise SheetTitleException(msg)
         self._title = value
 
-    def _get_title(self):
-        """Return the title for this sheet."""
-        return self._title
-
-    title = property(_get_title, _set_title, doc=
-                     'Get or set the title of the worksheet. '
-                     'Limited to 31 characters, no special characters.')
-
-    def _set_auto_filter(self, range):
-        # Normalize range to a str or None
-        if not range:
-            range = None
-        elif isinstance(range, str):
-            range = range.upper()
-        else:  # Assume a range
-            range = range[0][0].address + ':' + range[-1][-1].address
-        self._auto_filter = range
-
-    def _get_auto_filter(self):
+    @property
+    def auto_filter(self):
         return self._auto_filter
 
-    auto_filter = property(_get_auto_filter, _set_auto_filter, doc=
-                           'get or set auto filtering on columns')
-    def _set_freeze_panes(self, topLeftCell):
+    @auto_filter.setter
+    def auto_filter(self, cell_range):
+        # Normalize range to a str or None
+        if not cell_range:
+            cell_range = None
+        elif isinstance(cell_range, str):
+            cell_range = cell_range.upper()
+        else:  # Assume a range
+            cell_range = cell_range[0][0].address + ':' + cell_range[-1][-1].address
+        self._auto_filter = cell_range
+
+    @property
+    def freeze_panes(self):
+        return self._freeze_panes
+
+    @freeze_panes.setter
+    def freeze_panes(self, topLeftCell):
         if not topLeftCell:
             topLeftCell = None
         elif isinstance(topLeftCell, str):
@@ -545,12 +571,6 @@ class Worksheet(object):
         if topLeftCell == 'A1':
             topLeftCell = None
         self._freeze_panes = topLeftCell
-
-    def _get_freeze_panes(self):
-        return self._freeze_panes
-
-    freeze_panes = property(_get_freeze_panes, _set_freeze_panes, doc=
-                           "Get or set frozen panes")
 
     def add_print_title(self, n, rows_or_cols='rows'):
         """ Print Titles are rows or columns that are repeated on each printed sheet.
@@ -611,6 +631,15 @@ class Worksheet(object):
             if row not in self.row_dimensions:
                 self.row_dimensions[row] = RowDimension(row)
         return self._cells[coordinate]
+
+    def __getitem__(self, key):
+        """Convenience access by Excel style address"""
+        if isinstance(key, slice):
+            return self.range("{0}:{1}".format(key.start, key.stop))
+        return self._get_cell(key)
+
+    def __setitem__(self, key, value):
+        self[key].value = value
 
     def get_highest_row(self):
         """Returns the maximum row index containing data
@@ -727,9 +756,10 @@ class Worksheet(object):
     def set_printer_settings(self, paper_size, orientation):
         """Set printer settings """
 
-        self.paper_size = paper_size
-        assert orientation in (self.ORIENTATION_PORTRAIT, self.ORIENTATION_LANDSCAPE), "Values should be %s or %s" % (self.ORIENTATION_PORTRAIT, self.ORIENTATION_LANDSCAPE)
-        self.orientation = orientation
+        self.page_setup.paperSize = paper_size
+        if orientation not in (self.ORIENTATION_PORTRAIT, self.ORIENTATION_LANDSCAPE):
+            raise ValueError("Values should be %s or %s" % (self.ORIENTATION_PORTRAIT, self.ORIENTATION_LANDSCAPE))
+        self.page_setup.orientation = orientation
 
     def create_relationship(self, rel_type):
         """Add a relationship for this sheet."""
@@ -746,18 +776,26 @@ class Worksheet(object):
         """
         data_validation._sheet = self
         self._data_validations.append(data_validation)
-                
+
     def add_chart(self, chart):
         """ Add a chart to the sheet """
-
         chart._sheet = self
         self._charts.append(chart)
+        self.add_drawing(chart)
 
     def add_image(self, img):
         """ Add an image to the sheet """
-
         img._sheet = self
         self._images.append(img)
+        self.add_drawing(img)
+
+    def add_drawing(self, obj):
+        """Images and charts both create drawings"""
+        self._parent.drawings.append(obj)
+
+    def add_rel(self, obj):
+        """Drawings and hyperlinks create relationships"""
+        self._parent.relationships.append(obj)
 
     def merge_cells(self, range_string=None, start_row=None, start_column=None, end_row=None, end_column=None):
         """ Set merge on a cell range.  Range is a cell range (e.g. A1:E1) """
