@@ -31,7 +31,8 @@ class SurfaceChart(GraphChart):
     TYPE = "SurfaceChart"
     GROUPING = "clustered"
 
-class 3DSurfaceChart(GraphChart):
+
+class SurfaceChart3D(GraphChart):
 
     TYPE = "3DSurfaceChart"
     GROUPING = "clustered"

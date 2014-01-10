@@ -376,7 +376,7 @@ class TestScatterChart(object):
         assert c.y_axis.type == "valAx"
 
 
-from openpyxl.chart.surface import SufraceChart
+from openpyxl.charts.surface import SurfaceChart3D
 class TestSurface3DCharttWriter(object):
 
     def setUp(self):
