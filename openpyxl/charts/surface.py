@@ -38,5 +38,5 @@ class SurfaceChart3D(GraphChart):
     GROUPING = "clustered"
 
     def __init__(self):
-        super(3DSurfaceChart, self).__init__()
+        super(SurfaceChart3D, self).__init__()
         self.z_axis = SeriesAxis()
