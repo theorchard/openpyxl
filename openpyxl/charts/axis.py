@@ -159,5 +159,5 @@ class SeriesAxis(Axis):
     tick_label_position = 'nextTo'
     crosses = 'autoZero'
     auto = False
-    ax.cross_between = 'between'
+    cross_between = 'between'
     types = "SerAx"
