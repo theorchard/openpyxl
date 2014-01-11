@@ -76,6 +76,13 @@ def ScatterChart():
 
 
 @pytest.fixture
+def SurfaceChart():
+    """SurfaceChart class"""
+    from openpyxl.charts import SurfaceChart
+    return SurfaceChart
+
+
+@pytest.fixture
 def Reference():
     """Reference class"""
     from openpyxl.charts import Reference

@@ -30,4 +30,5 @@ from .bar import BarChart
 from .pie import PieChart
 from .line import LineChart
 from .scatter import ScatterChart
+from .surface import SurfaceChart
 from .error_bar import ErrorBar
