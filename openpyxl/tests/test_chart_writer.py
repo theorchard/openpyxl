@@ -9,7 +9,8 @@ from openpyxl.writer.charts import (ChartWriter,
                                     LineChartWriter,
                                     BarChartWriter,
                                     ScatterChartWriter,
-                                    BaseChartWriter
+                                    BaseChartWriter,
+                                    SurfaceChartWriter,
                                     )
 from openpyxl.style import Color
 
@@ -342,16 +343,6 @@ def bar_chart_2(ws, BarChart, Reference, Series):
     return chart
 
 
-@pytest.fixture
-def surface_chart(ws, SurfaceChart, Reference, Series):
-    ws.title = 'Numbers'
-    for i in range(10):
-        ws.append([i])
-    chart = SurfaceChart()
-    chart.add_series(Series(Reference(ws, (0, 0), (9, 0))))
-    return chart
-
-
 class TestBarChartWriter(object):
 
     def test_write_chart(self, bar_chart_2):
@@ -379,11 +370,20 @@ class TestBarChartWriter(object):
             assert diff is None, diff
 
 
+@pytest.fixture
+def surface_chart(ws, SurfaceChart, Reference, Series):
+    ws.title = 'Numbers'
+    for i in range(10):
+        ws.append([i])
+    chart = SurfaceChart()
+    chart.add_series(Series(Reference(ws, (0, 0), (9, 0))))
+    return chart
+
+
 from openpyxl import Workbook
 from openpyxl.charts import Series, Reference
 from openpyxl.charts.surface import SurfaceChart
-from openpyxl.writer.charts import SurfaceChartWriter
-class TestSurfaceChart3DWriter(object):
+class TestSurfaceChartWriter(object):
 
     def setup(self):
 
