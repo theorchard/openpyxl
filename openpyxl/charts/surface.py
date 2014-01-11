@@ -30,11 +30,12 @@ class SurfaceChart(GraphChart):
 
     TYPE = "SurfaceChart"
     GROUPING = "clustered"
+    wireframe = False
 
 
-class SurfaceChart3D(GraphChart):
+class SurfaceChart_3D(SurfaceChart):
 
-    TYPE = "3DSurfaceChart"
+    TYPE = "Surface3DChart"
     GROUPING = "clustered"
 
     def __init__(self):
