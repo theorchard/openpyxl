@@ -374,100 +374,45 @@ class TestBarChartWriter(object):
 def surface_chart(ws, SurfaceChart, Reference, Series):
     ws.title = 'Numbers'
     for i in range(10):
-        ws.append([i])
+        ws.append([i, i+3])
     chart = SurfaceChart()
     chart.add_series(Series(Reference(ws, (0, 0), (9, 0))))
+    chart.add_series(Series(Reference(ws, (0, 1), (9, 1))))
     return chart
 
 
-from openpyxl import Workbook
-from openpyxl.charts import Series, Reference
-from openpyxl.charts.surface import SurfaceChart
 class TestSurfaceChartWriter(object):
 
-    def setup(self):
 
-        wb = Workbook()
-        ws = wb.get_active_sheet()
-        ws.title = 'data'
-        for i in range(10):
-            ws.cell(row = i, column = 0).value = i
-        self.chart = SurfaceChart()
-        self.chart.title = 'TITLE'
-        self.chart.add_series(Series(Reference(ws, (0, 0), (10, 0))))
-        self.chart._series[-1].color = Color.GREEN
-        self.cw = SurfaceChartWriter(self.chart)
-        self.root = Element('test')
+    def test_write_chart(self, surface_chart):
+        cw = SurfaceChartWriter(surface_chart)
+        cw._write_chart()
+        tagnames = ['{%s}surfaceChart' % CHART_NS,
+                    '{%s}valAx' % CHART_NS,
+                    '{%s}serAx' % CHART_NS]
 
-    def test_write_title(self):
-        self.cw._write_title(self.root)
-        xml = get_xml(self.root)
-        expected = '<?xml version=\'1.0\' encoding=\'UTF-8\'?><test><c:title><c:tx><c:rich><a:bodyPr /><a:lstStyle /><a:p><a:pPr><a:defRPr /></a:pPr><a:r><a:rPr lang="fr-FR" /><a:t>TITLE</a:t></a:r></a:p></c:rich></c:tx><c:layout /></c:title></test>'
-        diff = compare_xml(xml, expected)
-        assert diff is None, diff
 
-    def test_write_xaxis(self):
+    def test_serialised(self, surface_chart):
+        cw = SurfaceChartWriter(surface_chart)
+        xml = cw.write()
+        expected_file = os.path.join(DATADIR, "writer", "expected", "SurfaceChart.xml")
+        with open(expected_file) as expected:
+            diff = compare_xml(xml, expected.read())
+            assert diff is None, diff
 
-        self.cw._write_axis(self.root, self.chart.x_axis, 'c:catAx')
-        xml = get_xml(self.root)
-        expected = '<?xml version=\'1.0\' encoding=\'UTF-8\'?><test><c:catAx><c:axId val="60871424" /><c:scaling><c:orientation val="minMax" /></c:scaling><c:axPos val="b" /><c:tickLblPos val="nextTo" /><c:crossAx val="60873344" /><c:crosses val="autoZero" /><c:auto val="1" /><c:lblAlgn val="ctr" /><c:lblOffset val="100" /></c:catAx></test>'
-        diff = compare_xml(xml, expected)
-        assert diff is None, diff
 
-    def test_write_yaxis(self):
-
-        self.cw._write_axis(self.root, self.chart.y_axis, 'c:valAx')
-        xml = get_xml(self.root)
-        expected = '<?xml version=\'1.0\' encoding=\'UTF-8\'?><test><c:valAx><c:axId val="60873344" /><c:scaling><c:orientation val="minMax" /><c:max val="10.0" /><c:min val="0.0" /></c:scaling><c:axPos val="l" /><c:majorGridlines /><c:numFmt formatCode="General" sourceLinked="1" /><c:tickLblPos val="nextTo" /><c:crossAx val="60871424" /><c:crosses val="autoZero" /><c:crossBetween val="between" /><c:majorUnit val="2.0" /></c:valAx></test>'
-        diff = compare_xml(xml, expected)
-        assert diff is None, diff
-
-    def test_write_zaxis(self):
-
-        self.cw._write_axis(self.root, self.chart.z_axis, 'c:valSer')
-        xml = get_xml(self.root)
+    def test_write_zaxis(self, surface_chart, root):
+        cw = ScatterChartWriter(surface_chart)
+        cw._write_axis(root, 'c:valSer', '')
+        xml = get_xml(cw.root)
         expected = '<?xml version=\'1.0\' encoding=\'UTF-8\'?><test><c:valSer><c:axId val="60880064" /><c:scaling><c:orientation val="minMax" /></c:scaling><c:axPos val="b" /><c:tickLblPos val="nextTo" /><c:crossAx val="60873344" /><c:crosses val="autoZero" /></c:valSer></test>'
         diff = compare_xml(xml, expected)
         assert diff is None, diff
 
-    def test_write_series(self):
-
-        self.cw._write_series(self.root)
-        xml = get_xml(self.root)
+    def test_write_series(self, surface_chart, root):
+        cw = SurfaceChartWriter(surface_chart)
+        cw._write_series(root)
+        xml = get_xml(cw.root)
         expected = '<?xml version=\'1.0\' encoding=\'UTF-8\'?><test><c:ser><c:idx val="0" /><c:order val="0" /><c:spPr><a:ln><a:solidFill><a:srgbClr val="00FF00" /></a:solidFill></a:ln></c:spPr><c:marker><c:symbol val="none" /></c:marker><c:val><c:numRef><c:f>\'data\'!$A$1:$A$11</c:f><c:numCache><c:formatCode>General</c:formatCode><c:ptCount val="11" /><c:pt idx="0"><c:v>0</c:v></c:pt><c:pt idx="1"><c:v>1</c:v></c:pt><c:pt idx="2"><c:v>2</c:v></c:pt><c:pt idx="3"><c:v>3</c:v></c:pt><c:pt idx="4"><c:v>4</c:v></c:pt><c:pt idx="5"><c:v>5</c:v></c:pt><c:pt idx="6"><c:v>6</c:v></c:pt><c:pt idx="7"><c:v>7</c:v></c:pt><c:pt idx="8"><c:v>8</c:v></c:pt><c:pt idx="9"><c:v>9</c:v></c:pt><c:pt idx="10"><c:v>None</c:v></c:pt></c:numCache></c:numRef></c:val></c:ser></test>'
-        diff = compare_xml(xml, expected)
-        assert diff is None, diff
-
-    def test_write_legend(self):
-
-        self.cw._write_legend(self.root)
-        xml = get_xml(self.root)
-        expected = '<?xml version=\'1.0\' encoding=\'UTF-8\'?><test><c:legend><c:legendPos val="r" /><c:layout /></c:legend></test>'
-        diff = compare_xml(xml, expected)
-        assert diff is None, diff
-
-    def test_no_write_legend(self):
-
-        self.chart.show_legend = False
-        self.cw._write_legend(self.root)
-        xml = get_xml(self.root)
-        expected = '<?xml version=\'1.0\' encoding=\'UTF-8\'?><test />'
-        diff = compare_xml(xml, expected)
-        assert diff is None, diff
-
-    def test_write_print_settings(self):
-
-        self.cw._write_print_settings()
-        xml = get_xml(self.root)
-        expected = '<?xml version=\'1.0\' encoding=\'UTF-8\'?><test><c:printSettings><c:headerFooter /><c:pageMargins b="0.75" footer="0.3" header="0.3" l="0.7" r="0.7" t="0.75" /><c:pageSetup /></c:printSettings></test>'
-        diff = compare_xml(xml, expected)
-        assert diff is None, diff
-
-    def test_write_chart(self):
-
-        self.cw._write_chart()
-        # Truncate floats because results differ with Python >= 3.2 and <= 3.1
-        xml = get_xml(self.root)
-        expected = '<?xml version=\'1.0\' encoding=\'UTF-8\'?><test><c:chart><c:title><c:tx><c:rich><a:bodyPr /><a:lstStyle /><a:p><a:pPr><a:defRPr /></a:pPr><a:r><a:rPr lang="fr-FR" /><a:t>TITLE</a:t></a:r></a:p></c:rich></c:tx><c:layout /></c:title><c:plotArea><c:layout><c:manualLayout><c:layoutTarget val="inner" /><c:xMode val="edge" /><c:yMode val="edge" /><c:x val="1.2857" /><c:y val="0.2125" /><c:w val="0.6" /><c:h val="0.6" /></c:manualLayout></c:layout><c:surface3DChart><c:ser><c:idx val="0" /><c:order val="0" /><c:spPr><a:ln><a:solidFill><a:srgbClr val="00FF00" /></a:solidFill></a:ln></c:spPr><c:marker><c:symbol val="none" /></c:marker><c:val><c:numRef><c:f>\'data\'!$A$1:$A$11</c:f><c:numCache><c:formatCode>General</c:formatCode><c:ptCount val="11" /><c:pt idx="0"><c:v>0</c:v></c:pt><c:pt idx="1"><c:v>1</c:v></c:pt><c:pt idx="2"><c:v>2</c:v></c:pt><c:pt idx="3"><c:v>3</c:v></c:pt><c:pt idx="4"><c:v>4</c:v></c:pt><c:pt idx="5"><c:v>5</c:v></c:pt><c:pt idx="6"><c:v>6</c:v></c:pt><c:pt idx="7"><c:v>7</c:v></c:pt><c:pt idx="8"><c:v>8</c:v></c:pt><c:pt idx="9"><c:v>9</c:v></c:pt><c:pt idx="10"><c:v>None</c:v></c:pt></c:numCache></c:numRef></c:val></c:ser><c:axId val="60871424" /><c:axId val="60873344" /><c:axId val="60880064" /></c:surface3DChart><c:catAx><c:axId val="60871424" /><c:scaling><c:orientation val="minMax" /></c:scaling><c:axPos val="b" /><c:tickLblPos val="nextTo" /><c:crossAx val="60873344" /><c:crosses val="autoZero" /><c:auto val="1" /><c:lblAlgn val="ctr" /><c:lblOffset val="100" /></c:catAx><c:valAx><c:axId val="60873344" /><c:scaling><c:orientation val="minMax" /><c:max val="10.0" /><c:min val="0.0" /></c:scaling><c:axPos val="l" /><c:majorGridlines /><c:numFmt formatCode="General" sourceLinked="1" /><c:tickLblPos val="nextTo" /><c:crossAx val="60871424" /><c:crosses val="autoZero" /><c:crossBetween val="between" /><c:majorUnit val="2.0" /></c:valAx><c:serAx><c:axId val="60880064" /><c:scaling><c:orientation val="minMax" /></c:scaling><c:axPos val="b" /><c:tickLblPos val="nextTo" /><c:crossAx val="60873344" /><c:crosses val="autoZero" /></c:serAx></c:plotArea><c:legend><c:legendPos val="r" /><c:layout /></c:legend><c:plotVisOnly val="1" /></c:chart></test>'
         diff = compare_xml(xml, expected)
         assert diff is None, diff
