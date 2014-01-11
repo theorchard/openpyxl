@@ -1,0 +1,189 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<c:chartSpace xmlns:c="http://schemas.openxmlformats.org/drawingml/2006/chart" xmlns:a="http://schemas.openxmlformats.org/drawingml/2006/main" xmlns:r="http://schemas.openxmlformats.org/officeDocument/2006/relationships"<name />
+  <c:date1904 val="0"/>
+  <c:lang val="de-DE"/>
+  <c:roundedCorners val="0"/>
+  <c:chart>
+    <c:autoTitleDeleted val="0"/>
+    <c:view3D>
+      <c:rotX val="15"/>
+      <c:rotY val="20"/>
+      <c:rAngAx val="0"/>
+      <c:perspective val="30"/>
+    </c:view3D>
+    <c:floor>
+      <c:thickness val="0"/>
+    </c:floor>
+    <c:sideWall>
+      <c:thickness val="0"/>
+    </c:sideWall>
+    <c:backWall>
+      <c:thickness val="0"/>
+    </c:backWall>
+    <c:plotArea>
+      <c:layout/>
+      <c:surface3DChart>
+        <c:wireframe val="0"/>
+        <c:ser>
+          <c:idx val="0"/>
+          <c:order val="0"/>
+          <c:val>
+            <c:numRef>
+              <c:f>Surface3D!$A$1:$A$10</c:f>
+              <c:numCache>
+                <c:formatCode>General</c:formatCode>
+                <c:ptCount val="10"/>
+                <c:pt idx="0">
+                  <c:v>0.0</c:v>
+                </c:pt>
+                <c:pt idx="1">
+                  <c:v>1.0</c:v>
+                </c:pt>
+                <c:pt idx="2">
+                  <c:v>2.0</c:v>
+                </c:pt>
+                <c:pt idx="3">
+                  <c:v>3.0</c:v>
+                </c:pt>
+                <c:pt idx="4">
+                  <c:v>4.0</c:v>
+                </c:pt>
+                <c:pt idx="5">
+                  <c:v>5.0</c:v>
+                </c:pt>
+                <c:pt idx="6">
+                  <c:v>6.0</c:v>
+                </c:pt>
+                <c:pt idx="7">
+                  <c:v>7.0</c:v>
+                </c:pt>
+                <c:pt idx="8">
+                  <c:v>8.0</c:v>
+                </c:pt>
+                <c:pt idx="9">
+                  <c:v>9.0</c:v>
+                </c:pt>
+              </c:numCache>
+            </c:numRef>
+          </c:val>
+        </c:ser>
+        <c:ser>
+          <c:idx val="1"/>
+          <c:order val="1"/>
+          <c:val>
+            <c:numRef>
+              <c:f>Surface3D!$B$1:$B$10</c:f>
+              <c:numCache>
+                <c:formatCode>General</c:formatCode>
+                <c:ptCount val="10"/>
+                <c:pt idx="0">
+                  <c:v>3.0</c:v>
+                </c:pt>
+                <c:pt idx="1">
+                  <c:v>4.0</c:v>
+                </c:pt>
+                <c:pt idx="2">
+                  <c:v>5.0</c:v>
+                </c:pt>
+                <c:pt idx="3">
+                  <c:v>6.0</c:v>
+                </c:pt>
+                <c:pt idx="4">
+                  <c:v>7.0</c:v>
+                </c:pt>
+                <c:pt idx="5">
+                  <c:v>8.0</c:v>
+                </c:pt>
+                <c:pt idx="6">
+                  <c:v>9.0</c:v>
+                </c:pt>
+                <c:pt idx="7">
+                  <c:v>10.0</c:v>
+                </c:pt>
+                <c:pt idx="8">
+                  <c:v>11.0</c:v>
+                </c:pt>
+                <c:pt idx="9">
+                  <c:v>12.0</c:v>
+                </c:pt>
+              </c:numCache>
+            </c:numRef>
+          </c:val>
+        </c:ser>
+        <c:bandFmts/>
+        <c:axId val="2116783304"/>
+        <c:axId val="2116734008"/>
+        <c:axId val="2116774856"/>
+      </c:surface3DChart>
+      <c:catAx>
+        <c:axId val="2116783304"/>
+        <c:scaling>
+          <c:orientation val="minMax"/>
+        </c:scaling>
+        <c:delete val="0"/>
+        <c:axPos val="b"/>
+        <c:majorTickMark val="out"/>
+        <c:minorTickMark val="none"/>
+        <c:tickLblPos val="nextTo"/>
+        <c:crossAx val="2116734008"/>
+        <c:crosses val="autoZero"/>
+        <c:auto val="1"/>
+        <c:lblAlgn val="ctr"/>
+        <c:lblOffset val="100"/>
+        <c:noMultiLvlLbl val="0"/>
+      </c:catAx>
+      <c:valAx>
+        <c:axId val="2116734008"/>
+        <c:scaling>
+          <c:orientation val="minMax"/>
+        </c:scaling>
+        <c:delete val="0"/>
+        <c:axPos val="l"/>
+        <c:majorGridlines/>
+        <c:numFmt formatCode="General" sourceLinked="1"/>
+        <c:majorTickMark val="out"/>
+        <c:minorTickMark val="none"/>
+        <c:tickLblPos val="nextTo"/>
+        <c:crossAx val="2116783304"/>
+        <c:crosses val="autoZero"/>
+        <c:crossBetween val="midCat"/>
+      </c:valAx>
+      <c:serAx>
+        <c:axId val="2116774856"/>
+        <c:scaling>
+          <c:orientation val="minMax"/>
+        </c:scaling>
+        <c:delete val="0"/>
+        <c:axPos val="b"/>
+        <c:majorTickMark val="out"/>
+        <c:minorTickMark val="none"/>
+        <c:tickLblPos val="nextTo"/>
+        <c:crossAx val="2116734008"/>
+        <c:crosses val="autoZero"/>
+      </c:serAx>
+    </c:plotArea>
+    <c:legend>
+      <c:legendPos val="r"/>
+      <c:layout/>
+      <c:overlay val="0"/>
+      <c:txPr>
+        <a:bodyPr/>
+        <a:lstStyle/>
+        <a:p>
+          <a:pPr rtl="0">
+            <a:defRPr/>
+          </a:pPr>
+          <a:endParaRPr lang="de-DE"/>
+        </a:p>
+      </c:txPr>
+    </c:legend>
+    <c:plotVisOnly val="1"/>
+    <c:dispBlanksAs val="zero"/>
+    <c:showDLblsOverMax val="0"/>
+  </c:chart>
+  <c:printSettings>
+    <c:headerFooter/>
+    <c:pageMargins b="1.0" l="0.75" r="0.75" t="1.0" header="0.5" footer="0.5"/>
+    <c:pageSetup/>
+  </c:printSettings>
+</c:chartSpace>
