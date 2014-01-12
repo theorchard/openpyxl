@@ -401,17 +401,17 @@ class TestSurfaceChartWriter(object):
             assert diff is None, diff
 
 
-    def test_write_zaxis(self, surface_chart, root):
+    def test_write_zaxis(self, surface_chart, root_xml):
         cw = ScatterChartWriter(surface_chart)
         cw._write_axis(root, 'c:valSer', '')
-        xml = get_xml(cw.root)
+        xml = get_xml(cw.root_xml)
         expected = '<?xml version=\'1.0\' encoding=\'UTF-8\'?><test><c:valSer><c:axId val="60880064" /><c:scaling><c:orientation val="minMax" /></c:scaling><c:axPos val="b" /><c:tickLblPos val="nextTo" /><c:crossAx val="60873344" /><c:crosses val="autoZero" /></c:valSer></test>'
         diff = compare_xml(xml, expected)
         assert diff is None, diff
 
-    def test_write_series(self, surface_chart, root):
+    def test_write_series(self, surface_chart, root_xml):
         cw = SurfaceChartWriter(surface_chart)
-        cw._write_series(root)
+        cw._write_series(root_xml)
         xml = get_xml(cw.root)
         expected = '<?xml version=\'1.0\' encoding=\'UTF-8\'?><test><c:ser><c:idx val="0" /><c:order val="0" /><c:spPr><a:ln><a:solidFill><a:srgbClr val="00FF00" /></a:solidFill></a:ln></c:spPr><c:marker><c:symbol val="none" /></c:marker><c:val><c:numRef><c:f>\'data\'!$A$1:$A$11</c:f><c:numCache><c:formatCode>General</c:formatCode><c:ptCount val="11" /><c:pt idx="0"><c:v>0</c:v></c:pt><c:pt idx="1"><c:v>1</c:v></c:pt><c:pt idx="2"><c:v>2</c:v></c:pt><c:pt idx="3"><c:v>3</c:v></c:pt><c:pt idx="4"><c:v>4</c:v></c:pt><c:pt idx="5"><c:v>5</c:v></c:pt><c:pt idx="6"><c:v>6</c:v></c:pt><c:pt idx="7"><c:v>7</c:v></c:pt><c:pt idx="8"><c:v>8</c:v></c:pt><c:pt idx="9"><c:v>9</c:v></c:pt><c:pt idx="10"><c:v>None</c:v></c:pt></c:numCache></c:numRef></c:val></c:ser></test>'
         diff = compare_xml(xml, expected)
