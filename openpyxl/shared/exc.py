@@ -1,3 +1,4 @@
+from __future__ import absolute_import
 # Copyright (c) 2010-2014 openpyxl
 #
 # Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -26,6 +27,10 @@
 
 class CellCoordinatesException(Exception):
     """Error for converting between numeric and A1-style cell references."""
+
+class IllegalCharacterError(Exception):
+    """The data submitted which cannot be used directly in Excel files. It
+    must be removed or escaped."""
 
 class ColumnStringIndexException(Exception):
     """Error for bad column names in A1-style cell references."""
