@@ -1,3 +1,4 @@
+from __future__ import absolute_import
 # Copyright (c) 2010-2014 openpyxl
 #
 # Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -27,16 +28,16 @@
 from warnings import warn
 
 # compatibility imports
-from openpyxl.shared.compat import BytesIO
-from openpyxl.shared.xmltools import iterparse
+from openpyxl.compat import BytesIO
+from openpyxl.xml.xmltools import iterparse
 
 # package imports
 from openpyxl.cell import get_column_letter
-from openpyxl.shared.xmltools import safe_iterator
 from openpyxl.cell import Cell, coordinate_from_string
 from openpyxl.worksheet import Worksheet, ColumnDimension, RowDimension
-from openpyxl.shared.ooxml import SHEET_MAIN_NS
-from openpyxl.style import Color
+from openpyxl.xml.ooxml import SHEET_MAIN_NS
+from openpyxl.xml.xmltools import safe_iterator
+from openpyxl.styles import Color
 from openpyxl.styles.formatting import ConditionalFormatting
 
 
@@ -111,13 +112,13 @@ class WorkSheetParser(object):
             '{%s}pageMargins' % SHEET_MAIN_NS: self.parse_margins,
             '{%s}pageSetup' % SHEET_MAIN_NS: self.parse_page_setup,
             '{%s}headerFooter' % SHEET_MAIN_NS: self.parse_header_footer,
-            '{%s}conditionalFormatting' % SHEET_MAIN_NS: self.parser_conditional_formatting
+            '{%s}conditionalFormatting' % SHEET_MAIN_NS: self.parser_conditional_formatting,
+            '{%s}autoFilter' % SHEET_MAIN_NS: self.parse_auto_filter
                       }
         for event, element in it:
             tag_name = element.tag
             if tag_name in dispatcher:
                 dispatcher[tag_name](element)
-
 
     def parse_cell(self, element):
         value = element.findtext('{%s}v' % SHEET_MAIN_NS)
@@ -294,6 +295,14 @@ class WorkSheetParser(object):
         if len(rules):
             self.ws.conditional_formatting.setRules(rules)
 
+    def parse_auto_filter(self, element):
+        self.ws.auto_filter.ref = element.get("ref")
+        for fc in safe_iterator(element, '{%s}filterColumn' % SHEET_MAIN_NS):
+            filters = fc.find('{%s}filters' % SHEET_MAIN_NS)
+            vals = [f.get("val") for f in safe_iterator(filters, '{%s}filter' % SHEET_MAIN_NS)]
+            self.ws.auto_filter.add_filter_column(fc.get("colId"), vals, blank=filters.get("blank"))
+        for sc in safe_iterator(element, '{%s}sortCondition' % SHEET_MAIN_NS):
+            self.ws.auto_filter.add_sort_condition(sc.get("ref"), sc.get("descending"))
 
 def fast_parse(ws, xml_source, string_table, style_table, color_index=None):
 
@@ -302,12 +311,12 @@ def fast_parse(ws, xml_source, string_table, style_table, color_index=None):
 
 
 def read_worksheet(xml_source, parent, preset_title, string_table,
-                   style_table, color_index=None, workbook_name=None, sheet_codename=None, keep_vba=False):
+                   style_table, color_index=None, workbook_name=None, worksheet_path=None, keep_vba=False):
     """Read an xml worksheet"""
-    if workbook_name and sheet_codename:
+    if workbook_name and worksheet_path:
         from openpyxl.reader.iter_worksheet import IterableWorksheet
         ws = IterableWorksheet(parent, preset_title, workbook_name,
-                sheet_codename, xml_source, string_table, style_table)
+                worksheet_path, xml_source, string_table, style_table)
     else:
         ws = Worksheet(parent, preset_title)
         fast_parse(ws, xml_source, string_table, style_table, color_index)
