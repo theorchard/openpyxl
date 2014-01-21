@@ -1,5 +1,4 @@
-# file openpyxl/reader/iter_worksheet.py
-
+from __future__ import absolute_import
 # Copyright (c) 2010-2014 openpyxl
 #
 # Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -34,9 +33,8 @@ from collections import namedtuple
 
 
 # compatibility
-from openpyxl.shared.compat import xrange
-from openpyxl.shared.xmltools import iterparse
-
+from openpyxl.compat import xrange, unicode
+from openpyxl.xml.xmltools import iterparse
 
 # package
 from openpyxl.worksheet import Worksheet
@@ -44,13 +42,11 @@ from openpyxl.cell import (
     coordinate_from_string,
     get_column_letter,
     Cell,
-    column_index_from_string
 )
 from openpyxl.styles import is_date_format
-from openpyxl.shared.date_time import SharedDate
+from openpyxl.date_time import SharedDate
 from openpyxl.reader.worksheet import read_dimension
-from openpyxl.shared.compat import unicode
-from openpyxl.shared.ooxml import (
+from openpyxl.xml.ooxml import (
     PACKAGE_WORKSHEETS,
     SHEET_MAIN_NS
 )
@@ -125,11 +121,10 @@ def get_missing_cells(row, columns):
 
 class IterableWorksheet(Worksheet):
 
-    def __init__(self, parent_workbook, title, sheet_codename, xml_source,
-                 string_table, style_table):
-
+    def __init__(self, parent_workbook, title, worksheet_path,
+                 xml_source, string_table, style_table):
         Worksheet.__init__(self, parent_workbook, title)
-        self._sheet_codename = sheet_codename
+        self.worksheet_path = worksheet_path
         self._string_table = string_table
         self._style_table = style_table
 
@@ -143,8 +138,7 @@ class IterableWorksheet(Worksheet):
 
     @property
     def xml_source(self):
-        worksheet_path = '%s/%s' % (PACKAGE_WORKSHEETS, self._sheet_codename)
-        return self.parent._archive.open(worksheet_path)
+        return self.parent._archive.open(self.worksheet_path)
 
     @xml_source.setter
     def xml_source(self, value):
@@ -254,11 +248,18 @@ class IterableWorksheet(Worksheet):
                 continue
             element.clear()
 
+
     def cell(self, *args, **kwargs):
+        # TODO return an individual cell
+
         raise NotImplementedError("use 'iter_rows()' instead")
 
     def range(self, *args, **kwargs):
+        # TODO return a range of cells, basically get_squared_range with same interface as Worksheet
         raise NotImplementedError("use 'iter_rows()' instead")
+
+    def rows(self):
+        return self.iter_rows()
 
     def calculate_dimension(self):
         return '%s%s:%s%s' % (self.min_col, self.min_row, self.max_col, self.max_row)
