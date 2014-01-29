@@ -1,7 +1,30 @@
+1.9.0 (unreleased)
+==================
+
+Minor changes
+-------------
+
+* All tests converted to pytest
+* Pyflakes used for static code analysis
+
+
+Pull requests
+-------------
+#70 Add filterColumn, sortCondition support to AutoFilter (SHIBUKAWA Yoshiki)
+
+
+Bug fixes
+---------
+#137 - Workbooks with chartsheets
+#46  - ColumnDimension style error
+
+
 1.8.3
 ==================
 
 Bugfix #256 - error when trying to read comments with optimised reader
+Bugfix #260 - unsized worksheets
+
 
 
 1.8.2 (2014-01-17)

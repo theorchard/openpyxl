@@ -1,4 +1,4 @@
-# coding=UTF-8
+from __future__ import absolute_import
 # Copyright (c) 2010-2014 openpyxl
 #
 # Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -22,9 +22,9 @@
 # @license: http://www.opensource.org/licenses/mit-license.php
 # @author: see AUTHORS file
 
-from openpyxl.shared.compat import iteritems
-from openpyxl.shared.ooxml import COMMENTS_NS, REL_NS, PKG_REL_NS, SHEET_MAIN_NS
-from openpyxl.shared.xmltools import Element, SubElement, get_document_content
+from openpyxl.compat import iteritems
+from openpyxl.xml.ooxml import SHEET_MAIN_NS
+from openpyxl.xml.xmltools import Element, SubElement, get_document_content
 from openpyxl.cell import column_index_from_string
 
 vmlns="urn:schemas-microsoft-com:vml"

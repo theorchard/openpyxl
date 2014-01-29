@@ -1,3 +1,4 @@
+from __future__ import absolute_import
 # Copyright (c) 2010-2014 openpyxl
 #
 # Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -27,10 +28,10 @@
 from zipfile import ZipFile, ZIP_DEFLATED
 
 # compatibility imports
-from openpyxl.shared.compat import BytesIO, StringIO
+from openpyxl.compat import BytesIO
 
 # package imports
-from openpyxl.shared.ooxml import (
+from openpyxl.xml.ooxml import (
     ARC_SHARED_STRINGS,
     ARC_CONTENT_TYPES,
     ARC_ROOT_RELS,

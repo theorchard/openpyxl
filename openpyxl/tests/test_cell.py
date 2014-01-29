@@ -22,24 +22,33 @@
 # @author: see AUTHORS file
 
 # Python stdlib imports
-from datetime import time, datetime, timedelta
+from datetime import time, datetime, timedelta, date
 
 # 3rd party imports
-from nose.tools import eq_, raises, assert_raises #pylint: disable=E0611
 import pytest
 
 # package imports
+from openpyxl.compat import safe_string
 from openpyxl.worksheet import Worksheet
 from openpyxl.workbook import Workbook
-from openpyxl.shared.exc import ColumnStringIndexException, \
-        CellCoordinatesException, DataTypeException
-from openpyxl.shared.date_time import CALENDAR_WINDOWS_1900
-from openpyxl.cell import column_index_from_string, \
-        coordinate_from_string, get_column_letter, Cell, absolute_coordinate
+from openpyxl.exceptions import (
+    CellCoordinatesException,
+    DataTypeException
+    )
+from openpyxl.date_time import CALENDAR_WINDOWS_1900
+from openpyxl.cell import (
+    column_index_from_string,
+    coordinate_from_string,
+    get_column_letter,
+    Cell,
+    absolute_coordinate
+    )
 from openpyxl.comments import Comment
+from openpyxl.styles import NumberFormat
 
 import decimal
 
+@pytest.fixture
 def build_dummy_worksheet():
 
     class Ws(object):
@@ -54,24 +63,24 @@ def build_dummy_worksheet():
 
 def test_coordinates():
     column, row = coordinate_from_string('ZF46')
-    eq_("ZF", column)
-    eq_(46, row)
+    assert "ZF" == column
+    assert 46 == row
 
 
-@raises(CellCoordinatesException)
 def test_invalid_coordinate():
-    coordinate_from_string('AAA')
+    with pytest.raises(CellCoordinatesException):
+        coordinate_from_string('AAA')
 
-@raises(CellCoordinatesException)
 def test_zero_row():
-    coordinate_from_string('AQ0')
+    with pytest.raises(CellCoordinatesException):
+        coordinate_from_string('AQ0')
 
 def test_absolute():
-    eq_('$ZF$51', absolute_coordinate('ZF51'))
+    assert '$ZF$51' == absolute_coordinate('ZF51')
 
 def test_absolute_multiple():
 
-    eq_('$ZF$51:$ZF$53', absolute_coordinate('ZF51:ZF$53'))
+    assert '$ZF$51:$ZF$53' == absolute_coordinate('ZF51:ZF$53')
 
 @pytest.mark.parametrize("column, idx",
                          [
@@ -127,103 +136,161 @@ def test_column_letter(value, expected):
 def test_initial_value():
     ws = build_dummy_worksheet()
     cell = Cell(ws, 'A', 1, value='17.5')
-    eq_(cell.TYPE_NUMERIC, cell.data_type)
+    assert cell.TYPE_NUMERIC == cell.data_type
 
 
 class TestCellValueTypes(object):
 
     @classmethod
     def setup_class(cls):
-
-        ws = build_dummy_worksheet()
+        wb = Workbook()
+        ws = Worksheet(wb)
         cls.cell = Cell(ws, 'A', 1)
 
     def test_1st(self):
-        eq_(self.cell.TYPE_NULL, self.cell.data_type)
+        assert self.cell.TYPE_NULL == self.cell.data_type
 
     def test_null(self):
         self.cell.value = None
-        eq_(self.cell.TYPE_NULL, self.cell.data_type)
+        assert self.cell.TYPE_NULL == self.cell.data_type
 
-    def test_numeric(self):
-
-        def check_numeric(value):
-            self.cell.value = value
-            eq_(self.cell.TYPE_NUMERIC, self.cell.data_type)
-
-        values = (42, '4.2', '-42.000', '0', 0, 0.0001, '0.9999', '99E-02', 1e1, '4', '-1E3', 4, decimal.Decimal('3.14'))
-        for value in values:
-            yield check_numeric, value
+    @pytest.mark.parametrize("value, expected",
+                             [
+                                 (42, 42),
+                                 ('4.2', 4.2),
+                                 ('-42.000', -42),
+                                 ( '0', 0),
+                                 (0, 0),
+                                 ( 0.0001, 0.0001),
+                                 ('0.9999', 0.9999),
+                                 ('99E-02', 0.99),
+                                 ( 1e1, 10),
+                                 ('4', 4),
+                                 ('-1E3', -1000),
+                                 (4, 4),
+                                 (decimal.Decimal('3.14'), decimal.Decimal('3.14')),
+                             ]
+                            )
+    def test_numeric(self, value, expected):
+        self.cell.value = value
+        assert self.cell.internal_value == expected
+        assert self.cell.TYPE_NUMERIC == self.cell.data_type
 
     def test_string(self):
         self.cell.value = 'hello'
-        eq_(self.cell.TYPE_STRING, self.cell.data_type)
+        assert self.cell.TYPE_STRING == self.cell.data_type
 
     def test_single_dot(self):
         self.cell.value = '.'
-        eq_(self.cell.TYPE_STRING, self.cell.data_type)
+        assert self.cell.TYPE_STRING == self.cell.data_type
 
     def test_formula(self):
         self.cell.value = '=42'
-        eq_(self.cell.TYPE_FORMULA, self.cell.data_type)
+        assert self.cell.TYPE_FORMULA == self.cell.data_type
         self.cell.value = '=if(A1<4;-1;1)'
-        eq_(self.cell.TYPE_FORMULA, self.cell.data_type)
+        assert self.cell.TYPE_FORMULA == self.cell.data_type
 
     def test_boolean(self):
         self.cell.value = True
-        eq_(self.cell.TYPE_BOOL, self.cell.data_type)
+        assert self.cell.TYPE_BOOL == self.cell.data_type
         self.cell.value = False
-        eq_(self.cell.TYPE_BOOL, self.cell.data_type)
+        assert self.cell.TYPE_BOOL == self.cell.data_type
 
     def test_leading_zero(self):
         self.cell.value = '0800'
-        eq_(self.cell.TYPE_STRING, self.cell.data_type)
+        assert self.cell.TYPE_STRING == self.cell.data_type
 
-    def test_error_codes(self):
+    @pytest.mark.parametrize("error_string", Cell.ERROR_CODES.keys())
+    def test_error_codes(self, error_string):
+        self.cell.value = error_string
+        assert self.cell.TYPE_ERROR == self.cell.data_type
 
-        def check_error(cell):
-            eq_(cell.TYPE_ERROR, cell.data_type)
+    def test_insert_float(self):
+        self.cell.value = 3.14
+        assert Cell.TYPE_NUMERIC == self.cell.data_type
 
-        for error_string in self.cell.ERROR_CODES.keys():
-            self.cell.value = error_string
-            yield check_error, self.cell
+    def test_insert_percentage(self):
+        self.cell.value = '3.14%'
+        assert Cell.TYPE_NUMERIC == self.cell.data_type
+        assert safe_string(0.0314) == safe_string(self.cell.internal_value)
+
+    def test_insert_datetime(self):
+        self.cell.value = date.today()
+        assert Cell.TYPE_NUMERIC == self.cell.data_type
+
+    def test_insert_date(self):
+        self.cell.value = datetime.now()
+        assert Cell.TYPE_NUMERIC == self.cell.data_type
+
+    def test_internal_date(self):
+        dt = datetime(2010, 7, 13, 6, 37, 41)
+        self.cell.value = dt
+        assert 40372.27616898148 == self.cell.internal_value
+
+    def test_datetime_interpretation(self):
+        dt = datetime(2010, 7, 13, 6, 37, 41)
+        self.cell.value = dt
+        assert self.cell.value == dt
+        assert self.cell.internal_value == 40372.27616898148
+
+    def test_date_interpretation(self):
+        dt = date(2010, 7, 13)
+        self.cell.value = dt
+        assert self.cell.value == datetime(2010, 7, 13, 0, 0)
+        assert self.cell.internal_value == 40372
+
+    def test_number_format_style(self):
+        self.cell.value = '12.6%'
+        assert NumberFormat.FORMAT_PERCENTAGE == self.cell.style.number_format.format_code
 
 
 def test_data_type_check():
     ws = build_dummy_worksheet()
     cell = Cell(ws, 'A', 1)
     cell.bind_value(None)
-    eq_(Cell.TYPE_NULL, cell._data_type)
+    assert Cell.TYPE_NULL == cell._data_type
 
     cell.bind_value('.0e000')
-    eq_(Cell.TYPE_NUMERIC, cell._data_type)
+    assert Cell.TYPE_NUMERIC == cell._data_type
 
     cell.bind_value('-0.e-0')
-    eq_(Cell.TYPE_NUMERIC, cell._data_type)
+    assert Cell.TYPE_NUMERIC == cell._data_type
 
     cell.bind_value('1E')
-    eq_(Cell.TYPE_STRING, cell._data_type)
+    assert Cell.TYPE_STRING == cell._data_type
 
-@raises(DataTypeException)
+
 def test_set_bad_type():
     ws = build_dummy_worksheet()
     cell = Cell(ws, 'A', 1)
-    cell.set_explicit_value(1, 'q')
+    with pytest.raises(DataTypeException):
+        cell.set_explicit_value(1, 'q')
 
 
-def test_time():
+def test_illegal_chacters():
+    from openpyxl.exceptions import IllegalCharacterError
+    ws = build_dummy_worksheet()
+    cell = Cell(ws, 'A', 1)
+    for i in range(33):
+        with pytest.raises(IllegalCharacterError):
+            cell.value = chr(i)
+    # test legal UTF-8
+    cell.value = chr(33)
 
-    def check_time(raw_value, coerced_value):
-        cell.value = raw_value
-        eq_(cell.value, coerced_value)
-        eq_(cell.TYPE_NUMERIC, cell.data_type)
 
+values = (
+    ('03:40:16', time(3, 40, 16)),
+    ('03:40', time(3, 40)),
+)
+@pytest.mark.parametrize("value, expected",
+                         values)
+def test_time(value, expected):
     wb = Workbook()
     ws = Worksheet(wb)
     cell = Cell(ws, 'A', 1)
-    values = (('03:40:16', time(3, 40, 16)), ('03:40', time(3, 40)),)
-    for raw_value, coerced_value in values:
-        yield check_time, raw_value, coerced_value
+    cell.value = value
+    assert cell.value == expected
+    assert cell.TYPE_NUMERIC == cell.data_type
 
 
 def test_timedelta():
@@ -232,8 +299,8 @@ def test_timedelta():
     ws = Worksheet(wb)
     cell = Cell(ws, 'A', 1)
     cell.value = timedelta(days=1, hours=3)
-    eq_(cell.value, 1.125)
-    eq_(cell.TYPE_NUMERIC, cell.data_type)
+    assert cell.value == 1.125
+    assert cell.TYPE_NUMERIC == cell.data_type
 
 
 def test_date_format_on_non_date():
@@ -242,7 +309,7 @@ def test_date_format_on_non_date():
     cell = Cell(ws, 'A', 1)
     cell.value = datetime.now()
     cell.value = 'testme'
-    eq_('testme', cell.value)
+    assert 'testme' == cell.value
 
 def test_set_get_date():
     today = datetime(2010, 1, 18, 14, 15, 20, 1600)
@@ -250,22 +317,22 @@ def test_set_get_date():
     ws = Worksheet(wb)
     cell = Cell(ws, 'A', 1)
     cell.value = today
-    eq_(today, cell.value)
+    assert today == cell.value
 
 def test_repr():
     wb = Workbook()
     ws = Worksheet(wb)
     cell = Cell(ws, 'A', 1)
-    eq_(repr(cell), '<Cell Sheet1.A1>', 'Got bad repr: %s' % repr(cell))
+    assert repr(cell), '<Cell Sheet1.A1>' == 'Got bad repr: %s' % repr(cell)
 
 def test_is_date():
     wb = Workbook()
     ws = Worksheet(wb)
     cell = Cell(ws, 'A', 1)
     cell.value = datetime.now()
-    eq_(cell.is_date(), True)
+    assert cell.is_date() == True
     cell.value = 'testme'
-    eq_('testme', cell.value)
+    assert 'testme' == cell.value
     assert cell.is_date() is False
 
 def test_is_not_date_color_format():
