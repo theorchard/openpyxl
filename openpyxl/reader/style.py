@@ -1,3 +1,4 @@
+from __future__ import absolute_import
 # Copyright (c) 2010-2014 openpyxl
 #
 # Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -24,10 +25,10 @@
 """Read shared style definitions"""
 
 # package imports
-from openpyxl.shared.xmltools import fromstring
-from openpyxl.shared.exc import MissingNumberFormat
-from openpyxl.style import Style, NumberFormat, Font, Fill, Borders, Protection, Color
-from openpyxl.shared.ooxml import SHEET_MAIN_NS
+from openpyxl.xml.functions import fromstring
+from openpyxl.exceptions import MissingNumberFormat
+from openpyxl.styles import Style, NumberFormat, Font, Fill, Borders, Protection, Color
+from openpyxl.xml.constants import SHEET_MAIN_NS
 from copy import deepcopy
 
 def read_style_table(xml_source):

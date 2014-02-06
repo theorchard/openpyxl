@@ -1,3 +1,4 @@
+from __future__ import absolute_import
 # Copyright (c) 2010-2014 openpyxl
 #
 # Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -25,7 +26,7 @@ import threading
 
 from openpyxl.workbook import Workbook
 
-from openpyxl.shared.compat import StringIO
+from openpyxl.compat import StringIO
 
 def test_thread_safe_dump():
 

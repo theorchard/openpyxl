@@ -1,3 +1,4 @@
+from __future__ import absolute_import
 # Copyright (c) 2010-2014 openpyxl
 #
 # Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -29,28 +30,38 @@ from sys import exc_info
 import warnings
 
 # compatibility imports
+from openpyxl.compat import unicode, file, StringIO, BytesIO
 
-from openpyxl.shared.compat import unicode, file, StringIO
+# Allow blanket setting of KEEP_VBA for testing
+try:
+    from ..tests import KEEP_VBA
+except ImportError:
+    KEEP_VBA = False
+
 
 # package imports
-from openpyxl.shared.exc import OpenModeError, InvalidFileException
-from openpyxl.shared.ooxml import (ARC_SHARED_STRINGS, ARC_CORE, ARC_WORKBOOK,
-                                   PACKAGE_WORKSHEETS, ARC_STYLE, ARC_THEME,
-                                   ARC_CONTENT_TYPES)
+from openpyxl.exceptions import OpenModeError, InvalidFileException
+from openpyxl.xml.constants import (
+    ARC_SHARED_STRINGS,
+    ARC_CORE,
+    ARC_WORKBOOK,
+    ARC_STYLE,
+    ARC_THEME,
+    PACKAGE_XL,
+)
+
 from openpyxl.workbook import Workbook, DocumentProperties
 from openpyxl.reader.strings import read_string_table
 from openpyxl.reader.style import read_style_table
-from openpyxl.reader.workbook import (read_sheets_titles, read_named_ranges,
-        read_properties_core, read_excel_base_date,
-        read_content_types)
+from openpyxl.reader.workbook import (
+    read_named_ranges,
+    read_properties_core,
+    read_excel_base_date,
+    detect_worksheets
+)
 from openpyxl.reader.worksheet import read_worksheet
 from openpyxl.reader.comments import read_comments, get_comments_file
 # Use exc_info for Python 2 compatibility with "except Exception[,/ as] e"
-
-
-VALID_WORKSHEET = "application/vnd.openxmlformats-officedocument.spreadsheetml.worksheet+xml"
-VALID_CHARTSHEET = "application/vnd.openxmlformats-officedocument.spreadsheetml.chartsheet+xml"
-WORK_OR_CHART_TYPE = [VALID_WORKSHEET, VALID_CHARTSHEET]
 
 
 CENTRAL_DIRECTORY_SIGNATURE = '\x50\x4b\x05\x06'
@@ -76,7 +87,7 @@ def repair_central_directory(zipFile, is_file_instance):
     return f
 
 
-def load_workbook(filename, use_iterators=False, keep_vba=False, guess_types=True, data_only=False):
+def load_workbook(filename, use_iterators=False, keep_vba=KEEP_VBA, guess_types=False, data_only=False):
     """Open the given filename and return the workbook
 
     :param filename: the path to open or a file-like object
@@ -127,10 +138,8 @@ def load_workbook(filename, use_iterators=False, keep_vba=False, guess_types=Tru
 
     if use_iterators:
         wb._set_optimized_read()
-        if not guess_types:
-            warnings.warn('please note that data types are not guessed '
-                          'when using iterator reader, so you do not need '
-                          'to use guess_types=False')
+        if guess_types:
+            warnings.warn('Data types are not guessed when using iterator reader')
 
     try:
         _load_workbook(wb, archive, filename, use_iterators, keep_vba)
@@ -138,8 +147,7 @@ def load_workbook(filename, use_iterators=False, keep_vba=False, guess_types=Tru
         e = exc_info()[1]
         raise InvalidFileException(unicode(e))
 
-    if not keep_vba:
-        archive.close()
+    archive.close()
     return wb
 
 
@@ -147,10 +155,19 @@ def _load_workbook(wb, archive, filename, use_iterators, keep_vba):
 
     valid_files = archive.namelist()
 
-    # If are going to preserve the vba then attach the archive to the
+    # If are going to preserve the vba then attach a copy of the archive to the
     # workbook so that is available for the save.
     if keep_vba:
-        wb.vba_archive = archive
+        try:
+            f = open(filename, 'rb')
+            s = f.read()
+            f.close()
+        except:
+            pos = filename.tell()
+            filename.seek(0)
+            s = filename.read()
+            filename.seek(pos)
+        wb.vba_archive = ZipFile(BytesIO(s), 'r')
 
     if use_iterators:
         wb._archive = ZipFile(filename)
@@ -179,15 +196,9 @@ def _load_workbook(wb, archive, filename, use_iterators, keep_vba):
 
     # get worksheets
     wb.worksheets = []  # remove preset worksheet
-    content_types = read_content_types(archive.read(ARC_CONTENT_TYPES))
-    sheet_types = [(sheet, contyp) for sheet, contyp in content_types if contyp in WORK_OR_CHART_TYPE]
-    sheet_names = read_sheets_titles(archive.read(ARC_WORKBOOK))
-    worksheet_names = [worksheet for worksheet, sheet_type in zip(sheet_names, sheet_types) if sheet_type[1] == VALID_WORKSHEET]
-    for i, sheet_name in enumerate(worksheet_names):
-
-        sheet_codename = 'sheet%d.xml' % (i + 1)
-        worksheet_path = '%s/%s' % (PACKAGE_WORKSHEETS, sheet_codename)
-
+    for sheet in detect_worksheets(archive):
+        sheet_name = sheet['title']
+        worksheet_path = '%s/%s' % (PACKAGE_XL, sheet['path'])
         if not worksheet_path in valid_files:
             continue
 
@@ -200,12 +211,12 @@ def _load_workbook(wb, archive, filename, use_iterators, keep_vba):
             new_ws = read_worksheet(None, wb, sheet_name, string_table,
                                     style_table,
                                     color_index=style_properties['color_index'],
-                                    sheet_codename=sheet_codename)
-        wb.add_sheet(new_ws, index=i)
+                                    worksheet_path=worksheet_path)
+        wb.add_sheet(new_ws)
 
         if not use_iterators:
-            # load comments into the worksheet cells
-            comments_file = get_comments_file(sheet_codename, archive, valid_files)
+        # load comments into the worksheet cells
+            comments_file = get_comments_file(worksheet_path, archive, valid_files)
             if comments_file is not None:
                 read_comments(new_ws, archive.read(comments_file))
 

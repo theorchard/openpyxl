@@ -1,3 +1,32 @@
+1.9.0 (unreleased)
+==================
+
+
+Major changes
+-------------
+
+* Type inference is disabled by default
+* RawCell.internal_value and RawCell.value now behave the same as Cell
+
+
+Minor changes
+-------------
+
+* All tests converted to pytest
+* Pyflakes used for static code analysis
+
+
+Pull requests
+-------------
+#70 Add filterColumn, sortCondition support to AutoFilter (SHIBUKAWA Yoshiki)
+
+
+Bug fixes
+---------
+#137 - Workbooks with chartsheets
+#46  - ColumnDimension style error
+
+
 1.8.3
 ==================
 

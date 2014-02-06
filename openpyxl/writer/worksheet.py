@@ -1,3 +1,4 @@
+from __future__ import absolute_import
 # Copyright (c) 2010-2014 openpyxl
 #
 # Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -24,35 +25,32 @@
 """Write worksheets to xml representations."""
 
 # Python stdlib imports
-import decimal, re
+import decimal
 
 # compatibility imports
 
-from openpyxl.shared.compat import BytesIO, StringIO, long
+from openpyxl.compat import StringIO, long
 
 # package imports
-from openpyxl.cell import coordinate_from_string, column_index_from_string
-from openpyxl.shared.xmltools import (
+from openpyxl.cell import coordinate_from_string, column_index_from_string, COORD_RE
+from openpyxl.xml.functions import (
     Element,
     SubElement,
     XMLGenerator,
-    ElementTree,
     get_document_content,
     start_tag,
     end_tag,
     tag,
     fromstring,
-    tostring,
-    register_namespace,
     )
-from openpyxl.shared.ooxml import (
+from openpyxl.xml.constants import (
     SHEET_MAIN_NS,
     PKG_REL_NS,
     REL_NS,
     COMMENTS_NS,
     VML_NS
 )
-from openpyxl.shared.compat.itertools import iteritems, iterkeys
+from openpyxl.compat.itertools import iteritems, iterkeys
 from openpyxl.styles.formatting import ConditionalFormatting
 
 
@@ -97,8 +95,7 @@ def write_worksheet(worksheet, string_table, style_table):
     tag(doc, 'sheetFormatPr', {'defaultRowHeight': '15'})
     write_worksheet_cols(doc, worksheet, style_table)
     write_worksheet_data(doc, worksheet, string_table, style_table)
-    if worksheet.auto_filter:
-        tag(doc, 'autoFilter', {'ref': worksheet.auto_filter})
+    write_worksheet_autofilter(doc, worksheet)
     write_worksheet_mergecells(doc, worksheet)
     write_worksheet_datavalidations(doc, worksheet)
     write_worksheet_hyperlinks(doc, worksheet)
@@ -205,8 +202,8 @@ def write_worksheet_cols(doc, worksheet, style_table):
                 col_def['collapsed'] = 'true'
             if columndimension.auto_size:
                 col_def['bestFit'] = 'true'
-            if columndimension.style_index and hash(columndimension.style_index) in style_table:
-                col_def['style'] = str(style_table[hash(columndimension.style_index)])
+            if columndimension.column_index in worksheet._styles:
+                col_def['style'] = str(style_table[hash(worksheet.get_style(columndimension.column_index))])
             if columndimension.width > 0:
                 col_def['width'] = str(columndimension.width)
             else:
@@ -269,7 +266,8 @@ def write_worksheet_data(doc, worksheet, string_table, style_table):
     cells_by_row = {}
     for styleCoord in iterkeys(worksheet._styles):
         # Ensure a blank cell exists if it has a style
-        worksheet.cell(styleCoord)
+        if isinstance(styleCoord, str) and COORD_RE.search(styleCoord):
+            worksheet.cell(styleCoord)
     for cell in worksheet.get_cell_collection():
         cells_by_row.setdefault(cell.row, []).append(cell)
     for row_idx in sorted(cells_by_row):
@@ -281,12 +279,15 @@ def write_worksheet_data(doc, worksheet, string_table, style_table):
         if row_dimension.height > 0:
             attrs['ht'] = str(row_dimension.height)
             attrs['customHeight'] = '1'
+        if row_dimension.row_index in worksheet._styles:
+            attrs['s'] = str(style_table[hash(worksheet.get_style(row_dimension.row_index))])
+            attrs['customFormat'] = '1'
         start_tag(doc, 'row', attrs)
         row_cells = cells_by_row[row_idx]
         sorted_cells = sorted(row_cells, key=row_sort)
         for cell in sorted_cells:
             value = cell._value
-            coordinate = cell.get_coordinate()
+            coordinate = cell.coordinate
             attributes = {'r': coordinate}
             if cell.data_type != cell.TYPE_FORMULA:
                 attributes['t'] = cell.data_type
@@ -325,6 +326,31 @@ def write_worksheet_data(doc, worksheet, string_table, style_table):
         end_tag(doc, 'row')
     end_tag(doc, 'sheetData')
 
+def write_worksheet_autofilter(doc, worksheet):
+    auto_filter = worksheet.auto_filter
+    if auto_filter.filter_columns or auto_filter.sort_conditions:
+        start_tag(doc, 'autoFilter', {'ref': auto_filter.ref})
+        for col_id, filter_column in sorted(auto_filter.filter_columns.items()):
+            start_tag(doc, 'filterColumn', {'colId': str(col_id)})
+            if filter_column.blank:
+                start_tag(doc, 'filters', {'blank': '1'})
+            else:
+                start_tag(doc, 'filters')
+            for val in filter_column.vals:
+                tag(doc, 'filter', {'val': val})
+            end_tag(doc, 'filters')
+            end_tag(doc, 'filterColumn')
+        if auto_filter.sort_conditions:
+            start_tag(doc, 'sortState', {'ref': auto_filter.ref})
+            for sort_condition in auto_filter.sort_conditions:
+                sort_attr = {'ref': sort_condition.ref}
+                if sort_condition.descending:
+                    sort_attr['descending'] = '1'
+                tag(doc, 'sortCondtion', sort_attr)
+            end_tag(doc, 'sortState')
+        end_tag(doc, 'autoFilter')
+    elif auto_filter.ref:
+        tag(doc, 'autoFilter', {'ref': auto_filter.ref})
 
 def write_worksheet_mergecells(doc, worksheet):
     """Write merged cells to xml."""
@@ -366,7 +392,7 @@ def write_worksheet_hyperlinks(doc, worksheet):
         for cell in worksheet.get_cell_collection():
             if cell.hyperlink_rel_id is not None:
                 attrs = {'display': cell.hyperlink,
-                        'ref': cell.get_coordinate(),
+                        'ref': cell.coordinate,
                         'r:id': cell.hyperlink_rel_id}
                 tag(doc, 'hyperlink', attrs)
         end_tag(doc, 'hyperlinks')

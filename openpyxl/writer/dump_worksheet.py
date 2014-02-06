@@ -1,3 +1,4 @@
+from __future__ import absolute_import
 # Copyright (c) 2010-2014 openpyxl
 #
 # Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -27,21 +28,21 @@ import datetime
 import os
 from tempfile import NamedTemporaryFile
 
-from openpyxl.shared.compat import OrderedDict
+from openpyxl.compat import OrderedDict
 
 from openpyxl.cell import  get_column_letter, Cell
 from openpyxl.worksheet import Worksheet
-from openpyxl.shared.xmltools import (XMLGenerator, start_tag, end_tag, tag)
-from openpyxl.shared.date_time import SharedDate
-from openpyxl.shared.ooxml import MAX_COLUMN, MAX_ROW
-from openpyxl.shared import NUMERIC_TYPES
-from openpyxl.shared.exc import WorkbookAlreadySaved
+from openpyxl.xml.functions import (XMLGenerator, start_tag, end_tag, tag)
+from openpyxl.date_time import to_excel
+from openpyxl.xml.constants import MAX_COLUMN, MAX_ROW
+from openpyxl.units import NUMERIC_TYPES
+from openpyxl.exceptions import WorkbookAlreadySaved
 from openpyxl.writer.excel import ExcelWriter
 from openpyxl.writer.strings import write_string_table
 from openpyxl.writer.styles import StyleWriter
-from openpyxl.style import Style, NumberFormat
+from openpyxl.styles import Style, NumberFormat
 
-from openpyxl.shared.ooxml import (ARC_SHARED_STRINGS, PACKAGE_WORKSHEETS)
+from openpyxl.xml.constants import (ARC_SHARED_STRINGS, PACKAGE_WORKSHEETS)
 
 STYLES = {'datetime' : {'type':Cell.TYPE_NUMERIC,
                         'style':'1'},
@@ -84,8 +85,8 @@ class DumpWorksheet(Worksheet):
         self._fileobj_content_name = create_temporary_file(suffix='.content')
         self._fileobj_name = create_temporary_file()
 
-        self._shared_date = SharedDate()
         self._string_builder = self._parent.strings_table_builder
+
 
     def get_temporary_file(self, filename):
         if filename in self._descriptors_cache:
@@ -227,7 +228,7 @@ class DumpWorksheet(Worksheet):
                 dtype = 'numeric'
             elif isinstance(cell, (datetime.datetime, datetime.date)):
                 dtype = 'datetime'
-                cell = self._shared_date.datetime_to_julian(cell)
+                cell = to_excel(cell)
                 attributes['s'] = STYLES[dtype]['style']
             elif cell and cell[0] == '=':
                 dtype = 'formula'

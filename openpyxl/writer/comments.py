@@ -1,4 +1,4 @@
-# coding=UTF-8
+from __future__ import absolute_import
 # Copyright (c) 2010-2014 openpyxl
 #
 # Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -22,9 +22,9 @@
 # @license: http://www.opensource.org/licenses/mit-license.php
 # @author: see AUTHORS file
 
-from openpyxl.shared.compat import iteritems
-from openpyxl.shared.ooxml import COMMENTS_NS, REL_NS, PKG_REL_NS, SHEET_MAIN_NS
-from openpyxl.shared.xmltools import Element, SubElement, get_document_content
+from openpyxl.compat import iteritems
+from openpyxl.xml.constants import SHEET_MAIN_NS
+from openpyxl.xml.functions import Element, SubElement, get_document_content
 from openpyxl.cell import column_index_from_string
 
 vmlns="urn:schemas-microsoft-com:vml"
@@ -59,7 +59,7 @@ class CommentWriter(object):
 
         commentlist_tag = SubElement(root, "{%s}commentList" % SHEET_MAIN_NS)
         for comment in self.comments:
-            attrs = {'ref': comment._parent.get_coordinate(),
+            attrs = {'ref': comment._parent.coordinate,
                      'authorId': self.author_to_id[comment.author],
                      'shapeId': '0'}
             comment_tag = SubElement(commentlist_tag, "{%s}comment" % SHEET_MAIN_NS, attrs)

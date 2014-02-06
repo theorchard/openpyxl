@@ -25,41 +25,20 @@
 import warnings
 
 try:
-    from lxml.etree import LXML_VERSION
-    LXML = LXML_VERSION >= (3, 2, 5, 0)
-    if LXML is False:
-        warnings.warn("The installed version of lxml is too old to be used with openpyxl")
-except ImportError:
-    LXML = False
+    from .tests import LXML
+except  ImportError:
+    try:
+        from lxml.etree import LXML_VERSION
+        LXML = LXML_VERSION >= (3, 2, 5, 0)
+        if LXML is False:
+            warnings.warn("The installed version of lxml is too old to be used with openpyxl")
+    except ImportError:
+        LXML = False
 
-# package imports
-from openpyxl import cell
-from openpyxl import namedrange
-from openpyxl import style
-from openpyxl import workbook
-from openpyxl import worksheet
-from openpyxl import reader
-from openpyxl import shared
-from openpyxl import writer
-from openpyxl import comments
 
-# shortcuts
 from openpyxl.workbook import Workbook
 from openpyxl.reader.excel import load_workbook
 
-# constants
+__author__ = 'Eric Gazoni and contributors'
 
-__major__ = 1  # for major interface/format changes
-__minor__ = 8  # for minor interface/format changes
-__release__ = 2  # for tweaks, bug-fixes, or development
-
-__version__ = '%d.%d.%d' % (__major__, __minor__, __release__)
-
-__author__ = 'Eric Gazoni'
-__license__ = 'MIT/Expat'
-__author_email__ = 'eric.gazoni@gmail.com'
-__maintainer_email__ = 'openpyxl-users@googlegroups.com'
-__url__ = 'http://openpyxl.readthedocs.org'
-__downloadUrl__ = "http://bitbucket.org/ericgazoni/openpyxl/downloads"
-
-__all__ = ('reader', 'shared', 'writer',)
+__version__ = '1.9.0' # major.minor.patch

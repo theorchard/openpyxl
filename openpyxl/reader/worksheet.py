@@ -1,3 +1,4 @@
+from __future__ import absolute_import
 # Copyright (c) 2010-2014 openpyxl
 #
 # Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -27,16 +28,17 @@
 from warnings import warn
 
 # compatibility imports
-from openpyxl.shared.compat import BytesIO
-from openpyxl.shared.xmltools import iterparse
+from openpyxl.compat import BytesIO
+from openpyxl.xml.functions import iterparse
 
 # package imports
+from openpyxl import LXML
 from openpyxl.cell import get_column_letter
-from openpyxl.shared.xmltools import safe_iterator
 from openpyxl.cell import Cell, coordinate_from_string
 from openpyxl.worksheet import Worksheet, ColumnDimension, RowDimension
-from openpyxl.shared.ooxml import SHEET_MAIN_NS
-from openpyxl.style import Color
+from openpyxl.xml.constants import SHEET_MAIN_NS
+from openpyxl.xml.functions import safe_iterator
+from openpyxl.styles import Color
 from openpyxl.styles.formatting import ConditionalFormatting
 
 
@@ -83,12 +85,20 @@ def read_dimension(xml_source):
                 else:
                     min_col = min(min_col, int(start))
                     max_col = max(max_col, int(stop))
+        el.clear()
     max_row = int(row)
     warn("Unsized worksheet")
     return get_column_letter(min_col), min_row, get_column_letter(max_col),  max_row
 
 
 class WorkSheetParser(object):
+
+    COL_TAG = '{%s}col' % SHEET_MAIN_NS
+    ROW_TAG = '{%s}row' % SHEET_MAIN_NS
+    CELL_TAG = '{%s}c' % SHEET_MAIN_NS
+    VALUE_TAG = '{%s}v' % SHEET_MAIN_NS
+    FORMULA_TAG = '{%s}f' % SHEET_MAIN_NS
+    MERGE_TAG = '{%s}mergeCell' % SHEET_MAIN_NS
 
     def __init__(self, ws, xml_source, string_table, style_table, color_index=None):
         self.ws = ws
@@ -104,25 +114,29 @@ class WorkSheetParser(object):
         it = iterparse(stream)
 
         dispatcher = {
-            '{%s}c' % SHEET_MAIN_NS: self.parse_cell,
             '{%s}mergeCells' % SHEET_MAIN_NS: self.parse_merge,
-            '{%s}cols' % SHEET_MAIN_NS: self.parse_column_dimensions,
-            '{%s}sheetData' % SHEET_MAIN_NS: self.parse_row_dimensions,
+            '{%s}col' % SHEET_MAIN_NS: self.parse_column_dimensions,
+            '{%s}row' % SHEET_MAIN_NS: self.parse_row_dimensions,
             '{%s}printOptions' % SHEET_MAIN_NS: self.parse_print_options,
             '{%s}pageMargins' % SHEET_MAIN_NS: self.parse_margins,
             '{%s}pageSetup' % SHEET_MAIN_NS: self.parse_page_setup,
             '{%s}headerFooter' % SHEET_MAIN_NS: self.parse_header_footer,
-            '{%s}conditionalFormatting' % SHEET_MAIN_NS: self.parser_conditional_formatting
+            '{%s}conditionalFormatting' % SHEET_MAIN_NS: self.parser_conditional_formatting,
+            '{%s}autoFilter' % SHEET_MAIN_NS: self.parse_auto_filter
                       }
+        tags = dispatcher.keys()
+        stream = _get_xml_iter(self.source)
+        it = iterparse(stream, tag=tags)
+
         for event, element in it:
             tag_name = element.tag
             if tag_name in dispatcher:
                 dispatcher[tag_name](element)
-
+                element.clear()
 
     def parse_cell(self, element):
-        value = element.findtext('{%s}v' % SHEET_MAIN_NS)
-        formula = element.find('{%s}f' % SHEET_MAIN_NS)
+        value = element.findtext(self.VALUE_TAG)
+        formula = element.find(self.FORMULA_TAG)
 
         coordinate = element.get('r')
         style_id = element.get('s')
@@ -133,7 +147,7 @@ class WorkSheetParser(object):
             data_type = element.get('t', 'n')
             if data_type == Cell.TYPE_STRING:
                 value = self.string_table.get(int(value))
-            if data_type == Cell.TYPE_BOOL:
+            elif data_type == Cell.TYPE_BOOL:
                 value = bool(int(value))
             if formula is not None and not self.data_only:
                 if formula.text:
@@ -158,37 +172,43 @@ class WorkSheetParser(object):
             self.ws.merge_cells(mergeCell.get('ref'))
 
 
-    def parse_column_dimensions(self, element):
-        for col in safe_iterator(element, '{%s}col' % SHEET_MAIN_NS):
-            min = int(col.get('min')) if col.get('min') else 1
-            max = int(col.get('max')) if col.get('max') else 1
-            # Ignore ranges that go up to the max column 16384.  Columns need to be extended to handle
-            # ranges without creating an entry for every single one.
-            if max != 16384:
-                for colId in range(min, max + 1):
-                    column = get_column_letter(colId)
-                    width = col.get("width")
-                    auto_size = col.get('bestFit') == '1'
-                    visible = col.get('hidden') != '1'
-                    outline = col.get('outlineLevel') or 0
-                    collapsed = col.get('collapsed') == '1'
-                    style_index =  self.style_table.get(int(col.get('style', 0)))
-                    if column not in self.ws.column_dimensions:
-                        new_dim = ColumnDimension(index=column,
-                                                  width=width, auto_size=auto_size,
-                                                  visible=visible, outline_level=outline,
-                                                  collapsed=collapsed, style_index=style_index)
-                        self.ws.column_dimensions[column] = new_dim
+    def parse_column_dimensions(self, col):
+        min = int(col.get('min')) if col.get('min') else 1
+        max = int(col.get('max')) if col.get('max') else 1
+        # Ignore ranges that go up to the max column 16384.  Columns need to be extended to handle
+        # ranges without creating an entry for every single one.
+        if max != 16384:
+            for colId in range(min, max + 1):
+                column = get_column_letter(colId)
+                width = col.get("width")
+                auto_size = col.get('bestFit') == '1'
+                visible = col.get('hidden') != '1'
+                outline = col.get('outlineLevel') or 0
+                collapsed = col.get('collapsed') == '1'
+                style_index = col.get('style')
+                if style_index is not None:
+                    self.ws._styles[column] = self.style_table.get(int(style_index))
+                if column not in self.ws.column_dimensions:
+                    new_dim = ColumnDimension(self.ws,
+                                              index=column,
+                                              width=width, auto_size=auto_size,
+                                              visible=visible, outline_level=outline,
+                                              collapsed=collapsed)
+                    self.ws.column_dimensions[column] = new_dim
 
 
-    def parse_row_dimensions(self, element):
-        for row in safe_iterator(element, '{%s}row' % SHEET_MAIN_NS):
-            rowId = int(row.get('r'))
-            if rowId not in self.ws.row_dimensions:
-                self.ws.row_dimensions[rowId] = RowDimension(rowId)
-            ht = row.get('ht')
-            if ht is not None:
-                self.ws.row_dimensions[rowId].height = float(ht)
+    def parse_row_dimensions(self, row):
+        rowId = int(row.get('r'))
+        if rowId not in self.ws.row_dimensions:
+            self.ws.row_dimensions[rowId] = RowDimension(self.ws, rowId)
+        style_index = row.get('s')
+        if row.get('customFormat') and style_index:
+            self.ws._styles[rowId] = self.style_table.get(int(style_index))
+        ht = row.get('ht')
+        if ht is not None:
+            self.ws.row_dimensions[rowId].height = float(ht)
+        for cell in safe_iterator(row, self.CELL_TAG):
+            self.parse_cell(cell)
 
 
     def parse_print_options(self, element):
@@ -295,20 +315,29 @@ class WorkSheetParser(object):
         if len(rules):
             self.ws.conditional_formatting.setRules(rules)
 
+    def parse_auto_filter(self, element):
+        self.ws.auto_filter.ref = element.get("ref")
+        for fc in safe_iterator(element, '{%s}filterColumn' % SHEET_MAIN_NS):
+            filters = fc.find('{%s}filters' % SHEET_MAIN_NS)
+            vals = [f.get("val") for f in safe_iterator(filters, '{%s}filter' % SHEET_MAIN_NS)]
+            self.ws.auto_filter.add_filter_column(fc.get("colId"), vals, blank=filters.get("blank"))
+        for sc in safe_iterator(element, '{%s}sortCondition' % SHEET_MAIN_NS):
+            self.ws.auto_filter.add_sort_condition(sc.get("ref"), sc.get("descending"))
 
 def fast_parse(ws, xml_source, string_table, style_table, color_index=None):
 
     parser = WorkSheetParser(ws, xml_source, string_table, style_table, color_index)
     parser.parse()
+    del parser
 
 
 def read_worksheet(xml_source, parent, preset_title, string_table,
-                   style_table, color_index=None, sheet_codename=None, keep_vba=False):
+                   style_table, color_index=None, worksheet_path=None, keep_vba=False):
     """Read an xml worksheet"""
-    if sheet_codename:
+    if worksheet_path:
         from openpyxl.reader.iter_worksheet import IterableWorksheet
-        ws = IterableWorksheet(parent, preset_title, sheet_codename,
-                               xml_source, string_table, style_table)
+        ws = IterableWorksheet(parent, preset_title,
+                worksheet_path, xml_source, string_table, style_table)
     else:
         ws = Worksheet(parent, preset_title)
         fast_parse(ws, xml_source, string_table, style_table, color_index)

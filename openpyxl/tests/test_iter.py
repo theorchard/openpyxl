@@ -1,5 +1,3 @@
-# file openpyxl/tests/test_iter.py
-
 # Copyright (c) 2010-2014 openpyxl
 #
 # Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -31,7 +29,7 @@ import pytest
 from openpyxl.tests.helper import DATADIR
 from openpyxl.reader.iter_worksheet import get_range_boundaries
 from openpyxl.reader.excel import load_workbook
-from openpyxl.shared.compat import xrange
+from openpyxl.compat import xrange
 
 
 def test_open_many_sheets():
@@ -100,13 +98,13 @@ class TestText(TestWorksheet):
         wb = self._open_wb()
         ws = wb.get_sheet_by_name(name = self.sheet_name)
         for row, expected_row in zip(ws.iter_rows(), self.expected):
-            row_values = [x.internal_value for x in row]
+            row_values = [x.value for x in row]
             assert row_values == expected_row
 
     def test_read_single_cell_range(self):
         wb = self._open_wb()
         ws = wb.get_sheet_by_name(name = self.sheet_name)
-        assert 'This is cell A1 in Sheet 1' == list(ws.iter_rows('A1'))[0][0].internal_value
+        assert 'This is cell A1 in Sheet 1' == list(ws.iter_rows('A1'))[0][0].value
 
 class TestIntegers(TestWorksheet):
 
@@ -118,7 +116,7 @@ class TestIntegers(TestWorksheet):
         wb = self._open_wb()
         ws = wb.get_sheet_by_name(name = self.sheet_name)
         for row, expected_row in zip(ws.iter_rows(self.query_range), self.expected):
-            row_values = [x.internal_value for x in row]
+            row_values = [x.value for x in row]
             assert row_values == expected_row
 
 
@@ -132,7 +130,7 @@ class TestFloats(TestWorksheet):
         wb = self._open_wb()
         ws = wb.get_sheet_by_name(name = self.sheet_name)
         for row, expected_row in zip(ws.iter_rows(self.query_range), self.expected):
-            row_values = [x.internal_value for x in row]
+            row_values = [x.value for x in row]
             assert row_values == expected_row
 
 
@@ -151,7 +149,7 @@ class TestDates(TestWorksheet):
         ws = wb.get_sheet_by_name(name = self.sheet_name)
         rows = ws.iter_rows(cell)
         cell = list(rows)[0][0]
-        assert cell.internal_value == value
+        assert cell.value == value
 
 class TestFormula(TestWorksheet):
 
@@ -167,7 +165,7 @@ class TestFormula(TestWorksheet):
         rows = ws.iter_rows("D2")
         cell = list(rows)[0][0]
         assert ws.parent.data_only == data_only
-        assert cell.internal_value == expected
+        assert cell.value == expected
 
 
 class TestBoolean(TestWorksheet):
@@ -184,4 +182,4 @@ class TestBoolean(TestWorksheet):
         row = list(ws.iter_rows(cell))
         assert row[0][0].coordinate == cell
         assert row[0][0].data_type == 'b'
-        assert row[0][0].internal_value == expected
+        assert row[0][0].value == expected

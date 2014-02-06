@@ -1,6 +1,5 @@
-# file openpyxl/datavalidations.py
-
-# Copyright (c) 2010-2012 openpyxl
+from __future__ import absolute_import
+# Copyright (c) 2010-2014 openpyxl
 #
 # Permission is hereby granted, free of charge, to any person obtaining a copy
 # of this software and associated documentation files (the "Software"), to deal
@@ -25,8 +24,7 @@
 
 from itertools import groupby
 
-from openpyxl.shared.compat import OrderedDict
-
+from openpyxl.compat import OrderedDict
 from openpyxl.cell import coordinate_from_string
 
 
@@ -176,7 +174,7 @@ class DataValidation(object):
 
     def add_cell(self, cell):
         """Adds a openpyxl.cell to this validator"""
-        self.cells.append(cell.get_coordinate())
+        self.cells.append(cell.coordinate)
 
     def set_error_message(self, error, error_title="Validation Error"):
         """Creates a custom error message, displayed when a user changes a cell

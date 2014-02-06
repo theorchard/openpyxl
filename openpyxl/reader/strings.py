@@ -1,3 +1,4 @@
+from __future__ import absolute_import
 # Copyright (c) 2010-2014 openpyxl
 #
 # Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -24,9 +25,9 @@
 """Read the shared strings table."""
 
 # package imports
-from openpyxl.shared.xmltools import fromstring
-from openpyxl.shared.ooxml import SHEET_MAIN_NS, XML_NS
-from openpyxl.shared.compat import unicode
+from openpyxl.xml.functions import fromstring
+from openpyxl.xml.constants import SHEET_MAIN_NS, XML_NS
+from openpyxl.compat import unicode
 
 
 def read_string_table(xml_source):

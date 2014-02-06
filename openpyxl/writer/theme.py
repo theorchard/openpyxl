@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+from __future__ import absolute_import
 # Copyright (c) 2010-2014 openpyxl
 #
 # Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -25,7 +26,7 @@
 """Write the theme xml based on a fixed string."""
 
 # package imports
-from openpyxl.shared.xmltools import fromstring, get_document_content
+from openpyxl.xml.functions import fromstring, get_document_content
 
 
 def write_theme():

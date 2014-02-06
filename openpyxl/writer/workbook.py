@@ -1,3 +1,4 @@
+from __future__ import absolute_import
 # Copyright (c) 2010-2014 openpyxl
 #
 # Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -25,11 +26,10 @@
 
 # package imports
 
-#from openpyxl.shared.compat import register_namespace
-from openpyxl.shared.xmltools import Element, SubElement
+from openpyxl import LXML
+from openpyxl.xml.functions import Element, SubElement
 from openpyxl.cell import absolute_coordinate
-from openpyxl.shared.xmltools import get_document_content
-from openpyxl.shared.ooxml import (
+from openpyxl.xml.constants import (
     ARC_CORE,
     ARC_WORKBOOK,
     ARC_APP,
@@ -43,7 +43,6 @@ from openpyxl.shared.ooxml import (
     DCTERMS_NS,
     DCTERMS_PREFIX,
     XSI_NS,
-    XML_NS,
     SHEET_MAIN_NS,
     CONTYPES_NS,
     PKG_REL_NS,
@@ -53,8 +52,8 @@ from openpyxl.shared.ooxml import (
     ARC_CONTENT_TYPES,
     ARC_ROOT_RELS
 )
-from openpyxl.shared.xmltools import get_document_content, fromstring
-from openpyxl.shared.date_time import datetime_to_W3CDTF
+from openpyxl.xml.functions import get_document_content, fromstring
+from openpyxl.date_time import datetime_to_W3CDTF
 from openpyxl.namedrange import NamedRange, NamedRangeContainingValue
 
 
@@ -105,7 +104,11 @@ def write_content_types(workbook):
         for elem in root.findall('{%s}Override' % CONTYPES_NS):
             seen.add(elem.attrib['PartName'])
     else:
-        root = Element('{%s}Types' % CONTYPES_NS)
+        if LXML:
+            NSMAP = {None : CONTYPES_NS}
+            root = Element('{%s}Types' % CONTYPES_NS, nsmap=NSMAP)
+        else:
+            root = Element('{%s}Types' % CONTYPES_NS)
         for setting_type, name, content_type in static_content_types_config:
             if setting_type == 'Override':
                 tag = '{%s}Override' % CONTYPES_NS
@@ -262,7 +265,7 @@ def write_workbook(workbook):
     # Defined names -> autoFilter
     for i, sheet in enumerate(workbook.worksheets):
         #continue
-        auto_filter = sheet.auto_filter
+        auto_filter = sheet.auto_filter.ref
         if not auto_filter:
             continue
         name = SubElement(

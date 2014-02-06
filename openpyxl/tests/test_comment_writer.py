@@ -21,8 +21,6 @@
 # @license: http://www.opensource.org/licenses/mit-license.php
 # @author: see AUTHORS file
 
-import pytest
-
 import os
 
 from openpyxl.workbook import Workbook
@@ -30,9 +28,9 @@ from openpyxl.worksheet import Worksheet
 from openpyxl.writer.comments import CommentWriter
 from openpyxl.comments import Comment
 from openpyxl.tests.helper import DATADIR, compare_xml
-from openpyxl.shared.xmltools import fromstring, get_document_content
-from openpyxl.shared.ooxml import SHEET_MAIN_NS
-from openpyxl.writer.comments import vmlns, excelns, officens
+from openpyxl.xml.functions import fromstring, get_document_content
+from openpyxl.xml.constants import SHEET_MAIN_NS
+from openpyxl.writer.comments import vmlns, excelns
 
 def _create_ws():
     wb = Workbook()

@@ -21,18 +21,15 @@
 # @license: http://www.opensource.org/licenses/mit-license.php
 # @author: see AUTHORS file
 
-import pytest
 
 from zipfile import ZipFile, ZIP_DEFLATED
 import os.path
-from collections import namedtuple
 
 from openpyxl.workbook import Workbook
 from openpyxl.worksheet import Worksheet
-from openpyxl.comments import Comment
 from openpyxl.reader import comments
 from openpyxl.reader.excel import load_workbook
-from openpyxl.shared.xmltools import fromstring
+from openpyxl.xml.functions import fromstring
 from openpyxl.tests.helper import DATADIR
 
 def test_get_author_list():
