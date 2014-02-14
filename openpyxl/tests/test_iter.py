@@ -27,15 +27,46 @@ import os.path
 import pytest
 
 from openpyxl.tests.helper import DATADIR
-from openpyxl.reader.iter_worksheet import get_range_boundaries
+from openpyxl.worksheet.iter_worksheet import get_range_boundaries, read_dimension
 from openpyxl.reader.excel import load_workbook
-from openpyxl.compat import xrange
+from openpyxl.compat import xrange, izip
 
 
-def test_open_many_sheets():
-    src = os.path.join(DATADIR, "reader", "bigfoot.xlsx")
-    wb = load_workbook(src, True) # if
+def test_open_many_sheets(datadir):
+    datadir.join("reader").chdir()
+    wb = load_workbook("bigfoot.xlsx", True) # if
     assert len(wb.worksheets) == 1024
+
+
+@pytest.mark.parametrize("filename, expected",
+                         [
+                             ("sheet2.xml", ('D', 1, 'AA', 30)),
+                             ("sheet2_no_dimension.xml", None),
+                             ("sheet2_no_span.xml", None),
+                          ]
+                         )
+def test_read_dimension(datadir, filename, expected):
+    datadir.join("reader").chdir()
+    with open(filename) as handle:
+        dimension = read_dimension(handle)
+    assert dimension == expected
+
+
+def test_calculate_dimension(datadir):
+    datadir.join("genuine").chdir()
+    wb = load_workbook("empty.xlsx", use_iterators=True)
+    sheet2 = wb.get_sheet_by_name('Sheet2 - Numbers')
+    dimensions = sheet2.calculate_dimension()
+    assert '%s%s:%s%s' % ('D', 1, 'AA', 30) == dimensions
+
+
+def test_get_highest_row(datadir):
+    datadir.join("genuine").chdir()
+    wb = load_workbook("empty.xlsx", use_iterators=True)
+    sheet2 = wb.get_sheet_by_name('Sheet2 - Numbers')
+    max_row = sheet2.get_highest_row()
+    assert 30 == max_row
+
 
 
 class TestWorksheet(object):
@@ -49,9 +80,13 @@ class TestWorksheet(object):
 
     def test_getitem(self):
         wb = self._open_wb()
-        ws = wb.get_active_sheet()
-        assert list(ws.iter_rows("A1")) == list(ws['A1'])
+        ws = wb['Sheet1 - Text']
+        assert list(ws.iter_rows("A1"))[0][0] == ws['A1']
         assert list(ws.iter_rows("A1:D30")) == list(ws["A1:D30"])
+        assert list(ws.iter_rows("A1:D30")) == list(ws["A1":"D30"])
+
+        ws = wb['Sheet2 - Numbers']
+        assert ws['A1'] is None
 
 
 class TestDims(TestWorksheet):
@@ -64,8 +99,8 @@ class TestDims(TestWorksheet):
     @pytest.mark.parametrize("sheetname, dims", expected)
     def test_get_dimensions(self, sheetname, dims):
         wb = self._open_wb()
-        ws = wb.get_sheet_by_name(sheetname)
-        assert ws.calculate_dimension() == dims
+        ws = wb[sheetname]
+        assert ws.dimensions == dims
 
     expected = [
         ("Sheet1 - Text", 7),
@@ -76,7 +111,7 @@ class TestDims(TestWorksheet):
     @pytest.mark.parametrize("sheetname, col", expected)
     def test_get_highest_column_iter(self, sheetname, col):
         wb = self._open_wb()
-        ws = wb.get_sheet_by_name(sheetname)
+        ws = wb[sheetname]
         assert ws.get_highest_column() == col
 
 
@@ -97,7 +132,7 @@ class TestText(TestWorksheet):
     def test_read_fast_integrated(self):
         wb = self._open_wb()
         ws = wb.get_sheet_by_name(name = self.sheet_name)
-        for row, expected_row in zip(ws.iter_rows(), self.expected):
+        for row, expected_row in izip(ws.iter_rows(), self.expected):
             row_values = [x.value for x in row]
             assert row_values == expected_row
 
@@ -115,7 +150,7 @@ class TestIntegers(TestWorksheet):
     def test_read_fast_integrated(self):
         wb = self._open_wb()
         ws = wb.get_sheet_by_name(name = self.sheet_name)
-        for row, expected_row in zip(ws.iter_rows(self.query_range), self.expected):
+        for row, expected_row in izip(ws.iter_rows(self.query_range), self.expected):
             row_values = [x.value for x in row]
             assert row_values == expected_row
 
@@ -129,7 +164,7 @@ class TestFloats(TestWorksheet):
     def test_read_fast_integrated(self):
         wb = self._open_wb()
         ws = wb.get_sheet_by_name(name = self.sheet_name)
-        for row, expected_row in zip(ws.iter_rows(self.query_range), self.expected):
+        for row, expected_row in izip(ws.iter_rows(self.query_range), self.expected):
             row_values = [x.value for x in row]
             assert row_values == expected_row
 

@@ -36,6 +36,7 @@ from openpyxl import LXML
 from openpyxl.cell import get_column_letter
 from openpyxl.cell import Cell, coordinate_from_string
 from openpyxl.worksheet import Worksheet, ColumnDimension, RowDimension
+from openpyxl.worksheet.iter_worksheet import IterableWorksheet
 from openpyxl.xml.constants import SHEET_MAIN_NS
 from openpyxl.xml.functions import safe_iterator
 from openpyxl.styles import Color
@@ -55,40 +56,6 @@ def _get_xml_iter(xml_source):
         except:
             pass
         return xml_source
-
-
-def read_dimension(xml_source):
-    min_row = min_col =  max_row = max_col = None
-    source = _get_xml_iter(xml_source)
-    it = iterparse(source)
-    for event, el in it:
-        if el.tag == '{%s}dimension' % SHEET_MAIN_NS:
-            dim = el.get("ref")
-            if ':' in dim:
-                start, stop = dim.split(':')
-            else:
-                start = stop = dim
-            min_col, min_row = coordinate_from_string(start)
-            max_col, max_row = coordinate_from_string(stop)
-            return min_col, min_row, max_col, max_row
-
-        if el.tag == '{%s}row' % SHEET_MAIN_NS:
-            row = el.get("r")
-            if min_row is None:
-                min_row = int(row)
-            span = el.get("spans")
-            if ":" in span:
-                start, stop = span.split(":")
-                if min_col is None:
-                    min_col = int(start)
-                    max_col = int(stop)
-                else:
-                    min_col = min(min_col, int(start))
-                    max_col = max(max_col, int(stop))
-        el.clear()
-    max_row = int(row)
-    warn("Unsized worksheet")
-    return get_column_letter(min_col), min_row, get_column_letter(max_col),  max_row
 
 
 class WorkSheetParser(object):
@@ -151,7 +118,7 @@ class WorkSheetParser(object):
                 value = bool(int(value))
             if formula is not None and not self.data_only:
                 if formula.text:
-                    value = "=" + str(formula.text)
+                    value = "=" + formula.text
                 else:
                     value = "="
                 formula_type = formula.get('t')
@@ -189,24 +156,20 @@ class WorkSheetParser(object):
                 if style_index is not None:
                     self.ws._styles[column] = self.style_table.get(int(style_index))
                 if column not in self.ws.column_dimensions:
-                    new_dim = ColumnDimension(self.ws,
-                                              index=column,
-                                              width=width, auto_size=auto_size,
-                                              visible=visible, outline_level=outline,
-                                              collapsed=collapsed)
+                    new_dim = ColumnDimension( index=column, width=width,
+                                               auto_size=auto_size, visible=visible,
+                                               outline_level=outline, collapsed=collapsed)
                     self.ws.column_dimensions[column] = new_dim
 
 
     def parse_row_dimensions(self, row):
         rowId = int(row.get('r'))
+        ht = row.get('ht', -1)
         if rowId not in self.ws.row_dimensions:
-            self.ws.row_dimensions[rowId] = RowDimension(self.ws, rowId)
+            self.ws.row_dimensions[rowId] = RowDimension(rowId, height=ht)
         style_index = row.get('s')
         if row.get('customFormat') and style_index:
             self.ws._styles[rowId] = self.style_table.get(int(style_index))
-        ht = row.get('ht')
-        if ht is not None:
-            self.ws.row_dimensions[rowId].height = float(ht)
         for cell in safe_iterator(row, self.CELL_TAG):
             self.parse_cell(cell)
 
@@ -335,7 +298,6 @@ def read_worksheet(xml_source, parent, preset_title, string_table,
                    style_table, color_index=None, worksheet_path=None, keep_vba=False):
     """Read an xml worksheet"""
     if worksheet_path:
-        from openpyxl.reader.iter_worksheet import IterableWorksheet
         ws = IterableWorksheet(parent, preset_title,
                 worksheet_path, xml_source, string_table, style_table)
     else:

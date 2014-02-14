@@ -28,112 +28,22 @@ from __future__ import absolute_import
 # stdlib
 import operator
 from itertools import groupby
-import re
 
 # compatibility
-from openpyxl.compat import unicode, lru_cache, xrange
+from openpyxl.compat import xrange
 from openpyxl.xml.functions import iterparse
 
 # package
-from openpyxl import LXML
 from openpyxl.worksheet import Worksheet
 from openpyxl.cell import (
     coordinate_from_string,
     column_index_from_string,
     get_column_letter,
-    Cell,
+    Cell
 )
-from openpyxl.styles import is_date_format
-from openpyxl.date_time import from_excel
-from openpyxl.reader.worksheet import read_dimension
+from openpyxl.cell.read_only import ReadOnlyCell, EMPTY_CELL
 from openpyxl.xml.functions import safe_iterator
-
-from openpyxl.xml.constants import (
-    PACKAGE_WORKSHEETS,
-    SHEET_MAIN_NS
-)
-
-
-class RawCell(object):
-
-    __slots__ = ('row', 'column', '_value', 'data_type', '_style_id')
-
-
-    def __init__(self, row, column, value, data_type, style_id=None):
-        self.row = row
-        self.column = column
-        self.data_type = data_type
-        self.style_id = style_id
-        self.value = value
-
-    def __eq__(self, other):
-        for a in self.__slots__:
-            if getattr(self, a) != getattr(other, a):
-                return False
-        return True
-
-    @classmethod
-    def set_string_table(cls, string_table):
-        cls.string_table = string_table
-
-    @classmethod
-    def set_style_table(cls, style_table):
-        cls.style_table = style_table
-
-    @classmethod
-    def set_base_date(cls, base_date):
-        cls.base_date = base_date
-
-    @property
-    def coordinate(self):
-        return "{1}{0}".format(self.row, self.column)
-
-    @property
-    def is_date(self):
-        return self.data_type == Cell.TYPE_NUMERIC and is_date_format(self.number_format)
-
-    @property
-    def number_format(self):
-        if self.style_id is None:
-            return
-        style = self.style_table[self._style_id]
-        return style.number_format.format_code
-
-    @property
-    def style_id(self):
-        return self._style_id
-
-    @style_id.setter
-    def style_id(self, value):
-        if value is not None:
-            value = int(value)
-        self._style_id = value
-
-    @property
-    def internal_value(self):
-        return self._value
-
-    @property
-    def value(self):
-        if self._value is None:
-            return
-        if self.data_type == Cell.TYPE_BOOL:
-            return self._value == '1'
-        elif self.is_date:
-            return from_excel(self._value, self.base_date)
-        elif self.data_type in(Cell.TYPE_INLINE, Cell.TYPE_FORMULA_CACHE_STRING):
-            return unicode(self._value)
-        elif self.data_type == Cell.TYPE_STRING:
-            return unicode(self.string_table[int(self._value)])
-        return self._value
-
-    @value.setter
-    def value(self, value):
-        if value is None:
-            self.data_type = Cell.TYPE_NULL
-        elif self.data_type == Cell.TYPE_NUMERIC:
-            value = float(value)
-        self._value = value
+from openpyxl.xml.constants import SHEET_MAIN_NS
 
 
 def get_range_boundaries(range_string, row_offset=0, column_offset=1):
@@ -155,32 +65,50 @@ def get_range_boundaries(range_string, row_offset=0, column_offset=1):
     return (min_col, min_row, max_col, max_row)
 
 
-def empty_cell(row, column):
-    return RawCell(row, column, None, Cell.TYPE_NULL, None)
+def read_dimension(source):
+    min_row = min_col =  max_row = max_col = None
+    DIMENSION_TAG = '{%s}dimension' % SHEET_MAIN_NS
+    DATA_TAG = '{%s}sheetData' % SHEET_MAIN_NS
+    it = iterparse(source, tag=[DIMENSION_TAG, DATA_TAG])
+    for _event, element in it:
+        if element.tag == DIMENSION_TAG:
+            dim = element.get("ref")
+            if ':' in dim:
+                start, stop = dim.split(':')
+            else:
+                start = stop = dim
+            min_col, min_row = coordinate_from_string(start)
+            max_col, max_row = coordinate_from_string(stop)
+            return min_col, min_row, max_col, max_row
+        elif element.tag == DATA_TAG:
+            # Dimensions missing
+            break
+        element.clear()
 
-#------------------------------------------------------------------------------
 
 ROW_TAG = '{%s}row' % SHEET_MAIN_NS
 CELL_TAG = '{%s}c' % SHEET_MAIN_NS
 VALUE_TAG = '{%s}v' % SHEET_MAIN_NS
 FORMULA_TAG = '{%s}f' % SHEET_MAIN_NS
+DIMENSION_TAG = '{%s}dimension' % SHEET_MAIN_NS
 
 
 class IterableWorksheet(Worksheet):
+
+    min_col = 'A'
+    min_row = 1
+    max_col = max_row = None
 
     def __init__(self, parent_workbook, title, worksheet_path,
                  xml_source, string_table, style_table):
         Worksheet.__init__(self, parent_workbook, title)
         self.worksheet_path = worksheet_path
-        RawCell.set_string_table(string_table)
-        RawCell.set_style_table(style_table)
-        RawCell.set_base_date(parent_workbook.excel_base_date)
-
-        min_col, min_row, max_col, max_row = read_dimension(xml_source=self.xml_source)
-        self.min_col = min_col
-        self.min_row = min_row
-        self.max_row = max_row
-        self.max_col = max_col
+        ReadOnlyCell.set_string_table(string_table)
+        ReadOnlyCell.set_style_table(style_table)
+        ReadOnlyCell.set_base_date(parent_workbook.excel_base_date)
+        dimensions = read_dimension(self.xml_source)
+        if dimensions is not None:
+            self.min_col, self.min_row, self.max_col, self.max_row = dimensions
 
     @property
     def xml_source(self):
@@ -191,10 +119,18 @@ class IterableWorksheet(Worksheet):
         """Base class is always supplied XML source, IteratableWorksheet obtains it on demand."""
         pass
 
+    @property
+    def dimensions(self):
+        if not all([self.max_col, self.max_row]):
+            raise ValueError("Worksheet is unsized, cannot calculate dimensions")
+        return '%s%s:%s%s' % (self.min_col, self.min_row, self.max_col, self.max_row)
+
     def __getitem__(self, key):
         if isinstance(key, slice):
-            key = "{0}:{1}".format(key)
-        return self.iter_rows(key)
+            key = "{0}:{1}".format(key.start, key.stop)
+        if ":" in key:
+            return self.iter_rows(key)
+        return self.cell(key)
 
     def iter_rows(self, range_string='', row_offset=0, column_offset=1):
         """ Returns a squared range based on the `range_string` parameter,
@@ -216,9 +152,11 @@ class IterableWorksheet(Worksheet):
             min_col, min_row, max_col, max_row = get_range_boundaries(range_string, row_offset, column_offset)
         else:
             min_col = column_index_from_string(self.min_col)
-            max_col = column_index_from_string(self.max_col) + 1
+            max_col = self.max_col
+            if max_col is not None:
+                max_col = column_index_from_string(self.max_col) + 1
             min_row = self.min_row
-            max_row = self.max_row + 6
+            max_row = self.max_row
 
         return self.get_squared_range(min_col, min_row, max_col, max_row)
 
@@ -227,7 +165,10 @@ class IterableWorksheet(Worksheet):
         The source worksheet file may have columns or rows missing.
         Missing cells will be created.
         """
-        expected_columns = [get_column_letter(ci) for ci in xrange(min_col, max_col)]
+        if max_col is not None:
+            expected_columns = [get_column_letter(ci) for ci in xrange(min_col, max_col)]
+        else:
+            expected_columns = []
         row_counter = min_row
 
         # get cells row by row
@@ -238,17 +179,20 @@ class IterableWorksheet(Worksheet):
             if row_counter < row:
                 # Rows requested before those in the worksheet
                 for gap_row in xrange(row_counter, row):
-                    yield tuple(empty_cell(row, column) for column in expected_columns)
+                    yield tuple(EMPTY_CELL for column in expected_columns)
                     row_counter = row
 
-            retrieved_columns = dict([(c.column, c) for c in cells])
-            for column in expected_columns:
-                if column in retrieved_columns:
-                    cell = retrieved_columns[column]
-                    full_row.append(cell)
-                else:
-                    # create missing cell
-                    full_row.append(empty_cell(row, column))
+            if expected_columns:
+                retrieved_columns = dict([(c.column, c) for c in cells])
+                for column in expected_columns:
+                    if column in retrieved_columns:
+                        cell = retrieved_columns[column]
+                        full_row.append(cell)
+                    else:
+                        # create missing cell
+                        full_row.append(EMPTY_CELL)
+            else:
+                full_row = tuple(cells)
             row_counter = row + 1
             yield tuple(full_row)
 
@@ -258,14 +202,14 @@ class IterableWorksheet(Worksheet):
         for _event, element in p:
             if element.tag == ROW_TAG:
                 row = int(element.get("r"))
-                if row > max_row:
+                if max_row is not None and row > max_row:
                     break
                 if min_row <= row:
                     for cell in safe_iterator(element, CELL_TAG):
                         coord = cell.get('r')
                         column_str, row = coordinate_from_string(coord)
                         column = column_index_from_string(column_str)
-                        if column > max_col:
+                        if max_col is not None and column > max_col:
                             break
                         if min_col <= column:
                             data_type = cell.get('t', 'n')
@@ -275,7 +219,7 @@ class IterableWorksheet(Worksheet):
                             if formula is not None and not self.parent.data_only:
                                 data_type = Cell.TYPE_FORMULA
                                 value = "=%s" % formula
-                            yield RawCell(row, column_str, value, data_type,
+                            yield ReadOnlyCell(row, column_str, value, data_type,
                                           style_id)
             if element.tag in (CELL_TAG, VALUE_TAG, FORMULA_TAG):
                 # sub-elements of rows should be skipped
@@ -283,23 +227,29 @@ class IterableWorksheet(Worksheet):
             element.clear()
 
 
-    def cell(self, *args, **kwargs):
-        # TODO return an individual cell
+    def _get_cell(self, coordinate):
+        """.iter_rows always returns a generator of rows each of which
+        contains a generator of cells. This can be empty in which case
+        return None"""
+        result = list(self.iter_rows(coordinate))
+        if result:
+            return result[0][0]
 
-        raise NotImplementedError("use 'iter_rows()' instead")
 
     def range(self, *args, **kwargs):
         # TODO return a range of cells, basically get_squared_range with same interface as Worksheet
         raise NotImplementedError("use 'iter_rows()' instead")
 
+    @property
     def rows(self):
         return self.iter_rows()
 
     def calculate_dimension(self):
-        return '%s%s:%s%s' % (self.min_col, self.min_row, self.max_col, self.max_row)
+        return self.dimensions
 
     def get_highest_column(self):
-        return column_index_from_string(self.max_col)
+        if self.max_col is not None:
+            return column_index_from_string(self.max_col)
 
     def get_highest_row(self):
         return self.max_row
