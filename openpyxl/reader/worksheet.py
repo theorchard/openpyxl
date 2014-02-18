@@ -226,6 +226,7 @@ class WorkSheetParser(object):
                 rule_type = cfRule.get('type')
                 if rule_type in (None, 'dataBar'):
                     # dataBar conditional formatting isn't supported, as it relies on the complex <extLst> tag
+                    warn("DataBar conditional formatting will be lost.")
                     continue
                 rule = {'type': cfRule.get('type')}
                 rule = FormatRule()
