@@ -13,7 +13,7 @@ class FormatRule(Mapping):
 
     __slots__ = ('aboveAverage', 'bottom', 'dxfId', 'equalAverage',
                  'operator', 'percent', 'priority', 'rank', 'stdDev', 'stopIfTrue',
-                 'text', 'type', 'formula', 'colorScale', 'iconSet')
+                 'text', 'type')
 
     def update(self, dictionary):
         for k, v in iteritems(dictionary):
@@ -195,6 +195,3 @@ class CellIsRule(object):
         return r
 
 
-class IconSetRule(object):
-
-    pass

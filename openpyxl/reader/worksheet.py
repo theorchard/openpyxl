@@ -223,12 +223,16 @@ class WorkSheetParser(object):
             if range_string not in self.ws.conditional_formatting.parse_rules:
                 self.ws.conditional_formatting.parse_rules[range_string] = []
             for cfRule in cfRules:
-                rule_type = cfRule.get('type')
-                if rule_type in (None, 'dataBar'):
+                if not cfRule.get('type') or cfRule.get('type') == 'dataBar':
                     # dataBar conditional formatting isn't supported, as it relies on the complex <extLst> tag
                     continue
                 rule = {'type': cfRule.get('type')}
-                rule = FormatRule()
+                for attr in ConditionalFormatting.rule_attributes:
+                    if cfRule.get(attr) is not None:
+                        if attr == 'priority':
+                            rule[attr] = int(cfRule.get(attr))
+                        else:
+                            rule[attr] = cfRule.get(attr)
 
                 formula = cfRule.findall('{%s}formula' % SHEET_MAIN_NS)
                 for f in formula:
