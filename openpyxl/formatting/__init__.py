@@ -7,6 +7,13 @@ from openpyxl.styles import Font, Fill, Borders
 from .rules import CellIsRule, ColorScaleRule, FormatRule
 
 
+
+def unpack_rules(cfRules):
+    for key, rules in iteritems(cfRules):
+        for idx,rule in enumerate(rules):
+            yield (key, idx, rule['priority'])
+
+
 class ConditionalFormatting(object):
     """Conditional formatting rules."""
     rule_attributes = ('aboveAverage', 'bottom', 'dxfId', 'equalAverage', 'operator', 'percent', 'priority', 'rank',
@@ -34,6 +41,15 @@ class ConditionalFormatting(object):
         if range_string not in self.cf_rules:
             self.cf_rules[range_string] = []
         self.cf_rules[range_string].append(rule)
+
+
+    def _fix_priorities(self):
+        rules = unpack_rules(self.cf_rules)
+        rules = sorted(rules, key=lambda x: x[2])
+        for idx, (key, rule_no, prio) in enumerate(rules):
+            self.cf_rules[key][rule_no]['priority']= idx + 1
+        self.max_priority = len(rules)
+
 
     def update(self, cfRules):
         """Set the conditional formatting rules from a dictionary.  Intended for use when loading a document.
