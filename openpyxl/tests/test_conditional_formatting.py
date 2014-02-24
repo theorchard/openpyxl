@@ -571,16 +571,28 @@ def compare_complex(a, b):
         return False
     return True
 
-
-def test_conditional_formatting_read():
-    reference_file = os.path.join(DATADIR, 'reader', 'conditional-formatting.xlsx')
-    wb = load_workbook(reference_file)
-    ws = wb.get_active_sheet()
+test_values = [
+    (
+        'A1:A1048576',
+        {'priority': 27, 'type': 'colorScale', 'colorScale': {'color': [Color('FFFF7128'), Color('FFFFEF9C')], 'cfvo': [{'type': 'min'}, {'type': 'max'}]}}),
+    (
+        'B1:B10',
+        {'priority': 26, 'type': 'colorScale', 'colorScale': {'color': [Color('theme:6:'), Color('theme:4:')], 'cfvo': [{'type': 'num', 'val': '3'}, {'type': 'num', 'val': '7'}]}}
+               ),
+    (
+        'C1:C10',
+        {'priority': 25, 'type': 'colorScale', 'colorScale': {'color': [Color('FFFF7128'), Color('FFFFEF9C')], 'cfvo': [{'type': 'percent', 'val': '10'}, {'type': 'percent', 'val': '90'}]}}
+    ),
+]
+@pytest.mark.parametrize("cell_range, expected", test_values)
+def test_conditional_formatting_read(datadir, cell_range, expected):
+    datadir.join("reader").chdir()
+    wb = load_workbook('conditional-formatting.xlsx')
+    ws = wb.active
 
     # First test the conditional formatting rules read
-    assert ws.conditional_formatting.cf_rules['A1:A1048576'] == [{'priority': 27, 'type': 'colorScale', 'colorScale': {'color': [Color('FFFF7128'), Color('FFFFEF9C')], 'cfvo': [{'type': 'min'}, {'type': 'max'}]}}]
-    assert compare_complex(ws.conditional_formatting.cf_rules['B1:B10'], [{'priority': 26, 'type': 'colorScale', 'colorScale': {'color': [Color('theme:6:'), Color('theme:4:')], 'cfvo': [{'type': 'num', 'val': '3'}, {'type': 'num', 'val': '7'}]}}])
-    assert compare_complex(ws.conditional_formatting.cf_rules['C1:C10'], [{'priority': 25, 'type': 'colorScale', 'colorScale': {'color': [Color('FFFF7128'), Color('FFFFEF9C')], 'cfvo': [{'type': 'percent', 'val': '10'}, {'type': 'percent', 'val': '90'}]}}])
+    rules = ws.conditional_formatting.cf_rules
+    assert dict(rules[cell_range][0]) == expected
     assert compare_complex(ws.conditional_formatting.cf_rules['D1:D10'], [{'priority': 24, 'type': 'colorScale', 'colorScale': {'color': [Color('theme:6:'), Color('theme:5:')], 'cfvo': [{'type': 'formula', 'val': '2'}, {'type': 'formula', 'val': '4'}]}}])
     assert compare_complex(ws.conditional_formatting.cf_rules['E1:E10'], [{'priority': 23, 'type': 'colorScale', 'colorScale': {'color': [Color('FFFF7128'), Color('FFFFEF9C')], 'cfvo': [{'type': 'percentile', 'val': '10'}, {'type': 'percentile', 'val': '90'}]}}])
     assert compare_complex(ws.conditional_formatting.cf_rules['F1:F10'], [{'priority': 22, 'type': 'colorScale', 'colorScale': {'color': [Color('FFFF7128'), Color('FFFFEB84'), Color('FF63BE7B')], 'cfvo': [{'type': 'min'}, {'type': 'percentile', 'val': '50'}, {'type': 'max'}]}}])
