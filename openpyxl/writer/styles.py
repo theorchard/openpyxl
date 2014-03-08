@@ -28,6 +28,7 @@ from __future__ import absolute_import
 from openpyxl.xml.functions import (
     Element,
     SubElement,
+    ConditionalElement,
     get_document_content
     )
 from openpyxl.xml.constants import SHEET_MAIN_NS
@@ -71,6 +72,26 @@ class StyleWriter(object):
 
         return get_document_content(xml_node=self._root)
 
+
+    def _unpack_color(self, node, color, key='color'):
+        """Convert colors encoded as RGB, theme or tints
+        Possible values
+        RGB: #4F81BD
+        Theme: theme:9
+        Tint: theme:9:7 # guess work
+        """
+        if color is None:
+            return
+        if not ":" in color:
+            SubElement(node, key, {'rgb':color})
+        else:
+            _, theme, tint = color.split(":")
+            if tint == '':
+                SubElement(node, key, {'theme':theme})
+            else:
+                SubElement(node, key, {'theme':theme, 'tint':tint})
+
+
     def _write_fonts(self):
         """ add fonts part to root
             return {font.crc => index}
@@ -91,28 +112,18 @@ class StyleWriter(object):
         index = 1
         for st in self._style_list:
             if st.font != DEFAULTS.font and st.font not in table:
-                table[hash(st.font)] = str(index)
+                table[st.font] = index
                 font_node = SubElement(fonts, 'font')
                 SubElement(font_node, 'sz', {'val':str(st.font.size)})
-                if str(st.font.color.index).split(':')[0] == 'theme': # strip prefix theme if marked as such
-                    if str(st.font.color.index).split(':')[2]:
-                        SubElement(font_node, 'color', {'theme':str(st.font.color.index).split(':')[1],
-                                                        'tint':str(st.font.color.index).split(':')[2]})
-                    else:
-                        SubElement(font_node, 'color', {'theme':str(st.font.color.index).split(':')[1]})
-                else:
-                    SubElement(font_node, 'color', {'rgb':str(st.font.color.index)})
+                self._unpack_color(font_node, st.font.color.index)
                 SubElement(font_node, 'name', {'val':st.font.name})
                 SubElement(font_node, 'family', {'val':'2'})
                 # Don't write the 'scheme' element because it appears to prevent
                 # the font name from being applied in Excel.
                 #SubElement(font_node, 'scheme', {'val':'minor'})
-                if st.font.bold:
-                    SubElement(font_node, 'b')
-                if st.font.italic:
-                    SubElement(font_node, 'i')
-                if st.font.underline == 'single':
-                    SubElement(font_node, 'u')
+                ConditionalElement(font_node, "b", st.font.bold)
+                ConditionalElement(font_node, "i", st.font.italic)
+                ConditionalElement(font_node, "u",  st.font.underline == 'single')
 
                 index += 1
 
@@ -130,28 +141,16 @@ class StyleWriter(object):
         index = 2
         for st in self._style_list:
             if st.fill != DEFAULTS.fill and st.fill not in table:
-                table[hash(st.fill)] = str(index)
+                table[st.fill] = index
                 fill = SubElement(fills, 'fill')
                 if st.fill.fill_type != DEFAULTS.fill.fill_type:
                     node = SubElement(fill, 'patternFill', {'patternType':st.fill.fill_type})
                     if st.fill.start_color != DEFAULTS.fill.start_color:
-                        if str(st.fill.start_color.index).split(':')[0] == 'theme': # strip prefix theme if marked as such
-                            if str(st.fill.start_color.index).split(':')[2]:
-                                SubElement(node, 'fgColor', {'theme':str(st.fill.start_color.index).split(':')[1],
-                                                             'tint':str(st.fill.start_color.index).split(':')[2]})
-                            else:
-                                SubElement(node, 'fgColor', {'theme':str(st.fill.start_color.index).split(':')[1]})
-                        else:
-                            SubElement(node, 'fgColor', {'rgb':str(st.fill.start_color.index)})
+                        self._unpack_color(node, st.fill.start_color.index, 'fgColor')
+
                     if st.fill.end_color != DEFAULTS.fill.end_color:
-                        if str(st.fill.end_color.index).split(':')[0] == 'theme': # strip prefix theme if marked as such
-                            if str(st.fill.end_color.index).split(':')[2]:
-                                SubElement(node, 'bgColor', {'theme':str(st.fill.end_color.index).split(':')[1],
-                                                             'tint':str(st.fill.end_color.index).split(':')[2]})
-                            else:
-                                SubElement(node, 'bgColor', {'theme':str(st.fill.end_color.index).split(':')[1]})
-                        else:
-                            SubElement(node, 'bgColor', {'rgb':str(st.fill.end_color.index)})
+                        self._unpack_color(node, st.fill.end_color.index, 'bgColor')
+
                 index += 1
 
         fills.attrib["count"] = str(index)
@@ -173,7 +172,7 @@ class StyleWriter(object):
         index = 1
         for st in self._style_list:
             if st.borders != DEFAULTS.borders and st.borders not in table:
-                table[hash(st.borders)] = str(index)
+                table[st.borders] = index
                 border = SubElement(borders, 'border')
                 # caution: respect this order
                 for side in ('left', 'right', 'top', 'bottom', 'diagonal'):
@@ -182,14 +181,8 @@ class StyleWriter(object):
                         node = SubElement(border, side)
                     else:
                         node = SubElement(border, side, {'style':obj.border_style})
-                        if str(obj.color.index).split(':')[0] == 'theme': # strip prefix theme if marked as such
-                            if str(obj.color.index).split(':')[2]:
-                                SubElement(node, 'color', {'theme':str(obj.color.index).split(':')[1],
-                                                                'tint':str(obj.color.index).split(':')[2]})
-                            else:
-                                SubElement(node, 'color', {'theme':str(obj.color.index).split(':')[1]})
-                        else:
-                            SubElement(node, 'color', {'rgb':str(obj.color.index)})
+                        self._unpack_color(node, obj.color.index)
+
                 index += 1
 
         borders.attrib["count"] = str(index)
@@ -218,15 +211,15 @@ class StyleWriter(object):
             vals = _get_default_vals()
 
             if st.font != DEFAULTS.font:
-                vals['fontId'] = fonts_table[hash(st.font)]
+                vals['fontId'] = str(fonts_table[st.font])
                 vals['applyFont'] = '1'
 
             if st.borders != DEFAULTS.borders:
-                vals['borderId'] = borders_table[hash(st.borders)]
+                vals['borderId'] = str(borders_table[st.borders])
                 vals['applyBorder'] = '1'
 
             if st.fill != DEFAULTS.fill:
-                vals['fillId'] = fills_table[hash(st.fill)]
+                vals['fillId'] = str(fills_table[st.fill])
                 vals['applyFill'] = '1'
 
             if st.number_format != DEFAULTS.number_format:
@@ -292,22 +285,14 @@ class StyleWriter(object):
                 if 'font' in d and d['font'] is not None:
                     font_node = SubElement(dxf, 'font')
                     if d['font'].color is not None:
-                        if str(d['font'].color.index).split(':')[0] == 'theme':  # strip prefix theme if marked
-                            if str(d['font'].color.index).split(':')[2]:
-                                SubElement(font_node, 'color', {'theme': str(d['font'].color.index).split(':')[1],
-                                                                'tint': str(d['font'].color.index).split(':')[2]})
-                            else:
-                                SubElement(font_node, 'color', {'theme': str(d['font'].color.index).split(':')[1]})
-                        else:
-                            SubElement(font_node, 'color', {'rgb': str(d['font'].color.index)})
-                    if d['font'].bold:
-                        SubElement(font_node, 'b', {'val': '1'})
-                    if d['font'].italic:
-                        SubElement(font_node, 'i', {'val': '1'})
-                    if d['font'].underline != 'none':
-                        SubElement(font_node, 'u', {'val': d['font'].underline})
-                    if d['font'].strikethrough:
-                        SubElement(font_node, 'strike')
+                        self._unpack_color(font_node, d['font'].color.index)
+                    ConditionalElement(font_node, 'b', d['font'].bold, 'val')
+                    ConditionalElement(font_node, 'i', d['font'].italic, 'val')
+                    ConditionalElement(font_node, 'u', d['font'].underline != 'none',
+                                       {'val': d['font'].underline})
+                    ConditionalElement(font_node, 'strike', d['font'].strikethrough)
+
+
                 if 'fill' in d:
                     f = d['fill']
                     fill = SubElement(dxf, 'fill')
@@ -316,23 +301,11 @@ class StyleWriter(object):
                     else:
                         node = SubElement(fill, 'patternFill')
                     if f.start_color != DEFAULTS.fill.start_color:
-                        if str(f.start_color.index).split(':')[0] == 'theme':  # strip prefix theme if marked
-                            if str(f.start_color.index).split(':')[2]:
-                                SubElement(node, 'fgColor', {'theme': str(f.start_color.index).split(':')[1],
-                                                             'tint': str(f.start_color.index).split(':')[2]})
-                            else:
-                                SubElement(node, 'fgColor', {'theme': str(f.start_color.index).split(':')[1]})
-                        else:
-                            SubElement(node, 'fgColor', {'rgb': str(f.start_color.index)})
+                        self._unpack_color(node, f.start_color.index, 'fgColor')
+
                     if f.end_color != DEFAULTS.fill.end_color:
-                        if str(f.end_color.index).split(':')[0] == 'theme':  # strip prefix theme if marked
-                            if str(f.end_color.index).split(':')[2]:
-                                SubElement(node, 'bgColor', {'theme': str(f.end_color.index).split(':')[1],
-                                                             'tint': str(f.end_color.index).split(':')[2]})
-                            else:
-                                SubElement(node, 'bgColor', {'theme': str(f.end_color.index).split(':')[1]})
-                        else:
-                            SubElement(node, 'bgColor', {'rgb': str(f.end_color.index)})
+                        self._unpack_color(node, f.end_color.index, 'bgColor')
+
                 if 'border' in d:
                     borders = d['border']
                     border = SubElement(dxf, 'border')
@@ -343,14 +316,7 @@ class StyleWriter(object):
                             node = SubElement(border, side)
                         else:
                             node = SubElement(border, side, {'style': obj.border_style})
-                            if str(obj.color.index).split(':')[0] == 'theme':  # strip prefix theme if marked as such
-                                if str(obj.color.index).split(':')[2]:
-                                    SubElement(node, 'color', {'theme': str(obj.color.index).split(':')[1],
-                                                               'tint': str(obj.color.index).split(':')[2]})
-                                else:
-                                    SubElement(node, 'color', {'theme': str(obj.color.index).split(':')[1]})
-                            else:
-                                SubElement(node, 'color', {'rgb': str(obj.color.index)})
+                            self._unpack_color(node, obj.color.index)
         else:
             dxfs = SubElement(self._root, 'dxfs', {'count': '0'})
         return dxfs

@@ -33,17 +33,17 @@ cells using Excel's 'A1' column/row nomenclature are also provided.
 __docformat__ = "restructuredtext en"
 
 # Python stdlib imports
+from numbers import Number
 import datetime
 import re
 import warnings
 
 from openpyxl.compat import lru_cache, xrange
 from openpyxl.units import (
-    NUMERIC_TYPES,
     DEFAULT_ROW_HEIGHT,
     DEFAULT_COLUMN_WIDTH
 )
-from openpyxl.compat import unicode, basestring
+from openpyxl.compat import unicode, basestring, bytes
 from openpyxl.date_time import (
     to_excel,
     time_to_days,
@@ -52,7 +52,6 @@ from openpyxl.date_time import (
     )
 from openpyxl.exceptions import (
     CellCoordinatesException,
-    DataTypeException,
     IllegalCharacterError
 )
 from openpyxl.units import points_to_pixels
@@ -66,7 +65,8 @@ COORD_RE = re.compile('^[$]?([A-Z]+)[$]?(\d+)$')
 ABSOLUTE_RE = re.compile('^[$]?([A-Z]+)[$]?(\d+)(:[$]?([A-Z]+)[$]?(\d+))?$')
 ILLEGAL_CHARACTERS_RE = re.compile(r'[\000-\010]|[\013-\014]|[\016-\037]')
 
-
+TIME_TYPES = (datetime.datetime, datetime.date, datetime.time, datetime.timedelta)
+KNOWN_TYPES = TIME_TYPES + (Number, basestring, unicode, bytes, bool, type(None))
 
 def coordinate_from_string(coord_string):
     """Convert a coordinate string like 'B12' to a tuple ('B', 12)"""
@@ -142,6 +142,7 @@ TIME_REGEX = re.compile(r"""
 """, re.VERBOSE)
 NUMBER_REGEX = re.compile(r'^-?([\d]|[\d]+\.[\d]*|\.[\d]+|[1-9][\d]+\.?[\d]*)((E|e)-?[\d]+)?$')
 
+
 class Cell(object):
     """Describes cell associated properties.
 
@@ -151,20 +152,20 @@ class Cell(object):
     __slots__ = ('column',
                  'row',
                  '_value',
-                 '_data_type',
+                 'data_type',
                  'parent',
                  'xf_index',
                  '_hyperlink_rel',
                  'merged',
                  '_comment')
 
-    ERROR_CODES = {'#NULL!': 0,
-                   '#DIV/0!': 1,
-                   '#VALUE!': 2,
-                   '#REF!': 3,
-                   '#NAME?': 4,
-                   '#NUM!': 5,
-                   '#N/A': 6}
+    ERROR_CODES = ('#NULL!',
+                   '#DIV/0!',
+                   '#VALUE!',
+                   '#REF!',
+                   '#NAME?',
+                   '#NUM!',
+                   '#N/A')
 
     TYPE_STRING = 's'
     TYPE_FORMULA = 'f'
@@ -175,8 +176,8 @@ class Cell(object):
     TYPE_ERROR = 'e'
     TYPE_FORMULA_CACHE_STRING = 'str'
 
-    VALID_TYPES = [TYPE_STRING, TYPE_FORMULA, TYPE_NUMERIC, TYPE_BOOL,
-                   TYPE_NULL, TYPE_INLINE, TYPE_ERROR, TYPE_FORMULA_CACHE_STRING]
+    VALID_TYPES = (TYPE_STRING, TYPE_FORMULA, TYPE_NUMERIC, TYPE_BOOL,
+                   TYPE_NULL, TYPE_INLINE, TYPE_ERROR, TYPE_FORMULA_CACHE_STRING)
 
     def __init__(self, worksheet, column, row, value=None):
         self.column = column.upper()
@@ -185,12 +186,15 @@ class Cell(object):
         self._value = None
         self._hyperlink_rel = None
         self.data_type = self.TYPE_NULL
+        self.parent = worksheet
         if value:
             self.value = value
-        self.parent = worksheet
         self.xf_index = 0
         self.merged = False
         self._comment = None
+
+    def bool(self, value):
+        return bool(value)
 
     @property
     def encoding(self):
@@ -200,11 +204,17 @@ class Cell(object):
     def base_date(self):
         return self.parent.parent.excel_base_date
 
+    @property
+    def guess_types(self):
+        return getattr(self.parent.parent, '_guess_types', False)
+
     def __repr__(self):
         return unicode("<Cell %s.%s>") % (self.parent.title, self.coordinate)
 
     def check_string(self, value):
         """Check string coding, length, and line break character"""
+        if value is None:
+            return
         # convert to unicode string
         if not isinstance(value, unicode):
             value = unicode(value, self.encoding)
@@ -219,15 +229,6 @@ class Cell(object):
         value = value.replace('\r\n', '\n')
         return value
 
-    def check_numeric(self, value):
-        """Cast value to int or float if necessary"""
-        if not isinstance(value, NUMERIC_TYPES):
-            try:
-                value = int(value)
-            except ValueError:
-                value = float(value)
-        return value
-
     def check_error(self, value):
         """Tries to convert Error" else N/A"""
         try:
@@ -237,48 +238,31 @@ class Cell(object):
 
     def set_explicit_value(self, value=None, data_type=TYPE_STRING):
         """Coerce values according to their explicit type"""
-        type_coercion_map = {
-            self.TYPE_INLINE: self.check_string,
-            self.TYPE_STRING: self.check_string,
-            self.TYPE_FORMULA: self.check_string,
-            self.TYPE_NUMERIC: self.check_numeric,
-            self.TYPE_BOOL: bool,
-            self.TYPE_ERROR: self.check_error}
-        try:
-            self._value = type_coercion_map[data_type](value)
-        except KeyError:
-            if data_type not in self.VALID_TYPES:
-                msg = 'Invalid data type: %s' % data_type
-                raise DataTypeException(msg)
+        if data_type not in self.VALID_TYPES:
+            raise ValueError('Invalid data type: %s' % data_type)
+        if isinstance(value, (str, unicode, bytes)):
+            value = self.check_string(value)
+        self._value = value
         self.data_type = data_type
-
-    # preserve old method name
-    set_value_explicit = set_explicit_value
 
     def data_type_for_value(self, value):
         """Given a value, infer the correct data type"""
+        if not isinstance(value, KNOWN_TYPES):
+            raise ValueError("Cannot convert {0} to Excel".format(value))
+        data_type = self.TYPE_STRING
         if value is None:
             data_type = self.TYPE_NULL
-        elif value is True or value is False:
+        elif isinstance(value, bool):
             data_type = self.TYPE_BOOL
-        elif isinstance(value, NUMERIC_TYPES):
+        elif isinstance(value, Number):
             data_type = self.TYPE_NUMERIC
-        elif isinstance(value, (datetime.datetime, datetime.date, datetime.time, datetime.timedelta)):
+        elif isinstance(value, TIME_TYPES):
             data_type = self.TYPE_NUMERIC
-        elif not value:
-            data_type = self.TYPE_STRING
-        elif isinstance(value, basestring) and value[0] == '=':
-            data_type = self.TYPE_FORMULA
-        elif isinstance(value, unicode) and NUMBER_REGEX.match(value):
-            data_type = self.TYPE_NUMERIC
-        elif not isinstance(value, unicode) and NUMBER_REGEX.match(str(value)):
-            data_type = self.TYPE_NUMERIC
-        elif isinstance(value, basestring) and value.strip() in self.ERROR_CODES:
-            data_type = self.TYPE_ERROR
-        elif isinstance(value, list):
-            data_type = self.TYPE_ERROR
-        else:
-            data_type = self.TYPE_STRING
+        elif isinstance(value, basestring):
+            if value.startswith("="):
+                data_type = self.TYPE_FORMULA
+            elif value in self.ERROR_CODES:
+                data_type = self.TYPE_ERROR
         return data_type
 
     def bind_value(self, value):
@@ -286,22 +270,37 @@ class Cell(object):
         self.data_type = self.data_type_for_value(value)
         if value is None:
             self.set_explicit_value('', self.TYPE_NULL)
-            return True
-        elif self.data_type == self.TYPE_STRING:
+            return
+        elif self.guess_types and self.data_type == self.TYPE_STRING:
+            if not isinstance(value, unicode):
+                value = str(value)
+            # number detection
+            if self._cast_numeric(value):
+                return
             # percentage detection
-            if self._bind_percentage(value):
+            if self._cast_percentage(value):
                 return
             # time detection
-            if self._bind_time(value):
+            if self._cast_time(value):
                 return
         if self.data_type == self.TYPE_NUMERIC:
-            if self._bind_datetime(value):
+            if self._cast_datetime(value):
                 return
         self.set_explicit_value(value, self.data_type)
 
-    def _bind_percentage(self, value):
-        if not isinstance(value, unicode):
-            value = str(value)
+    def _cast_numeric(self, value):
+        """Explicity convert a string to a numeric value"""
+        if NUMBER_REGEX.match(value):
+            try:
+                value = int(value)
+            except ValueError:
+                value = float(value)
+            self.set_explicit_value(value, self.TYPE_NUMERIC)
+            return True
+
+    def _cast_percentage(self, value):
+        """Explicitly convert a string to numeric value and format as a
+        percentage"""
         match = PERCENT_REGEX.match(value)
         if match:
             value = float(match.group('number')) / 100
@@ -309,9 +308,9 @@ class Cell(object):
             self.number_format = NumberFormat.FORMAT_PERCENTAGE
             return True
 
-    def _bind_time(self, value):
-        if not isinstance(value, unicode):
-            value = str(value)
+    def _cast_time(self, value):
+        """Explicitly convert a string to a number and format as datetime or
+        time"""
         match = TIME_REGEX.match(value)
         if match:
             if match.group("microsecond") is not None:
@@ -330,7 +329,7 @@ class Cell(object):
             self.number_format = fmt
             return True
 
-    def _bind_datetime(self, value):
+    def _cast_datetime(self, value):
         if isinstance(value, datetime.date):
             value = to_excel(value, self.base_date)
             self.number_format = NumberFormat.FORMAT_DATE_YYYYMMDD2
@@ -342,7 +341,6 @@ class Cell(object):
             self.number_format = NumberFormat.FORMAT_DATE_TIMEDELTA
         self.set_explicit_value(value, self.TYPE_NUMERIC)
         return True
-
 
     @property
     def value(self):
@@ -416,21 +414,12 @@ class Cell(object):
     @property
     def has_style(self):
         """Check if the parent worksheet has a style for this cell"""
-        return self.coordinate in self.parent._styles  # pylint: disable=W0212
+        return self.coordinate in self.parent._styles
 
     @property
     def style(self):
         """Returns the :class:`openpyxl.style.Style` object for this cell"""
         return self.parent.get_style(self.coordinate)
-
-    @property
-    def data_type(self):
-        """Return the data type represented by this cell"""
-        return self._data_type
-
-    @data_type.setter
-    def data_type(self, value):
-        self._data_type = value
 
     def get_coordinate(self):
         warnings.warn("cell.get_coordinate() is deprecated use cell.coordinate instead")

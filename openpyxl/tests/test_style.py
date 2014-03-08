@@ -52,7 +52,7 @@ class TestCreateStyle(object):
     @classmethod
     def setup_class(cls):
         now = datetime.datetime.now()
-        cls.workbook = Workbook()
+        cls.workbook = Workbook(guess_types=True)
         cls.worksheet = cls.workbook.create_sheet()
         cls.worksheet.cell(coordinate='A1').value = '12.34%'
         cls.worksheet.cell(coordinate='B4').value = now
@@ -209,6 +209,20 @@ class TestStyleWriter(object):
         </styleSheet>
         """)
         assert diff is None, diff
+
+    @pytest.mark.parametrize("value, expected",
+                             [
+                                 ('FFFFFF', {'rgb': 'FFFFFF'}),
+                                 ('theme:7:', {'theme': '7'}),
+                                 ('theme:7:8', {'theme':'7', 'tint':'8'})
+                             ])
+    def test_unpack_color(self, value, expected):
+        w = StyleWriter(self.workbook)
+        root = Element("root")
+        w._unpack_color(root, value)
+        assert root.find('color') is not None
+        assert root.find('color').attrib == expected
+
 
     def test_write_cell_xfs_1(self):
         self.worksheet.cell('A1').style.font.size = 12

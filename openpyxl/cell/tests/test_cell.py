@@ -13,7 +13,6 @@ from openpyxl.worksheet import Worksheet
 from openpyxl.workbook import Workbook
 from openpyxl.exceptions import (
     CellCoordinatesException,
-    DataTypeException
     )
 from openpyxl.date_time import CALENDAR_WINDOWS_1900
 from openpyxl.cell import (
@@ -116,7 +115,7 @@ def test_column_letter(value, expected):
 def test_initial_value():
     ws = build_dummy_worksheet()
     cell = Cell(ws, 'A', 1, value='17.5')
-    assert cell.TYPE_NUMERIC == cell.data_type
+    assert cell.TYPE_STRING == cell.data_type
 
 
 class TestCellValueTypes(object):
@@ -152,6 +151,7 @@ class TestCellValueTypes(object):
                              ]
                             )
     def test_numeric(self, value, expected):
+        self.cell.parent.parent._guess_types = True
         self.cell.value = value
         assert self.cell.internal_value == expected
         assert self.cell.TYPE_NUMERIC == self.cell.data_type
@@ -180,7 +180,7 @@ class TestCellValueTypes(object):
         self.cell.value = '0800'
         assert self.cell.TYPE_STRING == self.cell.data_type
 
-    @pytest.mark.parametrize("error_string", Cell.ERROR_CODES.keys())
+    @pytest.mark.parametrize("error_string", Cell.ERROR_CODES)
     def test_error_codes(self, error_string):
         self.cell.value = error_string
         assert self.cell.TYPE_ERROR == self.cell.data_type
@@ -189,10 +189,16 @@ class TestCellValueTypes(object):
         self.cell.value = 3.14
         assert Cell.TYPE_NUMERIC == self.cell.data_type
 
-    def test_insert_percentage(self):
+    @pytest.mark.parametrize("infer, expected",
+                             [
+                                 (False, '3.14%'),
+                                 (True, safe_string(0.0314)),
+                             ]
+                             )
+    def test_insert_percentage(self, infer, expected):
+        self.cell.parent.parent._guess_types= infer
         self.cell.value = '3.14%'
-        assert Cell.TYPE_NUMERIC == self.cell.data_type
-        assert safe_string(0.0314) == safe_string(self.cell.internal_value)
+        assert expected == safe_string(self.cell.internal_value)
 
     def test_insert_datetime(self):
         self.cell.value = date.today()
@@ -233,6 +239,7 @@ class TestCellValueTypes(object):
                          ])
 def test_data_type_check(value, datatype):
     ws = build_dummy_worksheet()
+    ws.parent._guess_types = True
     cell = Cell(ws, 'A', 1)
     cell.bind_value(value)
     assert cell.data_type == datatype
@@ -241,7 +248,7 @@ def test_data_type_check(value, datatype):
 def test_set_bad_type():
     ws = build_dummy_worksheet()
     cell = Cell(ws, 'A', 1)
-    with pytest.raises(DataTypeException):
+    with pytest.raises(ValueError):
         cell.set_explicit_value(1, 'q')
 
 
@@ -291,7 +298,7 @@ values = (
 @pytest.mark.parametrize("value, expected",
                          values)
 def test_time(value, expected):
-    wb = Workbook()
+    wb = Workbook(guess_types=True)
     ws = Worksheet(wb)
     cell = Cell(ws, 'A', 1)
     cell.value = value
@@ -384,3 +391,29 @@ def test_cell_offset():
     wb = Workbook()
     ws = Worksheet(wb)
     assert ws['B15'].offset(2, 1).coordinate == 'C17'
+
+
+class TestEncoding:
+
+    try:
+        # Python 2
+        pound = unichr(163)
+    except NameError:
+        # Python 3
+        pound = chr(163)
+    test_string = ('Compound Value (' + pound + ')').encode('latin1')
+
+    def test_bad_encoding(self):
+        wb = Workbook()
+        ws = wb.active
+        cell = ws['A1']
+        with pytest.raises(UnicodeDecodeError):
+            cell.check_string(self.test_string)
+        with pytest.raises(UnicodeDecodeError):
+            cell.value = self.test_string
+
+    def test_good_encoding(self):
+        wb = Workbook(encoding='latin1')
+        ws = wb.active
+        cell = ws['A1']
+        cell.value = self.test_string
