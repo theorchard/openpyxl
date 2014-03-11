@@ -22,7 +22,7 @@
 # @author: see AUTHORS file
 
 # Python stdlib imports
-from datetime import datetime
+from datetime import datetime, time, timedelta
 from tempfile import NamedTemporaryFile
 import os
 import os.path
@@ -134,3 +134,17 @@ def test_append_after_save():
     os.remove(test_filename)
     with pytest.raises(WorkbookAlreadySaved):
         ws.append(['hello'])
+
+
+@pytest.mark.parametrize("value",
+                         [
+                             time(12, 15, 30),
+                             datetime.now(),
+                             timedelta(1),
+                         ]
+                         )
+def test_datetime(value):
+    wb = Workbook(optimized_write=True)
+    ws = wb.create_sheet()
+    row = [value]
+    ws.append(row)
