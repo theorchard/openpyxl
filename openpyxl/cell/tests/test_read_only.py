@@ -6,40 +6,46 @@ import pytest
 from openpyxl.cell.read_only import ReadOnlyCell
 
 
-def test_ctor():
-    cell = ReadOnlyCell(None, None, 10, 'n')
+@pytest.fixture(scope='module')
+def dummy_sheet():
+    class DummySheet(object):
+        base_date = 2415018.5
+        style_table = {}
+        string_table = {1:'Hello world'}
+    return DummySheet()
+
+
+def test_ctor(dummy_sheet):
+    cell = ReadOnlyCell(dummy_sheet, None, None, 10, 'n')
     assert cell.value == 10
 
 
-def test_empty_cell():
+def test_empty_cell(dummy_sheet):
     from openpyxl.cell.read_only import EMPTY_CELL
     assert EMPTY_CELL.value is None
     assert EMPTY_CELL.data_type == 's'
 
 
-def test_base_date():
-    ReadOnlyCell.set_base_date(2415018.5)
-    cell = ReadOnlyCell(None, None, 10, 'n')
+def test_base_date(dummy_sheet):
+    cell = ReadOnlyCell(dummy_sheet, None, None, 10, 'n')
     assert cell.base_date == 2415018.5
 
 
-def test_style_table():
-    ReadOnlyCell.set_style_table({})
-    cell = ReadOnlyCell(None, None, 10, 'n')
+def test_style_table(dummy_sheet):
+    cell = ReadOnlyCell(dummy_sheet, None, None, 10, 'n')
     assert cell.style_table == {}
 
 
-def test_string_table():
-    ReadOnlyCell.set_string_table({1:'Hello world'})
-    cell = ReadOnlyCell(None, None, 1, 's')
+def test_string_table(dummy_sheet):
+    cell = ReadOnlyCell(dummy_sheet, None, None, 1, 's')
     assert cell.string_table == {1:'Hello world'}
     assert cell.value == 'Hello world'
 
 
-def test_coordinate():
-    cell = ReadOnlyCell(1, "A", 10, None)
+def test_coordinate(dummy_sheet):
+    cell = ReadOnlyCell(dummy_sheet, 1, "A", 10, None)
     assert cell.coordinate == "A1"
-    cell = ReadOnlyCell(None, None, 1, None)
+    cell = ReadOnlyCell(dummy_sheet, None, None, 1, None)
     with pytest.raises(AttributeError):
         cell.coordinate
 
@@ -49,37 +55,33 @@ def test_coordinate():
                          ('1', True),
                          ('0', False),
                          ])
-def test_bool(value, expected):
-    cell = ReadOnlyCell(None, None, value, 'b')
+def test_bool(dummy_sheet, value, expected):
+    cell = ReadOnlyCell(dummy_sheet, None, None, value, 'b')
     assert cell.value is expected
 
 
-def test_inline_String():
-    cell = ReadOnlyCell(None, None, "Hello World!", 'inlineStr')
+def test_inline_String(dummy_sheet):
+    cell = ReadOnlyCell(dummy_sheet, None, None, "Hello World!", 'inlineStr')
     assert cell.value == "Hello World!"
 
 
-def test_numeric():
-    cell = ReadOnlyCell(None, None, "24555", 'n')
+def test_numeric(dummy_sheet):
+    cell = ReadOnlyCell(dummy_sheet, None, None, "24555", 'n')
     assert cell.value == 24555
-    cell = ReadOnlyCell(None, None, None, 'n')
+    cell = ReadOnlyCell(dummy_sheet, None, None, None, 'n')
     assert cell.value is None
 
 
 @pytest.fixture(scope="class")
-def DummyCell():
+def DummyCell(dummy_sheet):
     class DummyNumberFormat:
-
         format_code = 'd-mmm-yy'
 
-
     class DummyStyle(object):
-
         number_format = DummyNumberFormat()
 
-    style_table = {1:DummyStyle()}
-    cell = ReadOnlyCell(None, None, "23596", 'n', '1')
-    cell.set_style_table(style_table)
+    dummy_sheet.style_table = {1: DummyStyle()}
+    cell = ReadOnlyCell(dummy_sheet, None, None, "23596", 'n', '1')
     return cell
 
 

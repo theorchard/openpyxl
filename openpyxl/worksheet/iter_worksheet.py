@@ -103,9 +103,9 @@ class IterableWorksheet(Worksheet):
                  xml_source, string_table, style_table):
         Worksheet.__init__(self, parent_workbook, title)
         self.worksheet_path = worksheet_path
-        ReadOnlyCell.set_string_table(string_table)
-        ReadOnlyCell.set_style_table(style_table)
-        ReadOnlyCell.set_base_date(parent_workbook.excel_base_date)
+        self.string_table = string_table
+        self.style_table = style_table
+        self.base_date = parent_workbook.excel_base_date
         dimensions = read_dimension(self.xml_source)
         if dimensions is not None:
             self.min_col, self.min_row, self.max_col, self.max_row = dimensions
@@ -219,8 +219,8 @@ class IterableWorksheet(Worksheet):
                             if formula is not None and not self.parent.data_only:
                                 data_type = Cell.TYPE_FORMULA
                                 value = "=%s" % formula
-                            yield ReadOnlyCell(row, column_str, value, data_type,
-                                          style_id)
+                            yield ReadOnlyCell(self, row, column_str,
+                                               value, data_type, style_id)
             if element.tag in (CELL_TAG, VALUE_TAG, FORMULA_TAG):
                 # sub-elements of rows should be skipped
                 continue

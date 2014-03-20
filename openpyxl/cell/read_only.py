@@ -10,13 +10,13 @@ from .cell import Cell, get_column_letter
 
 class ReadOnlyCell(object):
 
-    __slots__ = ('row', 'column', '_value', 'data_type', '_style_id')
+    __slots__ = ('sheet', 'row', 'column', '_value', 'data_type', '_style_id')
 
-
-    def __init__(self, row, column, value, data_type=Cell.TYPE_NULL, style_id=None):
+    def __init__(self, sheet, row, column, value, data_type=Cell.TYPE_NULL, style_id=None):
         self.row = row
         self.column = column
         self.data_type = data_type
+        self.sheet = sheet
         self._set_value(value)
         self._set_style_id(style_id)
 
@@ -29,17 +29,17 @@ class ReadOnlyCell(object):
     def __ne__(self, other):
         return not self.__eq__(other)
 
-    @classmethod
-    def set_string_table(cls, string_table):
-        cls.string_table = string_table
+    @property
+    def string_table(self):
+        return self.sheet.string_table
 
-    @classmethod
-    def set_style_table(cls, style_table):
-        cls.style_table = style_table
+    @property
+    def style_table(self):
+        return self.sheet.style_table
 
-    @classmethod
-    def set_base_date(cls, base_date):
-        cls.base_date = base_date
+    @property
+    def base_date(self):
+        return self.sheet.base_date
 
     @property
     def coordinate(self):
@@ -92,4 +92,4 @@ class ReadOnlyCell(object):
             value = float(value)
         self._value = value
 
-EMPTY_CELL = ReadOnlyCell(None, None, None)
+EMPTY_CELL = ReadOnlyCell(None, None, None, None)
