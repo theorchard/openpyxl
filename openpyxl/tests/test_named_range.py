@@ -35,6 +35,25 @@ from openpyxl.reader.excel import load_workbook
 from openpyxl.workbook import Workbook
 
 
+class DummyWS:
+
+    def __init__(self, title):
+        self.title = title
+
+    def __str__(self):
+        return self.title
+
+
+class DummyWB(object):
+
+    def __init__(self, ws):
+        self.ws = ws
+
+    def __getitem__(self, key):
+        if key == self.ws.title:
+            return self.ws
+
+
 def test_split():
     assert [('My Sheet', '$D$8'), ] == split_named_range("'My Sheet'!$D$8")
 
@@ -47,48 +66,29 @@ def test_bad_range_name():
     with pytest.raises(NamedRangeException):
         split_named_range('HYPOTHESES$B$3')
 
+
 def test_range_name_worksheet_special_chars():
-        class DummyWs(object):
-            title = 'My Sheeet with a , and \''
 
-            def __str__(self):
-                return self.title
-        ws = DummyWs()
+    ws = DummyWS('My Sheeet with a , and \'')
+    wb = DummyWB(ws)
 
-        class DummyWB(object):
-
-            def get_sheet_by_name(self, name):
-                if name == ws.title:
-                    return ws
-
-        handle = open(os.path.join(DATADIR, 'reader', 'workbook_namedrange.xml'))
-        try:
-            content = handle.read()
-            named_ranges = read_named_ranges(content, DummyWB())
-            assert 1 == len(named_ranges)
-            assert isinstance(named_ranges[0], NamedRange)
-            assert [(ws, '$U$16:$U$24'), (ws, '$V$28:$V$36')] == named_ranges[0].destinations
-        finally:
-            handle.close()
+    handle = open(os.path.join(DATADIR, 'reader', 'workbook_namedrange.xml'))
+    try:
+        content = handle.read()
+        named_ranges = list(read_named_ranges(content, DummyWB(ws)))
+        assert len(named_ranges) == 1
+        assert isinstance(named_ranges[0], NamedRange)
+        assert [(ws, '$U$16:$U$24'), (ws, '$V$28:$V$36')] == named_ranges[0].destinations
+    finally:
+        handle.close()
 
 
 def test_read_named_ranges():
-
-    class DummyWs(object):
-        title = 'My Sheeet'
-
-        def __str__(self):
-            return self.title
-
-    class DummyWB(object):
-
-        def get_sheet_by_name(self, name):
-            return DummyWs()
-
+    ws = DummyWS('My Sheeet')
     handle = open(os.path.join(DATADIR, 'reader', 'workbook.xml'))
     try:
         content = handle.read()
-        named_ranges = read_named_ranges(content, DummyWB())
+        named_ranges = read_named_ranges(content, DummyWB(ws))
         assert ["My Sheeet!$D$8"] == [str(range) for range in named_ranges]
     finally:
         handle.close()
@@ -137,7 +137,7 @@ def test_print_titles():
 class TestNameRefersToValue(object):
     def setup(self):
         self.wb = load_workbook(os.path.join(DATADIR, 'genuine', 'NameWithValueBug.xlsx'))
-        self.ws = self.wb.get_sheet_by_name("Sheet1")
+        self.ws = self.wb["Sheet1"]
 
     def test_has_ranges(self):
         ranges = self.wb.get_named_ranges()
