@@ -44,7 +44,7 @@ class DummyWS:
         return self.title
 
 
-class DummyWB(object):
+class DummyWB:
 
     def __init__(self, ws):
         self.ws = ws
@@ -134,7 +134,7 @@ def test_print_titles():
     assert(actual_named_ranges == expected_named_ranges)
 
 
-class TestNameRefersToValue(object):
+class TestNameRefersToValue:
     def setup(self):
         self.wb = load_workbook(os.path.join(DATADIR, 'genuine', 'NameWithValueBug.xlsx'))
         self.ws = self.wb["Sheet1"]
