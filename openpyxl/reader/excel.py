@@ -220,4 +220,4 @@ def _load_workbook(wb, archive, filename, use_iterators, keep_vba):
             if comments_file is not None:
                 read_comments(new_ws, archive.read(comments_file))
 
-    wb._named_ranges = read_named_ranges(archive.read(ARC_WORKBOOK), wb)
+    wb._named_ranges = list(read_named_ranges(archive.read(ARC_WORKBOOK), wb))

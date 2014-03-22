@@ -52,10 +52,11 @@ from openpyxl.namedrange import (
     )
 
 import datetime
+import re
 
 # constants
-BUGGY_NAMED_RANGES = ['NA()', '#REF!']
-DISCARDED_RANGES = ['Excel_BuiltIn', 'Print_Area']
+BUGGY_NAMED_RANGES = re.compile("|".join(['NA()', '#REF!']))
+DISCARDED_RANGES = re.compile("|".join(['Excel_BuiltIn', 'Print_Area']))
 VALID_WORKSHEET = "application/vnd.openxmlformats-officedocument.spreadsheetml.worksheet+xml"
 
 
@@ -139,50 +140,37 @@ def detect_worksheets(archive):
 
 def read_named_ranges(xml_source, workbook):
     """Read named ranges, excluding poorly defined ranges."""
-    named_ranges = []
     root = fromstring(xml_source)
     names_root = root.find('{%s}definedNames' %SHEET_MAIN_NS)
     if names_root is not None:
         for name_node in names_root:
             range_name = name_node.get('name')
             node_text = name_node.text or ''
-
-            if name_node.get("hidden", '0') == '1':
+            if bool(name_node.get("hidden", False)):
                 continue
 
-            valid = True
+            if DISCARDED_RANGES.search(range_name) or BUGGY_NAMED_RANGES.search(range_name):
+                continue
 
-            for discarded_range in DISCARDED_RANGES:
-                if discarded_range in range_name:
-                    valid = False
+            if refers_to_range(node_text):
+                destinations = split_named_range(node_text)
 
-            for bad_range in BUGGY_NAMED_RANGES:
-                if bad_range in node_text:
-                    valid = False
+                new_destinations = []
+                for worksheet, cells_range in destinations:
+                    # it can happen that a valid named range references
+                    # a missing worksheet, when Excel didn't properly maintain
+                    # the named range list
+                    #
+                    # we just ignore them here
+                    worksheet = workbook[worksheet]
+                    if worksheet:
+                        new_destinations.append((worksheet, cells_range))
 
-            if valid:
-                if refers_to_range(node_text):
-                    destinations = split_named_range(node_text)
+                named_range = NamedRange(range_name, new_destinations)
+            else:
+                named_range = NamedRangeContainingValue(range_name, node_text)
 
-                    new_destinations = []
-                    for worksheet, cells_range in destinations:
-                        # it can happen that a valid named range references
-                        # a missing worksheet, when Excel didn't properly maintain
-                        # the named range list
-                        #
-                        # we just ignore them here
-                        worksheet = workbook.get_sheet_by_name(worksheet)
-                        if worksheet:
-                            new_destinations.append((worksheet, cells_range))
-
-                    named_range = NamedRange(range_name, new_destinations)
-                else:
-                    named_range = NamedRangeContainingValue(range_name, node_text)
-
-                location_id = name_node.get("localSheetId")
-                if location_id:
-                    named_range.scope = workbook.worksheets[int(location_id)]
-
-                named_ranges.append(named_range)
-
-    return named_ranges
+            location_id = name_node.get("localSheetId")
+            if location_id:
+                named_range.scope = workbook.worksheets[int(location_id)]
+            yield named_range
