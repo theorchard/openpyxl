@@ -139,10 +139,12 @@ class TestNameRefersToValue:
         self.wb = load_workbook(os.path.join(DATADIR, 'genuine', 'NameWithValueBug.xlsx'))
         self.ws = self.wb["Sheet1"]
 
+
     def test_has_ranges(self):
         ranges = self.wb.get_named_ranges()
         assert ['MyRef', 'MySheetRef', 'MySheetRef', 'MySheetValue', 'MySheetValue',
                 'MyValue'] == [range.name for range in ranges]
+
 
     def test_workbook_has_normal_range(self):
         normal_range = self.wb.get_named_range("MyRef")
@@ -150,39 +152,33 @@ class TestNameRefersToValue:
         assert normal_range.destinations == [(self.ws, '$A$1')]
         assert normal_range.scope is None
 
+
     def test_workbook_has_value_range(self):
         value_range = self.wb.get_named_range("MyValue")
         assert "MyValue" == value_range.name
         assert "9.99" == value_range.value
 
+
     def test_worksheet_range(self):
         range = self.ws.range("MyRef")
         assert range.coordinate == "A1"
+
 
     def test_worksheet_range_error_on_value_range(self):
         with pytest.raises(NamedRangeException):
             self.ws.range("MyValue")
 
-    # TODO document this helper function
-    def range_as_string(self, range, include_value=False):
-        def scope_as_string(range):
-            if range.scope:
-                return range.scope.title
-            else:
-                return "Workbook"
-        retval = "%s: %s" % (range.name, scope_as_string(range))
-        if include_value:
-            if isinstance(range, NamedRange):
-                retval += "=[range]"
-            else:
-                retval += "=" + range.value
-        return retval
 
     def test_handles_scope(self):
+        scoped = [
+            ("MySheetRef", "Sheet1"), ("MySheetRef", "Sheet2"),
+            ("MySheetValue", "Sheet1"), ("MySheetValue", "Sheet2"),
+        ]
+        no_scoped = ["MyRef", "MyValue"]
         ranges = self.wb.get_named_ranges()
-        assert self.wb.get_sheet_names() == ["Sheet1", "Sheet2"]
-        assert set(['MyRef: Workbook', 'MySheetRef: Sheet1', 'MySheetRef: Sheet2', 'MySheetValue: Sheet1',
-                'MySheetValue: Sheet2', 'MyValue: Workbook']) == set([self.range_as_string(range) for range in ranges])
+        assert [(r.name, r.scope.title) for r in ranges if r.scope is not None] == scoped
+        assert [r.name for r in ranges if r.scope is None] == no_scoped
+
 
     def test_can_be_saved(self, tmpdir):
         tmpdir.chdir()
@@ -191,13 +187,8 @@ class TestNameRefersToValue:
 
         wbcopy = load_workbook(FNAME)
         ranges = wbcopy.get_named_ranges()
-        assert wbcopy.get_sheet_names() == ['Sheet1', 'Sheet2']
-        assert ['MyRef: Workbook', 'MySheetRef: Sheet1', 'MySheetRef: Sheet2',
-                'MySheetValue: Sheet1', 'MySheetValue: Sheet2', 'MyValue: Workbook'] \
-               == [self.range_as_string(range) for range in ranges]
+        names = ["MyRef", "MySheetRef", "MySheetRef", "MySheetValue", "MySheetValue", "MyValue"]
+        assert [r.name for r in ranges] == names
 
-        assert [ 'MyRef: Workbook=[range]', 'MySheetRef: Sheet1=[range]',
-                 'MySheetRef: Sheet2=[range]', 'MySheetValue: Sheet1=3.33',
-                 'MySheetValue: Sheet2=14.4', 'MyValue: Workbook=9.99' ] \
-               == [self.range_as_string(range, include_value=True) for range in
-                   wbcopy.get_named_ranges()]
+        values = ['3.33', '14.4', '9.99']
+        assert [r.value for r in ranges if hasattr(r, 'value')] == values
