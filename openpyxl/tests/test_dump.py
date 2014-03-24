@@ -54,6 +54,26 @@ def test_dump_sheet_title():
     ws = wb2.get_sheet_by_name('Test1')
     assert 'Test1' == ws.title
 
+
+def test_dump_string_table():
+    test_filename = _get_test_filename()
+    wb = Workbook(optimized_write=True)
+    ws = wb.create_sheet()
+    letters = [get_column_letter(x + 1) for x in xrange(10)]
+    expected_rows = []
+
+    for row in xrange(5):
+        ws.append(['%s%d' % (letter, row + 1) for letter in letters])
+    table = wb.strings_table_builder.get_table()
+    assert table == {'A1': 0, 'A2': 10, 'A3': 20, 'A4': 30, 'A5': 40, 'B1':
+                     1, 'B2': 11, 'B3': 21, 'B4': 31, 'B5': 41, 'C1': 2, 'C2': 12, 'C3': 22,
+                     'C4': 32, 'C5': 42, 'D1': 3, 'D2': 13, 'D3': 23, 'D4': 33, 'D5': 43,
+                     'E1': 4, 'E2': 14, 'E3': 24, 'E4': 34, 'E5': 44, 'F1': 5, 'F2': 15, 'F3':
+                     25, 'F4': 35, 'F5': 45, 'G1': 6, 'G2': 16, 'G3': 26, 'G4': 36, 'G5': 46,
+                     'H1': 7, 'H2': 17, 'H3': 27, 'H4': 37, 'H5': 47, 'I1': 8, 'I2': 18, 'I3':
+                     28, 'I4': 38, 'I5': 48, 'J1': 9, 'J2': 19, 'J3': 29, 'J4': 39, 'J5': 49}
+
+
 def test_dump_sheet():
     test_filename = _get_test_filename()
     wb = Workbook(optimized_write=True)
@@ -94,9 +114,8 @@ def test_table_builder():
         for x in range(5):
             sb.add(letter)
     table = dict(sb.get_table())
+    assert table == result
 
-    for key, idx in result.items():
-        assert idx == table[key]
 
 def test_open_too_many_files():
     test_filename = _get_test_filename()
