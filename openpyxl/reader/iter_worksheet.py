@@ -247,6 +247,10 @@ class IterableWorksheet(Worksheet):
                     if formula is not None and not self.parent.data_only:
                         data_type = Cell.TYPE_FORMULA
                         value = "=" + formula
+                    if not (value or formula or style_id):
+                        # this cell is pointless and should not have been
+                        # written in the first place
+                        continue
                     yield RawCell(row, column_str, coord, value, data_type, style_id, None)
             # sub-elements of cells should be skipped
             if (element.tag == '{%s}v' % SHEET_MAIN_NS
