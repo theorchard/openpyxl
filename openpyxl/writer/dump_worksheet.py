@@ -93,7 +93,7 @@ class DumpWorksheet(Worksheet):
         self._fileobj_content_name = create_temporary_file(suffix='.content')
         self._fileobj_name = create_temporary_file()
 
-        self._string_builder = self._parent.strings_table_builder
+        self._strings = self._parent.shared_strings
 
 
     def get_temporary_file(self, filename):
@@ -205,9 +205,7 @@ class DumpWorksheet(Worksheet):
         handle = self.get_temporary_file(filename=self._fileobj_content_name)
         handle.seek(0, 2)
 
-        doc = XMLGenerator(out=handle)
-
-        return doc
+        return XMLGenerator(out=handle)
 
     def append(self, row):
         """
@@ -247,7 +245,7 @@ class DumpWorksheet(Worksheet):
                 dtype = 'formula'
             else:
                 dtype = 'string'
-                cell = self._string_builder.add(cell)
+                cell = self._strings.add(cell)
 
             if dtype != 'formula':
                 attributes['t'] = STYLES[dtype]['type']
@@ -263,10 +261,12 @@ class DumpWorksheet(Worksheet):
             end_tag(doc, 'c')
         end_tag(doc, 'row')
 
+
 def save_dump(workbook, filename):
     writer = ExcelDumpWriter(workbook)
     writer.save(filename)
     return True
+
 
 class ExcelDumpWriter(ExcelWriter):
     def __init__(self, workbook):
@@ -275,13 +275,11 @@ class ExcelDumpWriter(ExcelWriter):
         self.style_writer._style_list.append(DATETIME_STYLE)
 
     def _write_string_table(self, archive):
-        shared_string_table = self.workbook.strings_table_builder
+        shared_strings = self.workbook.shared_strings
         archive.writestr(ARC_SHARED_STRINGS,
-                write_string_table(shared_string_table))
+                write_string_table(shared_strings))
 
-        return shared_string_table
-
-    def _write_worksheets(self, archive, shared_string_table, style_writer):
+    def _write_worksheets(self, archive, style_writer):
         for i, sheet in enumerate(self.workbook.worksheets):
             sheet.write_header()
             sheet.close()
@@ -291,7 +289,7 @@ class ExcelDumpWriter(ExcelWriter):
                 os.remove(filename)
             sheet._unset_temp_files()
 
+
 class StyleDumpWriter(StyleWriter):
     def _get_style_list(self, workbook):
         return []
-

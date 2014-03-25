@@ -64,7 +64,7 @@ def write_etree(doc, element):
         write_etree(doc, e)
     end_tag(doc, element.tag)
 
-def write_worksheet(worksheet, string_table, style_table):
+def write_worksheet(worksheet, shared_strings, style_table):
     """Write a worksheet to an xml file."""
     if worksheet.xml_source:
         vba_root = fromstring(worksheet.xml_source)
@@ -94,7 +94,7 @@ def write_worksheet(worksheet, string_table, style_table):
     write_worksheet_sheetviews(doc, worksheet)
     tag(doc, 'sheetFormatPr', {'defaultRowHeight': '15'})
     write_worksheet_cols(doc, worksheet, style_table)
-    write_worksheet_data(doc, worksheet, string_table, style_table)
+    write_worksheet_data(doc, worksheet, shared_strings, style_table)
     if worksheet.protection.enabled:
         tag(doc, 'sheetProtection',
             {'objects': '1', 'scenarios': '1', 'sheet': '1'})

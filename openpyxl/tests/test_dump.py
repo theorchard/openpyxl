@@ -63,7 +63,7 @@ def test_dump_string_table():
 
     for row in xrange(5):
         ws.append(['%s%d' % (letter, row + 1) for letter in letters])
-    table = list(wb.strings_table_builder)
+    table = list(wb.shared_strings)
     assert table == ['A1', 'B1', 'C1', 'D1', 'E1', 'F1', 'G1', 'H1', 'I1', 'J1',
                      'A2', 'B2', 'C2', 'D2', 'E2', 'F2', 'G2', 'H2', 'I2', 'J2',
                      'A3', 'B3', 'C3', 'D3', 'E3', 'F3', 'G3', 'H3', 'I3', 'J3',

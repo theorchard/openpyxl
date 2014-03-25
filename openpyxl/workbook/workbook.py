@@ -88,7 +88,7 @@ class Workbook(object):
         self.__optimized_write = optimized_write
         self.__optimized_read = False
         self.__thread_local_data = threading.local()
-        self.strings_table_builder = IndexedList()
+        self.shared_strings = IndexedList()
         self.loaded_theme = None
         self._worksheet_class = worksheet_class
         self._optimized_worksheet_class = optimized_worksheet_class
