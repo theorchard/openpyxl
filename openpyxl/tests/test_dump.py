@@ -183,7 +183,7 @@ def test_equal_string():
     test_filename = _get_test_filename()
     wb = Workbook(optimized_write=True)
     ws = wb.create_sheet()
-    ws.append(['', u'', None, u'='])
+    ws.append(['', '', None, '='])
     wb.save(test_filename)
 
     wb2 = load_workbook(test_filename, True)
