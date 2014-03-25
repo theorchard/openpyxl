@@ -26,6 +26,7 @@ class IndexedList(list):
             if value not in self._dict:
                 self._dict[value] = idx
                 idx += 1
+        self.clean = True
 
     def __contains__(self, value):
         if not self.clean:
@@ -39,6 +40,10 @@ class IndexedList(list):
 
     def append(self, value):
         if value not in self._dict:
+            self._dict[value] = len(self)
             list.append(self, value)
-            self._dict[value] = len(self) - 1
             self.clean = True
+
+    def add(self, value):
+        self.append(value)
+        return self._dict[value]
