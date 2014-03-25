@@ -9,11 +9,13 @@ class IndexedList(list):
     http://code.activestate.com/recipes/52303-the-auxiliary-dictionary-idiom-for-sequences-with-/
     """
 
+    clean = False
+
     def __init__(self, iterable=()):
-        self.clean = False
+        self._dict = {}
         if iterable != ():
-            self._dict = dict.fromkeys(iterable)
-            iterable = sorted(self._dict)
+            for i in iterable:
+                self.append(i)
             self.clean = True
         super(IndexedList, self).__init__(iterable)
 
@@ -35,23 +37,8 @@ class IndexedList(list):
             return self._dict[value]
         raise ValueError
 
-    @property
-    def values(self):
-        """Return a deduped sorted list of the list's values"""
-        if not self.clean:
-            self._rebuild_dict()
-        return sorted(self._dict)
-
-
-def method_wrapper(methodname):
-    _method = getattr(list, methodname)
-    def wrapper(self, *args):
-        self.clean = False
-        return _method(self, *args)
-    setattr(IndexedList, methodname, wrapper)
-
-for meth in ['__setitem__', '__delitem__', '__setslice__', '__delslice__',
-             '__iadd__', 'insert', 'append', 'pop', 'remove', 'extend', 'sort']:
-    method_wrapper(meth)
-
-del method_wrapper
+    def append(self, value):
+        if value not in self._dict:
+            list.append(self, value)
+            self._dict[value] = len(self) - 1
+            self.clean = True
