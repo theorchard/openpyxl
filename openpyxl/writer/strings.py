@@ -83,3 +83,10 @@ class StringTableBuilder(object):
     def get_table(self):
 
         return self.dct
+
+    def __len__(self):
+        return len(self.dct)
+
+    def __iter__(self):
+        for pair in sorted(self.dct.items(), key=lambda pair: pair[1]):
+            yield pair[0]
