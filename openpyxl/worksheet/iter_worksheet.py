@@ -100,10 +100,10 @@ class IterableWorksheet(Worksheet):
     max_col = max_row = None
 
     def __init__(self, parent_workbook, title, worksheet_path,
-                 xml_source, string_table, style_table):
+                 xml_source, shared_strings, style_table):
         Worksheet.__init__(self, parent_workbook, title)
         self.worksheet_path = worksheet_path
-        self.string_table = string_table
+        self.shared_strings = shared_strings
         self.style_table = style_table
         self.base_date = parent_workbook.excel_base_date
         dimensions = read_dimension(self.xml_source)

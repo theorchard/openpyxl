@@ -24,27 +24,20 @@ from __future__ import absolute_import
 
 """Read the shared strings table."""
 
-# package imports
-from openpyxl.xml.functions import fromstring
-from openpyxl.xml.constants import SHEET_MAIN_NS, XML_NS
 from openpyxl.compat import unicode
+
+# package imports
+from openpyxl.strings import IndexedList
+from openpyxl.xml.functions import fromstring, safe_iterator
+from openpyxl.xml.constants import SHEET_MAIN_NS, XML_NS
 
 
 def read_string_table(xml_source):
     """Read in all shared strings in the table"""
-    table = {}
     root = fromstring(text=xml_source)
-    string_index_nodes = root.findall('{%s}si' % SHEET_MAIN_NS)
-    for index, string_index_node in enumerate(string_index_nodes):
-
-        string = get_string(string_index_node)
-
-        # fix XML escaping sequence for '_x'
-        string = string.replace('x005F_', '')
-
-        table[index] = string
-
-    return table
+    nodes = safe_iterator(root, '{%s}si' % SHEET_MAIN_NS)
+    strings = [get_string(node) for node in nodes]
+    return IndexedList(strings)
 
 
 def get_string(string_index_node):
@@ -56,15 +49,17 @@ def get_string(string_index_node):
             partial_text = get_text(rich_node)
             reconstructed_text.append(partial_text)
         return unicode(''.join(reconstructed_text))
-    else:
-        return get_text(string_index_node)
+    return get_text(string_index_node)
 
 
 def get_text(rich_node):
     """Read rich text, discarding formatting if not disallowed"""
     text_node = rich_node.find('{%s}t' % SHEET_MAIN_NS)
-    partial_text = text_node.text or unicode('')
+    text = text_node.text or unicode('')
 
     if text_node.get('{%s}space' % XML_NS) != 'preserve':
-        partial_text = partial_text.strip()
-    return unicode(partial_text)
+        text = text.strip()
+
+    # fix XML escaping sequence for '_x'
+    text = text.replace('x005F_', '')
+    return unicode(text)

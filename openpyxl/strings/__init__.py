@@ -1,6 +1,5 @@
 # Copyright (c) 2010-2014 openpyxl
 
-
 class IndexedList(list):
     """
     List with optimised access by value

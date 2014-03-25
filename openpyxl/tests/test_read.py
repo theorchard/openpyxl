@@ -34,6 +34,7 @@ import pytest
 from openpyxl.compat import BytesIO, StringIO, unicode, tempfile
 
 # package imports
+from openpyxl.strings import IndexedList
 from openpyxl.tests.helper import DATADIR
 from openpyxl.worksheet import Worksheet
 from openpyxl.workbook import Workbook
@@ -63,9 +64,10 @@ def test_read_standalone_worksheet():
     path = os.path.join(DATADIR, 'reader', 'sheet2.xml')
     ws = None
     handle = open(path)
+    shared_strings = IndexedList(['hello'])
     try:
         ws = read_worksheet(handle.read(), DummyWb(),
-                'Sheet 2', {1: 'hello'}, {1: Style()})
+                'Sheet 2', shared_strings, {1: Style()})
     finally:
         handle.close()
     assert isinstance(ws, Worksheet)
@@ -200,7 +202,7 @@ def test_read_cell_formulae():
     src_file = os.path.join(DATADIR, "reader", "worksheet_formula.xml")
     wb = Workbook()
     ws = wb.active
-    fast_parse(ws, open(src_file), {}, {}, None)
+    fast_parse(ws, open(src_file), ['', ''], {}, None)
     b1 = ws['B1']
     assert b1.data_type == 'f'
     assert b1.value == '=CONCATENATE(A1,A2)'

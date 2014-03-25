@@ -68,10 +68,10 @@ class WorkSheetParser(object):
     FORMULA_TAG = '{%s}f' % SHEET_MAIN_NS
     MERGE_TAG = '{%s}mergeCell' % SHEET_MAIN_NS
 
-    def __init__(self, ws, xml_source, string_table, style_table, color_index=None):
+    def __init__(self, ws, xml_source, shared_strings, style_table, color_index=None):
         self.ws = ws
         self.source = xml_source
-        self.string_table = string_table
+        self.shared_strings = shared_strings
         self.style_table = style_table
         self.color_index = color_index
         self.guess_types = ws.parent._guess_types
@@ -119,7 +119,7 @@ class WorkSheetParser(object):
             cell = self.ws[coordinate]
             data_type = element.get('t', 'n')
             if data_type == Cell.TYPE_STRING:
-                value = self.string_table.get(int(value))
+                value = self.shared_strings[int(value)]
             elif data_type == Cell.TYPE_BOOL:
                 value = bool(int(value))
             elif data_type == 'n':
@@ -301,22 +301,22 @@ class WorkSheetParser(object):
         for sc in safe_iterator(element, '{%s}sortCondition' % SHEET_MAIN_NS):
             self.ws.auto_filter.add_sort_condition(sc.get("ref"), sc.get("descending"))
 
-def fast_parse(ws, xml_source, string_table, style_table, color_index=None):
+def fast_parse(ws, xml_source, shared_strings, style_table, color_index=None):
 
-    parser = WorkSheetParser(ws, xml_source, string_table, style_table, color_index)
+    parser = WorkSheetParser(ws, xml_source, shared_strings, style_table, color_index)
     parser.parse()
     del parser
 
 
-def read_worksheet(xml_source, parent, preset_title, string_table,
+def read_worksheet(xml_source, parent, preset_title, shared_strings,
                    style_table, color_index=None, worksheet_path=None, keep_vba=False):
     """Read an xml worksheet"""
     if worksheet_path:
         ws = IterableWorksheet(parent, preset_title,
-                worksheet_path, xml_source, string_table, style_table)
+                worksheet_path, xml_source, shared_strings, style_table)
     else:
         ws = Worksheet(parent, preset_title)
-        fast_parse(ws, xml_source, string_table, style_table, color_index)
+        fast_parse(ws, xml_source, shared_strings, style_table, color_index)
     if keep_vba:
         ws.xml_source = xml_source
     return ws

@@ -30,8 +30,8 @@ class ReadOnlyCell(object):
         return not self.__eq__(other)
 
     @property
-    def string_table(self):
-        return self.sheet.string_table
+    def shared_strings(self):
+        return self.sheet.shared_strings
 
     @property
     def style_table(self):
@@ -82,7 +82,7 @@ class ReadOnlyCell(object):
         elif self.data_type in(Cell.TYPE_INLINE, Cell.TYPE_FORMULA_CACHE_STRING):
             return unicode(self._value)
         elif self.data_type == Cell.TYPE_STRING:
-            return unicode(self.string_table[int(self._value)])
+            return unicode(self.shared_strings[int(self._value)])
         return self._value
 
     def _set_value(self, value):

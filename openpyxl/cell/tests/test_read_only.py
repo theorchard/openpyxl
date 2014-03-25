@@ -11,7 +11,7 @@ def dummy_sheet():
     class DummySheet(object):
         base_date = 2415018.5
         style_table = {}
-        string_table = {1:'Hello world'}
+        shared_strings = ['Hello world']
     return DummySheet()
 
 
@@ -37,8 +37,8 @@ def test_style_table(dummy_sheet):
 
 
 def test_string_table(dummy_sheet):
-    cell = ReadOnlyCell(dummy_sheet, None, None, 1, 's')
-    assert cell.string_table == {1:'Hello world'}
+    cell = ReadOnlyCell(dummy_sheet, None, None, 0, 's')
+    assert cell.shared_strings == ['Hello world']
     assert cell.value == 'Hello world'
 
 

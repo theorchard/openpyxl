@@ -180,9 +180,10 @@ def _load_workbook(wb, archive, filename, use_iterators, keep_vba):
         wb.properties = DocumentProperties()
 
     try:
-        string_table = read_string_table(archive.read(ARC_SHARED_STRINGS))
+        shared_strings = read_string_table(archive.read(ARC_SHARED_STRINGS))
     except KeyError:
-        string_table = {}
+        shared_strings = []
+
     try:
         wb.loaded_theme = archive.read(ARC_THEME)  # some writers don't output a theme, live with it (fixes #160)
     except KeyError:
@@ -204,11 +205,11 @@ def _load_workbook(wb, archive, filename, use_iterators, keep_vba):
 
         if not use_iterators:
             new_ws = read_worksheet(archive.read(worksheet_path), wb,
-                                    sheet_name, string_table, style_table,
+                                    sheet_name, shared_strings, style_table,
                                     color_index=style_properties['color_index'],
                                     keep_vba=keep_vba)
         else:
-            new_ws = read_worksheet(None, wb, sheet_name, string_table,
+            new_ws = read_worksheet(None, wb, sheet_name, shared_strings,
                                     style_table,
                                     color_index=style_properties['color_index'],
                                     worksheet_path=worksheet_path)
