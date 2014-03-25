@@ -63,6 +63,7 @@ def write_string_table(string_table):
     temp_buffer.close()
     return string_table_xml
 
+
 class StringTableBuilder(object):
 
     def __init__(self):
@@ -80,11 +81,7 @@ class StringTableBuilder(object):
             self.counter += 1
             return res
 
-    def get_table(self):
-
-        return self.dct
-
-    def __len__(self):
+     def __len__(self):
         return len(self.dct)
 
     def __iter__(self):

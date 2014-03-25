@@ -106,14 +106,13 @@ def test_dump_sheet():
 
 
 def test_table_builder():
-    sb = StringTableBuilder()
-    result = {'a':0, 'b':1, 'c':2, 'd':3}
+    table = StringTableBuilder()
+    values = ['a', 'b', 'c', 'd']
 
-    for letter in sorted(result.keys()):
+    for letter in values:
         for x in range(5):
-            sb.add(letter)
-    table = dict(sb.get_table())
-    assert table == result
+            table.add(letter)
+    assert list(table) == values
 
 
 def test_open_too_many_files():
