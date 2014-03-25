@@ -62,28 +62,3 @@ def write_string_table(string_table):
     string_table_xml = temp_buffer.getvalue()
     temp_buffer.close()
     return string_table_xml
-
-
-class StringTableBuilder(object):
-
-    def __init__(self):
-
-        self.counter = 0
-        self.dct = {}
-
-    def add(self, key):
-
-        key = key.strip()
-        try:
-            return self.dct[key]
-        except KeyError:
-            res = self.dct[key] = self.counter
-            self.counter += 1
-            return res
-
-     def __len__(self):
-        return len(self.dct)
-
-    def __iter__(self):
-        for pair in sorted(self.dct.items(), key=lambda pair: pair[1]):
-            yield pair[0]

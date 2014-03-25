@@ -31,9 +31,9 @@ import datetime
 import threading
 
 # package imports
+from openpyxl.strings import IndexedList
 from openpyxl.worksheet import Worksheet
 from openpyxl.writer.dump_worksheet import DumpWorksheet, save_dump
-from openpyxl.writer.strings import StringTableBuilder
 from openpyxl.namedrange import NamedRange
 from openpyxl.styles import Style
 from openpyxl.writer.excel import save_workbook
@@ -88,7 +88,7 @@ class Workbook(object):
         self.__optimized_write = optimized_write
         self.__optimized_read = False
         self.__thread_local_data = threading.local()
-        self.strings_table_builder = StringTableBuilder()
+        self.strings_table_builder = IndexedList()
         self.loaded_theme = None
         self._worksheet_class = worksheet_class
         self._optimized_worksheet_class = optimized_worksheet_class
