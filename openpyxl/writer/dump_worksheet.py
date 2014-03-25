@@ -229,7 +229,7 @@ class DumpWorksheet(Worksheet):
                 dtype = 'datetime'
                 cell = self._shared_date.datetime_to_julian(cell)
                 attributes['s'] = STYLES[dtype]['style']
-            elif cell and cell[0] and cell[1:] == '=':
+            elif cell and cell[0] == '=' and cell[1:]:
                 dtype = 'formula'
             else:
                 dtype = 'string'

@@ -179,3 +179,14 @@ def test_append_after_save():
 
     ws.append(['hello'])
 
+def test_equal_string():
+    test_filename = _get_test_filename()
+    wb = Workbook(optimized_write=True)
+    ws = wb.create_sheet()
+    ws.append(['', u'', None, u'='])
+    wb.save(test_filename)
+
+    wb2 = load_workbook(test_filename, True)
+    last_cell = list(wb2.worksheets[0].iter_rows().next())[-1]
+    assert last_cell.data_type == 's'
+    
