@@ -187,6 +187,6 @@ def test_equal_string():
     wb.save(test_filename)
 
     wb2 = load_workbook(test_filename, True)
-    last_cell = list(wb2.worksheets[0].iter_rows().next())[-1]
+    last_cell = list(wb2.worksheets[0].iter_rows())[0][-1]
     assert last_cell.data_type == 's'
     
