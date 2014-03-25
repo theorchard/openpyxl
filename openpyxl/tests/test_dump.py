@@ -64,14 +64,13 @@ def test_dump_string_table():
 
     for row in xrange(5):
         ws.append(['%s%d' % (letter, row + 1) for letter in letters])
-    table = wb.strings_table_builder.get_table()
-    assert table == {'A1': 0, 'A2': 10, 'A3': 20, 'A4': 30, 'A5': 40, 'B1':
-                     1, 'B2': 11, 'B3': 21, 'B4': 31, 'B5': 41, 'C1': 2, 'C2': 12, 'C3': 22,
-                     'C4': 32, 'C5': 42, 'D1': 3, 'D2': 13, 'D3': 23, 'D4': 33, 'D5': 43,
-                     'E1': 4, 'E2': 14, 'E3': 24, 'E4': 34, 'E5': 44, 'F1': 5, 'F2': 15, 'F3':
-                     25, 'F4': 35, 'F5': 45, 'G1': 6, 'G2': 16, 'G3': 26, 'G4': 36, 'G5': 46,
-                     'H1': 7, 'H2': 17, 'H3': 27, 'H4': 37, 'H5': 47, 'I1': 8, 'I2': 18, 'I3':
-                     28, 'I4': 38, 'I5': 48, 'J1': 9, 'J2': 19, 'J3': 29, 'J4': 39, 'J5': 49}
+    table = list(wb.strings_table_builder)
+    assert table == ['A1', 'B1', 'C1', 'D1', 'E1', 'F1', 'G1', 'H1', 'I1', 'J1',
+                     'A2', 'B2', 'C2', 'D2', 'E2', 'F2', 'G2', 'H2', 'I2', 'J2',
+                     'A3', 'B3', 'C3', 'D3', 'E3', 'F3', 'G3', 'H3', 'I3', 'J3',
+                     'A4', 'B4', 'C4', 'D4', 'E4', 'F4', 'G4', 'H4', 'I4', 'J4',
+                     'A5', 'B5', 'C5', 'D5', 'E5', 'F5', 'G5', 'H5', 'I5', 'J5',
+                     ]
 
 
 def test_dump_sheet():
