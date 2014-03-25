@@ -9,7 +9,7 @@ def list():
 
 def test_ctor(list):
     l = list(['b', 'a'])
-    assert l == ['a', 'b']
+    assert l == ['b', 'a']
 
 
 def test_function(list):
@@ -17,13 +17,12 @@ def test_function(list):
     l.append('b')
     l.append('a')
     assert l == ['b', 'a']
-    assert l.values == ['a', 'b']
 
 
 def test_index(list):
     l = list(['a', 'b'])
     l.append('a')
-    assert l == ['a', 'b', 'a']
+    assert l == ['a', 'b']
     l.append('c')
     assert l.index('c') == 2
 
@@ -36,4 +35,4 @@ def test_table_builder(list):
         for x in range(5):
             sb.append(letter)
         assert sb.index(letter) == result[letter]
-    assert sb.values == ['a', 'b', 'c', 'd']
+    assert sb == ['a', 'b', 'c', 'd']
