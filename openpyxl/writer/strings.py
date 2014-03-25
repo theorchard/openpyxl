@@ -29,23 +29,22 @@ from openpyxl.compat import StringIO
 
 # package imports
 from openpyxl.xml.functions import start_tag, end_tag, tag, XMLGenerator
+from openpyxl.strings import IndexedList
 
 
 def create_string_table(workbook):
     """Compile the string table for a workbook."""
+
     strings = set()
     for sheet in workbook.worksheets:
         for cell in sheet.get_cell_collection():
             if cell.data_type == cell.TYPE_STRING and cell._value is not None:
                 strings.add(cell.value)
-    return dict((key, i) for i, key in enumerate(sorted(strings)))
+    return IndexedList(sorted(strings))
 
 
 def write_string_table(string_table):
     """Write the string table xml."""
-    if isinstance(string_table, dict):
-        string_table = [pair[0] for pair in sorted(string_table.items(),
-                                                   key=lambda pair: pair[1])]
     temp_buffer = StringIO()
     doc = XMLGenerator(out=temp_buffer, encoding='utf-8')
     start_tag(doc, 'sst', {'xmlns':

@@ -38,7 +38,7 @@ def test_create_string_table():
     ws.cell('B13').value = 'world'
     ws.cell('D28').value = 'hello'
     table = create_string_table(wb)
-    assert {'hello': 0, 'world': 1} == table
+    assert table == ['hello', 'world']
 
 
 def test_read_string_table():

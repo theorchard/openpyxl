@@ -303,7 +303,7 @@ def write_worksheet_data(doc, worksheet, string_table, style_table):
             else:
                 start_tag(doc, 'c', attributes)
                 if cell.data_type == cell.TYPE_STRING:
-                    tag(doc, 'v', body='%s' % string_table[value])
+                    tag(doc, 'v', body='%s' % string_table.index(value))
                 elif cell.data_type == cell.TYPE_FORMULA:
                     if coordinate in worksheet.formula_attributes:
                         attr = worksheet.formula_attributes[coordinate]
