@@ -275,7 +275,7 @@ class ExcelDumpWriter(ExcelWriter):
         self.style_writer._style_list.append(DATETIME_STYLE)
 
     def _write_string_table(self, archive):
-        shared_string_table = self.workbook.strings_table_builder.get_table()
+        shared_string_table = self.workbook.strings_table_builder
         archive.writestr(ARC_SHARED_STRINGS,
                 write_string_table(shared_string_table))
 
