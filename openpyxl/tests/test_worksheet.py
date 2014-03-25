@@ -349,7 +349,7 @@ class TestWorkSheetWriter(object):
 
     def test_merge(self):
         ws = Worksheet(self.wb)
-        string_table = {'':'', 'Cell A1':'Cell A1', 'Cell B1':'Cell B1'}
+        string_table = ['Cell A1', 'Cell B1']
         expected = """
         <worksheet xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main" xmlns:r="http://schemas.openxmlformats.org/officeDocument/2006/relationships">
           <sheetPr>
@@ -369,10 +369,10 @@ class TestWorkSheetWriter(object):
           <sheetData>
             <row r="1" spans="1:2">
               <c r="A1" t="s">
-                <v>Cell A1</v>
+                <v>0</v>
               </c>
               <c r="B1" t="s">
-                <v>Cell B1</v>
+                <v>1</v>
               </c>
             </row>
           </sheetData>
@@ -406,7 +406,7 @@ class TestWorkSheetWriter(object):
           <sheetData>
             <row r="1" spans="1:2">
               <c r="A1" t="s">
-                <v>Cell A1</v>
+                <v>0</v>
               </c>
               <c r="B1" t="s"/>
             </row>
@@ -440,7 +440,7 @@ class TestWorkSheetWriter(object):
           <sheetData>
             <row r="1" spans="1:2">
               <c r="A1" t="s">
-                <v>Cell A1</v>
+                <v>0</v>
               </c>
               <c r="B1" t="s"/>
             </row>
