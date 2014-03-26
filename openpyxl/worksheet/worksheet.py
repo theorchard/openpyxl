@@ -413,8 +413,6 @@ class Worksheet(object):
         """Return the style object for the specified cell."""
         if not coordinate in self._styles:
             self._styles[coordinate] = Style()
-        elif self._styles[coordinate].static and not read_only:
-            self._styles[coordinate] = self._styles[coordinate].copy()
         return self._styles[coordinate]
 
     def set_printer_settings(self, paper_size, orientation):

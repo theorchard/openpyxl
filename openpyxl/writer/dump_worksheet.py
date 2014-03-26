@@ -64,10 +64,9 @@ STYLES = {'datetime' : {'type':Cell.TYPE_NUMERIC,
                     'style':'0'},
         }
 
-DESCRIPTORS_CACHE_SIZE = 50
 
-DATETIME_STYLE = Style()
-DATETIME_STYLE.number_format.format_code = NumberFormat.FORMAT_DATE_YYYYMMDD2
+DESCRIPTORS_CACHE_SIZE = 50
+DATETIME_STYLE = Style(number_format=NumberFormat(format_code=NumberFormat.FORMAT_DATE_YYYYMMDD2))
 BOUNDING_BOX_PLACEHOLDER = 'A1:%s%d' % (get_column_letter(MAX_COLUMN), MAX_ROW)
 
 def create_temporary_file(suffix=''):

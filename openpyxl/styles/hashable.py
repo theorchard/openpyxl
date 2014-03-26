@@ -27,6 +27,15 @@ class HashableObject(object):
     """Define how to hash property classes."""
     __fields__ = None
 
+    def __setattr__(self, *args, **kwargs):
+        name = args[0]
+        if hasattr(self, name) and getattr(self, name) is not None:
+            raise TypeError('cannot set %s attribute' % name)
+        return object.__setattr__(self, *args, **kwargs)
+
+    def __delattr__(self, *args, **kwargs):
+        raise TypeError('cannot delete %s attribute' % args[0])
+
     def __repr__(self):
         return '%s(%s)' % (self.__class__.__name__,
                            ', '.join(['%s=%s' % (k, repr(getattr(self, k)))

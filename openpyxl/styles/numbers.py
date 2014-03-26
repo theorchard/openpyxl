@@ -106,12 +106,17 @@ class NumberFormat(HashableObject):
     _BUILTIN_FORMATS_REVERSE = dict(
             [(value, key) for key, value in _BUILTIN_FORMATS.items()])
 
-    __fields__ = ('_format_code',
-                  '_format_index')
+    __fields__ = ('format_code',)
     __slots__ = __fields__
 
     DATE_INDICATORS = 'dmyhs'
     BAD_DATE_RE = re.compile(r'(\[|").*[dmhys].*(\]|")')
+
+    def __init__(self, format_code=FORMAT_GENERAL):
+        self.format_code = format_code
+
+    def format_index(self):
+        return self.builtin_format_id(self.format_code)
 
     def __eq__(self, other):
         if isinstance(other, NumberFormat):
@@ -120,21 +125,6 @@ class NumberFormat(HashableObject):
 
     def __hash__(self):
         return super(NumberFormat, self).__hash__()
-
-    def __init__(self):
-        self._format_code = self.FORMAT_GENERAL
-        self._format_index = 0
-
-    @property
-    def format_code(self):
-        """Getter for the format_code property."""
-        return self._format_code
-
-    @format_code.setter
-    def format_code(self, format_code = FORMAT_GENERAL):
-        """Setter for the format_code property."""
-        self._format_code = format_code
-        self._format_index = self.builtin_format_id(format_code)
 
     def builtin_format_code(self, index):
         """Return one of the standard format codes by index."""

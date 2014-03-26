@@ -214,7 +214,7 @@ class SharedStylesParser(object):
         builtin_formats = NumberFormat._BUILTIN_FORMATS
         cell_xfs_nodes = safe_iterator(cell_xfs, '{%s}xf' % SHEET_MAIN_NS)
         for index, cell_xfs_node in enumerate(cell_xfs_nodes):
-            new_style = Style(static=True)
+            new_style = Style()
             number_format_id = int(cell_xfs_node.get('numFmtId'))
             if number_format_id < 164:
                 new_style.number_format.format_code = \
