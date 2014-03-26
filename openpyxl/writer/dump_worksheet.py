@@ -243,7 +243,7 @@ class DumpWorksheet(Worksheet):
                 elif isinstance(cell, datetime.timedelta):
                     cell = timedelta_to_days(cell)
                 attributes['s'] = STYLES[dtype]['style']
-            elif cell and cell[0] == '=':
+            elif cell and cell[0] == '=' and cell[1:]:
                 dtype = 'formula'
             else:
                 dtype = 'string'

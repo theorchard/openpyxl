@@ -219,6 +219,10 @@ class IterableWorksheet(Worksheet):
                             if formula is not None and not self.parent.data_only:
                                 data_type = Cell.TYPE_FORMULA
                                 value = "=%s" % formula
+                            if not (value or formula or style_id):
+                                # this cell is pointless and should not have been
+                                # written in the first place
+                                continue
                             yield ReadOnlyCell(self, row, column_str,
                                                value, data_type, style_id)
             if element.tag in (CELL_TAG, VALUE_TAG, FORMULA_TAG):

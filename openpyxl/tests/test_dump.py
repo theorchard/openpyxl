@@ -148,3 +148,15 @@ def test_datetime(value):
     ws = wb.create_sheet()
     row = [value]
     ws.append(row)
+
+def test_equal_string():
+    test_filename = _get_test_filename()
+    wb = Workbook(optimized_write=True)
+    ws = wb.create_sheet()
+    ws.append(['', '', None, '='])
+    wb.save(test_filename)
+
+    wb2 = load_workbook(test_filename, True)
+    last_cell = list(wb2.worksheets[0].iter_rows())[0][-1]
+    assert last_cell.data_type == 's'
+    
