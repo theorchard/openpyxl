@@ -1,4 +1,5 @@
 from __future__ import absolute_import
+from openpyxl.styles.borders import Border
 # Copyright (c) 2010-2014 openpyxl
 #
 # Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -154,15 +155,15 @@ class SharedStylesParser(object):
         """Read individual fill"""
         patternFill = fill_node.find('{%s}patternFill' % SHEET_MAIN_NS)
         if patternFill is not None:
-            newFill = Fill()
-            newFill.fill_type = patternFill.get('patternType')
+            fill = {}
+            fill['fill_type'] = patternFill.get('patternType')
             fgColor = patternFill.find('{%s}fgColor' % SHEET_MAIN_NS)
             if fgColor is not None:
-                newFill.start_color.index = self._get_relevant_color(fgColor)
+                fill['start_color'] = Color(self._get_relevant_color(fgColor))
             bgColor = patternFill.find('{%s}bgColor' % SHEET_MAIN_NS)
             if bgColor is not None:
-                newFill.end_color.index = self._get_relevant_color(bgColor)
-            return newFill
+                fill['end_color'] = Color(self._get_relevant_color(bgColor))
+            return Fill(**fill)
 
     def parse_borders(self):
         """Read in the boarders"""
@@ -173,26 +174,27 @@ class SharedStylesParser(object):
 
     def parse_border(self, border_node):
         """Read individual border"""
-        newBorder = Borders()
+        border = {}
         if bool(border_node.get('diagonalup')):
-            newBorder.diagonal_direction = newBorder.DIAGONAL_UP
+            border['diagonal_direction'] = Borders.DIAGONAL_UP
         if bool(border_node.get('diagonalDown')):
-            if newBorder.diagonal_direction == newBorder.DIAGONAL_UP:
-                newBorder.diagonal_direction = newBorder.DIAGONAL_BOTH
+            if border['diagonal_direction'] == Borders.DIAGONAL_UP:
+                border['diagonal_direction'] = Borders.DIAGONAL_BOTH
             else:
-                newBorder.diagonal_direction = newBorder.DIAGONAL_DOWN
+                border['diagonal_direction'] = Borders.DIAGONAL_DOWN
 
         for side in ('left', 'right', 'top', 'bottom', 'diagonal'):
             node = border_node.find('{%s}%s' % (SHEET_MAIN_NS, side))
             if node is not None:
-                borderSide = getattr(newBorder,side)
+                bside = {}
                 if node.get('style') is not None:
-                    borderSide.border_style = node.get('style')
+                    bside['border_style'] = node.get('style')
                 color = node.find('{%s}color' % SHEET_MAIN_NS)
                 if color is not None:
-                    borderSide.color.index = self._get_relevant_color(color)
+                    bside['color'] = Color(self._get_relevant_color(color))
                     # Ignore 'auto'
-        return newBorder
+                border[side] = Border(**bside)
+        return Borders(**border)
 
     def parse_cell_xfs(self):
         """Read styles from the shared style table"""

@@ -208,7 +208,6 @@ class WorkSheetParser(object):
             if value is not None:
                 setattr(self.ws.page_setup, key, value)
 
-
     def parse_header_footer(self, element):
         oddHeader = element.find('{%s}oddHeader' % SHEET_MAIN_NS)
         if oddHeader is not None and oddHeader.text is not None:
@@ -216,7 +215,6 @@ class WorkSheetParser(object):
         oddFooter = element.find('{%s}oddFooter' % SHEET_MAIN_NS)
         if oddFooter is not None and oddFooter.text is not None:
             self.ws.header_footer.setFooter(oddFooter.text)
-
 
     def parser_conditional_formatting(self, element):
         for cf in safe_iterator(element, '{%s}conditionalFormatting' % SHEET_MAIN_NS):
@@ -258,19 +256,20 @@ class WorkSheetParser(object):
                         rule['colorScale']['cfvo'].append(cfvo)
                     colorNodes = colorScale.findall('{%s}color' % SHEET_MAIN_NS)
                     for color in colorNodes:
-                        c = Color(Color.BLACK)
-                        if self.color_index\
-                           and color.get('indexed') is not None\
-                           and 0 <= int(color.get('indexed')) < len(self.color_index):
-                            c.index = self.color_index[int(color.get('indexed'))]
+                        index = Color.BLACK
+                        if (self.color_index
+                            and color.get('indexed') is not None
+                            and 0 <= int(color.get('indexed')) < len(self.color_index)):
+                            index = self.color_index[int(color.get('indexed'))]
                         if color.get('theme') is not None:
                             if color.get('tint') is not None:
-                                c.index = 'theme:%s:%s' % (color.get('theme'), color.get('tint'))
+                                index = 'theme:%s:%s' % (color.get('theme'),
+                                                         color.get('tint'))
                             else:
-                                c.index = 'theme:%s:' % color.get('theme')  # prefix color with theme
+                                index = 'theme:%s:' % color.get('theme')  # prefix color with theme
                         elif color.get('rgb'):
-                            c.index = color.get('rgb')
-                        rule['colorScale']['color'].append(c)
+                            index = color.get('rgb')
+                        rule['colorScale']['color'].append(Color(index))
 
                 iconSet = cfRule.find('{%s}iconSet' % SHEET_MAIN_NS)
                 if iconSet is not None:

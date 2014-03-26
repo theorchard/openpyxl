@@ -616,8 +616,7 @@ def test_parse_dxfs():
     assert cond_styles['font'].color == Color('FF9C0006')
     assert not cond_styles['font'].bold
     assert not cond_styles['font'].italic
-    f = Fill()
-    f.end_color = Color('FFFFC7CE')
+    f = Fill(end_color=Color('FFFFC7CE'))
     assert cond_styles['fill'] == f
 
     # Verify that the dxf styles stay the same when they're written and read back in.
