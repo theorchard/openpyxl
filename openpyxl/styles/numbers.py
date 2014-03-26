@@ -109,7 +109,6 @@ class NumberFormat(HashableObject):
     __fields__ = ('_format_code',
                   '_format_index')
     __slots__ = __fields__
-    __leaf__ = True
 
     DATE_INDICATORS = 'dmyhs'
     BAD_DATE_RE = re.compile(r'(\[|").*[dmhys].*(\]|")')

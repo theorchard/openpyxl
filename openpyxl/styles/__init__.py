@@ -44,14 +44,15 @@ class Style(HashableObject):
                   'protection')
     __slots__ = __fields__
 
-    def __init__(self, static=False):
-        self.static = static
-        self.font = Font()
-        self.fill = Fill()
-        self.borders = Borders()
-        self.alignment = Alignment()
-        self.number_format = NumberFormat()
-        self.protection = Protection()
+    def __init__(self, font=Font(), fill=Fill(), borders=Borders(),
+                 alignment=Alignment(), number_format=NumberFormat(),
+                 protection=Protection()):
+        self.font = font
+        self.fill = fill
+        self.borders = borders
+        self.alignment = alignment
+        self.number_format = number_format
+        self.protection = protection
 
     def copy(self):
         new_style = Style()

@@ -34,8 +34,7 @@ class Protection(HashableObject):
     __fields__ = ('locked',
                   'hidden')
     __slots__ = __fields__
-    __leaf__ = True
 
-    def __init__(self):
-        self.locked = self.PROTECTION_INHERIT
-        self.hidden = self.PROTECTION_INHERIT
+    def __init__(self, locked=PROTECTION_INHERIT, hidden=PROTECTION_INHERIT):
+        self.locked = locked
+        self.hidden = hidden

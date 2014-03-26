@@ -45,13 +45,15 @@ class Font(HashableObject):
                   'color')
     __slots__ = __fields__
 
-    def __init__(self):
-        self.name = 'Calibri'
-        self.size = 11
-        self.bold = False
-        self.italic = False
-        self.superscript = False
-        self.subscript = False
-        self.underline = self.UNDERLINE_NONE
-        self.strikethrough = False
-        self.color = Color(Color.BLACK)
+    def __init__(self, name='Calibri', size=11, bold=False, italic=False,
+                 superscript=False, subscript=False, underline=UNDERLINE_NONE,
+                 strikethrough=False, color=Color(Color.BLACK)):
+        self.name = name
+        self.size = size
+        self.bold = bold
+        self.italic = italic
+        self.superscript = superscript
+        self.subscript = subscript
+        self.underline = underline
+        self.strikethrough = strikethrough
+        self.color = color

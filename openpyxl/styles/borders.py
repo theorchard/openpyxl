@@ -72,16 +72,20 @@ class Borders(HashableObject):
                   'horizontal')
     __slots__ = __fields__
 
-    def __init__(self):
-        self.left = Border()
-        self.right = Border()
-        self.top = Border()
-        self.bottom = Border()
-        self.diagonal = Border()
-        self.diagonal_direction = self.DIAGONAL_NONE
+    def __init__(self, left=Border(), right=Border(), top=Border(),
+                 bottom=Border(), diagonal=Border(),
+                 diagonal_direction=DIAGONAL_NONE,
+                 all_borders=Border(), outline=Border(),
+                 inside=Border(), vertical=Border(), horizontal=Border()):
+        self.left = left
+        self.right = right
+        self.top = top
+        self.bottom = bottom
+        self.diagonal = diagonal
+        self.diagonal_direction = diagonal_direction
+        self.all_borders = all_borders
+        self.outline = outline
+        self.inside = inside
+        self.vertical = vertical
+        self.horizontal = horizontal
 
-        self.all_borders = Border()
-        self.outline = Border()
-        self.inside = Border()
-        self.vertical = Border()
-        self.horizontal = Border()

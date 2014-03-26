@@ -45,12 +45,13 @@ class Alignment(HashableObject):
                   'shrink_to_fit',
                   'indent')
     __slots__ = __fields__
-    __leaf__ = True
 
-    def __init__(self):
-        self.horizontal = self.HORIZONTAL_GENERAL
-        self.vertical = self.VERTICAL_BOTTOM
-        self.text_rotation = 0
-        self.wrap_text = False
-        self.shrink_to_fit = False
-        self.indent = 0
+    def __init__(self, horizontal=HORIZONTAL_GENERAL, vertical=VERTICAL_BOTTOM,
+                 text_rotation=0, wrap_text=False, shrink_to_fit=False,
+                 indent=0):
+        self.horizontal = horizontal
+        self.vertical = vertical
+        self.text_rotation = text_rotation
+        self.wrap_text = wrap_text
+        self.shrink_to_fit = shrink_to_fit
+        self.indent = indent

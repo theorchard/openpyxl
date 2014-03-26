@@ -22,20 +22,15 @@ from __future__ import absolute_import
 # @license: http://www.opensource.org/licenses/mit-license.php
 # @author: see AUTHORS file
 
-try:
-    from hashlib import md5
-except ImportError:
-    from md5 import md5
-
-from copy import deepcopy
 
 class HashableObject(object):
     """Define how to hash property classes."""
     __fields__ = None
-    __leaf__ = False
 
     def __repr__(self):
-        return str(self.__key)
+        return '%s(%s)' % (self.__class__.__name__,
+                           ', '.join(['%s=%s' % (k, repr(getattr(self, k)))
+                                        for k in self.__fields__]))
 
     @property
     def __key(self):

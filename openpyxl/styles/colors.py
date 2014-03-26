@@ -51,7 +51,6 @@ class Color(HashableObject):
 
     __fields__ = ('index',)
     __slots__ = __fields__
-    __leaf__ = True
 
-    def __init__(self, index):
+    def __init__(self, index=BLACK):
         self.index = index

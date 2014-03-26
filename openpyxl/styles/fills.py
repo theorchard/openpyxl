@@ -56,8 +56,10 @@ class Fill(HashableObject):
                   'end_color')
     __slots__ = __fields__
 
-    def __init__(self):
-        self.fill_type = self.FILL_NONE
-        self.rotation = 0
-        self.start_color = Color(Color.WHITE)
-        self.end_color = Color(Color.BLACK)
+    def __init__(self, fill_type=FILL_NONE, rotation=0,
+                 start_color=Color(Color.WHITE),
+                 end_color=Color(Color.BLACK)):
+        self.fill_type = fill_type
+        self.rotation = rotation
+        self.start_color = start_color
+        self.end_color = end_color
