@@ -355,7 +355,7 @@ def test_is_not_date_color_format():
     cell = Cell(ws, 'A', 1)
 
     cell.value = -13.5
-    cell.style.number_format.format_code = '0.00_);[Red]\(0.00\)'
+    cell.style = cell.style.copy(number_format=NumberFormat('0.00_);[Red]\(0.00\)'))
 
     assert cell.is_date() is False
 
