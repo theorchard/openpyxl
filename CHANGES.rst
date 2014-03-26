@@ -9,7 +9,6 @@ Major changes
 * ReadOnlyCell.internal_value and ReadOnlyCell.value now behave the same as Cell
 * Provide no size information on unsized worksheets
 
-
 Minor changes
 -------------
 
@@ -33,7 +32,16 @@ Bug fixes
 #275 - Handling auto filters where there are only custom filters
 
 
-1.8.4 (unreleased)
+1.8.5 (2014-03-25)
+==================
+
+Minor changes
+-------------
+* The '=' string is no longer interpreted as a formula
+* When a client writes empty xml tags for cells (e.g. <c r='A1'></c>), reader will not crash
+
+
+1.8.4 (2014-02-25)
 ==================
 
 Bugfixes
