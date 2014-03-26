@@ -27,6 +27,11 @@ class HashableObject(object):
     """Define how to hash property classes."""
     __fields__ = None
 
+    def copy(self, **kwargs):
+        current = dict([(x, getattr(self, x)) for x in self.__fields__])
+        current.update(kwargs)
+        return self.__class__(**current)
+
     def __setattr__(self, *args, **kwargs):
         name = args[0]
         if hasattr(self, name) and getattr(self, name) is not None:
