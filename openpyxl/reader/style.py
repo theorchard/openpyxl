@@ -175,6 +175,7 @@ class SharedStylesParser(object):
     def parse_border(self, border_node):
         """Read individual border"""
         border = {}
+        border['diagonal_direction'] = Borders.DIAGONAL_NONE
         if bool(border_node.get('diagonalup')):
             border['diagonal_direction'] = Borders.DIAGONAL_UP
         if bool(border_node.get('diagonalDown')):
@@ -222,7 +223,7 @@ class SharedStylesParser(object):
             if bool(cell_xfs_node.get('applyAlignment')):
                 alignment = {}
                 al = cell_xfs_node.find('{%s}alignment' % SHEET_MAIN_NS)
-                if alignment is not None:
+                if al is not None:
                     for key in ('horizontal', 'vertical', 'indent'):
                         _value = al.get(key)
                         if _value is not None:
