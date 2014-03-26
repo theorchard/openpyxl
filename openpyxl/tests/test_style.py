@@ -291,25 +291,17 @@ class TestStyleWriter(object):
         assert third_wb
 
     def test_write_dxf(self):
-        redFill = Fill()
-        redFill.start_color.index = 'FFEE1111'
-        redFill.end_color.index = 'FFEE1111'
-        redFill.fill_type = Fill.FILL_SOLID
-        whiteFont = Font()
-        whiteFont.color.index = "FFFFFFFF"
-        whiteFont.bold = True
-        whiteFont.italic = True
-        whiteFont.underline = 'single'
-        whiteFont.strikethrough = True
-        blueBorder = Borders()
-        blueBorder.left.border_style = 'medium'
-        blueBorder.left.color = Color(Color.BLUE)
-        blueBorder.right.border_style = 'medium'
-        blueBorder.right.color = Color(Color.BLUE)
-        blueBorder.top.border_style = 'medium'
-        blueBorder.top.color = Color(Color.BLUE)
-        blueBorder.bottom.border_style = 'medium'
-        blueBorder.bottom.color = Color(Color.BLUE)
+        redFill = Fill(start_color=Color('FFEE1111'),
+                       end_color=Color('FFEE1111'),
+                       fill_type=Fill.FILL_SOLID)
+        whiteFont = Font(color=Color("FFFFFFFF"),
+                         bold=True, italic=True, underline='single',
+                         strikethrough=True)
+        medium_blue = Border(border_style='medium', color=Color(Color.BLUE))
+        blueBorder = Borders(left=medium_blue,
+                             right=medium_blue,
+                             top=medium_blue,
+                             bottom=medium_blue)
         cf = ConditionalFormatting()
         cf.add('A1:A2', FormulaRule(formula="[A1=1]", font=whiteFont, border=blueBorder, fill=redFill))
         cf.setDxfStyles(self.workbook)
