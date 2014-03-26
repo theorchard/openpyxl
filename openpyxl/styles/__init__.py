@@ -54,15 +54,5 @@ class Style(HashableObject):
         self.number_format = number_format
         self.protection = protection
 
-    def copy(self):
-        new_style = Style()
-        new_style.font = deepcopy(self.font)
-        new_style.fill = deepcopy(self.fill)
-        new_style.borders = deepcopy(self.borders)
-        new_style.alignment = deepcopy(self.alignment)
-        new_style.number_format = deepcopy(self.number_format)
-        new_style.protection = deepcopy(self.protection)
-        return new_style
-
 DEFAULTS = Style()
 

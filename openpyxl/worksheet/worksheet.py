@@ -415,6 +415,9 @@ class Worksheet(object):
             self._styles[coordinate] = Style()
         return self._styles[coordinate]
 
+    def set_style(self, coordinate, style):
+        self._styles[coordinate] = style
+
     def set_printer_settings(self, paper_size, orientation):
         """Set printer settings """
 

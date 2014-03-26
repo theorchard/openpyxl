@@ -395,7 +395,7 @@ class Cell(object):
     @number_format.setter
     def number_format(self, format_code):
         """Set a new formatting code for numeric values"""
-        self.style.number_format.format_code = format_code
+        self.style = self.style.copy(number_format=NumberFormat(format_code=format_code))
 
     def _set_number_format(self, format_code):
         """Set a new formatting code for numeric values"""
@@ -420,6 +420,10 @@ class Cell(object):
     def style(self):
         """Returns the :class:`openpyxl.style.Style` object for this cell"""
         return self.parent.get_style(self.coordinate)
+
+    @style.setter
+    def style(self, new_style):
+        return self.parent.set_style(self.coordinate, new_style)
 
     def get_coordinate(self):
         warnings.warn("cell.get_coordinate() is deprecated use cell.coordinate instead")
