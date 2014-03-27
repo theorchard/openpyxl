@@ -141,7 +141,9 @@ class SharedStylesParser(object):
             font['strikethrough'] = True
         color = font_node.find('{%s}color' % SHEET_MAIN_NS)
         if color is not None:
-            font['color'] = Color(self._get_relevant_color(color))
+            index = self._get_relevant_color(color)
+            if index is not None:
+                font['color'] = Color(index)
         return Font(**font)
 
     def parse_fills(self):
@@ -196,7 +198,9 @@ class SharedStylesParser(object):
                     bside['border_style'] = node.get('style')
                 color = node.find('{%s}color' % SHEET_MAIN_NS)
                 if color is not None:
-                    bside['color'] = Color(self._get_relevant_color(color))
+                    index = self._get_relevant_color(color)
+                    if index is not None:
+                        bside['color'] = Color(index)
                     # Ignore 'auto'
                 border[side] = Border(**bside)
         return Borders(**border)
