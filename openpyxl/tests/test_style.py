@@ -441,8 +441,8 @@ def test_change_existing_styles():
 
     ws.column_dimensions['A'].width = 20
     i_style = ws.get_style('I')
-    print "***", i_style.fill
-    ws.set_style('I', i_style.copy(fill=Fill(start_color=Color('FF442200')),
+    ws.set_style('I', i_style.copy(fill=Fill(fill_type='solid',
+                                             start_color=Color('FF442200')),
                                    font=Font(color=Color('FF002244'))))
     ws.cell('A2').style = ws.cell('A2').style.copy(font=Font(name='Times New Roman',
                                                              size=12,
@@ -458,8 +458,10 @@ def test_change_existing_styles():
                                                              italic=False))
     ws.cell('A5').style = ws.cell('A5').style.copy(font=Font(color=Color('FF66FF66')))
     ws.cell('A6').style = ws.cell('A6').style.copy(font=Font(color=Color('theme:1:')))
-    ws.cell('A7').style = ws.cell('A7').style.copy(fill=Fill(start_color=Color('FF330066')))
-    ws.cell('A8').style = ws.cell('A8').style.copy(fill=Fill(start_color=Color('theme:2:')))
+    ws.cell('A7').style = ws.cell('A7').style.copy(fill=Fill(fill_type='solid',
+                                                             start_color=Color('FF330066')))
+    ws.cell('A8').style = ws.cell('A8').style.copy(fill=Fill(fill_type='solid',
+                                                             start_color=Color('theme:2:')))
     ws.cell('A9').style = ws.cell('A9').style.copy(alignment=Alignment(horizontal='center'))
     ws.cell('A10').style = ws.cell('A10').style.copy(alignment=Alignment(horizontal='left'))
     ws.cell('A11').style = ws.cell('A11').style.copy(alignment=Alignment(horizontal='right'))

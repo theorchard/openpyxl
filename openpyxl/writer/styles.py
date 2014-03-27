@@ -81,7 +81,6 @@ class StyleWriter(object):
         """
         if color is None:
             return
-        print color, node
         if not ":" in color:
             SubElement(node, key, {'rgb': color})
         else:
@@ -140,11 +139,10 @@ class StyleWriter(object):
         index = 2
         for st in self._style_list:
             if st.fill != DEFAULTS.fill and st.fill not in table:
-                print st.fill
                 table[st.fill] = index
                 fill = SubElement(fills, 'fill')
-                if st.fill != DEFAULTS.fill:
-                    node = SubElement(fill, 'patternFill', {'patternType':st.fill.fill_type})
+                if st.fill != DEFAULTS.fill and st.fill.fill_type is not None:
+                    node = SubElement(fill, 'patternFill', {'patternType': st.fill.fill_type})
                     if st.fill.start_color != DEFAULTS.fill.start_color:
                         self._unpack_color(node, st.fill.start_color.index, 'fgColor')
                     if st.fill.end_color != DEFAULTS.fill.end_color:

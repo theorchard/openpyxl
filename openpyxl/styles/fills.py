@@ -24,10 +24,13 @@ from __future__ import absolute_import
 
 from .colors import Color
 from .hashable import HashableObject
+import warnings
 
 
 class Fill(HashableObject):
-    """Area fill patterns for use in styles."""
+    """Area fill patterns for use in styles.
+    Caution: if you do not specify a fill_type, other attributes will have
+    no effect !"""
     FILL_NONE = None
     FILL_SOLID = 'solid'
     FILL_GRADIENT_LINEAR = 'linear'
