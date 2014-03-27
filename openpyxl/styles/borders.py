@@ -27,7 +27,9 @@ from .hashable import HashableObject
 
 
 class Border(HashableObject):
-    """Border options for use in styles."""
+    """Border options for use in styles.
+    Caution: if you do not specify a border_style, other attributes will
+    have no effect !"""
     BORDER_NONE = 'none'
     BORDER_DASHDOT = 'dashDot'
     BORDER_DASHDOTDOT = 'dashDotDot'
