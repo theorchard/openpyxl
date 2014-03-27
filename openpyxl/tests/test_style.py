@@ -465,23 +465,33 @@ def test_change_existing_styles():
     ws.cell('A9').style = ws.cell('A9').style.copy(alignment=Alignment(horizontal='center'))
     ws.cell('A10').style = ws.cell('A10').style.copy(alignment=Alignment(horizontal='left'))
     ws.cell('A11').style = ws.cell('A11').style.copy(alignment=Alignment(horizontal='right'))
-    ws.cell('A12').style = ws.cell('A12').style.copy(alignment=Alignment(horizontal='bottom'))
-    ws.cell('A13').style = ws.cell('A13').style.copy(alignment=Alignment(horizontal='top'))
-    ws.cell('A14').style = ws.cell('A14').style.copy(alignment=Alignment(horizontal='center'))
+    ws.cell('A12').style = ws.cell('A12').style.copy(alignment=Alignment(vertical='bottom'))
+    ws.cell('A13').style = ws.cell('A13').style.copy(alignment=Alignment(vertical='top'))
+    ws.cell('A14').style = ws.cell('A14').style.copy(alignment=Alignment(vertical='center'))
     ws.cell('A15').style = ws.cell('A15').style.copy(number_format=NumberFormat('0.00%'))
     ws.cell('A16').style = ws.cell('A16').style.copy(number_format=NumberFormat('0.00'))
     ws.cell('A17').style = ws.cell('A17').style.copy(number_format=NumberFormat('mm-dd-yy'))
     ws.unmerge_cells('A18:B18')
-    ws.cell('A19').style = ws.cell('A19').style.copy(borders=Borders(top=Border(color=Color('FF006600')),
-                                                                     bottom=Border(color=Color('FF006600')),
-                                                                     left=Border(color=Color('FF006600')),
-                                                                     right=Border(color=Color('FF006600'))))
-    ws.cell('A21').style = ws.cell('A21').style.copy(borders=Borders(top=Border(color=Color('theme:7:')),
-                                                                     bottom=Border(color=Color('theme:7:')),
-                                                                     left=Border(color=Color('theme:7:')),
-                                                                     right=Border(color=Color('theme:7:'))))
-    ws.cell('A23').style = ws.cell('A23').style.copy(borders=Borders(top=Border(color=Color('theme:6:'))),
-                                                     fill=Fill(start_color=Color('FFCCCCFF')))
+    ws.cell('A19').style = ws.cell('A19').style.copy(borders=Borders(top=Border(border_style=Border.BORDER_THIN,
+                                                                                color=Color('FF006600')),
+                                                                     bottom=Border(border_style=Border.BORDER_THIN,
+                                                                                   color=Color('FF006600')),
+                                                                     left=Border(border_style=Border.BORDER_THIN,
+                                                                                 color=Color('FF006600')),
+                                                                     right=Border(border_style=Border.BORDER_THIN,
+                                                                                  color=Color('FF006600'))))
+    ws.cell('A21').style = ws.cell('A21').style.copy(borders=Borders(top=Border(border_style=Border.BORDER_THIN,
+                                                                                color=Color('theme:7:')),
+                                                                     bottom=Border(border_style=Border.BORDER_THIN,
+                                                                                   color=Color('theme:7:')),
+                                                                     left=Border(border_style=Border.BORDER_THIN,
+                                                                                 color=Color('theme:7:')),
+                                                                     right=Border(border_style=Border.BORDER_THIN,
+                                                                                  color=Color('theme:7:'))))
+    ws.cell('A23').style = ws.cell('A23').style.copy(borders=Borders(top=Border(border_style=Border.BORDER_THIN,
+                                                                                color=Color('theme:6:'))),
+                                                     fill=Fill(fill_type='solid',
+                                                               start_color=Color('FFCCCCFF')))
     ws.unmerge_cells('A23:B24')
     ws.cell('A25').style = ws.cell('A25').style.copy(alignment=Alignment(wrap_text=False))
     ws.cell('A26').style = ws.cell('A26').style.copy(alignment=Alignment(shrink_to_fit=False))
