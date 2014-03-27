@@ -43,6 +43,7 @@ class Font(HashableObject):
                   'underline',
                   'strikethrough',
                   'color')
+    __check__ = {'color': Color}
     __slots__ = __fields__
 
     def __init__(self, name='Calibri', size=11, bold=False, italic=False,

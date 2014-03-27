@@ -54,6 +54,8 @@ class Fill(HashableObject):
                   'rotation',
                   'start_color',
                   'end_color')
+    __check__ = {'start_color': Color,
+                 'end_color': Color}
     __slots__ = __fields__
 
     def __init__(self, fill_type=FILL_NONE, rotation=0,

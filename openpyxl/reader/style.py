@@ -141,7 +141,7 @@ class SharedStylesParser(object):
             font['strikethrough'] = True
         color = font_node.find('{%s}color' % SHEET_MAIN_NS)
         if color is not None:
-            font['color'] = Color( self._get_relevant_color(color))
+            font['color'] = Color(self._get_relevant_color(color))
         return Font(**font)
 
     def parse_fills(self):
@@ -154,8 +154,8 @@ class SharedStylesParser(object):
     def parse_fill(self, fill_node):
         """Read individual fill"""
         patternFill = fill_node.find('{%s}patternFill' % SHEET_MAIN_NS)
+        fill = {}
         if patternFill is not None:
-            fill = {}
             fill['fill_type'] = patternFill.get('patternType')
             fgColor = patternFill.find('{%s}fgColor' % SHEET_MAIN_NS)
             if fgColor is not None:
@@ -163,7 +163,7 @@ class SharedStylesParser(object):
             bgColor = patternFill.find('{%s}bgColor' % SHEET_MAIN_NS)
             if bgColor is not None:
                 fill['end_color'] = Color(self._get_relevant_color(bgColor))
-            return Fill(**fill)
+        return Fill(**fill)
 
     def parse_borders(self):
         """Read in the boarders"""

@@ -45,6 +45,7 @@ class Border(HashableObject):
 
     __fields__ = ('border_style',
                   'color')
+    __check__ = {'color': Color}
     __slots__ = __fields__
 
     def __init__(self, border_style=BORDER_NONE, color=Color(Color.BLACK)):
@@ -71,6 +72,16 @@ class Borders(HashableObject):
                   'vertical',
                   'horizontal')
     __slots__ = __fields__
+    __check__ = {'left': Border,
+                 'right': Border,
+                 'top': Border,
+                 'bottom': Border,
+                 'diagonal': Border,
+                 'all_borders': Border,
+                 'outline': Border,
+                 'inside': Border,
+                 'vertical': Border,
+                 'horizontal': Border}
 
     def __init__(self, left=Border(), right=Border(), top=Border(),
                  bottom=Border(), diagonal=Border(),

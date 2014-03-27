@@ -43,6 +43,12 @@ class Style(HashableObject):
                   'number_format',
                   'protection')
     __slots__ = __fields__
+    __check__ = {'font': Font,
+                 'fill': Fill,
+                 'borders': Borders,
+                 'alignment': Alignment,
+                 'number_format': NumberFormat,
+                 'protection': Protection}
 
     def __init__(self, font=Font(), fill=Fill(), borders=Borders(),
                  alignment=Alignment(), number_format=NumberFormat(),
