@@ -50,6 +50,7 @@ class Color(HashableObject):
     DARKYELLOW = 'FF808000'
 
     __fields__ = ('index',)
+    __check__ = {'index': str}
     __slots__ = __fields__
 
     def __init__(self, index=BLACK):

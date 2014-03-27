@@ -72,7 +72,6 @@ class StyleWriter(object):
 
         return get_document_content(xml_node=self._root)
 
-
     def _unpack_color(self, node, color, key='color'):
         """Convert colors encoded as RGB, theme or tints
         Possible values
@@ -82,15 +81,15 @@ class StyleWriter(object):
         """
         if color is None:
             return
+        print color, node
         if not ":" in color:
-            SubElement(node, key, {'rgb':color})
+            SubElement(node, key, {'rgb': color})
         else:
             _, theme, tint = color.split(":")
             if tint == '':
-                SubElement(node, key, {'theme':theme})
+                SubElement(node, key, {'theme': theme})
             else:
-                SubElement(node, key, {'theme':theme, 'tint':tint})
-
+                SubElement(node, key, {'theme': theme, 'tint': tint})
 
     def _write_fonts(self):
         """ add fonts part to root
@@ -141,13 +140,13 @@ class StyleWriter(object):
         index = 2
         for st in self._style_list:
             if st.fill != DEFAULTS.fill and st.fill not in table:
+                print st.fill
                 table[st.fill] = index
                 fill = SubElement(fills, 'fill')
-                if st.fill.fill_type != DEFAULTS.fill.fill_type:
+                if st.fill != DEFAULTS.fill:
                     node = SubElement(fill, 'patternFill', {'patternType':st.fill.fill_type})
                     if st.fill.start_color != DEFAULTS.fill.start_color:
                         self._unpack_color(node, st.fill.start_color.index, 'fgColor')
-
                     if st.fill.end_color != DEFAULTS.fill.end_color:
                         self._unpack_color(node, st.fill.end_color.index, 'bgColor')
 

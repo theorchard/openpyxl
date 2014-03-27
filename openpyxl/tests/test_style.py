@@ -441,6 +441,7 @@ def test_change_existing_styles():
 
     ws.column_dimensions['A'].width = 20
     i_style = ws.get_style('I')
+    print "***", i_style.fill
     ws.set_style('I', i_style.copy(fill=Fill(start_color=Color('FF442200')),
                                    font=Font(color=Color('FF002244'))))
     ws.cell('A2').style = ws.cell('A2').style.copy(font=Font(name='Times New Roman',

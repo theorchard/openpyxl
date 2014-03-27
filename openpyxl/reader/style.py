@@ -159,10 +159,14 @@ class SharedStylesParser(object):
             fill['fill_type'] = patternFill.get('patternType')
             fgColor = patternFill.find('{%s}fgColor' % SHEET_MAIN_NS)
             if fgColor is not None:
-                fill['start_color'] = Color(self._get_relevant_color(fgColor))
+                color = self._get_relevant_color(fgColor)
+                if color:
+                    fill['start_color'] = Color(color)
             bgColor = patternFill.find('{%s}bgColor' % SHEET_MAIN_NS)
             if bgColor is not None:
-                fill['end_color'] = Color(self._get_relevant_color(bgColor))
+                color = self._get_relevant_color(bgColor)
+                if color:
+                    fill['end_color'] = Color(color)
         return Fill(**fill)
 
     def parse_borders(self):
