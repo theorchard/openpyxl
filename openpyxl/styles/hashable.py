@@ -22,6 +22,8 @@ from __future__ import absolute_import
 # @license: http://www.opensource.org/licenses/mit-license.php
 # @author: see AUTHORS file
 
+from openpyxl.compat import unicode
+
 BASE_TYPES = (str, unicode, float, int)
 
 
