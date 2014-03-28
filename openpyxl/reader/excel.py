@@ -66,6 +66,7 @@ from openpyxl.reader.comments import read_comments, get_comments_file
 
 CENTRAL_DIRECTORY_SIGNATURE = '\x50\x4b\x05\x06'
 
+
 def repair_central_directory(zipFile, is_file_instance):
     ''' trims trailing data from the central directory
     code taken from http://stackoverflow.com/a/7457686/570216, courtesy of Uri Cohen

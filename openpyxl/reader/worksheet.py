@@ -24,28 +24,22 @@ from __future__ import absolute_import
 
 """Reader for a single worksheet."""
 
-# Python stdlib imports
-from warnings import warn
-
 # compatibility imports
 from openpyxl.compat import BytesIO
 from openpyxl.xml.functions import iterparse
 
 # package imports
-from openpyxl import LXML
 from openpyxl.cell import get_column_letter
-from openpyxl.cell import Cell, coordinate_from_string
+from openpyxl.cell import Cell
 from openpyxl.worksheet import Worksheet, ColumnDimension, RowDimension
 from openpyxl.worksheet.iter_worksheet import IterableWorksheet
 from openpyxl.xml.constants import SHEET_MAIN_NS
 from openpyxl.xml.functions import safe_iterator
 from openpyxl.styles import Color
 from openpyxl.formatting import ConditionalFormatting
-from openpyxl.formatting.rules import FormatRule, CellIsRule, ColorScaleRule, FormatRule
 
 
 def _get_xml_iter(xml_source):
-
     if not hasattr(xml_source, 'read'):
         if hasattr(xml_source, 'decode'):
             return BytesIO(xml_source)
@@ -78,9 +72,6 @@ class WorkSheetParser(object):
         self.data_only = ws.parent.data_only
 
     def parse(self):
-        stream = _get_xml_iter(self.source)
-        it = iterparse(stream)
-
         dispatcher = {
             '{%s}mergeCells' % SHEET_MAIN_NS: self.parse_merge,
             '{%s}col' % SHEET_MAIN_NS: self.parse_column_dimensions,
@@ -96,7 +87,7 @@ class WorkSheetParser(object):
         stream = _get_xml_iter(self.source)
         it = iterparse(stream, tag=tags)
 
-        for event, element in it:
+        for _, element in it:
             tag_name = element.tag
             if tag_name in dispatcher:
                 dispatcher[tag_name](element)
@@ -143,11 +134,9 @@ class WorkSheetParser(object):
             else:
                 cell.value = value
 
-
     def parse_merge(self, element):
         for mergeCell in safe_iterator(element, ('{%s}mergeCell' % SHEET_MAIN_NS)):
             self.ws.merge_cells(mergeCell.get('ref'))
-
 
     def parse_column_dimensions(self, col):
         min = int(col.get('min')) if col.get('min') else 1
@@ -166,11 +155,10 @@ class WorkSheetParser(object):
                 if style_index is not None:
                     self.ws._styles[column] = self.style_table.get(int(style_index))
                 if column not in self.ws.column_dimensions:
-                    new_dim = ColumnDimension( index=column, width=width,
-                                               auto_size=auto_size, visible=visible,
-                                               outline_level=outline, collapsed=collapsed)
+                    new_dim = ColumnDimension(index=column, width=width,
+                                              auto_size=auto_size, visible=visible,
+                                              outline_level=outline, collapsed=collapsed)
                     self.ws.column_dimensions[column] = new_dim
-
 
     def parse_row_dimensions(self, row):
         rowId = int(row.get('r'))
@@ -183,7 +171,6 @@ class WorkSheetParser(object):
         for cell in safe_iterator(row, self.CELL_TAG):
             self.parse_cell(cell)
 
-
     def parse_print_options(self, element):
         hc = element.get('horizontalCentered')
         if hc is not None:
@@ -192,13 +179,11 @@ class WorkSheetParser(object):
         if vc is not None:
             self.ws.page_setup.verticalCentered = vc
 
-
     def parse_margins(self, element):
         for key in ("left", "right", "top", "bottom", "header", "footer"):
             value = element.get(key)
             if value is not None:
                 setattr(self.ws.page_margins, key, float(value))
-
 
     def parse_page_setup(self, element):
         for key in ("orientation", "paperSize", "scale", "fitToPage",
@@ -300,8 +285,8 @@ class WorkSheetParser(object):
         for sc in safe_iterator(element, '{%s}sortCondition' % SHEET_MAIN_NS):
             self.ws.auto_filter.add_sort_condition(sc.get("ref"), sc.get("descending"))
 
-def fast_parse(ws, xml_source, shared_strings, style_table, color_index=None):
 
+def fast_parse(ws, xml_source, shared_strings, style_table, color_index=None):
     parser = WorkSheetParser(ws, xml_source, shared_strings, style_table, color_index)
     parser.parse()
     del parser

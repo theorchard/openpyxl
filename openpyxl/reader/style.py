@@ -1,5 +1,4 @@
 from __future__ import absolute_import
-from openpyxl.styles.borders import Border
 # Copyright (c) 2010-2014 openpyxl
 #
 # Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -29,7 +28,7 @@ from openpyxl.styles.borders import Border
 from openpyxl.xml.functions import fromstring, safe_iterator
 from openpyxl.exceptions import MissingNumberFormat
 from openpyxl.styles import (Style, NumberFormat, Font, Fill, Borders,
-                             Protection, Alignment)
+                             Protection, Alignment, Border)
 from openpyxl.styles.colors import COLOR_INDEX, Color
 from openpyxl.xml.constants import SHEET_MAIN_NS
 from copy import deepcopy
@@ -86,7 +85,7 @@ class SharedStylesParser(object):
                     dxf_item['font'] = self.parse_font(font_node)
                 fill_node = dxf.find('{%s}fill' % SHEET_MAIN_NS)
                 if fill_node is not None:
-                    dxf_item['fill'] =  self.parse_fill(fill_node)
+                    dxf_item['fill'] = self.parse_fill(fill_node)
                 border_node = dxf.find('{%s}border' % SHEET_MAIN_NS)
                 if border_node is not None:
                     dxf_item['border'] = self.parse_border(border_node)
