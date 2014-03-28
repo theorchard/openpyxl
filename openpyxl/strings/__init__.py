@@ -1,5 +1,6 @@
 # Copyright (c) 2010-2014 openpyxl
 
+
 class IndexedList(list):
     """
     List with optimised access by value
@@ -8,15 +9,14 @@ class IndexedList(list):
     http://code.activestate.com/recipes/52303-the-auxiliary-dictionary-idiom-for-sequences-with-/
     """
 
-    clean = False
-
     def __init__(self, iterable=()):
+        super(IndexedList, self).__init__()
+        self.clean = False
         self._dict = {}
         if iterable != ():
             for i in iterable:
                 self.append(i)
             self.clean = True
-        super(IndexedList, self).__init__(iterable)
 
     def _rebuild_dict(self):
         self._dict = {}
