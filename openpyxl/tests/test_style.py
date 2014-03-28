@@ -56,20 +56,20 @@ class TestCreateStyle(object):
         now = datetime.datetime.now()
         cls.workbook = Workbook(guess_types=True)
         cls.worksheet = cls.workbook.create_sheet()
-        cls.worksheet.cell(coordinate='A1').value = '12.34%'  # 1
-        cls.worksheet.cell(coordinate='B4').value = now  # 2
+        cls.worksheet.cell(coordinate='A1').value = '12.34%'  # 2
+        cls.worksheet.cell(coordinate='B4').value = now  # 3
         cls.worksheet.cell(coordinate='B5').value = now
-        cls.worksheet.cell(coordinate='C14').value = 'This is a test'
-        cls.worksheet.cell(coordinate='D9').value = '31.31415'
+        cls.worksheet.cell(coordinate='C14').value = 'This is a test'  # 1
+        cls.worksheet.cell(coordinate='D9').value = '31.31415'  # 3
         st = Style(number_format=NumberFormat(NumberFormat.FORMAT_NUMBER_00),
-                   protection=Protection(locked=Protection.PROTECTION_UNPROTECTED))  # 3
+                   protection=Protection(locked=Protection.PROTECTION_UNPROTECTED))  # 4
         cls.worksheet.cell(coordinate='D9').style = st
-        st2 = Style(protection=Protection(hidden=Protection.PROTECTION_UNPROTECTED))  # 4
+        st2 = Style(protection=Protection(hidden=Protection.PROTECTION_UNPROTECTED))  # 5
         cls.worksheet.cell(coordinate='E1').style = st2
         cls.writer = StyleWriter(cls.workbook)
 
     def test_create_style_table(self):
-        assert len(self.writer.style_table) == 4
+        assert len(self.writer.style_table) == 5
 
     @pytest.mark.xfail
     def test_write_style_table(self):
@@ -376,9 +376,10 @@ def test_read_style():
         handle.close()
     style_properties = read_style_table(content)
     style_table = style_properties['table']
+    style_list = style_properties['list']
     assert len(style_table) == 4
-    assert NumberFormat._BUILTIN_FORMATS[9] == style_table[1].number_format
-    assert 'yyyy-mm-dd' == style_table[2].number_format
+    assert NumberFormat._BUILTIN_FORMATS[9] == style_list[style_table[1]].number_format
+    assert 'yyyy-mm-dd' == style_list[style_table[2]].number_format
 
 
 def test_read_complex_style():

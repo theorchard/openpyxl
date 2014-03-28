@@ -265,7 +265,7 @@ def write_worksheet_data(doc, worksheet, string_table, style_table):
     """Write worksheet data to xml."""
     start_tag(doc, 'sheetData')
     max_column = worksheet.get_highest_column()
-    style_id_by_hash = style_table
+    shared_styles = worksheet.parent.shared_styles
     cells_by_row = {}
     for styleCoord in iterkeys(worksheet._styles):
         # Ensure a blank cell exists if it has a style
@@ -283,7 +283,7 @@ def write_worksheet_data(doc, worksheet, string_table, style_table):
             attrs['ht'] = str(row_dimension.height)
             attrs['customHeight'] = '1'
         if row_idx in worksheet._styles:
-            attrs['s'] = str(style_table[hash(worksheet.get_style(row_idx))])
+            attrs['s'] = '%d' % worksheet._styles[row_idx]
             attrs['customFormat'] = '1'
         start_tag(doc, 'row', attrs)
         row_cells = cells_by_row[row_idx]
@@ -295,8 +295,7 @@ def write_worksheet_data(doc, worksheet, string_table, style_table):
             if cell.data_type != cell.TYPE_FORMULA:
                 attributes['t'] = cell.data_type
             if coordinate in worksheet._styles:
-                attributes['s'] = '%d' % style_id_by_hash[
-                    hash(worksheet._styles[coordinate])]
+                attributes['s'] = '%d' % worksheet._styles[coordinate]
 
             if value in ('', None):
                 tag(doc, 'c', attributes)
