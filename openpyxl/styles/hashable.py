@@ -22,6 +22,7 @@ from __future__ import absolute_import
 # @license: http://www.opensource.org/licenses/mit-license.php
 # @author: see AUTHORS file
 
+import inspect
 from openpyxl.compat import unicode
 
 BASE_TYPES = (str, unicode, float, int)
@@ -31,6 +32,12 @@ class HashableObject(object):
     """Define how to hash property classes."""
     __fields__ = None
     __check__ = {}
+    __base__ = False
+
+    @property
+    def __defaults__(self):
+        spec = inspect.getargspec(self.__class__.__init__)
+        return dict(zip(spec.args[1:], spec.defaults))
 
     def _typecheck(self, name, value):
         expected = self.__check__.get(name)
@@ -59,10 +66,28 @@ class HashableObject(object):
     def __delattr__(self, *args, **kwargs):
         raise TypeError('cannot delete %s attribute' % args[0])
 
+    def __print__(self, defaults=False):
+        if defaults:
+            print_func = str
+        else:
+            print_func = repr
+        pieces = []
+        default_values = self.__defaults__
+        for k in self.__fields__:
+            value = getattr(self, k)
+            if not defaults and value == default_values[k]:
+                continue
+            pieces.append('%s=%s' % (k, print_func(value)))
+        if pieces or self.__base__:
+            return '%s(%s)' % (self.__class__.__name__, ', '.join(pieces))
+        else:
+            return ''
+
     def __repr__(self):
-        return '%s(%s)' % (self.__class__.__name__,
-                           ', '.join(['%s=%s' % (k, repr(getattr(self, k)))
-                                        for k in self.__fields__]))
+        return self.__print__(defaults=False)
+
+    def __str__(self):
+        return self.__print__(defaults=True)
 
     @property
     def __key(self):

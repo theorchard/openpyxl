@@ -42,6 +42,7 @@ class Style(HashableObject):
                   'alignment',
                   'number_format',
                   'protection')
+    __base__ = True
     __slots__ = __fields__
     __check__ = {'font': Font,
                  'fill': Fill,
