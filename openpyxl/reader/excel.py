@@ -192,6 +192,7 @@ def _load_workbook(wb, archive, filename, use_iterators, keep_vba):
 
     style_properties = read_style_table(archive.read(ARC_STYLE))
     style_table = style_properties.pop('table')
+    wb.shared_styles = style_properties.pop('list')
     wb.style_properties = style_properties
 
     wb.properties.excel_base_date = read_excel_base_date(xml_source=archive.read(ARC_WORKBOOK))

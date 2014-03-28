@@ -55,7 +55,7 @@ class ReadOnlyCell(object):
     def number_format(self):
         if self.style_id is None:
             return
-        style = self.style_table[self._style_id]
+        style = self.sheet.parent.shared_styles[self.style_table[self._style_id]]
         return style.number_format.format_code
 
     @property

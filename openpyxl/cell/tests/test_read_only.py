@@ -4,14 +4,19 @@ import datetime
 import pytest
 
 from openpyxl.cell.read_only import ReadOnlyCell
+from openpyxl.strings import IndexedList
 
 
 @pytest.fixture(scope='module')
 def dummy_sheet():
+    class DummyWorkbook(object):
+        shared_styles = IndexedList()
+
     class DummySheet(object):
         base_date = 2415018.5
         style_table = {}
         shared_strings = ['Hello world']
+        parent = DummyWorkbook()
     return DummySheet()
 
 
@@ -80,7 +85,8 @@ def DummyCell(dummy_sheet):
     class DummyStyle(object):
         number_format = DummyNumberFormat()
 
-    dummy_sheet.style_table = {1: DummyStyle()}
+    idx = dummy_sheet.parent.shared_styles.add(DummyStyle())
+    dummy_sheet.style_table = {1: idx}
     cell = ReadOnlyCell(dummy_sheet, None, None, "23596", 'n', '1')
     return cell
 

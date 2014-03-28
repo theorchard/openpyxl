@@ -389,7 +389,7 @@ class Cell(object):
 
     @property
     def number_format(self):
-        style = self.parent.get_style(self.coordinate, read_only=True)
+        style = self.parent.get_style(self.coordinate)
         return style.number_format.format_code
 
     @number_format.setter

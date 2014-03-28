@@ -56,15 +56,16 @@ class TestCreateStyle(object):
         now = datetime.datetime.now()
         cls.workbook = Workbook(guess_types=True)
         cls.worksheet = cls.workbook.create_sheet()
-        cls.worksheet.cell(coordinate='A1').value = '12.34%'
-        cls.worksheet.cell(coordinate='B4').value = now
+        cls.worksheet.cell(coordinate='A1').value = '12.34%'  # 1
+        cls.worksheet.cell(coordinate='B4').value = now  # 2
         cls.worksheet.cell(coordinate='B5').value = now
         cls.worksheet.cell(coordinate='C14').value = 'This is a test'
         cls.worksheet.cell(coordinate='D9').value = '31.31415'
         st = Style(number_format=NumberFormat(NumberFormat.FORMAT_NUMBER_00),
-                   protection=Protection(locked=Protection.PROTECTION_UNPROTECTED))
+                   protection=Protection(locked=Protection.PROTECTION_UNPROTECTED))  # 3
         cls.worksheet.cell(coordinate='D9').style = st
-        cls.worksheet.cell(coordinate='E1').style = Style(protection=Protection(hidden=Protection.PROTECTION_UNPROTECTED))
+        st2 = Style(protection=Protection(hidden=Protection.PROTECTION_UNPROTECTED))  # 4
+        cls.worksheet.cell(coordinate='E1').style = st2
         cls.writer = StyleWriter(cls.workbook)
 
     def test_create_style_table(self):
@@ -386,7 +387,7 @@ def test_read_complex_style():
     ws = wb.get_active_sheet()
     assert ws.column_dimensions['A'].width == 31.1640625
 
-    style = partial(ws.get_style, read_only=True)
+    style = partial(ws.get_style)
     assert style('I').fill.start_color.index == 'FF006600'
     assert style('I').font.color.index == 'FF3300FF'
     assert style('A2').font.name == 'Arial'
@@ -502,7 +503,7 @@ def test_change_existing_styles():
 
     assert ws.column_dimensions['A'].width == 20.0
 
-    style = partial(ws.get_style, read_only=True)
+    style = partial(ws.get_style)
 
     assert ws.get_style('I').fill.start_color.index == 'FF442200'
     assert ws.get_style('I').font.color.index == 'FF002244'

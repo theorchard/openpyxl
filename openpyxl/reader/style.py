@@ -1,4 +1,5 @@
 from __future__ import absolute_import
+from openpyxl.strings import IndexedList
 # Copyright (c) 2010-2014 openpyxl
 #
 # Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -38,7 +39,8 @@ class SharedStylesParser(object):
 
     def __init__(self, xml_source):
         self.root = fromstring(xml_source)
-        self.style_prop = {'table': {}}
+        self.style_prop = {'table': {},
+                           'list': IndexedList()}
         self.color_index = COLOR_INDEX
 
     def parse(self):
@@ -207,6 +209,7 @@ class SharedStylesParser(object):
     def parse_cell_xfs(self):
         """Read styles from the shared style table"""
         cell_xfs = self.root.find('{%s}cellXfs' % SHEET_MAIN_NS)
+        styles_list = self.style_prop['list']
 
         if cell_xfs is None:  # can happen on bad OOXML writers (e.g. Gnumeric)
             return
@@ -261,7 +264,7 @@ class SharedStylesParser(object):
                     protection['hidden'] = bool(prot.get('hidden'))
                 _style['protection'] = Protection(**protection)
 
-            self.style_prop['table'][index] = Style(**_style)
+            self.style_prop['table'][index] = styles_list.add(Style(**_style))
 
 
 def read_style_table(xml_source):

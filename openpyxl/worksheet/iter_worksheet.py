@@ -196,7 +196,6 @@ class IterableWorksheet(Worksheet):
             row_counter = row + 1
             yield tuple(full_row)
 
-
     def get_cells(self, min_row, min_col, max_row, max_col):
         p = iterparse(self.xml_source, tag=[ROW_TAG], remove_blank_text=True)
         for _event, element in p:
@@ -226,7 +225,6 @@ class IterableWorksheet(Worksheet):
                 continue
             element.clear()
 
-
     def _get_cell(self, coordinate):
         """.iter_rows always returns a generator of rows each of which
         contains a generator of cells. This can be empty in which case
@@ -234,7 +232,6 @@ class IterableWorksheet(Worksheet):
         result = list(self.iter_rows(coordinate))
         if result:
             return result[0][0]
-
 
     def range(self, *args, **kwargs):
         # TODO return a range of cells, basically get_squared_range with same interface as Worksheet

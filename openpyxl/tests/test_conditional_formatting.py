@@ -44,6 +44,7 @@ from openpyxl.styles import Border, Color, Fill, Font, Borders, HashableObject
 import pytest
 from zipfile import ZIP_DEFLATED, ZipFile
 from openpyxl.tests.helper import DATADIR, get_xml, compare_xml
+from openpyxl.strings import IndexedList
 
 
 class TestRule:
@@ -118,6 +119,7 @@ class TestConditionalFormatting(object):
 
     class WB():
         style_properties = None
+        shared_styles = IndexedList()
         worksheets = []
 
     def setup(self):

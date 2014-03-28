@@ -409,14 +409,14 @@ class Worksheet(object):
             else:
                 return tuple(result)
 
-    def get_style(self, coordinate, read_only=False):
+    def get_style(self, coordinate):
         """Return the style object for the specified cell."""
         if not coordinate in self._styles:
-            self._styles[coordinate] = Style()
-        return self._styles[coordinate]
+            self._styles[coordinate] = self.parent.shared_styles.add(Style())
+        return self.parent.shared_styles[self._styles[coordinate]]
 
     def set_style(self, coordinate, style):
-        self._styles[coordinate] = style
+        self._styles[coordinate] = self.parent.shared_styles.add(style)
 
     def set_printer_settings(self, paper_size, orientation):
         """Set printer settings """

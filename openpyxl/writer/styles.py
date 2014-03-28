@@ -44,20 +44,16 @@ class StyleWriter(object):
         self._root = Element('styleSheet', {'xmlns':SHEET_MAIN_NS})
 
     def _get_style_list(self, workbook):
-        crc = {}
-        for worksheet in workbook.worksheets:
-            uniqueStyles = dict((id(style), style) for style in worksheet._styles.values()).values()
-            for style in uniqueStyles:
-                crc[hash(style)] = style
-        self.style_table = dict([(style, i + 1) \
-            for i, style in enumerate(crc.values())])
-        sorted_styles = sorted(self.style_table.items(), \
-            key=lambda pair:pair[1])
+        all_styles = workbook.shared_styles
+        self.style_table = dict([(style, i + 1)
+                                 for i, style in enumerate(all_styles)])
+        sorted_styles = sorted(self.style_table.items(),
+                               key=lambda pair: pair[1])
         return [s[0] for s in sorted_styles]
 
     def get_style_by_hash(self):
-        return dict([(hash(style), id) \
-            for style, id in self.style_table.items()])
+        return dict([(hash(style), idx)
+                     for style, idx in self.style_table.items()])
 
     def write_table(self):
         number_format_table = self._write_number_formats()
