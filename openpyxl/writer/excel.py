@@ -123,7 +123,7 @@ class ExcelWriter(object):
         for i, sheet in enumerate(self.workbook.worksheets):
             archive.writestr(PACKAGE_WORKSHEETS + '/sheet%d.xml' % (i + 1),
                              write_worksheet(sheet, self.shared_strings,
-                            style_writer.get_style_by_hash()))
+                                             style_writer.styles))
             if (
                 sheet._charts or sheet._images
                 or sheet.relationships

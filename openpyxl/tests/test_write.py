@@ -151,8 +151,8 @@ def test_write_style():
     ws = wb.create_sheet()
     ws.cell('F1').value = '13%'
     ws._styles['F'] = ws._styles['F1']
-    style_id_by_hash = StyleWriter(wb).get_style_by_hash()
-    content = write_worksheet(ws, {}, style_id_by_hash)
+    styles = StyleWriter(wb).styles
+    content = write_worksheet(ws, {}, styles)
     reference_file = os.path.join(DATADIR, 'writer', 'expected', 'sheet1_style.xml')
     with open(reference_file) as expected:
         diff = compare_xml(content, expected.read())

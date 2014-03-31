@@ -48,31 +48,34 @@ from openpyxl.exceptions import WorkbookAlreadySaved
 from openpyxl.writer.excel import ExcelWriter
 from openpyxl.writer.strings import write_string_table
 from openpyxl.writer.styles import StyleWriter
-from openpyxl.styles import Style, NumberFormat
+from openpyxl.styles import Style, NumberFormat, DEFAULTS
 
 from openpyxl.xml.constants import (ARC_SHARED_STRINGS, PACKAGE_WORKSHEETS)
 
-STYLES = {'datetime' : {'type':Cell.TYPE_NUMERIC,
-                        'style':'1'},
-          'string':{'type':Cell.TYPE_STRING,
-                    'style':'0'},
-          'numeric':{'type':Cell.TYPE_NUMERIC,
-                     'style':'0'},
-          'formula':{'type':Cell.TYPE_FORMULA,
-                    'style':'0'},
-          'boolean':{'type':Cell.TYPE_BOOL,
-                    'style':'0'},
+
+DATETIME_STYLE = Style(number_format=NumberFormat(format_code=NumberFormat.FORMAT_DATE_YYYYMMDD2))
+STYLES = {'datetime': {'type': Cell.TYPE_NUMERIC,
+                       'style': DATETIME_STYLE},
+          'string': {'type': Cell.TYPE_STRING,
+                     'style': DEFAULTS},
+          'numeric': {'type': Cell.TYPE_NUMERIC,
+                      'style': DEFAULTS},
+          'formula': {'type': Cell.TYPE_FORMULA,
+                      'style': DEFAULTS},
+          'boolean': {'type': Cell.TYPE_BOOL,
+                    'style': DEFAULTS},
         }
 
-
 DESCRIPTORS_CACHE_SIZE = 50
-DATETIME_STYLE = Style(number_format=NumberFormat(format_code=NumberFormat.FORMAT_DATE_YYYYMMDD2))
 BOUNDING_BOX_PLACEHOLDER = 'A1:%s%d' % (get_column_letter(MAX_COLUMN), MAX_ROW)
 
+
 def create_temporary_file(suffix=''):
-    fobj = NamedTemporaryFile(mode='w+', suffix=suffix, prefix='openpyxl.', delete=False)
+    fobj = NamedTemporaryFile(mode='w+', suffix=suffix,
+                              prefix='openpyxl.', delete=False)
     filename = fobj.name
     return filename
+
 
 class DumpWorksheet(Worksheet):
     """
@@ -93,7 +96,7 @@ class DumpWorksheet(Worksheet):
         self._fileobj_name = create_temporary_file()
 
         self._strings = self._parent.shared_strings
-
+        self._styles = self.parent.shared_styles
 
     def get_temporary_file(self, filename):
         if filename in self._descriptors_cache:
@@ -239,7 +242,7 @@ class DumpWorksheet(Worksheet):
                     cell = time_to_days(cell)
                 elif isinstance(cell, datetime.timedelta):
                     cell = timedelta_to_days(cell)
-                attributes['s'] = STYLES[dtype]['style']
+                attributes['s'] = '%d' % self._styles.add(STYLES[dtype]['style'])
             elif cell and cell[0] == '=':
                 dtype = 'formula'
             else:
@@ -270,8 +273,7 @@ def save_dump(workbook, filename):
 class ExcelDumpWriter(ExcelWriter):
     def __init__(self, workbook):
         self.workbook = workbook
-        self.style_writer = StyleDumpWriter(workbook)
-        self.style_writer._style_list.append(DATETIME_STYLE)
+        self.style_writer = StyleWriter(workbook)
 
     def _write_string_table(self, archive):
         shared_strings = self.workbook.shared_strings
@@ -287,8 +289,3 @@ class ExcelDumpWriter(ExcelWriter):
                 del sheet._descriptors_cache[filename]
                 os.remove(filename)
             sheet._unset_temp_files()
-
-
-class StyleDumpWriter(StyleWriter):
-    def _get_style_list(self, workbook):
-        return []

@@ -69,7 +69,7 @@ class TestCreateStyle(object):
         cls.writer = StyleWriter(cls.workbook)
 
     def test_create_style_table(self):
-        assert len(self.writer.style_table) == 5
+        assert len(self.writer.styles) == 5
 
     @pytest.mark.xfail
     def test_write_style_table(self):
@@ -83,23 +83,23 @@ class TestStyleWriter(object):
 
     def test_no_style(self):
         w = StyleWriter(self.workbook)
-        assert len(w.style_table) == 0
+        assert len(w.styles) == 1  # there is always the empty (defaul) style
 
     def test_nb_style(self):
         for i in range(1, 6):
             self.worksheet.cell(row=1, column=i).style = Style(font=Font(size=i))
         w = StyleWriter(self.workbook)
-        assert len(w.style_table) == 5
+        assert len(w.styles) == 6  # 5 + the default
 
         self.worksheet.cell('A10').style = Style(borders=Borders(top=Border(border_style=Border.BORDER_THIN)))
         w = StyleWriter(self.workbook)
-        assert len(w.style_table) == 6
+        assert len(w.styles) == 7
 
     def test_style_unicity(self):
         for i in range(1, 6):
             self.worksheet.cell(row=1, column=i).style = Style(font=Font(bold=True))
         w = StyleWriter(self.workbook)
-        assert len(w.style_table) == 1
+        assert len(w.styles) == 2
 
     def test_fonts(self):
         st = Style(font=Font(size=12, bold=True))

@@ -59,8 +59,6 @@ from .dimensions import ColumnDimension, RowDimension
 from .protection import SheetProtection
 from .filters import AutoFilter
 
-_DEFAULTS_STYLE_HASH = hash(DEFAULTS_STYLE)
-
 
 def flatten(results):
     """Return cell values row-by-row"""
@@ -83,7 +81,6 @@ class Worksheet(object):
     """
     repr_format = unicode('<Worksheet "%s">')
     bad_title_char_re = re.compile(r'[\\*?:/\[\]]')
-
 
     BREAK_NONE = 0
     BREAK_ROW = 1
@@ -166,7 +163,7 @@ class Worksheet(object):
         delete_list = [coordinate for coordinate, cell in \
             iteritems(self._cells) if (not cell.merged and cell.value in ('', None) and \
             cell.comment is None and (coordinate not in self._styles or
-            hash(cell.style) == _DEFAULTS_STYLE_HASH))]
+            cell.style == DEFAULTS_STYLE))]
         for coordinate in delete_list:
             del self._cells[coordinate]
 
@@ -198,7 +195,7 @@ class Worksheet(object):
         sheets = self._parent.get_sheet_names()
         if value in sheets:
             sheets = ",".join(sheets)
-            sheet_title_regex=re.compile("(?P<title>%s)(?P<count>\d?),?" % value)
+            sheet_title_regex = re.compile("(?P<title>%s)(?P<count>\d?),?" % value)
             matches = sheet_title_regex.findall(sheets)
             if matches:
                 # use name, but append with the next highest integer
@@ -207,7 +204,7 @@ class Worksheet(object):
                     highest = max(counts)
                 else:
                     highest = 0
-                value = "%s%d" % (value, highest+1)
+                value = "%s%d" % (value, highest + 1)
         return value
 
     @property

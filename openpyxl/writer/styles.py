@@ -39,21 +39,13 @@ from openpyxl.styles import DEFAULTS, Protection
 class StyleWriter(object):
 
     def __init__(self, workbook):
-        self._style_list = self._get_style_list(workbook)
+        self.workbook = workbook
         self._style_properties = workbook.style_properties
-        self._root = Element('styleSheet', {'xmlns':SHEET_MAIN_NS})
+        self._root = Element('styleSheet', {'xmlns': SHEET_MAIN_NS})
 
-    def _get_style_list(self, workbook):
-        all_styles = workbook.shared_styles
-        self.style_table = dict([(style, i + 1)
-                                 for i, style in enumerate(all_styles)])
-        sorted_styles = sorted(self.style_table.items(),
-                               key=lambda pair: pair[1])
-        return [s[0] for s in sorted_styles]
-
-    def get_style_by_hash(self):
-        return dict([(hash(style), idx)
-                     for style, idx in self.style_table.items()])
+    @property
+    def styles(self):
+        return self.workbook.shared_styles
 
     def write_table(self):
         number_format_table = self._write_number_formats()
@@ -104,7 +96,7 @@ class StyleWriter(object):
         # others
         table = {}
         index = 1
-        for st in self._style_list:
+        for st in self.styles:
             if st.font != DEFAULTS.font and st.font not in table:
                 table[st.font] = index
                 font_node = SubElement(fonts, 'font')
@@ -133,7 +125,7 @@ class StyleWriter(object):
 
         table = {}
         index = 2
-        for st in self._style_list:
+        for st in self.styles:
             if st.fill != DEFAULTS.fill and st.fill not in table:
                 table[st.fill] = index
                 fill = SubElement(fills, 'fill')
@@ -163,7 +155,7 @@ class StyleWriter(object):
         # others
         table = {}
         index = 1
-        for st in self._style_list:
+        for st in self.styles:
             if st.borders != DEFAULTS.borders and st.borders not in table:
                 table[st.borders] = index
                 border = SubElement(borders, 'border')
@@ -191,16 +183,14 @@ class StyleWriter(object):
 
         # writing the cellXfs
         cell_xfs = SubElement(self._root, 'cellXfs',
-            {'count':'%d' % (len(self._style_list) + 1)})
+            {'count':'%d' % (len(self.styles) + 1)})
 
         # default
         def _get_default_vals():
             return dict(numFmtId='0', fontId='0', fillId='0',
-                xfId='0', borderId='0')
+                        xfId='0', borderId='0')
 
-        SubElement(cell_xfs, 'xf', _get_default_vals())
-
-        for st in self._style_list:
+        for st in self.styles:
             vals = _get_default_vals()
 
             if st.font != DEFAULTS.font:
@@ -329,7 +319,7 @@ class StyleWriter(object):
         num_fmt_id = 165 # start at a greatly higher value as any builtin can go
         num_fmt_offset = 0
 
-        for style in self._style_list:
+        for style in self.styles:
 
             if not style.number_format in number_format_list  :
                 number_format_list.append(style.number_format)

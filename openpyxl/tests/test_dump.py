@@ -72,7 +72,7 @@ def test_dump_string_table():
                      ]
 
 
-def test_dump_sheet():
+def test_dump_sheet_with_styles():
     test_filename = _get_test_filename()
     wb = Workbook(optimized_write=True)
     ws = wb.create_sheet()

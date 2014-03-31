@@ -90,6 +90,7 @@ class Workbook(object):
         self.__thread_local_data = threading.local()
         self.shared_strings = IndexedList()
         self.shared_styles = IndexedList()
+        self.shared_styles.add(Style())
         self.loaded_theme = None
         self._worksheet_class = worksheet_class
         self._optimized_worksheet_class = optimized_worksheet_class
