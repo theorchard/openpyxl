@@ -231,6 +231,8 @@ class DumpWorksheet(Worksheet):
             style = None
             if isinstance(cell, ITERABLES) and len(cell) == 2:
                 cell, style = cell
+                if cell is None:
+                    continue
                 if not isinstance(style, Style):
                     raise TypeError('style component should be a Style object '
                                     'not %s' % (style.__class__.__name__))
