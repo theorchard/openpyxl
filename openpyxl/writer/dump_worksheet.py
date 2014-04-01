@@ -52,6 +52,8 @@ from openpyxl.styles import Style, NumberFormat, DEFAULTS
 
 from openpyxl.xml.constants import (ARC_SHARED_STRINGS, PACKAGE_WORKSHEETS)
 
+ITERABLES = (list, tuple)
+
 
 DATETIME_STYLE = Style(number_format=NumberFormat(format_code=NumberFormat.FORMAT_DATE_YYYYMMDD2))
 STYLES = {'datetime': {'type': Cell.TYPE_NUMERIC,
@@ -226,6 +228,12 @@ class DumpWorksheet(Worksheet):
         for col_idx, cell in enumerate(row):
             if cell is None:
                 continue
+            style = None
+            if isinstance(cell, ITERABLES) and len(cell) == 2:
+                cell, style = cell
+                if not isinstance(style, Style):
+                    raise TypeError('style component should be a Style object '
+                                    'not %s' % (style.__class__.__name__))
 
             coordinate = '%s%d' % (get_column_letter(col_idx + 1), row_idx)
             attributes = {'r': coordinate}
@@ -242,12 +250,17 @@ class DumpWorksheet(Worksheet):
                     cell = time_to_days(cell)
                 elif isinstance(cell, datetime.timedelta):
                     cell = timedelta_to_days(cell)
-                attributes['s'] = '%d' % self._styles.add(STYLES[dtype]['style'])
+                if style is None:
+                    # allow user-defined style if needed
+                    style = STYLES[dtype]['style']
             elif cell and cell[0] == '=':
                 dtype = 'formula'
             else:
                 dtype = 'string'
                 cell = self._strings.add(cell)
+
+            if style is not None:
+                attributes['s'] = '%d' % self._styles.add(style)
 
             if dtype != 'formula':
                 attributes['t'] = STYLES[dtype]['type']
