@@ -34,25 +34,28 @@ from openpyxl.writer.excel import save_virtual_workbook
 from openpyxl.writer.workbook import write_content_types
 
 def test_write_content_types(datadir):
-    path = str(datadir.join('reader').join('vba-test.xlsm'))
-    wb = load_workbook(path, keep_vba=True)
+    datadir.join('reader').chdir()
+    wb = load_workbook('vba-test.xlsm', keep_vba=True)
     content = write_content_types(wb)
-    reference_file = str(datadir.join('writer').join('expected').join('Content_types_vba.xml'))
-    with open(reference_file) as expected:
+    datadir.chdir()
+    datadir.join('writer').join('expected').chdir()
+    with open('Content_types_vba.xml') as expected:
         diff = compare_xml(content, expected.read())
         assert diff is None, diff
 
 def test_save_vba(datadir):
-    path = str(datadir.join('reader').join('vba-test.xlsm'))
-    wb = load_workbook(path, keep_vba=True)
+    datadir.join('reader').chdir()
+    fname = 'vba-test.xlsm'
+    wb = load_workbook(fname, keep_vba=True)
     buf = save_virtual_workbook(wb)
-    files1 = set(zipfile.ZipFile(path, 'r').namelist())
+    files1 = set(zipfile.ZipFile(fname, 'r').namelist())
     files2 = set(zipfile.ZipFile(BytesIO(buf), 'r').namelist())
     assert files1.issubset(files2), "Missing files: %s" % ', '.join(files1 - files2)
 
 
 def test_save_without_vba(datadir):
-    path = str(datadir.join('reader').join('vba-test.xlsm'))
+    datadir.join('reader').chdir()
+    fname = 'vba-test.xlsm'
     vbFiles = set(['xl/activeX/activeX2.xml', 'xl/drawings/_rels/vmlDrawing1.vml.rels',
                    'xl/activeX/_rels/activeX1.xml.rels', 'xl/drawings/vmlDrawing1.vml', 'xl/activeX/activeX1.bin',
                    'xl/media/image1.emf', 'xl/vbaProject.bin', 'xl/activeX/_rels/activeX2.xml.rels',
@@ -60,17 +63,19 @@ def test_save_without_vba(datadir):
                    'xl/ctrlProps/ctrlProp1.xml', 'xl/activeX/activeX2.bin', 'xl/activeX/activeX1.xml',
                    'xl/ctrlProps/ctrlProp2.xml', 'xl/drawings/drawing1.xml'])
 
-    wb = load_workbook(path, keep_vba=False)
+    wb = load_workbook(fname, keep_vba=False)
     buf = save_virtual_workbook(wb)
-    files1 = set(zipfile.ZipFile(path, 'r').namelist())
+    files1 = set(zipfile.ZipFile(fname, 'r').namelist())
     files2 = set(zipfile.ZipFile(BytesIO(buf), 'r').namelist())
     difference = files1.difference(files2)
     assert difference.issubset(vbFiles), "Missing files: %s" % ', '.join(difference - vbFiles)
 
 def test_save_same_file(tmpdir, datadir):
-    p1 = datadir.join('reader').join('vba-test.xlsm')
-    p2 = tmpdir.join('vba-test.xlsm')
+    fname = 'vba-test.xlsm'
+    p1 = datadir.join('reader').join(fname)
+    p2 = tmpdir.join(fname)
     p1.copy(p2)
-    path = str(p2)
-    wb = load_workbook(path, keep_vba=True)
-    wb.save(path)
+    #path = str(p2)
+    tmpdir.chdir()
+    wb = load_workbook(fname, keep_vba=True)
+    wb.save(fname)
