@@ -169,10 +169,7 @@ def test_dump_with_font():
 
 
 def test_dump_bad_style():
-    test_filename = _get_test_filename()
-
     wb = Workbook(optimized_write=True)
     ws = wb.create_sheet()
-    ws.append([('hello', 'world'), 3.14, None])
-    wb.save(test_filename)
-    os.remove(test_filename)
+    with pytest.raises(TypeError):
+        ws.append([('hello', 'world'), 3.14, None])
