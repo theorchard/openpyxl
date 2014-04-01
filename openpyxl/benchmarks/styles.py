@@ -40,19 +40,35 @@ def generate_all_styles():
 
 styles = generate_all_styles()
 n = 10000
-wb = openpyxl.Workbook()
-for idx in range(1, n):
-    worksheet = rand.choice(wb.worksheets)
-    cell = worksheet.cell(column=1, row=(idx + 1))
-    cell.value = 0
-    cell.style = rand.choice(styles)
+
+
+def optimized_workbook(styles):
+    wb = openpyxl.Workbook(optimized_write=True)
+    worksheet = wb.create_sheet()
+    for _ in range(1, n):
+        style = rand.choice(styles)
+        worksheet.append([(0, style)])
+    return wb
+
+
+def non_optimized_workbook(styles):
+    wb = openpyxl.Workbook()
+    for idx in range(1, n):
+        worksheet = rand.choice(wb.worksheets)
+        cell = worksheet.cell(column=1, row=(idx + 1))
+        cell.value = 0
+        cell.style = rand.choice(styles)
+    return wb
 
 
 # @profile(filename='styles-benchmark.prof')
-def to_profile(f, n):
+def to_profile(wb, f, n):
     t = -time.time()
     wb.save(f)
     print 'took %.4fs for %d styles' % (t + time.time(), n)
 
-f = TemporaryFile()
-to_profile(f, n)
+for func in (optimized_workbook, non_optimized_workbook):
+    print '%s: ' % func.__name__,
+    wb = func(styles)
+    f = TemporaryFile()
+    to_profile(wb, f, n)
