@@ -75,7 +75,6 @@ def test_save_same_file(tmpdir, datadir):
     p1 = datadir.join('reader').join(fname)
     p2 = tmpdir.join(fname)
     p1.copy(p2)
-    #path = str(p2)
     tmpdir.chdir()
     wb = load_workbook(fname, keep_vba=True)
     wb.save(fname)
