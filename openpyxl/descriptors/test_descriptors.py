@@ -20,7 +20,8 @@ class TestDescriptor:
         assert client.key == 42
 
 
-def test_bool():
+@pytest.fixture
+def boolean():
 
     from . import Bool, Strict
 
@@ -28,13 +29,19 @@ def test_bool():
 
         value = Bool()
 
-    d = Dummy()
-    for v in ('', 1, []):
-        with pytest.raises(TypeError):
-            d.value = v
+    return Dummy()
 
-    d.value = True
-    assert d.value
+
+class TestBool:
+
+    def test_valid(self, boolean):
+        boolean.value = True
+        assert boolean.value
+
+
+    def test_invalid(self, boolean):
+        with pytest.raises(TypeError):
+            boolean.value = 1
 
 
 @pytest.fixture
@@ -49,6 +56,13 @@ def maximum():
 
 
 class TestMax:
+
+    def test_ctor(self):
+        from . import Strict, Max
+
+        with pytest.raises(TypeError):
+            class Dummy(Strict):
+                value = Max()
 
     def test_valid(self, maximum):
         maximum.value = 4
@@ -72,13 +86,23 @@ def minimum():
 
 class TestMin:
 
+    def test_ctor(self):
+        from . import Strict, Min
+
+        with pytest.raises(TypeError):
+            class Dummy(Strict):
+                value = Min()
+
+
     def test_valid(self, minimum):
         minimum.value = 2
         assert minimum.value == 2
 
+
     def test_invalid(self, minimum):
         with pytest.raises(ValueError):
             minimum.value = -1
+
 
 @pytest.fixture
 def min_max():
@@ -90,13 +114,28 @@ def min_max():
 
     return Dummy()
 
+
 class TestMinMax:
+
+    def test_ctor(self):
+        from . import MinMax, Strict
+
+        with pytest.raises(TypeError):
+
+            class Dummy(Strict):
+                value = MinMax(min=-10)
+
+        with pytest.raises(TypeError):
+
+            class Dummy(Strict):
+                value = MinMax(max=10)
+
 
     def test_valid(self, min_max):
         min_max.value = 1
         assert min_max.value == 1
 
+
     def test_invalid(self, min_max):
         with pytest.raises(ValueError):
             min_max.value = 2
-
