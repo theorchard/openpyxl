@@ -1,0 +1,9 @@
+[repository]
+
+[patterns]
+**.ini = native
+**.yml = native
+**.py = native
+**.xlsx = BIN
+**.png = BIN
+**.zip = BIN
