@@ -216,3 +216,35 @@ class TestMinMax:
     def test_invalid(self, min_max):
         with pytest.raises(ValueError):
             min_max.value = 2
+
+
+@pytest.fixture
+def set():
+    from . import Set, Strict
+
+    class Dummy(Strict):
+
+        value = Set(values=[1, 'a', None])
+
+    return Dummy()
+
+
+class TestValues:
+
+    def test_ctor(self):
+        from . import Set, Strict
+
+        with pytest.raises(TypeError):
+            class Dummy(Strict):
+
+                value = Set()
+
+
+    def test_valid(self, set):
+        set.value = 1
+        assert set.value == 1
+
+
+    def test_invalid(self, set):
+        with pytest.raises(ValueError):
+            set.value = 2

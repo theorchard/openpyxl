@@ -73,6 +73,20 @@ class Bool(Typed):
     expected_type = bool
 
 
+class Set(Descriptor):
+    """Value can only be from a set of know values"""
+
+    def __init__(self, name=None, **kw):
+        if not 'values' in kw:
+            raise TypeError("missing set of values")
+        super(Set, self).__init__(name, **kw)
+
+    def __set__(self, instance, value):
+        if value not in self.values:
+            raise ValueError("Value must be one of {0}".format(self.values))
+        super(Set, self).__set__(instance, value)
+
+
 class MetaStrict(type):
 
     def __new__(cls, clsname, bases, methods):
