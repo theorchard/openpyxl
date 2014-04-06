@@ -24,11 +24,12 @@ from __future__ import absolute_import
 
 import inspect
 from openpyxl.compat import unicode
+from openpyxl.descriptors import Descriptor, Strict
 
 BASE_TYPES = (str, unicode, float, int)
 
 
-class HashableObject(object):
+class HashableObject(Strict):
     """Define how to hash property classes."""
     __fields__ = None
     __check__ = {}
@@ -40,6 +41,8 @@ class HashableObject(object):
         return dict(zip(spec.args[1:], spec.defaults))
 
     def _typecheck(self, name, value):
+        if isinstance(getattr(self, name, None), Descriptor):
+            return
         expected = self.__check__.get(name)
         if expected:
             if not isinstance(value, expected):
@@ -47,6 +50,7 @@ class HashableObject(object):
                                                      value.__class__.__name__)
                 raise TypeError(msg)
         else:
+
             if value is not None and not isinstance(value, BASE_TYPES):
                 raise TypeError('%s cannot be a %s' % (name,
                                                        value.__class__.__name__))
@@ -56,12 +60,14 @@ class HashableObject(object):
         current.update(kwargs)
         return self.__class__(**current)
 
-    #def __setattr__(self, *args, **kwargs):
-        #name, value = args
-        #self._typecheck(name, value)
-        #if hasattr(self, name) and getattr(self, name) is not None:
-            #raise TypeError('cannot set %s attribute' % name)
-        #return object.__setattr__(self, *args, **kwargs)
+    def __setattr__(self, *args, **kwargs):
+        name, value = args
+        self._typecheck(name, value)
+        if hasattr(self, name) and (
+            getattr(self, name) is not None
+            and not isinstance(getattr(self, name), Descriptor)):
+            raise TypeError('cannot set %s attribute' % name)
+        return object.__setattr__(self, *args, **kwargs)
 
     def __delattr__(self, *args, **kwargs):
         raise TypeError('cannot delete %s attribute' % args[0])

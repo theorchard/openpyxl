@@ -26,7 +26,7 @@ from .colors import Color
 from .hashable import HashableObject
 
 
-from openpyxl.descriptors import Strict, Float, Set, Bool, String, Typed
+from openpyxl.descriptors import Float, Set, Bool, String, Typed, Integer
 
 
 class _Color(Typed):
@@ -34,7 +34,7 @@ class _Color(Typed):
     expected_type = Color
 
 
-class Font(Strict, HashableObject):
+class Font(HashableObject):
     """Font options used in styles."""
     UNDERLINE_NONE = 'none'
     UNDERLINE_DOUBLE = 'double'
@@ -43,7 +43,7 @@ class Font(Strict, HashableObject):
     UNDERLINE_SINGLE_ACCOUNTING = 'singleAccounting'
 
     name = String()
-    size = Float()
+    size = Integer()
     bold = Bool()
     italic = Bool()
     superscript = Bool()
