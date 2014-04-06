@@ -392,15 +392,15 @@ def test_read_complex_style():
     assert style('I').fill.start_color.index == 'FF006600'
     assert style('I').font.color.index == 'FF3300FF'
     assert style('A2').font.name == 'Arial'
-    assert style('A2').font.size == '10'
+    assert style('A2').font.size == 10
     assert not style('A2').font.bold
     assert not style('A2').font.italic
     assert style('A3').font.name == 'Arial'
-    assert style('A3').font.size == '12'
+    assert style('A3').font.size == 12
     assert style('A3').font.bold
     assert not style('A3').font.italic
     assert style('A4').font.name == 'Arial'
-    assert style('A4').font.size == '14'
+    assert style('A4').font.size == 14
     assert not style('A4').font.bold
     assert style('A4').font.italic
     assert style('A5').font.color.index == 'FF3300FF'
@@ -509,15 +509,15 @@ def test_change_existing_styles():
     assert ws.get_style('I').fill.start_color.index == 'FF442200'
     assert ws.get_style('I').font.color.index == 'FF002244'
     assert style('A2').font.name == 'Times New Roman'
-    assert style('A2').font.size == '12'
+    assert style('A2').font.size == 12
     assert style('A2').font.bold
     assert style('A2').font.italic
     assert style('A3').font.name == 'Times New Roman'
-    assert style('A3').font.size == '14'
+    assert style('A3').font.size == 14
     assert not style('A3').font.bold
     assert style('A3').font.italic
     assert style('A4').font.name == 'Times New Roman'
-    assert style('A4').font.size == '16'
+    assert style('A4').font.size == 16
     assert style('A4').font.bold
     assert not style('A4').font.italic
     assert style('A5').font.color.index == 'FF66FF66'
@@ -555,15 +555,15 @@ def test_change_existing_styles():
     # Verify that previously duplicate styles remain the same
     assert ws.column_dimensions['C'].width == 31.1640625
     assert style('C2').font.name == 'Arial'
-    assert style('C2').font.size == '10'
+    assert style('C2').font.size == 10
     assert not style('C2').font.bold
     assert not style('C2').font.italic
     assert style('C3').font.name == 'Arial'
-    assert style('C3').font.size == '12'
+    assert style('C3').font.size == 12
     assert style('C3').font.bold
     assert not style('C3').font.italic
     assert style('C4').font.name == 'Arial'
-    assert style('C4').font.size == '14'
+    assert style('C4').font.size == 14
     assert not style('C4').font.bold
     assert style('C4').font.italic
     assert style('C5').font.color.index == 'FF3300FF'

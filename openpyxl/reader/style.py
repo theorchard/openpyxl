@@ -247,13 +247,13 @@ class SharedStylesParser(object):
                 _style['alignment'] = Alignment(**alignment)
 
             if bool(cell_xfs_node.get('applyFont')):
-                _style['font'] = deepcopy(self.font_list[int(cell_xfs_node.get('fontId'))])
+                _style['font'] = self.font_list[int(cell_xfs_node.get('fontId'))].copy()
 
             if bool(cell_xfs_node.get('applyFill')):
-                _style['fill'] = deepcopy(self.fill_list[int(cell_xfs_node.get('fillId'))])
+                _style['fill'] = self.fill_list[int(cell_xfs_node.get('fillId'))].copy()
 
             if bool(cell_xfs_node.get('applyBorder')):
-                _style['borders'] = deepcopy(self.border_list[int(cell_xfs_node.get('borderId'))])
+                _style['borders'] = self.border_list[int(cell_xfs_node.get('borderId'))].copy()
 
             if bool(cell_xfs_node.get('applyProtection')):
                 protection = {}
