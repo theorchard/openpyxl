@@ -3,6 +3,7 @@
 
 """Based on Python Cookbook 3rd Edition, 8.13"""
 
+from openpyxl.compat import basestring, bytes
 
 class Descriptor(object):
 
@@ -16,16 +17,25 @@ class Descriptor(object):
 
 
 class Typed(Descriptor):
-    """Values must be of or convertible to a particular type"""
+    """Values must of a particular type"""
 
     expected_type = type(None)
 
     def __set__(self, instance, value):
         if not isinstance(value, self.expected_type):
-            try:
-                value = self.expected_type(value)
-            except:
-                raise TypeError('expected ' + str(self.expected_type))
+            raise TypeError('expected ' + str(self.expected_type))
+        super(Typed, self).__set__(instance, value)
+
+
+class Convertible(Typed):
+    """Values must be convertible to a particular type"""
+
+
+    def __set__(self, instance, value):
+        try:
+            value = self.expected_type(value)
+        except:
+            raise TypeError('expected ' + str(self.expected_type))
         super(Typed, self).__set__(instance, value)
 
 
@@ -76,19 +86,29 @@ class Set(Descriptor):
         super(Set, self).__set__(instance, value)
 
 
-class Integer(Typed):
+class Integer(Convertible):
 
     expected_type = int
 
 
-class Float(Typed):
+class Float(Convertible):
 
     expected_type = float
 
 
-class Bool(Typed):
+class Bool(Convertible):
 
     expected_type = bool
+
+
+class String(Typed):
+
+    expected_type = basestring
+
+
+class ASCII(Typed):
+
+    expected_type = bytes
 
 
 class MetaStrict(type):

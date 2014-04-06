@@ -248,3 +248,56 @@ class TestValues:
     def test_invalid(self, set):
         with pytest.raises(ValueError):
             set.value = 2
+
+
+@pytest.fixture
+def ascii():
+
+    from . import ASCII, Strict
+
+    class Dummy(Strict):
+
+        value = ASCII()
+
+    return Dummy()
+
+
+class TestASCII:
+
+    def test_valid(self, ascii):
+        ascii.value = 'some text'
+        assert ascii.value == 'some text'
+
+
+    @pytest.mark.parametrize("value",
+                             [
+                                 '\xc3\xbc'.decode("utf-8"),
+                                 10,
+                                 []
+                             ]
+                             )
+    def test_invalid(self, ascii, value):
+        with pytest.raises(TypeError):
+            ascii.value = value
+
+
+@pytest.fixture
+def string():
+
+    from . import String, Strict
+
+    class Dummy(Strict):
+
+        value = String()
+
+    return Dummy()
+
+
+class TestString:
+
+    def test_valid(self, string):
+        string.value = '\xc3\xbc'.decode("utf-8")
+
+    def test_invalid(self, string):
+        with pytest.raises(TypeError):
+            string.value = 5
