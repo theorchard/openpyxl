@@ -26,13 +26,32 @@ from .colors import Color
 from .hashable import HashableObject
 
 
-class Font(HashableObject):
+from openpyxl.descriptors import Strict, Float, Set, Bool, String, Typed
+
+
+class _Color(Typed):
+
+    expected_type = Color
+
+
+class Font(Strict, HashableObject):
     """Font options used in styles."""
     UNDERLINE_NONE = 'none'
     UNDERLINE_DOUBLE = 'double'
     UNDERLINE_DOUBLE_ACCOUNTING = 'doubleAccounting'
     UNDERLINE_SINGLE = 'single'
     UNDERLINE_SINGLE_ACCOUNTING = 'singleAccounting'
+
+    name = String()
+    size = Float()
+    bold = Bool()
+    italic = Bool()
+    superscript = Bool()
+    subscript = Bool()
+    underline = Set(values=set([UNDERLINE_DOUBLE, UNDERLINE_NONE,
+                               UNDERLINE_DOUBLE_ACCOUNTING, UNDERLINE_SINGLE,
+                               UNDERLINE_SINGLE_ACCOUNTING]))
+    color = _Color()
 
     __fields__ = ('name',
                   'size',
@@ -43,7 +62,6 @@ class Font(HashableObject):
                   'underline',
                   'strikethrough',
                   'color')
-    __check__ = {'color': Color}
     __slots__ = __fields__
 
     def __init__(self, name='Calibri', size=11, bold=False, italic=False,

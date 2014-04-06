@@ -23,6 +23,7 @@ from __future__ import absolute_import
 # @author: see AUTHORS file
 
 from .hashable import HashableObject
+from openpyxl.descriptors import ASCII, Strict
 
 # Default Color Index as per 18.8.27 of ECMA Part 4
 COLOR_INDEX = ('FF000000', 'FFFFFFFF', 'FFFF0000', 'FF00FF00', 'FF0000FF',
@@ -36,7 +37,7 @@ COLOR_INDEX = ('FF000000', 'FFFFFFFF', 'FFFF0000', 'FF00FF00', 'FF0000FF',
                'FF969696', 'FF003366', 'FF339966', 'FF003300', 'FF333300', 'FF993300',
                'FF993366', 'FF333399', 'FF333333')
 
-class Color(HashableObject):
+class Color(Strict, HashableObject):
     """Named colors for use in styles."""
     BLACK = COLOR_INDEX[0]
     WHITE = COLOR_INDEX[1]
@@ -50,8 +51,9 @@ class Color(HashableObject):
     DARKYELLOW = COLOR_INDEX[11]
 
     __fields__ = ('index',)
-    __check__ = {'index': str}
     __slots__ = __fields__
+
+    index = ASCII()
 
     def __init__(self, index=BLACK):
         self.index = index

@@ -56,12 +56,12 @@ class HashableObject(object):
         current.update(kwargs)
         return self.__class__(**current)
 
-    def __setattr__(self, *args, **kwargs):
-        name, value = args
-        self._typecheck(name, value)
-        if hasattr(self, name) and getattr(self, name) is not None:
-            raise TypeError('cannot set %s attribute' % name)
-        return object.__setattr__(self, *args, **kwargs)
+    #def __setattr__(self, *args, **kwargs):
+        #name, value = args
+        #self._typecheck(name, value)
+        #if hasattr(self, name) and getattr(self, name) is not None:
+            #raise TypeError('cannot set %s attribute' % name)
+        #return object.__setattr__(self, *args, **kwargs)
 
     def __delattr__(self, *args, **kwargs):
         raise TypeError('cannot delete %s attribute' % args[0])
