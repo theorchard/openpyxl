@@ -16,6 +16,7 @@ class Descriptor(object):
 
 
 class Typed(Descriptor):
+    """Values must be of or convertible to a particular type"""
 
     expected_type = type(None)
 
@@ -29,6 +30,7 @@ class Typed(Descriptor):
 
 
 class Max(Descriptor):
+    """Values must be less than a `max` value"""
 
     def __init__(self, name=None, **kw):
         if 'max' not in kw:
@@ -42,6 +44,7 @@ class Max(Descriptor):
 
 
 class Min(Descriptor):
+    """Values must be greater than a `min` value"""
 
     def __init__(self, name=None, **kw):
         if 'min' not in kw:
@@ -55,7 +58,22 @@ class Min(Descriptor):
 
 
 class MinMax(Min, Max):
+    """Values must be greater than `min` value and less than a `max` one"""
     pass
+
+
+class Set(Descriptor):
+    """Value can only be from a set of know values"""
+
+    def __init__(self, name=None, **kw):
+        if not 'values' in kw:
+            raise TypeError("missing set of values")
+        super(Set, self).__init__(name, **kw)
+
+    def __set__(self, instance, value):
+        if value not in self.values:
+            raise ValueError("Value must be one of {0}".format(self.values))
+        super(Set, self).__set__(instance, value)
 
 
 class Integer(Typed):
@@ -71,20 +89,6 @@ class Float(Typed):
 class Bool(Typed):
 
     expected_type = bool
-
-
-class Set(Descriptor):
-    """Value can only be from a set of know values"""
-
-    def __init__(self, name=None, **kw):
-        if not 'values' in kw:
-            raise TypeError("missing set of values")
-        super(Set, self).__init__(name, **kw)
-
-    def __set__(self, instance, value):
-        if value not in self.values:
-            raise ValueError("Value must be one of {0}".format(self.values))
-        super(Set, self).__set__(instance, value)
 
 
 class MetaStrict(type):
