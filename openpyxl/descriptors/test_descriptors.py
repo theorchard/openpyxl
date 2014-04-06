@@ -38,10 +38,87 @@ class TestBool:
         boolean.value = True
         assert boolean.value
 
+    @pytest.mark.parametrize("value, expected",
+                             [
+                                 (1, True,),
+                                 (0, False),
+                                 ('true', True),
+                                 ('false', True),
+                                 ('', False),
+                                 ([], False)
+                             ]
+                              )
+    def test_cast(self, boolean, value, expected):
+        boolean.value = value
+        assert boolean.value == expected
 
-    def test_invalid(self, boolean):
+
+@pytest.fixture
+def integer():
+
+    from . import Integer, Strict
+
+    class Dummy(Strict):
+
+        value =  Integer()
+
+    return Dummy()
+
+
+class TestInt:
+
+    def test_valid(self, integer):
+        integer.value = 4
+        assert integer.value == 4
+
+    @pytest.mark.parametrize("value", ['a', '4.5', None])
+    def test_invalid(self, integer, value):
         with pytest.raises(TypeError):
-            boolean.value = 1
+            integer.value = value
+
+    @pytest.mark.parametrize("value, expected",
+                             [
+                                 ('4', 4),
+                                 (4.5, 4),
+                             ])
+    def test_cast(self, integer, value, expected):
+        integer.value = value
+        assert integer.value == expected
+
+
+@pytest.fixture
+def float():
+
+    from . import Float, Strict
+
+    class Dummy(Strict):
+
+        value =  Float()
+
+    return Dummy()
+
+
+class TestFloat:
+
+    def test_valid(self, float):
+        float.value = 4
+        assert float.value == 4
+
+    @pytest.mark.parametrize("value", ['a', None])
+    def test_invalid(self, float, value):
+        with pytest.raises(TypeError):
+            float.value = value
+
+    @pytest.mark.parametrize("value, expected",
+                             [
+                                 ('4.5', 4.5),
+                                 (4.5, 4.5),
+                                 (4, 4.0),
+                             ])
+    def test_cast(self, float, value, expected):
+        float.value = value
+        assert float.value == expected
+
 
 
 @pytest.fixture

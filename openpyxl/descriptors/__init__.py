@@ -21,7 +21,10 @@ class Typed(Descriptor):
 
     def __set__(self, instance, value):
         if not isinstance(value, self.expected_type):
-            raise TypeError('expected ' + str(self.expected_type))
+            try:
+                value = self.expected_type(value)
+            except:
+                raise TypeError('expected ' + str(self.expected_type))
         super(Typed, self).__set__(instance, value)
 
 
