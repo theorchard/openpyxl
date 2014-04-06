@@ -1,6 +1,7 @@
 from openpyxl.styles.colors import Color
 import pytest
 
+
 class TestColor:
 
     def test_ctor(self):

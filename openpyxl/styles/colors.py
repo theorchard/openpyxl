@@ -24,7 +24,7 @@ from __future__ import absolute_import
 
 from .hashable import HashableObject
 
-# Default Color Index as per http://dmcritchie.mvps.org/excel/colors.htm
+# Default Color Index as per 18.8.27 of ECMA Part 4
 COLOR_INDEX = ('FF000000', 'FFFFFFFF', 'FFFF0000', 'FF00FF00', 'FF0000FF',
                'FFFFFF00', 'FFFF00FF', 'FF00FFFF', 'FF800000', 'FF008000', 'FF000080',
                'FF808000', 'FF800080', 'FF008080', 'FFC0C0C0', 'FF808080', 'FF9999FF',
@@ -38,16 +38,16 @@ COLOR_INDEX = ('FF000000', 'FFFFFFFF', 'FFFF0000', 'FF00FF00', 'FF0000FF',
 
 class Color(HashableObject):
     """Named colors for use in styles."""
-    BLACK = 'FF000000'
-    WHITE = 'FFFFFFFF'
-    RED = 'FFFF0000'
-    DARKRED = 'FF800000'
-    BLUE = 'FF0000FF'
-    DARKBLUE = 'FF000080'
-    GREEN = 'FF00FF00'
-    DARKGREEN = 'FF008000'
-    YELLOW = 'FFFFFF00'
-    DARKYELLOW = 'FF808000'
+    BLACK = COLOR_INDEX[0]
+    WHITE = COLOR_INDEX[1]
+    RED = COLOR_INDEX[2]
+    DARKRED = COLOR_INDEX[8]
+    BLUE = COLOR_INDEX[4]
+    DARKBLUE = COLOR_INDEX[10]
+    GREEN = COLOR_INDEX[3]
+    DARKGREEN = COLOR_INDEX[9]
+    YELLOW = COLOR_INDEX[5]
+    DARKYELLOW = COLOR_INDEX[11]
 
     __fields__ = ('index',)
     __check__ = {'index': str}
