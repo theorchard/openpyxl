@@ -23,7 +23,7 @@ from __future__ import absolute_import
 # @author: see AUTHORS file
 
 import inspect
-from openpyxl.compat import unicode
+from openpyxl.compat import unicode, basestring
 from openpyxl.descriptors import Descriptor, Strict
 
 BASE_TYPES = (str, unicode, float, int)
