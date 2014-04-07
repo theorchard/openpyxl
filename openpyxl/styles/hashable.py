@@ -37,7 +37,6 @@ class HashableObject(Strict):
     __base__ = False
 
 
-
     @property
     def __defaults__(self):
         spec = inspect.getargspec(self.__class__.__init__)
