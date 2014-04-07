@@ -1,7 +1,10 @@
 # Copyright (c) 2010-2014 openpyxl
 
 
-"""Based on Python Cookbook 3rd Edition, 8.13"""
+"""
+Based on Python Cookbook 3rd Edition, 8.13
+http://chimera.labs.oreilly.com/books/1230000000393/ch08.html#_discussion_130
+"""
 
 from openpyxl.compat import basestring, bytes
 
