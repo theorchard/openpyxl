@@ -113,8 +113,8 @@ class ASCII(Typed):
     def __set__(self, instance, value):
         try:
             value = value.encode("ascii")
-        except AttributeError:
-            pass
+        except:
+            raise TypeError("expected {0}".format(self.expected_type))
         super(ASCII, self).__set__(instance, value)
 
 

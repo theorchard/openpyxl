@@ -40,8 +40,9 @@ class TestHashable:
         #c = d.copy()
 
     def test_hash(self, Immutable):
-        d = Immutable()
-        assert hash(d) == 8982499335057739900
+        d1 = Immutable()
+        d2 = Immutable()
+        assert hash(d1) == hash(d2)
 
     def test_str(self, Immutable):
         d = Immutable()

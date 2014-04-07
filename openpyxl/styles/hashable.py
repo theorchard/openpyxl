@@ -31,9 +31,12 @@ BASE_TYPES = (str, unicode, float, int)
 
 class HashableObject(Strict):
     """Define how to hash property classes."""
-    __fields__ = None
+    __fields__ = ()
+    __slots__ = tuple('_' + f for f in __fields__)
     __check__ = {}
     __base__ = False
+
+
 
     @property
     def __defaults__(self):
@@ -81,6 +84,7 @@ class HashableObject(Strict):
         default_values = self.__defaults__
         for k in self.__fields__:
             value = getattr(self, k)
+            #value = self.__dict__[k]
             if not defaults and value == default_values[k]:
                 continue
             pieces.append('%s=%s' % (k, print_func(value)))

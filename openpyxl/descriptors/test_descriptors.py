@@ -268,10 +268,11 @@ class TestASCII:
         ascii.value = 'some text'
         assert ascii.value == 'some text'.encode("ascii")
 
-
     value = '\xc3\xbc'
-    if hasattr(value, 'decode'):
-        value = value.decode("utf-8")
+    try:
+        value = value.decode("utf8")
+    except AttributeError:
+        pass
     @pytest.mark.parametrize("value",
                              [
                                  value,
@@ -300,9 +301,12 @@ class TestString:
 
     def test_valid(self, string):
         value = '\xc3\xbc'
-        if hasattr(value, 'decode'):
+        try:
             value = value.decode("utf-8")
+        except AttributeError:
+            pass
         string.value = value
+        assert string.value == value
 
     def test_invalid(self, string):
         with pytest.raises(TypeError):
