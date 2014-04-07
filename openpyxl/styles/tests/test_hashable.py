@@ -37,7 +37,8 @@ class TestHashable:
     def test_copy(self, Immutable):
         d = Immutable()
         d.value = 1
-        #c = d.copy()
+        c = d.copy()
+        assert c == d
 
     def test_hash(self, Immutable):
         d1 = Immutable()
@@ -51,6 +52,13 @@ class TestHashable:
     def test_repr(self, Immutable):
         d = Immutable()
         assert repr(d) == ""
+        d2 = Immutable("hello")
+        assert repr(d2) == "Immutable(value='hello')"
+
+        class ImmutableBase(Immutable):
+            __base__ = True
+        d = ImmutableBase()
+        assert repr(d) == "ImmutableBase()"
 
     def test_eq(self, Immutable):
         d1 = Immutable(1)
@@ -62,3 +70,4 @@ class TestHashable:
         d1 = Immutable(1)
         d2 = Immutable(2)
         assert d1 != d2
+
