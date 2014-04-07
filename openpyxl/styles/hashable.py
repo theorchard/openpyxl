@@ -36,7 +36,6 @@ class HashableObject(Strict):
     __check__ = {}
     __base__ = False
 
-
     @property
     def __defaults__(self):
         spec = inspect.getargspec(self.__class__.__init__)
@@ -52,7 +51,6 @@ class HashableObject(Strict):
                                                      value.__class__.__name__)
                 raise TypeError(msg)
         else:
-
             if value is not None and not isinstance(value, BASE_TYPES):
                 raise TypeError('%s cannot be a %s' % (name,
                                                        value.__class__.__name__))
@@ -83,9 +81,10 @@ class HashableObject(Strict):
         default_values = self.__defaults__
         for k in self.__fields__:
             value = getattr(self, k)
-            #value = self.__dict__[k]
             if not defaults and value == default_values[k]:
                 continue
+            if isinstance(value, basestring):
+                print_func = repr  # keep quotes around strings
             pieces.append('%s=%s' % (k, print_func(value)))
         if pieces or self.__base__:
             return '%s(%s)' % (self.__class__.__name__, ', '.join(pieces))

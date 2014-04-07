@@ -49,6 +49,9 @@ class TestHashable:
         d = Immutable()
         assert str(d) == "Immutable(value=None)"
 
+        d2 = Immutable("hello")
+        assert str(d2) == "Immutable(value='hello')"
+
     def test_repr(self, Immutable):
         d = Immutable()
         assert repr(d) == ""
