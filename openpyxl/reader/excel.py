@@ -27,7 +27,7 @@ from __future__ import absolute_import
 # Python stdlib imports
 from zipfile import ZipFile, ZIP_DEFLATED, BadZipfile
 from sys import exc_info
-import os.path as osp
+import os.path
 import warnings
 
 # compatibility imports
@@ -128,7 +128,7 @@ def load_workbook(filename, use_iterators=False, keep_vba=KEEP_VBA, guess_types=
     try:
         archive = ZipFile(filename, 'r', ZIP_DEFLATED)
     except BadZipfile:
-        file_format = osp.splitext(filename)[-1]
+        file_format = os.path.splitext(filename)[-1]
         if file_format not in SUPPORTED_FORMATS:
             if file_format == '.xls':
                 msg = ('openpyxl does not support the old .xls file format, '
