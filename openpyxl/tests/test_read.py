@@ -27,6 +27,7 @@
 import os.path
 from datetime import datetime
 import zipfile
+from tempfile import NamedTemporaryFile
 
 import pytest
 
@@ -408,3 +409,21 @@ def test_read_autofilter(datadir):
     wb = load_workbook("bug275.xlsx")
     ws = wb.active
     assert ws.auto_filter.ref == 'A1:B6'
+
+
+class TestBadFormats:
+
+    def test_xlsb(self):
+        tmp = NamedTemporaryFile(suffix='.xlsb')
+        with pytest.raises(InvalidFileException):
+            load_workbook(filename=tmp.name)
+
+    def test_xls(self):
+        tmp = NamedTemporaryFile(suffix='.xls')
+        with pytest.raises(InvalidFileException):
+            load_workbook(filename=tmp.name)
+
+    def test_no(self):
+        tmp = NamedTemporaryFile(suffix='.no-format')
+        with pytest.raises(InvalidFileException):
+            load_workbook(filename=tmp.name)

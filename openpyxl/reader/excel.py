@@ -27,6 +27,7 @@ from __future__ import absolute_import
 # Python stdlib imports
 from zipfile import ZipFile, ZIP_DEFLATED, BadZipfile
 from sys import exc_info
+import os.path as osp
 import warnings
 
 # compatibility imports
@@ -65,6 +66,7 @@ from openpyxl.reader.comments import read_comments, get_comments_file
 
 
 CENTRAL_DIRECTORY_SIGNATURE = '\x50\x4b\x05\x06'
+SUPPORTED_FORMATS = ('.xlsx', '.xlsm')
 
 
 def repair_central_directory(zipFile, is_file_instance):
@@ -126,6 +128,24 @@ def load_workbook(filename, use_iterators=False, keep_vba=KEEP_VBA, guess_types=
     try:
         archive = ZipFile(filename, 'r', ZIP_DEFLATED)
     except BadZipfile:
+        file_format = osp.splitext(filename)[-1]
+        if file_format not in SUPPORTED_FORMATS:
+            if file_format == '.xls':
+                msg = ('openpyxl does not support the old .xls file format, '
+                       'please use xlrd to read this file, or convert it to '
+                       'the more recent .xlsx file format.')
+            elif file_format == '.xlsb':
+                msg = ('openpyxl does not support binary format .xlsb, '
+                       'please convert this file to .xlsx format if you want '
+                       'to open it with openpyxl')
+            else:
+                msg = ('openpyxl does not support %s file format, '
+                       'please check you can open '
+                       'it with Excel first. '
+                       'Supported formats are: %s') % (file_format,
+                                                     ','.join(SUPPORTED_FORMATS))
+            raise InvalidFileException(msg)
+
         try:
             f = repair_central_directory(filename, is_file_instance)
             archive = ZipFile(f, 'r', ZIP_DEFLATED)
