@@ -22,16 +22,9 @@ from __future__ import absolute_import
 # @license: http://www.opensource.org/licenses/mit-license.php
 # @author: see AUTHORS file
 
-from .colors import Color
-from .hashable import HashableObject
-
-
 from openpyxl.descriptors import Strict, Float, Set, Bool, String, Typed, Integer
-
-
-class _Color(Typed):
-
-    expected_type = Color
+from .hashable import HashableObject
+from .descriptors import Color
 
 
 class Font(HashableObject):
@@ -42,17 +35,16 @@ class Font(HashableObject):
     UNDERLINE_SINGLE = 'single'
     UNDERLINE_SINGLE_ACCOUNTING = 'singleAccounting'
 
-    name = String('_name')
-    size = Integer('_size')
-    bold = Bool('_bold')
-    italic = Bool('_italic')
-    superscript = Bool('_superscript')
-    subscript = Bool('_subscript')
-    underline = Set('_underline',
-                    values=set([UNDERLINE_DOUBLE, UNDERLINE_NONE,
-                               UNDERLINE_DOUBLE_ACCOUNTING, UNDERLINE_SINGLE,
-                               UNDERLINE_SINGLE_ACCOUNTING]))
-    color = _Color()
+    name = String()
+    size = Integer()
+    bold = Bool()
+    italic = Bool()
+    superscript = Bool()
+    subscript = Bool()
+    underline = Set(values=set([UNDERLINE_DOUBLE, UNDERLINE_NONE,
+                                UNDERLINE_DOUBLE_ACCOUNTING, UNDERLINE_SINGLE,
+                                UNDERLINE_SINGLE_ACCOUNTING]))
+    color = Color()
 
     __fields__ = ('name',
                   'size',
@@ -66,7 +58,7 @@ class Font(HashableObject):
 
     def __init__(self, name='Calibri', size=11, bold=False, italic=False,
                  superscript=False, subscript=False, underline=UNDERLINE_NONE,
-                 strikethrough=False, color=Color(Color.BLACK)):
+                 strikethrough=False, color=color()):
         self.name = name
         self.size = size
         self.bold = bold
