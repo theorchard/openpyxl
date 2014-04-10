@@ -203,9 +203,9 @@ class DumpWorksheet(Worksheet):
 
     def _close_content(self):
         doc = self._get_content_generator()
+        end_tag(doc, 'sheetData')
         if self._comments:
             tag(doc, 'legacyDrawing', {'r:id': 'commentsvml'})
-        end_tag(doc, 'sheetData')
         end_tag(doc, 'worksheet')
 
     def get_dimensions(self):
