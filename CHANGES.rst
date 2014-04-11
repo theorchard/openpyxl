@@ -4,6 +4,8 @@
 Major changes
 -------------
 
+* This is last release that will support Python 3.2
+* Merged immutable styles
 * Type inference is disabled by default
 * RawCell renamed ReadOnlyCell
 * ReadOnlyCell.internal_value and ReadOnlyCell.value now behave the same as Cell
