@@ -13,7 +13,6 @@ class Color(Typed):
     expected_type = Color
 
     def __init__(self, name=None, **kw):
-        print kw
         if "defaults" not in kw:
             kw['defaults'] = {}
         super(Color, self).__init__(name, **kw)
