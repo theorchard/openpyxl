@@ -91,7 +91,7 @@ else:
         iterparse
         )
     except ImportError:
-        from xml.etree.ElementTreee import (
+        from xml.etree.ElementTree import (
         ElementTree,
         Element,
         SubElement,
