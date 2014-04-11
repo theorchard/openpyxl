@@ -108,8 +108,9 @@ class CommentWriter(object):
         row = comment._parent.row - 1
         column = column_index_from_string(comment._parent.column) - 1
         style = ("position:absolute; margin-left:59.25pt;"
-                 "margin-top:1.5pt;width:108pt;height:59.25pt;"
-                 "z-index:1;visibility:hidden")
+                 "margin-top:1.5pt;width:%(width)s;height:%(height)s;"
+                 "z-index:1;visibility:hidden") % {'height': comment._height,
+                                                   'width': comment._width}
         attrs = {
             "id": "_x0000_s%s" % (idx + 1026),
             "type": "#_x0000_t202",

@@ -25,12 +25,16 @@ from __future__ import absolute_import
 class Comment(object):
     __slots__ = ('_parent',
                  '_text',
-                 '_author')
+                 '_author',
+                 '_width',
+                 '_height')
 
     def __init__(self, text, author):
         self._text = text
         self._author = author
         self._parent = None
+        self._width = '108pt'
+        self._height = '59.25pt'
 
     @property
     def author(self):
