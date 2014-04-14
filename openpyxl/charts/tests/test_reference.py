@@ -26,7 +26,7 @@ def ws(Workbook):
 def ten_row_sheet(ws):
     """Worksheet with values 0-9 in the first column"""
     for i in range(10):
-        ws.cell(row=i, column=0).value = i
+        ws.append([i])
     return ws
 
 
@@ -38,45 +38,45 @@ def sheet(ten_row_sheet):
 
 @pytest.fixture
 def cell(sheet, Reference):
-    return Reference(sheet, (0, 0))
+    return Reference(sheet, (1, 1))
 
 
 @pytest.fixture
 def cell_range(sheet, Reference):
-    return Reference(sheet, (0, 0), (9, 0))
+    return Reference(sheet, (1, 1), (10, 1))
 
 
 @pytest.fixture()
 def empty_range(sheet, Reference):
     for i in range(10):
-        sheet.cell(row=i, column=1).value = None
-    return Reference(sheet, (0, 1), (9, 1))
+        sheet.cell(row=i+1, column=2).value = None
+    return Reference(sheet, (1, 2), (10, 2))
 
 
 @pytest.fixture()
 def missing_values(sheet, Reference):
     vals = [None, None, 1, 2, 3, 4, 5, 6, 7, 8]
-    for idx, val in enumerate(vals):
-        sheet.cell(row=idx, column=2).value = val
-    return Reference(sheet, (0, 2), (9, 2))
+    for idx, val in enumerate(vals, 1):
+        sheet.cell(row=idx, column=3).value = val
+    return Reference(sheet, (1, 3), (10, 3))
 
 
 @pytest.fixture
 def column_of_letters(sheet, Reference):
-    for idx, l in enumerate("ABCDEFGHIJ"):
-        sheet.cell(row=idx, column=1).value = l
-    return Reference(sheet, (0, 1), (9, 1))
+    for idx, l in enumerate("ABCDEFGHIJ", 1):
+        sheet.cell(row=idx, column=2).value = l
+    return Reference(sheet, (1, 2), (10, 2))
 
 
 class TestReference(object):
 
     def test_single_cell_ctor(self, cell):
-        assert cell.pos1 == (0, 0)
+        assert cell.pos1 == (1, 1)
         assert cell.pos2 == None
 
     def test_range_ctor(self, cell_range):
-        assert cell_range.pos1 == (0, 0)
-        assert cell_range.pos2 == (9, 0)
+        assert cell_range.pos1 == (1, 1)
+        assert cell_range.pos2 == (10, 1)
 
     def test_single_cell_ref(self, cell):
         assert cell.values == [0]

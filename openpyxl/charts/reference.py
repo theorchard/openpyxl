@@ -73,7 +73,6 @@ class Reference(object):
         else:
             self._values = []
 
-            # use range method of sheets?
             for row in range(int(self.pos1[0]), int(self.pos2[0] + 1)):
                 for col in range(int(self.pos1[1]), int(self.pos2[1] + 1)):
                     cell = self.sheet.cell(row=row, column=col)
@@ -89,8 +88,8 @@ class Reference(object):
 
         if self.pos2:
             return "'%s'!$%s$%s:$%s$%s" % (self.sheet.title,
-                get_column_letter(self.pos1[1] + 1), self.pos1[0] + 1,
-                get_column_letter(self.pos2[1] + 1), self.pos2[0] + 1)
+                get_column_letter(self.pos1[1]), self.pos1[0],
+                get_column_letter(self.pos2[1]), self.pos2[0])
         else:
             return "'%s'!$%s$%s" % (self.sheet.title,
-                get_column_letter(self.pos1[1] + 1), self.pos1[0] + 1)
+                get_column_letter(self.pos1[1]), self.pos1[0])
