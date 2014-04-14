@@ -22,7 +22,6 @@
 # @author: see AUTHORS file
 
 # 3rd party imports
-#from nose.tools import eq_, raises, assert_raises
 import pytest
 from .helper import compare_xml
 
