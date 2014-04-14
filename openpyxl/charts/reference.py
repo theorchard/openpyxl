@@ -24,31 +24,51 @@ from __future__ import absolute_import
 
 from openpyxl.cell import get_column_letter
 from openpyxl.styles import NumberFormat, is_date_format, is_builtin
+from openpyxl.descriptors import Tuple, Length, Set, Strict
 
 
-class Reference(object):
+class Coordinate(Tuple, Length):
+
+    def __get__(self, instance, cls):
+        if instance is None:
+            return self
+        return instance.__dict__.get(self.name)
+
+
+class Reference(Strict):
     """ a simple wrapper around a serie of reference data """
 
-    _data_type = None
+    data_type = Set(values=['n', 's'])
+    pos1 = Coordinate(length=2)
+    pos2 = Coordinate(length=2)
 
     def __init__(self, sheet, pos1, pos2=None, data_type=None, number_format=None):
+        """Create a reference to a cell or range of cells
+
+        :param sheet: the worksheet referred to
+        :type sheet: string
+
+        :type pos1: cell coordinate
+        :type pos1: tuple
+
+        :param pos2: optional second coordinate for a range
+        :type row: tuple
+
+        :param data_type: optionally specify the data type
+        :type data_type: string
+
+        :param number_format: optional formatting style
+        :type number_format: string
+
+        """
 
         self.sheet = sheet
         self.pos1 = pos1
-        self.pos2 = pos2
+        if pos2 is not None:
+            self.pos2 = pos2
         if data_type is not None:
             self.data_type = data_type
         self.number_format = number_format
-
-    @property
-    def data_type(self):
-        return self._data_type
-
-    @data_type.setter
-    def data_type(self, value):
-        if value not in ['n', 's']:
-            raise ValueError("References must be either numeric or strings")
-        self._data_type = value
 
     @property
     def number_format(self):
@@ -79,7 +99,7 @@ class Reference(object):
                     self._values.append(cell.internal_value)
                     if cell.internal_value == '':
                         continue
-                    if self.data_type is None and cell.data_type:
+                    if isinstance(self.data_type, Set) and cell.data_type:
                         self.data_type = cell.data_type
         return self._values
 
