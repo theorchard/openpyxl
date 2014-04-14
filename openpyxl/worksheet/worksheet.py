@@ -269,13 +269,13 @@ class Worksheet(object):
         :rtype: :class:`openpyxl.cell.Cell`
 
         """
-        if not coordinate:
-            if  (row is None or column is None):
+        if coordinate is None:
+            if (row is None or column is None):
                 msg = "You have to provide a value either for " \
                         "'coordinate' or for 'row' *and* 'column'"
                 raise InsufficientCoordinatesException(msg)
             else:
-                coordinate = '%s%s' % (get_column_letter(column + 1), row + 1)
+                coordinate = '%s%s' % (get_column_letter(column), row)
         else:
             coordinate = coordinate.replace('$', '')
 
@@ -310,7 +310,11 @@ class Worksheet(object):
         if self.row_dimensions:
             return max(self.row_dimensions)
         else:
-            return 1
+            return 0
+
+    @property
+    def max_row(self):
+        return self.get_highest_row()
 
     def get_highest_column(self):
         """Get the largest value for column currently stored.
@@ -321,12 +325,16 @@ class Worksheet(object):
             return max([column_index_from_string(column_index)
                             for column_index in self.column_dimensions])
         else:
-            return 1
+            return 0
+
+    @property
+    def max_column(self):
+        return self.get_highest_column()
 
     def calculate_dimension(self):
         """Return the minimum bounding range for all cells containing data."""
-        return 'A1:%s%d' % (get_column_letter(self.get_highest_column()),
-                            self.get_highest_row())
+
+        return 'A1:%s%d' % (get_column_letter(self.max_column or 1), self.max_row or 1)
 
     def range(self, range_string, row=0, column=0):
         """Returns a 2D array of cells, with optional row and column offsets.
@@ -533,20 +541,20 @@ class Worksheet(object):
 
         * append(['This is A1', 'This is B1', 'This is C1'])
         * **or** append({'A' : 'This is A1', 'C' : 'This is C1'})
-        * **or** append({0 : 'This is A1', 2 : 'This is C1'})
+        * **or** append({1 : 'This is A1', 3 : 'This is C1'})
 
         :raise: TypeError when list_or_dict is neither a list/tuple nor a dict
 
         """
-        row_idx = len(self.row_dimensions)
+        row_idx = self.max_row + 1
         if isinstance(list_or_dict, (list, tuple)):
-            for col_idx, content in enumerate(list_or_dict):
+            for col_idx, content in enumerate(list_or_dict, 1):
                 self.cell(row=row_idx, column=col_idx).value = content
 
         elif isinstance(list_or_dict, dict):
             for col_idx, content in iteritems(list_or_dict):
                 if isinstance(col_idx, basestring):
-                    col_idx = column_index_from_string(col_idx) - 1
+                    col_idx = column_index_from_string(col_idx)
                 self.cell(row=row_idx, column=col_idx).value = content
 
         else:

@@ -56,7 +56,7 @@ class TestWorksheet(object):
 
     def test_get_cell(self):
         ws = Worksheet(self.wb)
-        cell = ws.cell('A1')
+        cell = ws.cell(row=1, column=1)
         assert cell.coordinate == 'A1'
 
     def test_set_bad_title(self):
@@ -119,11 +119,12 @@ class TestWorksheet(object):
         assert 4 == len(xlrange)
         assert 3 == len(xlrange[0])
         assert 'D2' == xlrange[0][0].coordinate
+        assert xlrange[-1][-1].coordinate == 'F5'
 
     def test_cell_alternate_coordinates(self):
         ws = Worksheet(self.wb)
         cell = ws.cell(row=8, column=4)
-        assert 'E9' == cell.coordinate
+        assert 'D8' == cell.coordinate
 
     def test_cell_insufficient_coordinates(self):
         ws = Worksheet(self.wb)
@@ -191,7 +192,7 @@ class TestWorksheet(object):
     def test_append_dict_index(self):
         ws = Worksheet(self.wb)
 
-        ws.append({0 : 'This is A1', 2 : 'This is C1'})
+        ws.append({1 : 'This is A1', 3 : 'This is C1'})
 
         assert 'This is A1' == ws.cell('A1').value
         assert 'This is C1' == ws.cell('C1').value
