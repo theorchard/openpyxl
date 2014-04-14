@@ -33,7 +33,6 @@ class Typed(Descriptor):
 class Convertible(Typed):
     """Values must be convertible to a particular type"""
 
-
     def __set__(self, instance, value):
         try:
             value = self.expected_type(value)
@@ -112,6 +111,25 @@ class String(Typed):
 class ASCII(Typed):
 
     expected_type = bytes
+
+
+class Tuple(Typed):
+
+    expected_type = tuple
+
+
+class Length(Descriptor):
+
+    def __init__(self, name=None, **kw):
+        if "length" not in kw:
+            raise TypeError("value length must be supplied")
+        super(Length, self).__init__(**kw)
+
+
+    def __set__(self, instance, value):
+        if len(value) != self.length:
+            raise ValueError("Value must be length {0}".format(self.length))
+        super(Length, self).__set__(instance, value)
 
 
 def Default(Typed):

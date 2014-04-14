@@ -303,3 +303,46 @@ class TestString:
     def test_invalid(self, string):
         with pytest.raises(TypeError):
             string.value = 5
+
+
+@pytest.fixture
+def Tuple():
+    from . import Tuple, Strict
+
+    class Dummy(Strict):
+
+        value = Tuple()
+
+    return Dummy()
+
+
+class TestTuple:
+
+    def test_valid(self, Tuple):
+        Tuple.value = (1, 2)
+        assert Tuple.value == (1, 2)
+
+    def test_invalid(self, Tuple):
+        with pytest.raises(TypeError):
+            Tuple.value = [1, 2, 3]
+
+
+@pytest.fixture
+def Length():
+    from . import Length, Strict
+
+    class Dummy(Strict):
+
+        value = Length(length=4)
+
+    return Dummy()
+
+
+class TestLength:
+
+    def test_valid(self, Length):
+        Length.value = "this"
+
+    def test_invalid(self, Length):
+        with pytest.raises(ValueError):
+            Length.value = "2"
