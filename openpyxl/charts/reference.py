@@ -73,6 +73,7 @@ class Reference(object):
         else:
             self._values = []
 
+            # use range method of sheets?
             for row in range(int(self.pos1[0]), int(self.pos2[0] + 1)):
                 for col in range(int(self.pos1[1]), int(self.pos2[1] + 1)):
                     cell = self.sheet.cell(row=row, column=col)
