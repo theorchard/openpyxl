@@ -113,13 +113,6 @@ class ASCII(Typed):
 
     expected_type = bytes
 
-    def __set__(self, instance, value):
-        try:
-            value = value.encode("ascii")
-        except:
-            raise TypeError("expected {0}".format(self.expected_type))
-        super(ASCII, self).__set__(instance, value)
-
 
 def Default(Typed):
     """

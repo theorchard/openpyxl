@@ -265,14 +265,10 @@ def ascii():
 class TestASCII:
 
     def test_valid(self, ascii):
-        ascii.value = 'some text'
-        assert ascii.value == 'some text'.encode("ascii")
+        ascii.value = b'some text'
+        assert ascii.value == b'some text'
 
-    value = '\xc3\xbc'
-    try:
-        value = value.decode("utf8")
-    except AttributeError:
-        pass
+    value = b'\xc3\xbc'.decode("utf-8")
     @pytest.mark.parametrize("value",
                              [
                                  value,
