@@ -296,11 +296,7 @@ def string():
 class TestString:
 
     def test_valid(self, string):
-        value = '\xc3\xbc'
-        try:
-            value = value.decode("utf-8")
-        except AttributeError:
-            pass
+        value = b'\xc3\xbc'.decode("utf-8")
         string.value = value
         assert string.value == value
 
