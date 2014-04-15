@@ -26,7 +26,7 @@ class TestSeries:
         series = Series(cell)
         assert series.color == None
         series.color = "blue"
-        assert series.color, "blue"
+        assert series.color == "blue"
         with pytest.raises(ValueError):
             series.color = None
 
