@@ -125,4 +125,3 @@ def missing_values(sheet, Reference):
 @pytest.fixture()
 def series(cell_range, Series):
     return Series(values=cell_range)
-
