@@ -32,7 +32,7 @@ BASE_TYPES = (str, unicode, float, int)
 class HashableObject(Strict):
     """Define how to hash property classes."""
     __fields__ = ()
-    __slots__ = tuple('_' + f for f in __fields__)
+    __slots__ = __fields__
     __check__ = {}
     __base__ = False
 
