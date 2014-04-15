@@ -183,16 +183,21 @@ class TestChartWriter(object):
         diff = compare_xml(xml, expected)
         assert diff is None, diff
 
-    @pytest.mark.xfail
-    def test_write_no_ascii(self, ten_row_sheet, Series, BarChart, Reference):
+    def test_write_no_ascii(self, ten_row_sheet, Series, BarChart, Reference, root_xml):
+        from openpyxl.writer.charts import ChartWriter
         ws = ten_row_sheet
-        ws.append(["D\xc3\xbcsseldorf"]*10)
-        serie = Series(values=Reference(ws, (0,0), (0,9)),
-                      title=(ws.cell(row=1, column=0).value)
+        ws.append([b"D\xc3\xbcsseldorf"]*10)
+        serie = Series(values=Reference(ws, (1,1), (1,10)),
+                      title=(ws.cell(row=1, column=1).value)
                       )
         c = BarChart()
         c.add_serie(serie)
-        cw = ChartWriter(c)
+        cw = BaseChartWriter(c)
+        cw._write_series(root_xml)
+        xml = get_xml(root_xml)
+        expected = """<test><c:ser xmlns:c="http://schemas.openxmlformats.org/drawingml/2006/chart"><c:idx val="0"/><c:order val="0"/><c:val><c:numRef><c:f>'data'!$A$1:$J$1</c:f><c:numCache><c:formatCode>General</c:formatCode><c:ptCount val="10"/><c:pt idx="0"><c:v>0</c:v></c:pt><c:pt idx="1"><c:v>None</c:v></c:pt><c:pt idx="2"><c:v>None</c:v></c:pt><c:pt idx="3"><c:v>None</c:v></c:pt><c:pt idx="4"><c:v>None</c:v></c:pt><c:pt idx="5"><c:v>None</c:v></c:pt><c:pt idx="6"><c:v>None</c:v></c:pt><c:pt idx="7"><c:v>None</c:v></c:pt><c:pt idx="8"><c:v>None</c:v></c:pt><c:pt idx="9"><c:v>None</c:v></c:pt></c:numCache></c:numRef></c:val></c:ser></test>"""
+        diff = compare_xml(xml, expected)
+        assert diff is None, diff
 
     def test_label_no_number_format(self, ten_column_sheet, Reference, Series, BarChart, root_xml):
         ws = ten_column_sheet
