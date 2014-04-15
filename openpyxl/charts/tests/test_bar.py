@@ -1,7 +1,7 @@
 import pytest
 
 
-class TestBarChart(object):
+class TestBarChart:
 
     def test_ctor(self, BarChart):
         c = BarChart()

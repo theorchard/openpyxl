@@ -9,7 +9,7 @@ def column_of_letters(sheet, Reference):
     return Reference(sheet, (1, 2), (10, 2))
 
 
-class TestReference(object):
+class TestReference:
 
     def test_single_cell_ctor(self, cell):
         assert cell.pos1 == (1, 1)

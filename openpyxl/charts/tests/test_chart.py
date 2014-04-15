@@ -1,7 +1,7 @@
 import pytest
 
 
-class TestChart(object):
+class TestChart:
 
     def test_ctor(self, Chart):
         from openpyxl.charts import Legend

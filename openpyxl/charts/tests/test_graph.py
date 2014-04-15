@@ -2,7 +2,7 @@ from datetime import date
 import pytest
 
 
-class TestGraphChart(object):
+class TestGraphChart:
 
     def test_ctor(self, GraphChart, Axis):
         c = GraphChart()

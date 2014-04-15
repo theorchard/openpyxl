@@ -1,7 +1,7 @@
 import pytest
 
 
-class TestScatterChart(object):
+class TestScatterChart:
 
     def test_ctor(self, ScatterChart):
         c = ScatterChart()

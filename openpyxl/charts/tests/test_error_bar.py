@@ -1,7 +1,7 @@
 import pytest
 
 
-class TestErrorBar(object):
+class TestErrorBar:
 
     def test_ctor(self, ErrorBar):
         with pytest.raises(TypeError):
