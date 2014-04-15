@@ -62,6 +62,3 @@ class TestSeries:
         series = Series(cell)
         series.error_bar = ErrorBar(None, cell)
         assert series.get_min_max() == (0, 0)
-
-
-

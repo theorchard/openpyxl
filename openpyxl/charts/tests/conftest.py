@@ -92,6 +92,13 @@ def ten_row_sheet(ws):
 
 
 @pytest.fixture
+def ten_column_sheet(ws):
+    """Worksheet with values 0-9 in the first row"""
+    ws.append(list(range(10)))
+    return ws
+
+
+@pytest.fixture
 def sheet(ten_row_sheet):
     ten_row_sheet.title = "reference"
     return ten_row_sheet
@@ -125,3 +132,13 @@ def missing_values(sheet, Reference):
 @pytest.fixture()
 def series(cell_range, Series):
     return Series(values=cell_range)
+
+
+@pytest.fixture
+def datadir():
+    """DATADIR as a LocalPath"""
+    import os
+    here = os.path.split(__file__)[0]
+    DATADIR = os.path.join(here, "data")
+    from py._path.local import LocalPath
+    return LocalPath(DATADIR)
