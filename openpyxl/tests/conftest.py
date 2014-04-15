@@ -37,13 +37,6 @@ def ws(Workbook):
     return ws
 
 
-from openpyxl.xml.functions import Element
-
-@pytest.fixture
-def root_xml():
-    """Root XML element <test>"""
-    return Element("test")
-
 @pytest.fixture
 def datadir():
     """DATADIR as a LocalPath"""
