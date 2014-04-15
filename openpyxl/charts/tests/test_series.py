@@ -1,7 +1,7 @@
 import pytest
 
 
-class TestSerie(object):
+class TestSeries:
 
     def test_ctor(self, Series, cell):
         series = Series(cell)

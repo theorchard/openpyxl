@@ -22,7 +22,7 @@ from __future__ import absolute_import
 # @license: http://www.opensource.org/licenses/mit-license.php
 # @author: see AUTHORS file
 
-from .chart import GraphChart
+from .graph import GraphChart
 
 
 class ScatterChart(GraphChart):

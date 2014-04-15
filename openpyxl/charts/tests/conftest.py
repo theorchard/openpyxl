@@ -12,7 +12,7 @@ def Chart():
 @pytest.fixture
 def GraphChart():
     """GraphicChart class"""
-    from openpyxl.charts.chart import GraphChart
+    from openpyxl.charts.graph import GraphChart
     return GraphChart
 
 
@@ -120,3 +120,9 @@ def missing_values(sheet, Reference):
     for idx, val in enumerate(vals, 1):
         sheet.cell(row=idx, column=3).value = val
     return Reference(sheet, (1, 3), (10, 3))
+
+
+@pytest.fixture()
+def series(cell_range, Series):
+    return Series(values=cell_range)
+

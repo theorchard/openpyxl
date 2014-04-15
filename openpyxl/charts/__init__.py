@@ -25,7 +25,7 @@ from __future__ import absolute_import
 from .legend import Legend
 from .reference import Reference
 from .series import Series
-from .chart import GraphChart
+from .graph import GraphChart
 from .bar import BarChart
 from .pie import PieChart
 from .line import LineChart
