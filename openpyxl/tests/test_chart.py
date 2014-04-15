@@ -27,51 +27,6 @@ from datetime import date
 import pytest
 
 
-@pytest.fixture
-def sheet(ten_row_sheet):
-    ten_row_sheet.title = "reference"
-    return ten_row_sheet
-
-
-@pytest.fixture
-def cell(sheet, Reference):
-    return Reference(sheet, (0, 0))
-
-
-@pytest.fixture
-def cell_range(sheet, Reference):
-    return Reference(sheet, (0, 0), (9, 0))
-
-
-@pytest.fixture()
-def empty_range(sheet, Reference):
-    for i in range(10):
-        sheet.cell(row=i, column=1).value = None
-    return Reference(sheet, (0, 1), (9, 1))
-
-
-@pytest.fixture()
-def missing_values(sheet, Reference):
-    vals = [None, None, 1, 2, 3, 4, 5, 6, 7, 8]
-    for idx, val in enumerate(vals):
-        sheet.cell(row=idx, column=2).value = val
-    return Reference(sheet, (0, 2), (9, 2))
-
-
-@pytest.fixture
-def column_of_letters(sheet, Reference):
-    for idx, l in enumerate("ABCDEFGHIJ"):
-        sheet.cell(row=idx, column=1).value = l
-    return Reference(sheet, (0, 1), (9, 1))
-
-
-class TestErrorBar(object):
-
-    def test_ctor(self, ErrorBar):
-        with pytest.raises(TypeError):
-            ErrorBar(None, range(10))
-
-
 @pytest.fixture()
 def series(cell_range, Series):
     return Series(values=cell_range)
