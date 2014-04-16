@@ -23,7 +23,7 @@ from __future__ import absolute_import
 # @author: see AUTHORS file
 
 import math
-from openpyxl.styles import Color
+from openpyxl.styles.colors import Color, BLACK, WHITE
 from openpyxl.units import pixels_to_EMU, EMU_to_pixels, short_color
 from openpyxl.cell import column_index_from_string
 
@@ -44,7 +44,7 @@ class Shadow(object):
         self.distance = 2
         self.direction = 0
         self.alignment = self.SHADOW_BOTTOM_RIGHT
-        self.color = Color(Color.BLACK)
+        self.color = Color()
         self.alpha = 50
 
 
@@ -326,9 +326,9 @@ class Shape(object):
         self.scheme = scheme
         self.style = Shape.RECT
         self.border_width = 0
-        self.border_color = Color.BLACK  # "F3B3C5"
-        self.color = Color.WHITE
-        self.text_color = Color.BLACK
+        self.border_color = BLACK  # "F3B3C5"
+        self.color = WHITE
+        self.text_color = BLACK
 
     @property
     def border_color(self):
