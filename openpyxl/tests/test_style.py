@@ -37,8 +37,18 @@ from openpyxl.reader.style import read_style_table
 from openpyxl.workbook import Workbook
 from openpyxl.writer.excel import save_virtual_workbook
 from openpyxl.writer.styles import StyleWriter
-from openpyxl.styles import NumberFormat, Border, Color, Font, Fill, Borders, Protection, \
+from openpyxl.styles import (
+    NumberFormat,
+    Color,
+    Font,
+    Fill,
+    Borders,
+    Protection,
     Style
+)
+from openpyxl.styles.border import Border
+from openpyxl.styles import colors
+from openpyxl.styles import fills
 from openpyxl.formatting import ConditionalFormatting
 from openpyxl.formatting.rules import FormulaRule
 from openpyxl.xml.functions import Element, SubElement, tostring
@@ -161,7 +171,7 @@ class TestStyleWriter(object):
 
     def test_fills(self):
         st = Style(fill=Fill(fill_type='solid',
-                             start_color=Color(Color.DARKYELLOW)))
+                             start_color=Color(colors.DARKYELLOW)))
         self.worksheet.cell('A1').style = st
         w = StyleWriter(self.workbook)
         w._write_fills()
@@ -187,7 +197,7 @@ class TestStyleWriter(object):
 
     def test_borders(self):
         st = Style(borders=Borders(top=Border(border_style=Border.BORDER_THIN,
-                                              color=Color(Color.DARKYELLOW))))
+                                              color=Color(colors.DARKYELLOW))))
         self.worksheet.cell('A1').style = st
         w = StyleWriter(self.workbook)
         w._write_borders()
@@ -296,11 +306,11 @@ class TestStyleWriter(object):
     def test_write_dxf(self):
         redFill = Fill(start_color=Color('FFEE1111'),
                        end_color=Color('FFEE1111'),
-                       fill_type=Fill.FILL_SOLID)
+                       fill_type=fills.FILL_SOLID)
         whiteFont = Font(color=Color("FFFFFFFF"),
                          bold=True, italic=True, underline='single',
                          strikethrough=True)
-        medium_blue = Border(border_style='medium', color=Color(Color.BLUE))
+        medium_blue = Border(border_style='medium', color=Color(colors.BLUE))
         blueBorder = Borders(left=medium_blue,
                              right=medium_blue,
                              top=medium_blue,

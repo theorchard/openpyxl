@@ -22,7 +22,7 @@ from __future__ import absolute_import
 # @license: http://www.opensource.org/licenses/mit-license.php
 # @author: see AUTHORS file
 
-from openpyxl.descriptors import Set, Float, Bool
+from openpyxl.descriptors import Set, Float, Bool, Integer
 
 from .hashable import HashableObject
 
@@ -53,10 +53,10 @@ class Alignment(HashableObject):
                   'indent')
     horizontal = Set(values=alignments)
     vertical = Set(values=alignments)
-    text_rotation = Float()
+    text_rotation = Integer()
     wrap_text = Bool()
     shrink_to_fit = Bool()
-    indent = Float()
+    indent = Integer()
 
     def __init__(self, horizontal=HORIZONTAL_GENERAL, vertical=VERTICAL_BOTTOM,
                  text_rotation=0, wrap_text=False, shrink_to_fit=False,
