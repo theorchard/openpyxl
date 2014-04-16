@@ -29,7 +29,9 @@ from openpyxl.strings import IndexedList
 from openpyxl.xml.functions import fromstring, safe_iterator
 from openpyxl.exceptions import MissingNumberFormat
 from openpyxl.styles import (Style, NumberFormat, Font, Fill, Borders,
-                             Protection, Alignment, Border)
+                             Protection, Alignment)
+from openpyxl.styles.border import Border
+from openpyxl.styles import borders
 from openpyxl.styles.colors import COLOR_INDEX, Color
 from openpyxl.xml.constants import SHEET_MAIN_NS
 from copy import deepcopy
@@ -185,14 +187,14 @@ class SharedStylesParser(object):
     def parse_border(self, border_node):
         """Read individual border"""
         border = {}
-        border['diagonal_direction'] = Borders.DIAGONAL_NONE
-        if bool(border_node.get('diagonalup')):
-            border['diagonal_direction'] = Borders.DIAGONAL_UP
-        if bool(border_node.get('diagonalDown')):
-            if border['diagonal_direction'] == Borders.DIAGONAL_UP:
-                border['diagonal_direction'] = Borders.DIAGONAL_BOTH
-            else:
-                border['diagonal_direction'] = Borders.DIAGONAL_DOWN
+        up = border_node.get('diagonalup') and borders.DIAGONAL_UP
+        down = border_node.get('diagonaldown') and borders.DIAGONAL_DOWN
+        if up and down:
+            direction = borders.DIAGONAL_BOTH
+        elif up:
+            direction = up
+        elif down:
+            direction = down
 
         for side in ('left', 'right', 'top', 'bottom', 'diagonal'):
             node = border_node.find('{%s}%s' % (SHEET_MAIN_NS, side))
