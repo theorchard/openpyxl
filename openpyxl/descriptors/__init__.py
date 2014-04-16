@@ -132,7 +132,7 @@ class Length(Descriptor):
         super(Length, self).__set__(instance, value)
 
 
-def Default(Typed):
+class Default(Typed):
     """
     When called returns an instance of the expected type.
     Additional default values can be passed in to the descriptor
@@ -141,7 +141,7 @@ def Default(Typed):
     def __init__(self, name=None, **kw):
         if "defaults" not in kw:
             kw['defaults'] = {}
-        super(Default, self).__init__(name, **kw)
+        super(Default, self).__init__(**kw)
 
     def __call__(self):
         return self.expected_type()

@@ -8,14 +8,6 @@ from openpyxl.descriptors import Typed, Default
 from .colors import Color
 
 
-class Color(Typed):
+class Color(Default):
 
     expected_type = Color
-
-    def __init__(self, name=None, **kw):
-        if "defaults" not in kw:
-            kw['defaults'] = {}
-        super(Color, self).__init__(name, **kw)
-
-    def __call__(self):
-        return self.expected_type()
