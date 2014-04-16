@@ -31,7 +31,7 @@ import warnings
 from .descriptors import Color
 
 
-FILL_NONE = None
+FILL_NONE = 'none'
 FILL_SOLID = 'solid'
 FILL_GRADIENT_LINEAR = 'linear'
 FILL_GRADIENT_PATH = 'path'

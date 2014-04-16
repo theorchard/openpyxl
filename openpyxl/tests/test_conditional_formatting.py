@@ -38,7 +38,9 @@ from openpyxl.reader.style import read_style_table
 from openpyxl.xml.constants import ARC_STYLE
 from openpyxl.writer.worksheet import write_worksheet_conditional_formatting
 from openpyxl.writer.styles import StyleWriter
-from openpyxl.styles import Border, Color, Fill, Font, Borders, HashableObject
+from openpyxl.styles import Color, Fill, Font, Borders, HashableObject
+from openpyxl.styles import borders, fills, colors
+from openpyxl.styles.border import Border
 
 # test imports
 import pytest
@@ -152,13 +154,13 @@ class TestConditionalFormatting(object):
         cf = ConditionalFormatting()
         fill = Fill(start_color=Color('FFEE1111'),
                     end_color=Color('FFEE1111'),
-                    fill_type=Fill.FILL_SOLID)
+                    fill_type=fills.FILL_SOLID)
         font = Font(name='Arial', size=12, bold=True,
                     underline=Font.UNDERLINE_SINGLE)
         borders = Borders(top=Border(border_style=Border.BORDER_THIN,
-                                     color=Color(Color.DARKYELLOW)),
+                                     color=Color(colors.DARKYELLOW)),
                           bottom=Border(border_style=Border.BORDER_THIN,
-                                        color=Color(Color.BLACK)))
+                                        color=Color(colors.BLACK)))
         cf.add('C1:C10', FormulaRule(formula=['ISBLANK(C1)'], font=font, border=borders, fill=fill))
         cf.add('D1:D10', FormulaRule(formula=['ISBLANK(D1)'], fill=fill))
         cf.setDxfStyles(self.workbook)
@@ -204,7 +206,7 @@ class TestConditionalFormatting(object):
         # Create cf rule
         redFill = Fill(start_color=Color('FFEE1111'),
                        end_color=Color('FFEE1111'),
-                       fill_type=Fill.FILL_SOLID)
+                       fill_type=fills.FILL_SOLID)
         whiteFont = Font(color=Color("FFFFFFFF"))
         worksheet.conditional_formatting.add('A1:A3', CellIsRule(operator='equal', formula=['"Fail"'], stopIfTrue=False,
                                                                  font=whiteFont, fill=redFill))
@@ -305,7 +307,7 @@ class TestCellIsRule(object):
         cf = ConditionalFormatting()
         redFill = Fill(start_color=Color('FFEE1111'),
                        end_color=Color('FFEE1111'),
-                       fill_type=Fill.FILL_SOLID)
+                       fill_type=fills.FILL_SOLID)
         cf.add('U10:U18', CellIsRule(operator='greaterThan', formula=['U$7'], stopIfTrue=True, fill=redFill))
         cf.add('V10:V18', CellIsRule(operator='>', formula=['V$7'], stopIfTrue=True, fill=redFill))
         cf.setDxfStyles(self.workbook)
@@ -331,7 +333,7 @@ class TestCellIsRule(object):
         cf = ConditionalFormatting()
         redFill = Fill(start_color=Color('FFEE1111'),
                        end_color=Color('FFEE1111'),
-                       fill_type=Fill.FILL_SOLID)
+                       fill_type=fills.FILL_SOLID)
         cf.add('U10:U18', CellIsRule(operator='greaterThanOrEqual', formula=['U$7'], stopIfTrue=True, fill=redFill))
         cf.add('V10:V18', CellIsRule(operator='>=', formula=['V$7'], stopIfTrue=True, fill=redFill))
         cf.setDxfStyles(self.workbook)
@@ -357,7 +359,7 @@ class TestCellIsRule(object):
         cf = ConditionalFormatting()
         redFill = Fill(start_color=Color('FFEE1111'),
                        end_color=Color('FFEE1111'),
-                       fill_type=Fill.FILL_SOLID)
+                       fill_type=fills.FILL_SOLID)
         cf.add('U10:U18', CellIsRule(operator='lessThan', formula=['U$7'], stopIfTrue=True, fill=redFill))
         cf.add('V10:V18', CellIsRule(operator='<', formula=['V$7'], stopIfTrue=True, fill=redFill))
         cf.setDxfStyles(self.workbook)
@@ -383,7 +385,7 @@ class TestCellIsRule(object):
         cf = ConditionalFormatting()
         redFill = Fill(start_color=Color('FFEE1111'),
                        end_color=Color('FFEE1111'),
-                       fill_type=Fill.FILL_SOLID)
+                       fill_type=fills.FILL_SOLID)
         cf.add('U10:U18', CellIsRule(operator='lessThanOrEqual', formula=['U$7'], stopIfTrue=True, fill=redFill))
         cf.add('V10:V18', CellIsRule(operator='<=', formula=['V$7'], stopIfTrue=True, fill=redFill))
         cf.setDxfStyles(self.workbook)
@@ -409,7 +411,7 @@ class TestCellIsRule(object):
         cf = ConditionalFormatting()
         redFill = Fill(start_color=Color('FFEE1111'),
                        end_color=Color('FFEE1111'),
-                       fill_type=Fill.FILL_SOLID)
+                       fill_type=fills.FILL_SOLID)
         cf.add('U10:U18', CellIsRule(operator='equal', formula=['U$7'], stopIfTrue=True, fill=redFill))
         cf.add('V10:V18', CellIsRule(operator='=', formula=['V$7'], stopIfTrue=True, fill=redFill))
         cf.add('W10:W18', CellIsRule(operator='==', formula=['W$7'], stopIfTrue=True, fill=redFill))
@@ -444,7 +446,7 @@ class TestCellIsRule(object):
         cf = ConditionalFormatting()
         redFill = Fill(start_color=Color('FFEE1111'),
                        end_color=Color('FFEE1111'),
-                       fill_type=Fill.FILL_SOLID)
+                       fill_type=fills.FILL_SOLID)
         cf.add('U10:U18', CellIsRule(operator='notEqual', formula=['U$7'], stopIfTrue=True, fill=redFill))
         cf.add('V10:V18', CellIsRule(operator='!=', formula=['V$7'], stopIfTrue=True, fill=redFill))
         cf.setDxfStyles(self.workbook)
@@ -470,7 +472,7 @@ class TestCellIsRule(object):
         cf = ConditionalFormatting()
         redFill = Fill(start_color=Color('FFEE1111'),
                        end_color=Color('FFEE1111'),
-                       fill_type=Fill.FILL_SOLID)
+                       fill_type=fills.FILL_SOLID)
         cf.add('U10:U18', CellIsRule(operator='between', formula=['U$7', 'U$8'], stopIfTrue=True, fill=redFill))
         cf.setDxfStyles(self.workbook)
         rules = cf.cf_rules
@@ -488,7 +490,7 @@ class TestCellIsRule(object):
         cf = ConditionalFormatting()
         redFill = Fill(start_color=Color('FFEE1111'),
                        end_color=Color('FFEE1111'),
-                       fill_type=Fill.FILL_SOLID)
+                       fill_type=fills.FILL_SOLID)
         cf.add('U10:U18', CellIsRule(operator='notBetween', formula=['U$7', 'U$8'], stopIfTrue=True, fill=redFill))
         cf.setDxfStyles(self.workbook)
         rules = cf.cf_rules
