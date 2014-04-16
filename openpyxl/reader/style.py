@@ -159,7 +159,10 @@ class SharedStylesParser(object):
         patternFill = fill_node.find('{%s}patternFill' % SHEET_MAIN_NS)
         fill = {}
         if patternFill is not None:
-            fill['fill_type'] = patternFill.get('patternType')
+            fill_type = patternFill.get('patternType')
+            if fill_type == 'none':
+                return
+            fill['fill_type'] = fill_type
             fgColor = patternFill.find('{%s}fgColor' % SHEET_MAIN_NS)
             if fgColor is not None:
                 color = self._get_relevant_color(fgColor)
