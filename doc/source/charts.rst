@@ -31,7 +31,7 @@ themselves are comprised of references to cell ranges.
 >>>     ws.append(i)
 >>>
 >>> from openpyxl.charts import BarChart, Reference, Series
->>> values = Reference(ws, (0, 0), (9, 0))
+>>> values = Reference(ws, (1, 1), (10, 1))
 >>> series = Series(values, title="First series of values")
 >>> chart = BarChart()
 >>> chart.append(series)
