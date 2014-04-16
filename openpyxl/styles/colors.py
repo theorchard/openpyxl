@@ -37,23 +37,25 @@ COLOR_INDEX = ('FF000000', 'FFFFFFFF', 'FFFF0000', 'FF00FF00', 'FF0000FF',
                'FF969696', 'FF003366', 'FF339966', 'FF003300', 'FF333300', 'FF993300',
                'FF993366', 'FF333399', 'FF333333')
 
+
+BLACK = COLOR_INDEX[0]
+WHITE = COLOR_INDEX[1]
+RED = COLOR_INDEX[2]
+DARKRED = COLOR_INDEX[8]
+BLUE = COLOR_INDEX[4]
+DARKBLUE = COLOR_INDEX[10]
+GREEN = COLOR_INDEX[3]
+DARKGREEN = COLOR_INDEX[9]
+YELLOW = COLOR_INDEX[5]
+DARKYELLOW = COLOR_INDEX[11]
+
+
 class Color(HashableObject):
     """Named colors for use in styles."""
-    BLACK = COLOR_INDEX[0]
-    WHITE = COLOR_INDEX[1]
-    RED = COLOR_INDEX[2]
-    DARKRED = COLOR_INDEX[8]
-    BLUE = COLOR_INDEX[4]
-    DARKBLUE = COLOR_INDEX[10]
-    GREEN = COLOR_INDEX[3]
-    DARKGREEN = COLOR_INDEX[9]
-    YELLOW = COLOR_INDEX[5]
-    DARKYELLOW = COLOR_INDEX[11]
 
     index = String('_index')
 
     __fields__ = ('index',)
-
 
     def __init__(self, index=BLACK):
         self.index = index
