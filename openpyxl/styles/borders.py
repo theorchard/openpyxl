@@ -22,45 +22,30 @@ from __future__ import absolute_import
 # @license: http://www.opensource.org/licenses/mit-license.php
 # @author: see AUTHORS file
 
+from openpyxl.descriptors import Set, Default, Typed
+
 from .colors import Color
 from .hashable import HashableObject
+from .descriptors import Color
+from .border import Border
 
 
-class Border(HashableObject):
-    """Border options for use in styles.
-    Caution: if you do not specify a border_style, other attributes will
-    have no effect !"""
-    BORDER_NONE = 'none'
-    BORDER_DASHDOT = 'dashDot'
-    BORDER_DASHDOTDOT = 'dashDotDot'
-    BORDER_DASHED = 'dashed'
-    BORDER_DOTTED = 'dotted'
-    BORDER_DOUBLE = 'double'
-    BORDER_HAIR = 'hair'
-    BORDER_MEDIUM = 'medium'
-    BORDER_MEDIUMDASHDOT = 'mediumDashDot'
-    BORDER_MEDIUMDASHDOTDOT = 'mediumDashDotDot'
-    BORDER_MEDIUMDASHED = 'mediumDashed'
-    BORDER_SLANTDASHDOT = 'slantDashDot'
-    BORDER_THICK = 'thick'
-    BORDER_THIN = 'thin'
+class Border(Default):
+    """Border descriptor"""
 
-    __fields__ = ('border_style',
-                  'color')
-    __check__ = {'color': Color}
-    __slots__ = __fields__
+    expected_type = Border
 
-    def __init__(self, border_style=BORDER_NONE, color=Color(Color.BLACK)):
-        self.border_style = border_style
-        self.color = color
+
+DIAGONAL_NONE = 0
+DIAGONAL_UP = 1
+DIAGONAL_DOWN = 2
+DIAGONAL_BOTH = 3
+diagonals = (DIAGONAL_NONE, DIAGONAL_UP, DIAGONAL_DOWN, DIAGONAL_BOTH)
 
 
 class Borders(HashableObject):
     """Border positioning for use in styles."""
-    DIAGONAL_NONE = 0
-    DIAGONAL_UP = 1
-    DIAGONAL_DOWN = 2
-    DIAGONAL_BOTH = 3
+
 
     __fields__ = ('left',
                   'right',
@@ -73,32 +58,31 @@ class Borders(HashableObject):
                   'inside',
                   'vertical',
                   'horizontal')
-    __slots__ = __fields__
-    __check__ = {'left': Border,
-                 'right': Border,
-                 'top': Border,
-                 'bottom': Border,
-                 'diagonal': Border,
-                 'all_borders': Border,
-                 'outline': Border,
-                 'inside': Border,
-                 'vertical': Border,
-                 'horizontal': Border}
 
-    def __init__(self, left=Border(), right=Border(), top=Border(),
-                 bottom=Border(), diagonal=Border(),
-                 diagonal_direction=DIAGONAL_NONE,
-                 all_borders=Border(), outline=Border(),
-                 inside=Border(), vertical=Border(), horizontal=Border()):
+    left = Border()
+    right = Border()
+    top = Border()
+    bottom = Border()
+    diagonal = Border()
+    diagonal_direction = Set(values=diagonals)
+    all_borders = Border()
+    outline = Border()
+    inside = Border()
+    vertical = Border()
+    horizontal = Border()
+
+    def __init__(self, left=left(), right=right(), top=top(),
+                 bottom=bottom(), diagonal=diagonal(), diagonal_direction=DIAGONAL_NONE,
+                 all_borders=all_borders(), outline=outline(), inside=inside(),
+                 vertical=vertical(), horizontal=horizontal()):
         self.left = left
         self.right = right
         self.top = top
         self.bottom = bottom
         self.diagonal = diagonal
-        self.diagonal_direction = diagonal_direction
         self.all_borders = all_borders
         self.outline = outline
         self.inside = inside
         self.vertical = vertical
         self.horizontal = horizontal
-
+        self.diagonal_direction = diagonal_direction
