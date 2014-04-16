@@ -22,36 +22,44 @@ from __future__ import absolute_import
 # @license: http://www.opensource.org/licenses/mit-license.php
 # @author: see AUTHORS file
 
-from .colors import Color
+from openpyxl.descriptors import Float, Set
+
+from .colors import WHITE
 from .hashable import HashableObject
 import warnings
+
+from .descriptors import Color
+
+
+FILL_NONE = None
+FILL_SOLID = 'solid'
+FILL_GRADIENT_LINEAR = 'linear'
+FILL_GRADIENT_PATH = 'path'
+FILL_PATTERN_DARKDOWN = 'darkDown'
+FILL_PATTERN_DARKGRAY = 'darkGray'
+FILL_PATTERN_DARKGRID = 'darkGrid'
+FILL_PATTERN_DARKHORIZONTAL = 'darkHorizontal'
+FILL_PATTERN_DARKTRELLIS = 'darkTrellis'
+FILL_PATTERN_DARKUP = 'darkUp'
+FILL_PATTERN_DARKVERTICAL = 'darkVertical'
+FILL_PATTERN_GRAY0625 = 'gray0625'
+FILL_PATTERN_GRAY125 = 'gray125'
+FILL_PATTERN_LIGHTDOWN = 'lightDown'
+FILL_PATTERN_LIGHTGRAY = 'lightGray'
+FILL_PATTERN_LIGHTGRID = 'lightGrid'
+FILL_PATTERN_LIGHTHORIZONTAL = 'lightHorizontal'
+FILL_PATTERN_LIGHTTRELLIS = 'lightTrellis'
+FILL_PATTERN_LIGHTUP = 'lightUp'
+FILL_PATTERN_LIGHTVERTICAL = 'lightVertical'
+FILL_PATTERN_MEDIUMGRAY = 'mediumGray'
+
+fills = (FILL_NONE, FILL_SOLID)
 
 
 class Fill(HashableObject):
     """Area fill patterns for use in styles.
     Caution: if you do not specify a fill_type, other attributes will have
     no effect !"""
-    FILL_NONE = None
-    FILL_SOLID = 'solid'
-    FILL_GRADIENT_LINEAR = 'linear'
-    FILL_GRADIENT_PATH = 'path'
-    FILL_PATTERN_DARKDOWN = 'darkDown'
-    FILL_PATTERN_DARKGRAY = 'darkGray'
-    FILL_PATTERN_DARKGRID = 'darkGrid'
-    FILL_PATTERN_DARKHORIZONTAL = 'darkHorizontal'
-    FILL_PATTERN_DARKTRELLIS = 'darkTrellis'
-    FILL_PATTERN_DARKUP = 'darkUp'
-    FILL_PATTERN_DARKVERTICAL = 'darkVertical'
-    FILL_PATTERN_GRAY0625 = 'gray0625'
-    FILL_PATTERN_GRAY125 = 'gray125'
-    FILL_PATTERN_LIGHTDOWN = 'lightDown'
-    FILL_PATTERN_LIGHTGRAY = 'lightGray'
-    FILL_PATTERN_LIGHTGRID = 'lightGrid'
-    FILL_PATTERN_LIGHTHORIZONTAL = 'lightHorizontal'
-    FILL_PATTERN_LIGHTTRELLIS = 'lightTrellis'
-    FILL_PATTERN_LIGHTUP = 'lightUp'
-    FILL_PATTERN_LIGHTVERTICAL = 'lightVertical'
-    FILL_PATTERN_MEDIUMGRAY = 'mediumGray'
 
     __fields__ = ('fill_type',
                   'rotation',
@@ -59,11 +67,13 @@ class Fill(HashableObject):
                   'end_color')
     __check__ = {'start_color': Color,
                  'end_color': Color}
-    __slots__ = __fields__
+    fill_type = Set(values=fills)
+    rotation = Float()
+    start_color = Color(WHITE)
+    end_color = Color()
 
     def __init__(self, fill_type=FILL_NONE, rotation=0,
-                 start_color=Color(Color.WHITE),
-                 end_color=Color(Color.BLACK)):
+                 start_color=start_color(), end_color=end_color()):
         self.fill_type = fill_type
         self.rotation = rotation
         self.start_color = start_color

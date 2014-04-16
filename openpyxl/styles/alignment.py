@@ -22,21 +22,28 @@ from __future__ import absolute_import
 # @license: http://www.opensource.org/licenses/mit-license.php
 # @author: see AUTHORS file
 
+from openpyxl.descriptors import Set, Float, Bool
+
 from .hashable import HashableObject
+
+HORIZONTAL_GENERAL = 'general'
+HORIZONTAL_LEFT = 'left'
+HORIZONTAL_RIGHT = 'right'
+HORIZONTAL_CENTER = 'center'
+HORIZONTAL_CENTER_CONTINUOUS = 'centerContinuous'
+HORIZONTAL_JUSTIFY = 'justify'
+VERTICAL_BOTTOM = 'bottom'
+VERTICAL_TOP = 'top'
+VERTICAL_CENTER = 'center'
+VERTICAL_JUSTIFY = 'justify'
+
+alignments = (HORIZONTAL_GENERAL, HORIZONTAL_LEFT, HORIZONTAL_RIGHT,
+              HORIZONTAL_CENTER, HORIZONTAL_CENTER_CONTINUOUS, HORIZONTAL_JUSTIFY,
+              VERTICAL_BOTTOM, VERTICAL_TOP, VERTICAL_CENTER, VERTICAL_JUSTIFY)
 
 
 class Alignment(HashableObject):
     """Alignment options for use in styles."""
-    HORIZONTAL_GENERAL = 'general'
-    HORIZONTAL_LEFT = 'left'
-    HORIZONTAL_RIGHT = 'right'
-    HORIZONTAL_CENTER = 'center'
-    HORIZONTAL_CENTER_CONTINUOUS = 'centerContinuous'
-    HORIZONTAL_JUSTIFY = 'justify'
-    VERTICAL_BOTTOM = 'bottom'
-    VERTICAL_TOP = 'top'
-    VERTICAL_CENTER = 'center'
-    VERTICAL_JUSTIFY = 'justify'
 
     __fields__ = ('horizontal',
                   'vertical',
@@ -44,7 +51,12 @@ class Alignment(HashableObject):
                   'wrap_text',
                   'shrink_to_fit',
                   'indent')
-    __slots__ = __fields__
+    horizontal = Set(values=alignments)
+    vertical = Set(values=alignments)
+    text_rotation = Float()
+    wrap_text = Bool()
+    shrink_to_fit = Bool()
+    indent = Float()
 
     def __init__(self, horizontal=HORIZONTAL_GENERAL, vertical=VERTICAL_BOTTOM,
                  text_rotation=0, wrap_text=False, shrink_to_fit=False,
