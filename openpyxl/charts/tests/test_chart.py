@@ -63,12 +63,12 @@ class TestChart:
 
 @pytest.fixture
 def bar_chart(ten_row_sheet, BarChart, Series, Reference):
-    from openpyxl.styles.colors import Color
+    from openpyxl.styles.colors import GREEN
     ws = ten_row_sheet
     chart = BarChart()
     chart.title = "TITLE"
     series = Series(Reference(ws, (1, 1), (11, 1)))
-    series.color = Color.GREEN
+    series.color = GREEN
     chart.add_serie(series)
     return chart
 
