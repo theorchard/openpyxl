@@ -1,38 +1,14 @@
 # Copyright (c) 2010-2014 openpyxl
-#
-# Permission is hereby granted, free of charge, to any person obtaining a copy
-# of this software and associated documentation files (the "Software"), to deal
-# in the Software without restriction, including without limitation the rights
-# to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-# copies of the Software, and to permit persons to whom the Software is
-# furnished to do so, subject to the following conditions:
-#
-# The above copyright notice and this permission notice shall be included in
-# all copies or substantial portions of the Software.
-#
-# THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-# IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-# FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-# AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-# LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-# OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
-# THE SOFTWARE.
-#
-# @license: http://www.opensource.org/licenses/mit-license.php
-# @author: see AUTHORS file
 
 # Python stdlib imports
-import os.path
 
 import pytest
 
 # package imports
-from openpyxl.tests.helper import DATADIR
 from openpyxl.namedrange import split_named_range, NamedRange
 from openpyxl.reader.workbook import read_named_ranges
 from openpyxl.exceptions import NamedRangeException
 from openpyxl.reader.excel import load_workbook
-from openpyxl.workbook import Workbook
 
 
 class DummyWS:
@@ -67,31 +43,28 @@ def test_bad_range_name():
         split_named_range('HYPOTHESES$B$3')
 
 
-def test_range_name_worksheet_special_chars():
+def test_range_name_worksheet_special_chars(datadir):
 
     ws = DummyWS('My Sheeet with a , and \'')
     wb = DummyWB(ws)
 
-    handle = open(os.path.join(DATADIR, 'reader', 'workbook_namedrange.xml'))
-    try:
-        content = handle.read()
+    datadir.join("reader").chdir()
+    with open('workbook_namedrange.xml') as src:
+        content = src.read()
         named_ranges = list(read_named_ranges(content, DummyWB(ws)))
         assert len(named_ranges) == 1
         assert isinstance(named_ranges[0], NamedRange)
         assert [(ws, '$U$16:$U$24'), (ws, '$V$28:$V$36')] == named_ranges[0].destinations
-    finally:
-        handle.close()
 
 
-def test_read_named_ranges():
+def test_read_named_ranges(datadir):
     ws = DummyWS('My Sheeet')
-    handle = open(os.path.join(DATADIR, 'reader', 'workbook.xml'))
-    try:
-        content = handle.read()
+    datadir.join("reader").chdir()
+
+    with open("workbook.xml") as src:
+        content = src.read()
         named_ranges = read_named_ranges(content, DummyWB(ws))
         assert ["My Sheeet!$D$8"] == [str(range) for range in named_ranges]
-    finally:
-        handle.close()
 
 
 ranges_counts = (
@@ -100,25 +73,25 @@ ranges_counts = (
     (13, 'TRAP_2')
 )
 @pytest.mark.parametrize("count, range_name", ranges_counts)
-def test_oddly_shaped_named_ranges(count, range_name):
+def test_oddly_shaped_named_ranges(datadir, count, range_name):
 
-    wb = load_workbook(os.path.join(DATADIR, 'genuine', 'merge_range.xlsx'),
-                       use_iterators = False)
+    datadir.join("genuine").chdir()
+    wb = load_workbook('merge_range.xlsx')
     ws = wb.worksheets[0]
     assert len(ws.range(range_name)) == count
 
 
-def test_merged_cells_named_range():
+def test_merged_cells_named_range(datadir):
+    datadir.join("genuine").chdir()
 
-    wb = load_workbook(os.path.join(DATADIR, 'genuine', 'merge_range.xlsx'),
-                       use_iterators = False)
+    wb = load_workbook('merge_range.xlsx')
     ws = wb.worksheets[0]
     cell = ws.range('TRAP_3')
     assert 'B15' == cell.coordinate
     assert 10 == cell.value
 
 
-def test_print_titles():
+def test_print_titles(Workbook):
     wb = Workbook()
     ws1 = wb.create_sheet()
     ws2 = wb.create_sheet()
@@ -134,9 +107,12 @@ def test_print_titles():
     assert(actual_named_ranges == expected_named_ranges)
 
 
+@pytest.mark.usefixtures("datadir")
 class TestNameRefersToValue:
-    def setup(self):
-        self.wb = load_workbook(os.path.join(DATADIR, 'genuine', 'NameWithValueBug.xlsx'))
+
+    def __init__(self, datadir):
+        datadir.join("genuine").chdir()
+        self.wb = load_workbook('NameWithValueBug.xlsx')
         self.ws = self.wb["Sheet1"]
 
 
