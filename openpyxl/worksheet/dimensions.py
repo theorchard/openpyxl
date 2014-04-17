@@ -23,9 +23,9 @@ from __future__ import absolute_import
 # @author: see AUTHORS file
 
 from openpyxl.cell import get_column_letter
+from openpyxl.descriptors import Integer, Float, Bool, Strict
 
-
-class Dimension(object):
+class Dimension(Strict):
     """Information about the display properties of a row or column."""
     __slots__ = ('index',
                  'visible',
@@ -46,34 +46,44 @@ class Dimension(object):
 class RowDimension(Dimension):
     """Information about the display properties of a row."""
 
+    #height = Float()
+
     __slots__ = Dimension.__slots__ + ('height',)
 
     def __init__(self,
                  index=0,
-                 height=-1,
+                 height=None,
                  visible=True,
                  outline_level=0,
                  collapsed=False):
         super(RowDimension, self).__init__(index, visible, outline_level,
                                            collapsed)
-        self.height = float(height)
+        if height is not None:
+            height = float(height)
+        self.height = height
 
 
 class ColumnDimension(Dimension):
     """Information about the display properties of a column."""
 
+    #width = Float()
+    auto_size = Bool()
+    collapsed = Bool()
+
     __slots__ = Dimension.__slots__ + ('width', 'auto_size')
 
     def __init__(self,
                  index='A',
-                 width=-1,
+                 width=None,
                  auto_size=False,
                  visible=True,
                  outline_level=0,
                  collapsed=False):
         super(ColumnDimension, self).__init__(index, visible, outline_level,
                                               collapsed)
-        self.width = float(width)
+        if width is not None:
+            width = float(width)
+        self.width = width
         self.auto_size = auto_size
 
     #@property

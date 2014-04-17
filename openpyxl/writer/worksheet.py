@@ -197,7 +197,7 @@ def write_worksheet_cols(doc, worksheet, style_table):
             sorted(iteritems(worksheet.column_dimensions)):
             col_index = column_index_from_string(column_string)
             col_def = {'min': str(col_index), 'max': str(col_index)}
-            if columndimension.width != -1:
+            if columndimension.width is not None:
                 col_def['customWidth'] = '1'
             if not columndimension.visible:
                 col_def['hidden'] = 'true'
