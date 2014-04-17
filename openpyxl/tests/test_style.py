@@ -128,7 +128,7 @@ class TestStyleWriter(object):
               <scheme val="minor" />
             </font>
             <font>
-              <sz val="12" />
+              <sz val="12.0" />
               <color rgb="FF000000" />
               <name val="Calibri" />
               <family val="2" />
@@ -157,7 +157,7 @@ class TestStyleWriter(object):
               <scheme val="minor" />
             </font>
             <font>
-              <sz val="12" />
+              <sz val="12.0" />
               <color rgb="FF000000" />
               <name val="Calibri" />
               <family val="2" />

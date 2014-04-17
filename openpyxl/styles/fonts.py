@@ -22,9 +22,13 @@ from __future__ import absolute_import
 # @license: http://www.opensource.org/licenses/mit-license.php
 # @author: see AUTHORS file
 
-from openpyxl.descriptors import Strict, Float, Set, Bool, String, Typed, Integer
+from openpyxl.descriptors import Strict, Float, Set, Bool, String, Typed, Convertible
 from .hashable import HashableObject
 from .descriptors import Color
+
+class Float(Float, Convertible):
+
+    pass
 
 
 class Font(HashableObject):
@@ -36,7 +40,7 @@ class Font(HashableObject):
     UNDERLINE_SINGLE_ACCOUNTING = 'singleAccounting'
 
     name = String()
-    size = Integer()
+    size = Float()
     bold = Bool()
     italic = Bool()
     superscript = Bool()
