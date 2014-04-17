@@ -209,7 +209,7 @@ def write_worksheet_cols(doc, worksheet, style_table):
                 col_def['bestFit'] = 'true'
             if column_string in worksheet._styles:
                 col_def['style'] = '%d' % worksheet._styles[column_string]
-            if columndimension.width > 0:
+            if columndimension.width is not None:
                 col_def['width'] = str(columndimension.width)
             else:
                 col_def['width'] = '9.10'
@@ -281,7 +281,7 @@ def write_worksheet_data(doc, worksheet, string_table, style_table):
                  'spans': '1:%d' % max_column}
         if not row_dimension.visible:
             attrs['hidden'] = '1'
-        if row_dimension.height > 0:
+        if row_dimension.height is not None:
             attrs['ht'] = str(row_dimension.height)
             attrs['customHeight'] = '1'
         if row_idx in worksheet._styles:
