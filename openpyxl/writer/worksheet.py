@@ -211,8 +211,6 @@ def write_worksheet_cols(doc, worksheet, style_table):
                 col_def['style'] = '%d' % worksheet._styles[column_string]
             if columndimension.width is not None:
                 col_def['width'] = str(columndimension.width)
-            else:
-                col_def['width'] = '9.10'
             tag(doc, 'col', col_def)
         end_tag(doc, 'cols')
 
