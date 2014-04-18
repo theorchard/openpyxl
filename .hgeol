@@ -4,6 +4,7 @@
 **.ini = native
 **.yml = native
 **.py = native
+**.xml = native
 **.xlsx = BIN
 **.png = BIN
 **.zip = BIN
