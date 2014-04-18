@@ -310,7 +310,7 @@ class TestWorkSheetWriter(object):
               <selection sqref="A1" activeCell="A1"/>
             </sheetView>
           </sheetViews>
-          <sheetFormatPr defaultRowHeight="15"/>
+          <sheetFormatPr baseColWidth="10" defaultRowHeight="15"/>
           <sheetData/>
         </worksheet>
         """
@@ -338,7 +338,7 @@ class TestWorkSheetWriter(object):
               <selection sqref="A1" activeCell="A1"/>
             </sheetView>
           </sheetViews>
-          <sheetFormatPr defaultRowHeight="15"/>
+          <sheetFormatPr baseColWidth="10" defaultRowHeight="15"/>
           <sheetData/>
           <pageMargins left="2.00" right="2.00" top="2.00" bottom="2.00" header="1.50" footer="1.50"/>
         </worksheet>
@@ -361,7 +361,7 @@ class TestWorkSheetWriter(object):
               <selection sqref="A1" activeCell="A1"/>
             </sheetView>
           </sheetViews>
-          <sheetFormatPr defaultRowHeight="15"/>
+          <sheetFormatPr baseColWidth="10" defaultRowHeight="15"/>
           <cols>
             <col min="1" max="1" width="9.10"/>
             <col min="2" max="2" width="9.10"/>
@@ -398,7 +398,7 @@ class TestWorkSheetWriter(object):
               <selection sqref="A1" activeCell="A1"/>
             </sheetView>
           </sheetViews>
-          <sheetFormatPr defaultRowHeight="15"/>
+          <sheetFormatPr baseColWidth="10" defaultRowHeight="15"/>
           <cols>
             <col min="1" max="1" width="9.10"/>
             <col min="2" max="2" width="9.10"/>
@@ -432,7 +432,7 @@ class TestWorkSheetWriter(object):
               <selection sqref="A1" activeCell="A1"/>
             </sheetView>
           </sheetViews>
-          <sheetFormatPr defaultRowHeight="15"/>
+          <sheetFormatPr baseColWidth="10" defaultRowHeight="15"/>
           <cols>
             <col min="1" max="1" width="9.10"/>
             <col min="2" max="2" width="9.10"/>
@@ -472,7 +472,7 @@ class TestWorkSheetWriter(object):
               <selection sqref="A1" activeCell="A1"/>
             </sheetView>
           </sheetViews>
-          <sheetFormatPr defaultRowHeight="15"/>
+          <sheetFormatPr baseColWidth="10" defaultRowHeight="15"/>
           <sheetData/>
           <printOptions horizontalCentered="1" verticalCentered="1"/>
           <pageSetup orientation="landscape" paperSize="3" fitToHeight="0" fitToWidth="1"/>
@@ -517,7 +517,7 @@ class TestWorkSheetWriter(object):
               <selection sqref="A1" activeCell="A1"/>
             </sheetView>
           </sheetViews>
-          <sheetFormatPr defaultRowHeight="15"/>
+          <sheetFormatPr baseColWidth="10" defaultRowHeight="15"/>
           <sheetData/>
           <headerFooter>
             <oddHeader>&amp;L&amp;"Calibri,Regular"&amp;K000000Left Header Text&amp;C&amp;"Arial,Regular"&amp;6&amp;K445566Center Header Text&amp;R&amp;"Arial,Bold"&amp;8&amp;K112233Right Header Text</oddHeader>
@@ -540,7 +540,7 @@ class TestWorkSheetWriter(object):
               <selection sqref="A1" activeCell="A1"/>
             </sheetView>
           </sheetViews>
-          <sheetFormatPr defaultRowHeight="15"/>
+          <sheetFormatPr baseColWidth="10" defaultRowHeight="15"/>
           <sheetData/>
         </worksheet>
         """)

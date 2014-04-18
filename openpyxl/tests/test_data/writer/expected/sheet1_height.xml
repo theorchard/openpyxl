@@ -9,7 +9,7 @@
       <selection activeCell="A1" sqref="A1"/>
     </sheetView>
   </sheetViews>
-  <sheetFormatPr defaultRowHeight="15"/>
+  <sheetFormatPr baseColWidth="10" defaultRowHeight="15"/>
   <cols>
     <col max="6" min="6" width="9.10"/>
   </cols>

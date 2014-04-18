@@ -94,7 +94,7 @@ def write_worksheet(worksheet, shared_strings, style_table):
     end_tag(doc, 'sheetPr')
     tag(doc, 'dimension', {'ref': '%s' % worksheet.calculate_dimension()})
     write_worksheet_sheetviews(doc, worksheet)
-    tag(doc, 'sheetFormatPr', {'defaultRowHeight': '15'})
+    tag(doc, 'sheetFormatPr', {'defaultRowHeight': '15', 'baseColWidth':'10'})
     write_worksheet_cols(doc, worksheet, style_table)
     write_worksheet_data(doc, worksheet, shared_strings, style_table)
     if worksheet.protection.enabled:
