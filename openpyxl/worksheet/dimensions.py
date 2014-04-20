@@ -27,10 +27,12 @@ from openpyxl.descriptors import Integer, Float, Bool, Strict
 
 class Dimension(Strict):
     """Information about the display properties of a row or column."""
-    __slots__ = ('index',
+    __fields__ = ('index',
                  'visible',
                  'outline_level',
                  'collapsed',)
+
+    __slots__ = __fields__
 
     def __init__(self,
                  index,
@@ -48,7 +50,7 @@ class RowDimension(Dimension):
 
     #height = Float()
 
-    __slots__ = Dimension.__slots__ + ('height',)
+    __fields__ = Dimension.__fields__ + ('height',)
 
     def __init__(self,
                  index=0,
@@ -70,7 +72,7 @@ class ColumnDimension(Dimension):
     auto_size = Bool()
     collapsed = Bool()
 
-    __slots__ = Dimension.__slots__ + ('width', 'auto_size')
+    __fields__ = Dimension.__fields__ + ('width', 'auto_size')
 
     def __init__(self,
                  index='A',
