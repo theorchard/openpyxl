@@ -26,10 +26,6 @@ from openpyxl.descriptors import Strict, Float, Set, Bool, String, Typed, Conver
 from .hashable import HashableObject
 from .descriptors import Color
 
-class Float(Float, Convertible):
-
-    pass
-
 
 class Font(HashableObject):
     """Font options used in styles."""
@@ -38,6 +34,11 @@ class Font(HashableObject):
     UNDERLINE_DOUBLE_ACCOUNTING = 'doubleAccounting'
     UNDERLINE_SINGLE = 'single'
     UNDERLINE_SINGLE_ACCOUNTING = 'singleAccounting'
+
+
+    class Float(Float, Convertible):
+
+        pass
 
     name = String()
     size = Float()
