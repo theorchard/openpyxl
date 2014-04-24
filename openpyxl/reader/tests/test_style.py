@@ -53,6 +53,37 @@ from openpyxl.tests.helper import get_xml, compare_xml
 from openpyxl.styles.alignment import Alignment
 
 
+@pytest.fixture
+def StyleReader():
+    from ..style import SharedStylesParser
+    return SharedStylesParser
+
+
+def test_get_color():
+    pass
+
+
+def test_read_fills(StyleReader,datadir):
+    datadir.chdir()
+    with open("bug311-styles-a.xml") as src:
+        reader = StyleReader(src.read())
+        assert list(reader.parse_fills()) == [
+            Fill(),
+            Fill(fill_type='gray125'),
+            Fill(fill_type='solid', start_color=Color(index='theme:0:-0.14999847407452621')),
+            Fill(fill_type='solid', start_color=Color(index='theme:0:')),
+            Fill(fill_type='solid'),
+        ]
+
+
+def test_read_cell_style(datadir):
+    datadir.chdir()
+    with open("empty-workbook-styles.xml") as content:
+        style_properties = read_style_table(content.read())
+        style_table = style_properties['table']
+        assert len(style_table) == 2
+
+
 def test_read_style(datadir):
     datadir.chdir()
     with open("simple-styles.xml") as content:
@@ -279,10 +310,3 @@ def test_change_existing_styles(datadir):
     assert style('C25').alignment.wrap_text
     assert style('C26').alignment.shrink_to_fit
 
-
-def test_read_cell_style(datadir):
-    datadir.chdir()
-    with open("empty-workbook-styles.xml") as content:
-        style_properties = read_style_table(content.read())
-        style_table = style_properties['table']
-        assert len(style_table) == 2

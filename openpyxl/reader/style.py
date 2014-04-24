@@ -103,7 +103,7 @@ class SharedStylesParser(object):
         theme = color.get('theme')
         tint = color.get('tint')
         rgb = color.get('rgb')
-        if 0 <= idx < len(self.color_index):
+        if 0 <= idx:  #< len(self.color_index):
             value = self.color_index[idx]
         elif theme is not None:
             if tint is not None:
@@ -112,6 +112,8 @@ class SharedStylesParser(object):
                 value = 'theme:%s:' % theme  # prefix color with theme
         elif rgb is not None:
             value = rgb
+        print [value, idx, theme, tint, rgb]
+
         return value
 
     def parse_fonts(self):
@@ -171,7 +173,7 @@ class SharedStylesParser(object):
             bgColor = patternFill.find('{%s}bgColor' % SHEET_MAIN_NS)
             if bgColor is not None:
                 color = self._get_relevant_color(bgColor)
-                if color:
+                if color is not None:
                     fill['end_color'] = Color(color)
         return Fill(**fill)
 
