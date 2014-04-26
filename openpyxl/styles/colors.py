@@ -27,7 +27,7 @@ from openpyxl.descriptors import String
 
 # Default Color Index as per 18.8.27 of ECMA Part 4
 COLOR_INDEX = ('00000000', '00FFFFFF', '00FF0000', '0000FF00', '000000FF',
-               '00FFFF00', '00FF00FF', '0000FFFF', '(none)', '00000000', '00FFFFFF',
+               '00FFFF00', '00FF00FF', '0000FFFF', '00000000', '00FFFFFF',
                '00FF0000', '0000FF00', '000000FF', '00FFFF00', '00FF00FF', '0000FFFF',
                '00800000', '00008000', '00000080', '00808000', '00800080', '00008080',
                '00C0C0C0', '00808080', '009999FF', '00993366', '00FFFFCC', '00CCFFFF',

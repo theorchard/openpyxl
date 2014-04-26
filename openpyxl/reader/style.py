@@ -105,7 +105,7 @@ class SharedStylesParser(object):
         rgb = color.get('rgb')
         if idx is not None:
             idx = int(idx)
-            if idx < len(self.color_index) - 1:
+            if idx < len(self.color_index):
                 value = self.color_index[int(idx)]
         elif theme is not None:
             if tint is not None:

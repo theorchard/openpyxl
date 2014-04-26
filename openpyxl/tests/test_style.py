@@ -187,7 +187,7 @@ class TestStyleWriter(object):
             </fill>
             <fill>
               <patternFill patternType="solid">
-                <fgColor rgb="00FF0000" />
+                <fgColor rgb="0000FF00" />
               </patternFill>
             </fill>
           </fills>
@@ -216,7 +216,7 @@ class TestStyleWriter(object):
               <left />
               <right />
               <top style="thin">
-                <color rgb="00FF0000" />
+                <color rgb="0000FF00" />
               </top>
               <bottom />
               <diagonal />

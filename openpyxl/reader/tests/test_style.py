@@ -61,7 +61,7 @@ def StyleReader():
 
 @pytest.mark.parametrize("value, expected",
                          [
-                             ({'indexed': '32'}, "00CCCCFF"),
+                             ({'indexed': '62'}, "00333399"),
                              ({'rgb': "FFFFFFFF"}, "FFFFFFFF"),
                              ({'theme': '0'}, 'theme:0:'),
                              ({'theme': '0', 'tint': "0.5"}, "theme:0:0.5")
@@ -78,15 +78,15 @@ def test_read_fills(StyleReader,datadir):
         Fill(fill_type='gray125'),
         Fill(fill_type='solid',
              start_color=Color('theme:0:-0.14999847407452621'),
-             end_color=Color('System Foreground')
+             end_color=Color('System Background')
              ),
         Fill(fill_type='solid',
              start_color=Color('theme:0:'),
-             end_color=Color('System Foreground')
+             end_color=Color('System Background')
              ),
         Fill(fill_type='solid',
-             start_color=Color("00993366"),
-             end_color=Color('System Foreground')
+             start_color=Color("00333399"),
+             end_color=Color('System Background')
              )
     ]
     with open("bug311-styles-a.xml") as src:
