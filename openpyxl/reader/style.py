@@ -99,12 +99,12 @@ class SharedStylesParser(object):
     def _get_relevant_color(self, color):
         """Utility method for getting the color from different attributes"""
         value = None
-        idx = int(color.get('indexed', -1))
+        idx = color.get('indexed')
         theme = color.get('theme')
         tint = color.get('tint')
         rgb = color.get('rgb')
-        if 0 <= idx:  #< len(self.color_index):
-            value = self.color_index[idx]
+        if idx is not None:
+            value = self.color_index[int(idx)]
         elif theme is not None:
             if tint is not None:
                 value = 'theme:%s:%s' % (theme, tint)
@@ -112,8 +112,6 @@ class SharedStylesParser(object):
                 value = 'theme:%s:' % theme  # prefix color with theme
         elif rgb is not None:
             value = rgb
-        print [value, idx, theme, tint, rgb]
-
         return value
 
     def parse_fonts(self):

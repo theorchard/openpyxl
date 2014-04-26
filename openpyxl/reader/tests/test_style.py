@@ -59,21 +59,39 @@ def StyleReader():
     return SharedStylesParser
 
 
-def test_get_color():
-    pass
+@pytest.mark.parametrize("value, expected",
+                         [
+                             ({'indexed': '32'}, "00CCCCFF"),
+                             ({'rgb': "FFFFFFFF"}, "FFFFFFFF"),
+                             ({'theme': '0'}, 'theme:0:'),
+                             ({'theme': '0', 'tint': "0.5"}, "theme:0:0.5")
+])
+def test_get_color(StyleReader, value, expected):
+    reader = StyleReader('<?xml version="1.0"?><styleSheet xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main"></styleSheet>')
+    assert reader._get_relevant_color(value) == expected
 
 
 def test_read_fills(StyleReader,datadir):
     datadir.chdir()
+    expected = [
+        Fill(),
+        Fill(fill_type='gray125'),
+        Fill(fill_type='solid',
+             start_color=Color('theme:0:-0.14999847407452621'),
+             end_color=Color('System Foreground')
+             ),
+        Fill(fill_type='solid',
+             start_color=Color('theme:0:'),
+             end_color=Color('System Foreground')
+             ),
+        Fill(fill_type='solid',
+             start_color=Color("00993366"),
+             end_color=Color('System Foreground')
+             )
+    ]
     with open("bug311-styles-a.xml") as src:
         reader = StyleReader(src.read())
-        assert list(reader.parse_fills()) == [
-            Fill(),
-            Fill(fill_type='gray125'),
-            Fill(fill_type='solid', start_color=Color(index='theme:0:-0.14999847407452621')),
-            Fill(fill_type='solid', start_color=Color(index='theme:0:')),
-            Fill(fill_type='solid'),
-        ]
+        assert list(reader.parse_fills()) == expected
 
 
 def test_read_cell_style(datadir):
