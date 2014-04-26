@@ -24,23 +24,15 @@ from __future__ import absolute_import
 
 from openpyxl.cell import get_column_letter
 from openpyxl.styles import NumberFormat, is_date_format, is_builtin
-from openpyxl.descriptors import Tuple, Length, Set, Strict
-
-
-class Coordinate(Tuple, Length):
-
-    def __get__(self, instance, cls):
-        if instance is None:
-            return self
-        return instance.__dict__.get(self.name)
+from openpyxl.descriptors import Tuple, Set, Strict
 
 
 class Reference(Strict):
     """ a simple wrapper around a serie of reference data """
 
-    data_type = Set(values=['n', 's'])
-    pos1 = Coordinate(length=2)
-    pos2 = Coordinate(length=2)
+    data_type = Set(values=['n', 's', None])
+    pos1 = Tuple()
+    pos2 = Tuple(allow_none=True)
 
     def __init__(self, sheet, pos1, pos2=None, data_type=None, number_format=None):
         """Create a reference to a cell or range of cells
@@ -64,10 +56,8 @@ class Reference(Strict):
 
         self.sheet = sheet
         self.pos1 = pos1
-        if pos2 is not None:
-            self.pos2 = pos2
-        if data_type is not None:
-            self.data_type = data_type
+        self.pos2 = pos2
+        self.data_type = data_type
         self.number_format = number_format
 
     @property
@@ -99,14 +89,14 @@ class Reference(Strict):
                     self._values.append(cell.internal_value)
                     if cell.internal_value == '':
                         continue
-                    if isinstance(self.data_type, Set) and cell.data_type:
+                    if self.data_type is None and cell.data_type:
                         self.data_type = cell.data_type
         return self._values
 
     def __str__(self):
         """ format excel reference notation """
 
-        if self.pos2:
+        if self.pos2 is not None:
             return "'%s'!$%s$%s:$%s$%s" % (self.sheet.title,
                 get_column_letter(self.pos1[1]), self.pos1[0],
                 get_column_letter(self.pos2[1]), self.pos2[0])

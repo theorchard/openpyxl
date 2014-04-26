@@ -13,7 +13,7 @@ class TestReference:
 
     def test_single_cell_ctor(self, cell):
         assert cell.pos1 == (1, 1)
-        assert cell.pos2 == None
+        assert cell.pos2 is None
 
     def test_range_ctor(self, cell_range):
         assert cell_range.pos1 == (1, 1)
