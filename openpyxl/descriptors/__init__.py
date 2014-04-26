@@ -23,10 +23,12 @@ class Typed(Descriptor):
     """Values must of a particular type"""
 
     expected_type = type(None)
+    allow_none = False
 
     def __set__(self, instance, value):
         if not isinstance(value, self.expected_type):
-            raise TypeError('expected ' + str(self.expected_type))
+            if not self.allow_none:
+                raise TypeError('expected ' + str(self.expected_type))
         super(Typed, self).__set__(instance, value)
 
 
@@ -34,10 +36,11 @@ class Convertible(Typed):
     """Values must be convertible to a particular type"""
 
     def __set__(self, instance, value):
-        try:
-            value = self.expected_type(value)
-        except:
-            raise TypeError('expected ' + str(self.expected_type))
+        if not self.allow_none:
+            try:
+                value = self.expected_type(value)
+            except:
+                raise TypeError('expected ' + str(self.expected_type))
         super(Typed, self).__set__(instance, value)
 
 

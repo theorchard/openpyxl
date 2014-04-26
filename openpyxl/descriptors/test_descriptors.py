@@ -120,6 +120,24 @@ class TestFloat:
         assert float.value == expected
 
 
+@pytest.fixture
+def allow_none():
+
+    from . import Float, Strict
+
+    class Dummy(Strict):
+
+        value = Float(allow_none=True)
+
+    return Dummy()
+
+
+class TestAllowNone:
+
+    def test_valid(self, allow_none):
+        allow_none.value = None
+        assert allow_none.value is None
+
 
 @pytest.fixture
 def maximum():
