@@ -129,7 +129,7 @@ class TestStyleWriter(object):
             </font>
             <font>
               <sz val="12.0" />
-              <color rgb="FF000000" />
+              <color rgb="00000000" />
               <name val="Calibri" />
               <family val="2" />
               <b />
@@ -158,7 +158,7 @@ class TestStyleWriter(object):
             </font>
             <font>
               <sz val="12.0" />
-              <color rgb="FF000000" />
+              <color rgb="00000000" />
               <name val="Calibri" />
               <family val="2" />
               <b />
@@ -187,7 +187,7 @@ class TestStyleWriter(object):
             </fill>
             <fill>
               <patternFill patternType="solid">
-                <fgColor rgb="FF808000" />
+                <fgColor rgb="00FF0000" />
               </patternFill>
             </fill>
           </fills>
@@ -216,7 +216,7 @@ class TestStyleWriter(object):
               <left />
               <right />
               <top style="thin">
-                <color rgb="FF808000" />
+                <color rgb="00FF0000" />
               </top>
               <bottom />
               <diagonal />
@@ -346,16 +346,16 @@ class TestStyleWriter(object):
               </fill>
               <border>
                 <left style="medium">
-                    <color rgb="FF0000FF"></color>
+                    <color rgb="000000FF"></color>
                 </left>
                 <right style="medium">
-                    <color rgb="FF0000FF"></color>
+                    <color rgb="000000FF"></color>
                 </right>
                 <top style="medium">
-                    <color rgb="FF0000FF"></color>
+                    <color rgb="000000FF"></color>
                 </top>
                 <bottom style="medium">
-                    <color rgb="FF0000FF"></color>
+                    <color rgb="000000FF"></color>
                 </bottom>
             </border>
             </dxf>

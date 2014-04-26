@@ -194,7 +194,7 @@ class TestShadow(object):
         assert s.distance == 2
         assert s.direction == 0
         assert s.alignment == "br"
-        assert s.color.index == "FF000000"
+        assert s.color.index == "00000000"
         assert s.alpha == 50
 
 
