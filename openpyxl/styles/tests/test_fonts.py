@@ -14,4 +14,4 @@ class TestFont:
         assert f.subscript is False
         assert f.underline == 'none'
         assert f.strikethrough is False
-        assert f.color.index == 'FF000000'
+        assert f.color.index == '00000000'

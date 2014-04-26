@@ -53,6 +53,55 @@ from openpyxl.tests.helper import get_xml, compare_xml
 from openpyxl.styles.alignment import Alignment
 
 
+@pytest.fixture
+def StyleReader():
+    from ..style import SharedStylesParser
+    return SharedStylesParser
+
+
+@pytest.mark.parametrize("value, expected",
+                         [
+                             ({'indexed': '32'}, "00CCCCFF"),
+                             ({'rgb': "FFFFFFFF"}, "FFFFFFFF"),
+                             ({'theme': '0'}, 'theme:0:'),
+                             ({'theme': '0', 'tint': "0.5"}, "theme:0:0.5")
+])
+def test_get_color(StyleReader, value, expected):
+    reader = StyleReader('<?xml version="1.0"?><styleSheet xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main"></styleSheet>')
+    assert reader._get_relevant_color(value) == expected
+
+
+def test_read_fills(StyleReader,datadir):
+    datadir.chdir()
+    expected = [
+        Fill(),
+        Fill(fill_type='gray125'),
+        Fill(fill_type='solid',
+             start_color=Color('theme:0:-0.14999847407452621'),
+             end_color=Color('System Foreground')
+             ),
+        Fill(fill_type='solid',
+             start_color=Color('theme:0:'),
+             end_color=Color('System Foreground')
+             ),
+        Fill(fill_type='solid',
+             start_color=Color("00993366"),
+             end_color=Color('System Foreground')
+             )
+    ]
+    with open("bug311-styles-a.xml") as src:
+        reader = StyleReader(src.read())
+        assert list(reader.parse_fills()) == expected
+
+
+def test_read_cell_style(datadir):
+    datadir.chdir()
+    with open("empty-workbook-styles.xml") as content:
+        style_properties = read_style_table(content.read())
+        style_table = style_properties['table']
+        assert len(style_table) == 2
+
+
 def test_read_style(datadir):
     datadir.chdir()
     with open("simple-styles.xml") as content:
@@ -279,10 +328,3 @@ def test_change_existing_styles(datadir):
     assert style('C25').alignment.wrap_text
     assert style('C26').alignment.shrink_to_fit
 
-
-def test_read_cell_style(datadir):
-    datadir.chdir()
-    with open("empty-workbook-styles.xml") as content:
-        style_properties = read_style_table(content.read())
-        style_table = style_properties['table']
-        assert len(style_table) == 2

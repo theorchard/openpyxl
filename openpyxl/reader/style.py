@@ -99,12 +99,12 @@ class SharedStylesParser(object):
     def _get_relevant_color(self, color):
         """Utility method for getting the color from different attributes"""
         value = None
-        idx = int(color.get('indexed', -1))
+        idx = color.get('indexed')
         theme = color.get('theme')
         tint = color.get('tint')
         rgb = color.get('rgb')
-        if 0 <= idx < len(self.color_index):
-            value = self.color_index[idx]
+        if idx is not None:
+            value = self.color_index[int(idx)]
         elif theme is not None:
             if tint is not None:
                 value = 'theme:%s:%s' % (theme, tint)
@@ -171,7 +171,7 @@ class SharedStylesParser(object):
             bgColor = patternFill.find('{%s}bgColor' % SHEET_MAIN_NS)
             if bgColor is not None:
                 color = self._get_relevant_color(bgColor)
-                if color:
+                if color is not None:
                     fill['end_color'] = Color(color)
         return Fill(**fill)
 
