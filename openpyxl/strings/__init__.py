@@ -9,13 +9,14 @@ class IndexedList(list):
     http://code.activestate.com/recipes/52303-the-auxiliary-dictionary-idiom-for-sequences-with-/
     """
 
-    def __init__(self, iterable=()):
+    def __init__(self, iterable=None):
         self.clean = True
         self._dict = {}
-        if iterable != ():
+        if iterable is not None:
             self.clean = False
-            self._dict = dict((val, idx) for idx, val in enumerate(iterable))
-            super(IndexedList, self).__init__(iterable)
+            for idx, val in enumerate(iterable):
+                self._dict[val] = idx
+                list.append(self, val)
 
     def _rebuild_dict(self):
         self._dict = {}
