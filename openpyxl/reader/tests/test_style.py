@@ -67,7 +67,9 @@ def StyleReader():
                              ({'theme': '0', 'tint': "0.5"}, "theme:0:0.5")
 ])
 def test_get_color(StyleReader, value, expected):
-    reader = StyleReader('<?xml version="1.0"?><styleSheet xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main"></styleSheet>')
+    reader = StyleReader("""
+    <styleSheet xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main"></styleSheet>
+    """)
     assert reader._get_relevant_color(value) == expected
 
 
@@ -89,7 +91,7 @@ def test_read_fills(StyleReader,datadir):
              end_color=Color('System Background')
              )
     ]
-    with open("bug311-styles-a.xml") as src:
+    with open("bug311-styles.xml") as src:
         reader = StyleReader(src.read())
         assert list(reader.parse_fills()) == expected
 
