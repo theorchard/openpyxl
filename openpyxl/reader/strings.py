@@ -36,7 +36,7 @@ def read_string_table(xml_source):
     """Read in all shared strings in the table"""
     root = fromstring(text=xml_source)
     nodes = safe_iterator(root, '{%s}si' % SHEET_MAIN_NS)
-    strings = [get_string(node) for node in nodes]
+    strings = (get_string(node) for node in nodes)
     return IndexedList(strings)
 
 
