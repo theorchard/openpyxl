@@ -10,6 +10,14 @@ def list():
 def test_ctor(list):
     l = list(['b', 'a'])
     assert l == ['b', 'a']
+    assert l.clean is False
+
+
+def test_allow_duplicate_ctor(list):
+    l = list(['b', 'a', 'b'])
+    assert l == ['b', 'a', 'b']
+    l.append('a')
+    assert l == ['b', 'a', 'b']
 
 
 def test_function(list):
@@ -19,12 +27,20 @@ def test_function(list):
     assert l == ['b', 'a']
 
 
+def test_contains(list):
+    l = list(['a', 'b', 'a'])
+    assert l.clean is False
+    assert 'a' in l
+    assert l.clean is True
+
+
 def test_index(list):
     l = list(['a', 'b'])
     l.append('a')
     assert l == ['a', 'b']
     l.append('c')
     assert l.index('c') == 2
+    assert l.clean is True
 
 
 def test_table_builder(list):

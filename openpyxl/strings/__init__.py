@@ -10,13 +10,12 @@ class IndexedList(list):
     """
 
     def __init__(self, iterable=()):
-        super(IndexedList, self).__init__()
-        self.clean = False
+        self.clean = True
         self._dict = {}
         if iterable != ():
-            for i in iterable:
-                self.append(i)
-            self.clean = True
+            self.clean = False
+            self._dict = dict((val, idx) for idx, val in enumerate(iterable))
+            super(IndexedList, self).__init__(iterable)
 
     def _rebuild_dict(self):
         self._dict = {}
@@ -41,7 +40,6 @@ class IndexedList(list):
         if value not in self._dict:
             self._dict[value] = len(self)
             list.append(self, value)
-            self.clean = True
 
     def add(self, value):
         self.append(value)
