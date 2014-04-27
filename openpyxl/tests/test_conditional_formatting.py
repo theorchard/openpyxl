@@ -46,7 +46,7 @@ from openpyxl.styles.border import Border
 import pytest
 from zipfile import ZIP_DEFLATED, ZipFile
 from openpyxl.tests.helper import DATADIR, get_xml, compare_xml
-from openpyxl.strings import IndexedList
+from openpyxl.collections import IndexedList
 
 
 class TestRule:

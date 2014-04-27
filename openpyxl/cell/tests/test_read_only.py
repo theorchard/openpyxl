@@ -4,7 +4,7 @@ import datetime
 import pytest
 
 from openpyxl.cell.read_only import ReadOnlyCell
-from openpyxl.strings import IndexedList
+from openpyxl.collections import IndexedList
 
 
 @pytest.fixture(scope='module')

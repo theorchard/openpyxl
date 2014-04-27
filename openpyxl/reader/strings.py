@@ -27,7 +27,7 @@ from __future__ import absolute_import
 from openpyxl.compat import unicode
 
 # package imports
-from openpyxl.strings import IndexedList
+from openpyxl.collections import IndexedList
 from openpyxl.xml.functions import fromstring, safe_iterator
 from openpyxl.xml.constants import SHEET_MAIN_NS, XML_NS
 

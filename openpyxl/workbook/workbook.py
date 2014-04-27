@@ -31,7 +31,7 @@ import datetime
 import threading
 
 # package imports
-from openpyxl.strings import IndexedList
+from openpyxl.collections import IndexedList
 from openpyxl.worksheet import Worksheet
 from openpyxl.writer.dump_worksheet import DumpWorksheet, save_dump
 from openpyxl.namedrange import NamedRange

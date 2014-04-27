@@ -29,7 +29,7 @@ from openpyxl.compat import StringIO
 
 # package imports
 from openpyxl.xml.functions import start_tag, end_tag, tag, XMLGenerator
-from openpyxl.strings import IndexedList
+from openpyxl.collections import IndexedList
 
 
 def create_string_table(workbook):

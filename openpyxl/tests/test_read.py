@@ -35,7 +35,7 @@ import pytest
 from openpyxl.compat import BytesIO, StringIO, unicode, tempfile
 
 # package imports
-from openpyxl.strings import IndexedList
+from openpyxl.collections import IndexedList
 from openpyxl.tests.helper import DATADIR
 from openpyxl.worksheet import Worksheet
 from openpyxl.workbook import Workbook
