@@ -31,7 +31,7 @@ import datetime
 import os
 from tempfile import NamedTemporaryFile
 
-from openpyxl.compat import OrderedDict
+from openpyxl.compat import OrderedDict, unicode
 
 from openpyxl.cell import  get_column_letter, Cell, TIME_TYPES
 from openpyxl.worksheet import Worksheet
