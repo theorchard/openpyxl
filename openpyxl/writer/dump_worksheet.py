@@ -289,7 +289,7 @@ class DumpWorksheet(Worksheet):
                 dtype = 'formula'
             else:
                 dtype = 'string'
-                cell = self._strings.add(cell)
+                cell = self._strings.add(unicode(cell))
 
             if style is not None:
                 attributes['s'] = '%d' % self._styles.add(style)
