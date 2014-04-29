@@ -22,7 +22,7 @@ from __future__ import absolute_import
 # @license: http://www.opensource.org/licenses/mit-license.php
 # @author: see AUTHORS file
 
-from openpyxl.descriptors import Float, Set
+from openpyxl.descriptors import Float, Set, Tuple
 
 from .colors import WHITE
 from .hashable import HashableObject
@@ -84,3 +84,26 @@ class Fill(HashableObject):
         self.rotation = rotation
         self.start_color = start_color
         self.end_color = end_color
+
+
+class GradientFill(HashableObject):
+
+    __fields__ = ('type', 'degree', 'left', 'right', 'top', 'bottom', 'stop')
+    type = Set(values=('linear', 'path'))
+    degree = Float()
+    left = Float()
+    right = Float()
+    top = Float()
+    bottom = Float()
+    stop = Tuple()
+
+
+    def __init__(self, typ="linear", degree=0, left=0, right=0, top=0,
+                 bottom=0, stop=()):
+        self.type = typ
+        self.degree = degree
+        self.left = left
+        self.right = right
+        self.top = top
+        self.bottom = bottom
+        self.stop = stop
