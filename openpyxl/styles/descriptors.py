@@ -11,3 +11,4 @@ from .colors import Color
 class Color(Default):
 
     expected_type = Color
+    allow_none = True
