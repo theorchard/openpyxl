@@ -24,24 +24,16 @@
 """Imports for the openpyxl package."""
 import warnings
 
-TEST_LXML = False
-SYSTEM_LXML = False
-
 try:
     from .tests import LXML
-    TEST_LXML = LXML
 except  ImportError:
     try:
         from lxml.etree import LXML_VERSION
-        SYSTEM_LXML = LXML_VERSION >= (3, 3, 1, 0)
-        if SYSTEM_LXML is False:
+        LXML = LXML_VERSION >= (3, 3, 1, 0)
+        if LXML is False:
             warnings.warn("The installed version of lxml is too old to be used with openpyxl")
     except ImportError:
-        SYSTEM_LXML = False
-
-# lxml is going to be used if and *only if* the version is correct on the sytem
-# and if it was not disabled using environment variables
-LXML = (TEST_LXML and SYSTEM_LXML)
+        LXML = False
 
 
 from openpyxl.workbook import Workbook
