@@ -22,7 +22,7 @@ class TestGradientFill:
         assert gf.stop == ()
 
 
-    def test_ctot(self, GradientFill):
+    def test_ctor(self, GradientFill):
         gf = GradientFill(degree=90, left=1, right=2, top=3, bottom=4)
         assert gf.degree == 90
         assert gf.left == 1
