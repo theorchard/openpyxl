@@ -60,7 +60,7 @@ fills = (FILL_NONE, FILL_SOLID, FILL_PATTERN_DARKDOWN, FILL_PATTERN_DARKGRAY,
          FILL_PATTERN_MEDIUMGRAY)
 
 
-class Fill(HashableObject):
+class PatternFill(HashableObject):
     """Area fill patterns for use in styles.
     Caution: if you do not specify a fill_type, other attributes will have
     no effect !"""
@@ -80,6 +80,9 @@ class Fill(HashableObject):
         self.fill_type = fill_type
         self.start_color = start_color
         self.end_color = end_color
+
+
+Fill = PatternFill # Backwards compatibility
 
 
 class GradientFill(HashableObject):

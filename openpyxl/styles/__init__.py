@@ -27,7 +27,7 @@ from copy import deepcopy
 from .alignment import Alignment
 from .borders import Borders, Border
 from .colors import Color
-from .fills import Fill
+from .fills import PatternFill, GradientFill
 from .fonts import Font
 from .hashable import HashableObject
 from .numbers import NumberFormat, is_date_format, is_builtin
@@ -45,13 +45,13 @@ class Style(HashableObject):
     __base__ = True
     __slots__ = __fields__
     __check__ = {'font': Font,
-                 'fill': Fill,
+                 'fill': PatternFill,
                  'borders': Borders,
                  'alignment': Alignment,
                  'number_format': NumberFormat,
                  'protection': Protection}
 
-    def __init__(self, font=Font(), fill=Fill(), borders=Borders(),
+    def __init__(self, font=Font(), fill=PatternFill(), borders=Borders(),
                  alignment=Alignment(), number_format=NumberFormat(),
                  protection=Protection()):
         self.font = font

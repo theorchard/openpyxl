@@ -39,7 +39,7 @@ from openpyxl.styles import (
     NumberFormat,
     Color,
     Font,
-    Fill,
+    PatternFill,
     Borders,
     Protection,
     Style
@@ -76,17 +76,17 @@ def test_get_color(StyleReader, value, expected):
 def test_read_fills(StyleReader,datadir):
     datadir.chdir()
     expected = [
-        Fill(),
-        Fill(fill_type='gray125'),
-        Fill(fill_type='solid',
+        PatternFill(),
+        PatternFill(fill_type='gray125'),
+        PatternFill(fill_type='solid',
              start_color=Color('theme:0:-0.14999847407452621'),
              end_color=Color('System Background')
              ),
-        Fill(fill_type='solid',
+        PatternFill(fill_type='solid',
              start_color=Color('theme:0:'),
              end_color=Color('System Background')
              ),
-        Fill(fill_type='solid',
+        PatternFill(fill_type='solid',
              start_color=Color("00333399"),
              end_color=Color('System Background')
              )
@@ -175,7 +175,7 @@ def test_change_existing_styles(datadir):
 
     ws.column_dimensions['A'].width = 20
     i_style = ws.get_style('I')
-    ws.set_style('I', i_style.copy(fill=Fill(fill_type='solid',
+    ws.set_style('I', i_style.copy(fill=PatternFill(fill_type='solid',
                                              start_color=Color('FF442200')),
                                    font=Font(color=Color('FF002244'))))
     ws.cell('A2').style = ws.cell('A2').style.copy(font=Font(name='Times New Roman',
@@ -192,9 +192,9 @@ def test_change_existing_styles(datadir):
                                                              italic=False))
     ws.cell('A5').style = ws.cell('A5').style.copy(font=Font(color=Color('FF66FF66')))
     ws.cell('A6').style = ws.cell('A6').style.copy(font=Font(color=Color('theme:1:')))
-    ws.cell('A7').style = ws.cell('A7').style.copy(fill=Fill(fill_type='solid',
+    ws.cell('A7').style = ws.cell('A7').style.copy(fill=PatternFill(fill_type='solid',
                                                              start_color=Color('FF330066')))
-    ws.cell('A8').style = ws.cell('A8').style.copy(fill=Fill(fill_type='solid',
+    ws.cell('A8').style = ws.cell('A8').style.copy(fill=PatternFill(fill_type='solid',
                                                              start_color=Color('theme:2:')))
     ws.cell('A9').style = ws.cell('A9').style.copy(alignment=Alignment(horizontal='center'))
     ws.cell('A10').style = ws.cell('A10').style.copy(alignment=Alignment(horizontal='left'))
@@ -224,7 +224,7 @@ def test_change_existing_styles(datadir):
                                                                                   color=Color('theme:7:'))))
     ws.cell('A23').style = ws.cell('A23').style.copy(borders=Borders(top=Border(border_style=Border.BORDER_THIN,
                                                                                 color=Color('theme:6:'))),
-                                                     fill=Fill(fill_type='solid',
+                                                     fill=PatternFill(fill_type='solid',
                                                                start_color=Color('FFCCCCFF')))
     ws.unmerge_cells('A23:B24')
     ws.cell('A25').style = ws.cell('A25').style.copy(alignment=Alignment(wrap_text=False))

@@ -3,7 +3,7 @@ from __future__ import absolute_import
 
 from openpyxl.compat import iteritems, OrderedDict
 
-from openpyxl.styles import Font, Fill, Borders
+from openpyxl.styles import Font, PatternFill, Borders
 from .rules import CellIsRule, ColorScaleRule, FormatRule, FormulaRule
 
 
@@ -84,7 +84,7 @@ class ConditionalFormatting(object):
                         dxf['font'] = rule['dxf']['font']
                     if 'border' in rule['dxf'] and isinstance(rule['dxf']['border'], Borders):
                         dxf['border'] = rule['dxf']['border']
-                    if 'fill' in rule['dxf'] and isinstance(rule['dxf']['fill'], Fill):
+                    if 'fill' in rule['dxf'] and isinstance(rule['dxf']['fill'], PatternFill):
                         dxf['fill'] = rule['dxf']['fill']
 
                     wb.style_properties['dxf_list'].append(dxf)

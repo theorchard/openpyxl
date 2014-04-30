@@ -41,7 +41,7 @@ from openpyxl.styles import (
     NumberFormat,
     Color,
     Font,
-    Fill,
+    PatternFill,
     Borders,
     Protection,
     Style
@@ -170,7 +170,7 @@ class TestStyleWriter(object):
         assert diff is None, diff
 
     def test_fills(self):
-        st = Style(fill=Fill(fill_type='solid',
+        st = Style(fill=PatternFill(fill_type='solid',
                              start_color=Color(colors.DARKYELLOW)))
         self.worksheet.cell('A1').style = st
         w = StyleWriter(self.workbook)
@@ -304,7 +304,7 @@ class TestStyleWriter(object):
         assert third_wb
 
     def test_write_dxf(self):
-        redFill = Fill(start_color=Color('FFEE1111'),
+        redFill = PatternFill(start_color=Color('FFEE1111'),
                        end_color=Color('FFEE1111'),
                        fill_type=fills.FILL_SOLID)
         whiteFont = Font(color=Color("FFFFFFFF"),
