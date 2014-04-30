@@ -2,6 +2,8 @@
 
 import pytest
 
+from openpyxl.styles.colors import BLACK, WHITE, Color
+
 
 @pytest.fixture
 def GradientFill():
@@ -29,3 +31,15 @@ class TestGradientFill:
         assert gf.right == 2
         assert gf.top == 3
         assert gf.bottom == 4
+
+
+    def test_sequence(self, GradientFill):
+        colors = [Color(BLACK), Color(WHITE)]
+        gf = GradientFill(stop=colors)
+        assert gf.stop == colors
+
+
+    def test_invalid_sequence(self, GradientFill):
+        colors = [BLACK, WHITE]
+        with pytest.raises(TypeError):
+            gf = GradientFill(stop=colors)
