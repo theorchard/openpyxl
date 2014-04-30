@@ -121,6 +121,26 @@ class Tuple(Typed):
     expected_type = tuple
 
 
+class Sequence(Descriptor):
+    """
+    A sequence (list or tuple) that may only contain objects of the declared
+    type
+    """
+
+    expected_type = type(None)
+
+    def __set__(self, instance, seq):
+        if not isinstance(seq, (list, tuple)):
+            raise TypeError("Value must be a sequence")
+        for idx, value in enumerate(seq):
+            if not isinstance(value, self.expected_type):
+                raise TypeError(
+                    "[{0}] of sequence must be of type {1}".format(
+                        idx, self.expected_type)
+                )
+        super(Sequence, self).__set__(instance, seq)
+
+
 class Length(Descriptor):
 
     def __init__(self, name=None, **kw):
