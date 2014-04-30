@@ -22,13 +22,11 @@ from __future__ import absolute_import
 # @license: http://www.opensource.org/licenses/mit-license.php
 # @author: see AUTHORS file
 
-from openpyxl.descriptors import Float, Set, Tuple
+from openpyxl.descriptors import Float, Set, Sequence
 
-from .colors import WHITE
+from .colors import WHITE, Color
 from .hashable import HashableObject
 import warnings
-
-from .descriptors import Color
 
 
 FILL_NONE = 'none'
@@ -65,11 +63,13 @@ class PatternFill(HashableObject):
     Caution: if you do not specify a fill_type, other attributes will have
     no effect !"""
 
+    from .descriptors import Color
+
+
     __fields__ = ('fill_type',
                   'start_color',
                   'end_color')
-    __check__ = {'start_color': Color,
-                 'end_color': Color}
+
     fill_type = Set(values=fills)
     rotation = Float()
     start_color = Color()
@@ -94,7 +94,7 @@ class GradientFill(HashableObject):
     right = Float()
     top = Float()
     bottom = Float()
-    stop = Tuple()
+    stop = Sequence(expected_type=Color)
 
 
     def __init__(self, typ="linear", degree=0, left=0, right=0, top=0,
