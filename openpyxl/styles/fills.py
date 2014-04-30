@@ -66,7 +66,6 @@ class Fill(HashableObject):
     no effect !"""
 
     __fields__ = ('fill_type',
-                  'rotation',
                   'start_color',
                   'end_color')
     __check__ = {'start_color': Color,
@@ -76,10 +75,9 @@ class Fill(HashableObject):
     start_color = Color()
     end_color = Color()
 
-    def __init__(self, fill_type=FILL_NONE, rotation=0,
-                 start_color=None, end_color=None):
+    def __init__(self, fill_type=FILL_NONE, start_color=None,
+                 end_color=None):
         self.fill_type = fill_type
-        self.rotation = rotation
         self.start_color = start_color
         self.end_color = end_color
 
