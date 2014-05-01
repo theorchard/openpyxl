@@ -97,12 +97,20 @@ class GradientFill(HashableObject):
     stop = Sequence(expected_type=Color)
 
 
-    def __init__(self, type="linear", degree=0, left=0, right=0, top=0,
+    def __init__(self, fill_type="linear", degree=0, left=0, right=0, top=0,
                  bottom=0, stop=()):
-        self.fill_type = type
+        self.fill_type = fill_type
         self.degree = degree
         self.left = left
         self.right = right
         self.top = top
         self.bottom = bottom
         self.stop = stop
+
+    @property
+    def type(self):
+        return self.fill_type
+
+    def __iter__(self):
+        for key in ('type', 'degree', 'left', 'right', 'top', 'bottom', 'stop'):
+            yield key, getattr(self, key)
