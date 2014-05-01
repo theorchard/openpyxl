@@ -160,22 +160,31 @@ class SharedStylesParser(object):
 
     def parse_fill(self, fill_node):
         """Read individual fill"""
-        patternFill = fill_node.find('{%s}patternFill' % SHEET_MAIN_NS)
+        pattern = fill_node.find('{%s}patternFill' % SHEET_MAIN_NS)
+        gradient = fill_node.find('{%s}gradientFill' % SHEET_MAIN_NS)
+        if pattern is not None:
+            return self.parse_pattern_fill(pattern)
+        if gradient is not None:
+            return self.parse_gradient_fill(gradient)
+
+    def parse_pattern_fill(self, node):
         fill = {}
-        if patternFill is not None:
-            fill_type = patternFill.get('patternType', 'none')
-            fill['fill_type'] = fill_type
-            fgColor = patternFill.find('{%s}fgColor' % SHEET_MAIN_NS)
-            if fgColor is not None:
-                color = self._get_relevant_color(fgColor)
-                if color:
-                    fill['start_color'] = Color(color)
-            bgColor = patternFill.find('{%s}bgColor' % SHEET_MAIN_NS)
-            if bgColor is not None:
-                color = self._get_relevant_color(bgColor)
-                if color is not None:
-                    fill['end_color'] = Color(color)
+        fill['fill_type'] = node.get('patternType')
+        fgColor = node.find('{%s}fgColor' % SHEET_MAIN_NS)
+        if fgColor is not None:
+            color = self._get_relevant_color(fgColor)
+            if color:
+                fill['start_color'] = Color(color)
+        bgColor = node.find('{%s}bgColor' % SHEET_MAIN_NS)
+        if bgColor is not None:
+            color = self._get_relevant_color(bgColor)
+            if color is not None:
+                fill['end_color'] = Color(color)
         return PatternFill(**fill)
+
+    def parse_gradient_fill(self, node):
+        fill = {}
+
 
     def parse_borders(self):
         """Read in the boarders"""
