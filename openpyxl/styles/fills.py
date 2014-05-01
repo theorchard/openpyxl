@@ -23,6 +23,7 @@ from __future__ import absolute_import
 # @author: see AUTHORS file
 
 from openpyxl.descriptors import Float, Set, Sequence
+from openpyxl.compat import safe_string
 
 from .colors import WHITE, Color
 from .hashable import HashableObject
@@ -112,7 +113,8 @@ class GradientFill(HashableObject):
         return self.fill_type
 
     def __iter__(self):
+
         for key in ('type', 'degree', 'left', 'right', 'top', 'bottom'):
             value = getattr(self, key)
             if value is not None:
-                yield key, value
+                yield key, safe_string(value)

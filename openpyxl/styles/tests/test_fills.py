@@ -47,6 +47,6 @@ class TestGradientFill:
 
     def test_dict_interface(self, GradientFill):
         gf = GradientFill(degree=90, left=1, right=2, top=3, bottom=4)
-        assert dict(gf) == {'bottom': 4.0, 'degree': 90.0, 'left': 1.0,
-                            'right': 2.0, 'stop': (), 'top': 3.0, 'type': 'linear'}
+        assert dict(gf) == {'bottom': "4", 'degree': "90", 'left':"1",
+                            'right': "2", 'top': "3", 'type': 'linear'}
 
