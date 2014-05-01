@@ -73,7 +73,7 @@ def test_get_color(StyleReader, value, expected):
     assert reader._get_relevant_color(value) == expected
 
 
-def test_read_fills(StyleReader,datadir):
+def test_read_pattern_fill(StyleReader, datadir):
     datadir.chdir()
     expected = [
         PatternFill(),
