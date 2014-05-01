@@ -95,10 +95,9 @@ class StyleWriter(object):
 
         # others
         table = {}
-        index = 1
-        for st in self.styles:
+        for idx, st in enumerate(self.styles, 1):
             if st.font != DEFAULTS.font and st.font not in table:
-                table[st.font] = index
+                table[st.font] = idx
                 font_node = SubElement(fonts, 'font')
                 SubElement(font_node, 'sz', {'val':str(st.font.size)})
                 self._unpack_color(font_node, st.font.color.index)
@@ -111,9 +110,8 @@ class StyleWriter(object):
                 ConditionalElement(font_node, "i", st.font.italic)
                 ConditionalElement(font_node, "u",  st.font.underline == 'single')
 
-                index += 1
 
-        fonts.attrib["count"] = str(index)
+        fonts.attrib["count"] = str(idx)
         return table
 
     def _write_fills(self):
@@ -124,10 +122,9 @@ class StyleWriter(object):
         SubElement(fill, 'patternFill', {'patternType':'gray125'})
 
         table = {}
-        index = 2
-        for st in self.styles:
+        for idx, st in enumerate(self.styles, 2):
             if st.fill != DEFAULTS.fill and st.fill not in table:
-                table[st.fill] = index
+                table[st.fill] = idx
                 fill = SubElement(fills, 'fill')
                 if st.fill != DEFAULTS.fill and st.fill.fill_type is not None:
                     node = SubElement(fill, 'patternFill', {'patternType': st.fill.fill_type})
@@ -136,9 +133,7 @@ class StyleWriter(object):
                     if st.fill.end_color != DEFAULTS.fill.end_color:
                         self._unpack_color(node, st.fill.end_color.index, 'bgColor')
 
-                index += 1
-
-        fills.attrib["count"] = str(index)
+        fills.attrib["count"] = str(idx)
         return table
 
     def _write_borders(self):
@@ -154,10 +149,9 @@ class StyleWriter(object):
 
         # others
         table = {}
-        index = 1
-        for st in self.styles:
+        for idx, st in enumerate(self.styles, 1):
             if st.borders != DEFAULTS.borders and st.borders not in table:
-                table[st.borders] = index
+                table[st.borders] = idx
                 border = SubElement(borders, 'border')
                 # caution: respect this order
                 for side in ('left', 'right', 'top', 'bottom', 'diagonal'):
@@ -168,9 +162,7 @@ class StyleWriter(object):
                         node = SubElement(border, side, {'style':obj.border_style})
                         self._unpack_color(node, obj.color.index)
 
-                index += 1
-
-        borders.attrib["count"] = str(index)
+        borders.attrib["count"] = str(idx)
         return table
 
     def _write_cell_style_xfs(self):
