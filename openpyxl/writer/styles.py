@@ -29,8 +29,9 @@ from openpyxl.xml.functions import (
     Element,
     SubElement,
     ConditionalElement,
-    get_document_content
+    get_document_content,
     )
+from openpyxl.compat import safe_string
 from openpyxl.xml.constants import SHEET_MAIN_NS
 
 from openpyxl.styles import DEFAULTS, Protection
@@ -125,16 +126,35 @@ class StyleWriter(object):
         for idx, st in enumerate(self.styles, 2):
             if st.fill != DEFAULTS.fill and st.fill not in table:
                 table[st.fill] = idx
-                fill = SubElement(fills, 'fill')
-                if st.fill != DEFAULTS.fill and st.fill.fill_type is not None:
-                    node = SubElement(fill, 'patternFill', {'patternType': st.fill.fill_type})
-                    if st.fill.start_color != DEFAULTS.fill.start_color:
-                        self._unpack_color(node, st.fill.start_color.index, 'fgColor')
-                    if st.fill.end_color != DEFAULTS.fill.end_color:
-                        self._unpack_color(node, st.fill.end_color.index, 'bgColor')
+                node = SubElement(fills, 'fill')
+                if isinstance(st.fill, PatternFill):
+                    self._write_pattern_fill(node, st.fill)
+                elif isinstance(st.fill, GradientFill):
+                    self._write_gradient_fill(node, st.fill)
 
         fills.attrib["count"] = str(idx)
         return table
+
+    def _write_pattern_fill(self, node, fill):
+        if fill != DEFAULTS.fill and fill.fill_type is not None:
+            node = SubElement(node, 'patternFill', {'patternType':
+                                                    fill.fill_type})
+            if fill.start_color != DEFAULTS.fill.start_color:
+                self._unpack_color(node, fill.start_color.index, 'fgColor')
+            if fill.end_color != DEFAULTS.fill.end_color:
+                self._unpack_color(node, fill.end_color.index, 'bgColor')
+
+    def _write_gradient_fill(self, node, fill):
+        attrs = {}
+        for key in ('fill_type', 'degree', 'left', 'right', 'top', 'bottom'):
+            value = getattr(fill, key)
+            if value is not None:
+                attrs[key] = safe_string(value)
+        attrs['type'] = attrs['fill_type']
+        del attrs['fill_type']
+        node = SubElement(node, 'gradientFill', attrs)
+        for color in fill.stop:
+            self._unpack_color(node, color.index)
 
     def _write_borders(self):
         borders = SubElement(self._root, 'borders')
