@@ -99,7 +99,7 @@ class GradientFill(HashableObject):
 
 
     def __init__(self, fill_type="linear", degree=0, left=0, right=0, top=0,
-                 bottom=0, stop=()):
+                 bottom=0, stop=(), type=None):
         self.fill_type = fill_type
         self.degree = degree
         self.left = left
@@ -107,6 +107,9 @@ class GradientFill(HashableObject):
         self.top = top
         self.bottom = bottom
         self.stop = stop
+        # cannot use type attribute but allow it is an argument (ie. when parsing)
+        if type is not None:
+            self.fill_type = type
 
     @property
     def type(self):

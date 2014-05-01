@@ -183,11 +183,7 @@ class SharedStylesParser(object):
         return PatternFill(**fill)
 
     def parse_gradient_fill(self, node):
-        fill = {}
-        for key in ['type', 'degree', 'left', 'right', 'top', 'bottom']:
-            value = node.get(key)
-            if value is not None:
-                fill[key] = value
+        fill = dict(node.items())
         color_nodes = safe_iterator(node, "{%s}color" % SHEET_MAIN_NS)
         fill['stop'] = [Color(self._get_relevant_color(node)) for node in color_nodes]
         return GradientFill(**fill)
