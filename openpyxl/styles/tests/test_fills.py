@@ -43,3 +43,10 @@ class TestGradientFill:
         colors = [BLACK, WHITE]
         with pytest.raises(TypeError):
             gf = GradientFill(stop=colors)
+
+
+    def test_dict_interface(self, GradientFill):
+        gf = GradientFill(degree=90, left=1, right=2, top=3, bottom=4)
+        assert dict(gf) == {'bottom': "4", 'degree': "90", 'left':"1",
+                            'right': "2", 'top': "3", 'type': 'linear'}
+
