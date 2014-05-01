@@ -40,6 +40,7 @@ from openpyxl.styles import (
     Color,
     Font,
     PatternFill,
+    GradientFill,
     Borders,
     Protection,
     Style
@@ -92,6 +93,16 @@ def test_read_pattern_fill(StyleReader, datadir):
              )
     ]
     with open("bug311-styles.xml") as src:
+        reader = StyleReader(src.read())
+        assert list(reader.parse_fills()) == expected
+
+
+def test_read_gradient_fill(StyleReader, datadir):
+    datadir.chdir()
+    expected = [
+        GradientFill(degree=90, stop=[Color('theme:0:'), Color('theme:4:')])
+    ]
+    with open("bug284-styles.xml") as src:
         reader = StyleReader(src.read())
         assert list(reader.parse_fills()) == expected
 

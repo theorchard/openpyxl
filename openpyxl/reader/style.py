@@ -28,8 +28,8 @@ from __future__ import absolute_import
 from openpyxl.collections import IndexedList
 from openpyxl.xml.functions import fromstring, safe_iterator
 from openpyxl.exceptions import MissingNumberFormat
-from openpyxl.styles import (Style, NumberFormat, Font, PatternFill, Borders,
-                             Protection, Alignment)
+from openpyxl.styles import (Style, NumberFormat, Font, PatternFill,
+                             GradientFill, Borders, Protection, Alignment)
 from openpyxl.styles.border import Border
 from openpyxl.styles import borders
 from openpyxl.styles.colors import COLOR_INDEX, Color
@@ -184,7 +184,13 @@ class SharedStylesParser(object):
 
     def parse_gradient_fill(self, node):
         fill = {}
-
+        for key in ['type', 'degree', 'left', 'right', 'top', 'bottom']:
+            value = node.get(key)
+            if value is not None:
+                fill[key] = value
+        color_nodes = safe_iterator(node, "{%s}color" % SHEET_MAIN_NS)
+        fill['stop'] = [Color(self._get_relevant_color(node)) for node in color_nodes]
+        return GradientFill(**fill)
 
     def parse_borders(self):
         """Read in the boarders"""
