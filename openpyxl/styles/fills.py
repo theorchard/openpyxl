@@ -87,8 +87,8 @@ Fill = PatternFill # Backwards compatibility
 
 class GradientFill(HashableObject):
 
-    __fields__ = ('type', 'degree', 'left', 'right', 'top', 'bottom', 'stop')
-    type = Set(values=('linear', 'path'))
+    __fields__ = ('fill_type', 'degree', 'left', 'right', 'top', 'bottom', 'stop')
+    fill_type = Set(values=('linear', 'path'))
     degree = Float()
     left = Float()
     right = Float()
@@ -97,9 +97,9 @@ class GradientFill(HashableObject):
     stop = Sequence(expected_type=Color)
 
 
-    def __init__(self, typ="linear", degree=0, left=0, right=0, top=0,
+    def __init__(self, type="linear", degree=0, left=0, right=0, top=0,
                  bottom=0, stop=()):
-        self.type = typ
+        self.fill_type = type
         self.degree = degree
         self.left = left
         self.right = right
