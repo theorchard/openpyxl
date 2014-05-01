@@ -113,7 +113,10 @@ class GradientFill(HashableObject):
         return self.fill_type
 
     def __iter__(self):
-
+        """
+        Dictionary interface for easier serialising.
+        All values converted to strings
+        """
         for key in ('type', 'degree', 'left', 'right', 'top', 'bottom'):
             value = getattr(self, key)
             if value is not None:
