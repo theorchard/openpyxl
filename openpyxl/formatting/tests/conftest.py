@@ -10,3 +10,13 @@ def datadir():
     DATADIR = os.path.join(here, "data")
     from py._path.local import LocalPath
     return LocalPath(DATADIR)
+
+
+# objects under test
+
+
+@pytest.fixture
+def FormatRule():
+    """Formatting rule class"""
+    from openpyxl.formatting.rules import FormatRule
+    return FormatRule

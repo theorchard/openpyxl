@@ -17,15 +17,6 @@ def Image():
     return Image
 
 
-# Styles
-
-@pytest.fixture
-def FormatRule():
-    """Formatting rule class"""
-    from openpyxl.formatting.rules import FormatRule
-    return FormatRule
-
-
 # utility fixtures
 
 @pytest.fixture
