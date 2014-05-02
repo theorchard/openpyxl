@@ -33,27 +33,12 @@ class HashableObject(Strict):
     """Define how to hash property classes."""
     __fields__ = ()
     __slots__ = __fields__
-    __check__ = {}
     __base__ = False
 
     @property
     def __defaults__(self):
         spec = inspect.getargspec(self.__class__.__init__)
         return dict(zip(spec.args[1:], spec.defaults))
-
-    def _typecheck(self, name, value):
-        if isinstance(getattr(self, name, None), Descriptor):
-            return
-        expected = self.__check__.get(name)
-        if expected:
-            if not isinstance(value, expected):
-                msg = '%s should be a %s, not %s' % (name, expected,
-                                                     value.__class__.__name__)
-                raise TypeError(msg)
-        else:
-            if value is not None and not isinstance(value, BASE_TYPES):
-                raise TypeError('%s cannot be a %s' % (name,
-                                                       value.__class__.__name__))
 
     def copy(self, **kwargs):
         current = dict([(x, getattr(self, x)) for x in self.__fields__])
@@ -62,7 +47,6 @@ class HashableObject(Strict):
 
     def __setattr__(self, *args, **kwargs):
         name, value = args
-        self._typecheck(name, value)
         if hasattr(self, name) and (
             getattr(self, name) is not None
             and not isinstance(getattr(self, name), Descriptor)):

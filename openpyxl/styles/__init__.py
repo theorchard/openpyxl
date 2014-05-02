@@ -24,10 +24,12 @@ from __future__ import absolute_import
 
 from copy import deepcopy
 
+from openpyxl.descriptors import Typed
+
 from .alignment import Alignment
 from .borders import Borders, Border
 from .colors import Color
-from .fills import PatternFill, GradientFill
+from .fills import PatternFill, GradientFill, Fill
 from .fonts import Font
 from .hashable import HashableObject
 from .numbers import NumberFormat, is_date_format, is_builtin
@@ -44,12 +46,13 @@ class Style(HashableObject):
                   'protection')
     __base__ = True
     __slots__ = __fields__
-    __check__ = {'font': Font,
-                 'fill': PatternFill,
-                 'borders': Borders,
-                 'alignment': Alignment,
-                 'number_format': NumberFormat,
-                 'protection': Protection}
+
+    font = Typed(expected_type=Font)
+    fill = Typed(expected_type=Fill)
+    borders = Typed(expected_type=Borders)
+    alignment = Typed(expected_type=Alignment)
+    number_format = Typed(expected_type=NumberFormat)
+    protection = Typed(expected_type=Protection)
 
     def __init__(self, font=Font(), fill=PatternFill(), borders=Borders(),
                  alignment=Alignment(), number_format=NumberFormat(),
