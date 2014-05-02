@@ -45,7 +45,6 @@ class Style(HashableObject):
                   'number_format',
                   'protection')
     __base__ = True
-    __slots__ = __fields__
 
     font = Typed(expected_type=Font)
     fill = Typed(expected_type=Fill)
@@ -65,4 +64,3 @@ class Style(HashableObject):
         self.protection = protection
 
 DEFAULTS = Style()
-
