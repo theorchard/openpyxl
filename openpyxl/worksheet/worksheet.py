@@ -325,7 +325,7 @@ class Worksheet(object):
             return max([column_index_from_string(column_index)
                             for column_index in self.column_dimensions])
         else:
-            return 0
+            return 1
 
     @property
     def max_column(self):
