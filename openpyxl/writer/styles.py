@@ -152,8 +152,9 @@ class StyleWriter(object):
 
     def _write_gradient_fill(self, node, fill):
         node = SubElement(node, 'gradientFill', dict(fill))
-        for color in fill.stop:
-            self._unpack_color(node, color.index)
+        for idx, color in enumerate(fill.stop):
+            stop = SubElement(node, "stop", {"position":safe_string(idx)})
+            self._unpack_color(stop, color.index)
 
     def _write_borders(self):
         borders = SubElement(self._root, 'borders')
