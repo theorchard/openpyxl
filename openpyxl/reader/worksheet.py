@@ -163,7 +163,7 @@ class WorkSheetParser(object):
 
     def parse_row_dimensions(self, row):
         rowId = int(row.get('r'))
-        ht = row.get('ht', -1)
+        ht = row.get('ht')
         if rowId not in self.ws.row_dimensions:
             self.ws.row_dimensions[rowId] = RowDimension(rowId, height=ht)
         style_index = row.get('s')
