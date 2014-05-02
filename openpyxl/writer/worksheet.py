@@ -289,7 +289,7 @@ def write_worksheet_data(doc, worksheet, string_table, style_table):
         row_cells = cells_by_row[row_idx]
         sorted_cells = sorted(row_cells, key=row_sort)
         for cell in sorted_cells:
-            value = cell._value
+            value = cell.internal_value
             coordinate = cell.coordinate
             attributes = {'r': coordinate}
             if cell.data_type != cell.TYPE_FORMULA:
