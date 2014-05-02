@@ -26,6 +26,7 @@ import os.path
 
 from openpyxl.comments import Comment
 from openpyxl.xml.constants import (
+    PACKAGE_XL,
     PACKAGE_WORKSHEET_RELS,
     PACKAGE_WORKSHEETS,
     SHEET_MAIN_NS,
@@ -67,7 +68,8 @@ def get_comments_file(worksheet_path, archive, valid_files):
     root = fromstring(rels_source)
     for i in root:
         if i.attrib['Type'] == COMMENTS_NS:
-            comments_file = os.path.normpath(PACKAGE_WORKSHEETS + '/' + i.attrib['Target'])
+            comments_file = os.path.split(i.attrib['Target'])[-1]
+            comments_file = PACKAGE_XL + '/' + comments_file
             if comments_file in valid_files:
                 return comments_file
     return None

@@ -34,6 +34,18 @@ Bug fixes
 #275 - Handling auto filters where there are only custom filters
 
 
+1.8.6
+==================
+
+Minor changes
+-------------
+Fixed typo for import Elementtree
+
+Bugfixes
+--------
+#279 Incorrect path for comments files on Windows
+
+
 1.8.5 (2014-03-25)
 ==================
 
