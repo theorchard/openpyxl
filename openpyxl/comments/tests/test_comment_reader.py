@@ -30,7 +30,6 @@ from openpyxl.worksheet import Worksheet
 from openpyxl.reader import comments
 from openpyxl.reader.excel import load_workbook
 from openpyxl.xml.functions import fromstring
-from openpyxl.tests.helper import DATADIR
 
 def test_get_author_list():
     xml = """<?xml version="1.0" standalone="yes"?><comments
@@ -66,22 +65,23 @@ def test_read_comments():
         assert ws.cell(coordinate=cell).comment.text == text
         assert ws.cell(coordinate=cell).comment._parent == ws.cell(coordinate=cell)
 
-def test_get_comments_file():
-    path = os.path.join(DATADIR, 'reader', 'comments.xlsx')
-    archive = ZipFile(path, 'r', ZIP_DEFLATED)
+def test_get_comments_file(datadir):
+    datadir.chdir()
+    archive = ZipFile('comments.xlsx', 'r', ZIP_DEFLATED)
     valid_files = archive.namelist()
     assert comments.get_comments_file('sheet1.xml', archive, valid_files) == 'xl/comments1.xml'
     assert comments.get_comments_file('sheet3.xml', archive, valid_files) == 'xl/comments2.xml'
     assert comments.get_comments_file('sheet2.xml', archive, valid_files) is None
 
-def test_comments_cell_association():
-    path = os.path.join(DATADIR, 'reader', 'comments.xlsx')
-    wb = load_workbook(path)
+def test_comments_cell_association(datadir):
+    datadir.chdir()
+    wb = load_workbook('comments.xlsx')
     assert wb.worksheets[0].cell(coordinate="A1").comment.author == "Cuke"
     assert wb.worksheets[0].cell(coordinate="A1").comment.text == "Cuke:\nFirst Comment"
     assert wb.worksheets[1].cell(coordinate="A1").comment is None
     assert wb.worksheets[0].cell(coordinate="D1").comment.text == "Cuke:\nSecond Comment"
 
-def test_comments_with_iterators():
-    wb = load_workbook(filename=os.path.join(DATADIR, 'reader', 'comments.xlsx'), use_iterators=True)
+def test_comments_with_iterators(datadir):
+    datadir.chdir()
+    wb = load_workbook('comments.xlsx', use_iterators=True)
     ws = wb.get_sheet_by_name(name='Sheet1')

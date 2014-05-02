@@ -21,13 +21,11 @@
 # @license: http://www.opensource.org/licenses/mit-license.php
 # @author: see AUTHORS file
 
-import os
-
 from openpyxl.workbook import Workbook
 from openpyxl.worksheet import Worksheet
 from openpyxl.writer.comments import CommentWriter
 from openpyxl.comments import Comment
-from openpyxl.tests.helper import DATADIR, compare_xml
+from openpyxl.tests.helper import compare_xml
 from openpyxl.xml.functions import fromstring, get_document_content
 from openpyxl.xml.constants import SHEET_MAIN_NS
 from openpyxl.writer.comments import vmlns, excelns
@@ -52,14 +50,12 @@ def test_comment_writer_init():
     assert cw.author_to_id[cw.authors[2]] == "2"
     assert set(cw.comments) == set([comment1, comment2, comment3])
 
-def test_write_comments():
+def test_write_comments(datadir):
+    datadir.chdir()
     ws = _create_ws()[0]
-
-    reference_file = os.path.join(DATADIR, 'writer', 'expected',
-            'comments1.xml')
     cw = CommentWriter(ws)
     content = cw.write_comments()
-    with open(reference_file) as expected:
+    with open('comments1.xml') as expected:
         correct = fromstring(expected.read())
         check = fromstring(content)
         # check top-level elements have the same name
@@ -92,13 +88,12 @@ def test_write_comments():
         diff = compare_xml(get_document_content(correct), get_document_content(check))
         assert diff is None, diff
 
-def test_write_comments_vml():
+def test_write_comments_vml(datadir):
+    datadir.chdir()
     ws = _create_ws()[0]
     cw = CommentWriter(ws)
-    reference_file = os.path.join(DATADIR, 'writer', 'expected',
-            'commentsDrawing1.vml')
     content = cw.write_comments_vml()
-    with open(reference_file) as expected:
+    with open('commentsDrawing1.vml') as expected:
         correct = fromstring(expected.read())
         check = fromstring(content)
         correct_ids = []
