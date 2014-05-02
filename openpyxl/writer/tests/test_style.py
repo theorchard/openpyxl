@@ -20,9 +20,13 @@ def test_write_gradient_fill():
     xml = get_xml(writer._root)
     expected = """<?xml version="1.0" ?>
 <styleSheet xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main">
-  <gradientFill bottom="0" degree="90" left="0" right="0" top="0" type="linear">
-    <color theme="0"/>
-    <color theme="4"/>
+  <gradientFill degree="90" type="linear">
+    <stop position="0">
+      <color theme="0"/>
+    </stop>
+    <stop position="1">
+      <color theme="4"/>
+    </stop>
   </gradientFill>
 </styleSheet>
     """
