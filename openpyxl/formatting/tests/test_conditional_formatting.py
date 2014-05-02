@@ -45,7 +45,7 @@ from openpyxl.styles.border import Border
 # test imports
 import pytest
 from zipfile import ZIP_DEFLATED, ZipFile
-from openpyxl.tests.helper import DATADIR, get_xml, compare_xml
+from openpyxl.tests.helper import get_xml, compare_xml
 from openpyxl.collections import IndexedList
 
 
@@ -561,8 +561,9 @@ def compare_complex(a, b):
     return True
 
 
-def test_conditional_formatting_read():
-    reference_file = os.path.join(DATADIR, 'reader', 'conditional-formatting.xlsx')
+def test_conditional_formatting_read(datadir):
+    datadir.chdir()
+    reference_file = 'conditional-formatting.xlsx'
     wb = load_workbook(reference_file)
     ws = wb.get_active_sheet()
 
@@ -599,8 +600,9 @@ def test_conditional_formatting_read():
     assert compare_complex(ws.conditional_formatting.cf_rules['AD1:AD10'], [{'priority': 1, 'dxfId': '14', 'type': 'expression', 'formula': ['AD1>3']}])
 
 
-def test_parse_dxfs():
-    reference_file = os.path.join(DATADIR, 'reader', 'conditional-formatting.xlsx')
+def test_parse_dxfs(datadir):
+    datadir.chdir()
+    reference_file = 'conditional-formatting.xlsx'
     wb = load_workbook(reference_file)
     assert isinstance(wb, Workbook)
     archive = ZipFile(reference_file, 'r', ZIP_DEFLATED)
@@ -611,7 +613,7 @@ def test_parse_dxfs():
     assert len(wb.style_properties['dxf_list']) == 164
 
     # Verify first dxf style
-    reference_file = os.path.join(DATADIR, 'writer', 'expected', 'dxf_style.xml')
+    reference_file = 'dxf_style.xml'
     with open(reference_file) as expected:
         diff = compare_xml(read_xml, expected.read())
         assert diff is None, diff
