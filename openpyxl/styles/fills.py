@@ -59,7 +59,14 @@ fills = (FILL_NONE, FILL_SOLID, FILL_PATTERN_DARKDOWN, FILL_PATTERN_DARKGRAY,
          FILL_PATTERN_MEDIUMGRAY)
 
 
-class PatternFill(HashableObject):
+class Fill(HashableObject):
+
+    """Base class"""
+
+    pass
+
+
+class PatternFill(Fill):
     """Area fill patterns for use in styles.
     Caution: if you do not specify a fill_type, other attributes will have
     no effect !"""
@@ -83,10 +90,7 @@ class PatternFill(HashableObject):
         self.end_color = end_color
 
 
-Fill = PatternFill # Backwards compatibility
-
-
-class GradientFill(HashableObject):
+class GradientFill(Fill):
 
     __fields__ = ('fill_type', 'degree', 'left', 'right', 'top', 'bottom', 'stop')
     fill_type = Set(values=('linear', 'path'))
@@ -122,5 +126,5 @@ class GradientFill(HashableObject):
         """
         for key in ('type', 'degree', 'left', 'right', 'top', 'bottom'):
             value = getattr(self, key)
-            if value is not None:
+            if bool(value):
                 yield key, safe_string(value)
