@@ -21,11 +21,16 @@
 # @license: http://www.opensource.org/licenses/mit-license.php
 # @author: see AUTHORS file
 
-from os import path
+import os
 
 from openpyxl.comments import Comment
-from openpyxl.shared.ooxml import PACKAGE_WORKSHEET_RELS, PACKAGE_WORKSHEETS, \
-                                  SHEET_MAIN_NS, COMMENTS_NS
+from openpyxl.shared.ooxml import (
+    PACKAGE_XL, 
+    PACKAGE_WORKSHEET_RELS,
+    PACKAGE_WORKSHEETS,
+    SHEET_MAIN_NS,
+    COMMENTS_NS
+    )
 from openpyxl.shared.xmltools import fromstring
 
 def _get_author_list(root):
@@ -62,7 +67,8 @@ def get_comments_file(sheet_codename, archive, valid_files):
     root = fromstring(rels_source)
     for i in root:
         if i.attrib['Type'] == COMMENTS_NS:
-            comments_file = path.normpath(PACKAGE_WORKSHEETS + '/' + i.attrib['Target'])
+            comments_file = os.path.split(i.attrib['Target'])[-1]
+            comments_file = PACKAGE_XL + '/' + comments_file
             if comments_file in valid_files:
                 return comments_file
     return None
