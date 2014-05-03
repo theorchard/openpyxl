@@ -34,6 +34,7 @@ raises an AttributeError.
 >>> comment = Comment("Text", "Author")
 >>> ws["A1"].comment = comment
 >>> ws["B2"].comment = comment
+Traceback (most recent call last):
 AttributeError: Comment already assigned to A1 in worksheet Sheet. Cannot
 assign a comment to more than one cell
 
