@@ -170,6 +170,23 @@ class Default(Typed):
         return self.expected_type()
 
 
+class Alias(Descriptor):
+    """
+    Aliases can be used when either the desired attribute name is not allowed
+    or confusing in Python (eg. "type") or a more descriptve name is desired
+    (eg. "underline" for "u")
+    """
+
+    def __init__(self, alias):
+        self.alias = alias
+
+    def __set__(self, instance, value):
+        setattr(instance, self.alias, value)
+
+    def __get__(self, instance, cls):
+        return getattr(instance, self.alias)
+
+
 class MetaStrict(type):
 
     def __new__(cls, clsname, bases, methods):

@@ -22,7 +22,7 @@ from __future__ import absolute_import
 # @license: http://www.opensource.org/licenses/mit-license.php
 # @author: see AUTHORS file
 
-from openpyxl.descriptors import Float, Set, Sequence
+from openpyxl.descriptors import Float, Set, Sequence, Alias
 from openpyxl.compat import safe_string
 
 from .colors import WHITE, Color
@@ -78,43 +78,30 @@ class PatternFill(Fill):
                   'bgColor')
 
     patternType = Set(values=fills)
-    rotation = Float()
+    fill_type = Alias("patternType")
     fgColor = Color()
+    start_color = Alias("fgColor")
     bgColor = Color()
+    end_color = Alias("bgColor")
 
     def __init__(self, patternType=FILL_NONE, fgColor=None, bgColor=None,
                  fill_type=None, start_color=None, end_color=None):
         if fill_type is not None:
-            self.patternType = fill_type
-        else:
-            self.patternType = patternType
+           patternType = fill_type
+        self.patternType = patternType
         if start_color is not None:
-            self.fgColor = start_color
-        else:
-            self.fgColor = fgColor
+            fgColor = start_color
+        self.fgColor = fgColor
         if end_color is not None:
-            self.bgColor = end_color
-        else:
-            self.bgColor = bgColor
-
-    @property
-    def fill_type(self):
-        return self.patternType
-
-    @property
-    def start_color(self):
-        return self.fgColor
-
-    @property
-    def end_color(self):
-        return self.bgColor
+            bgColor = end_color
+        self.bgColor = bgColor
 
 
 class GradientFill(Fill):
 
     __fields__ = ('fill_type', 'degree', 'left', 'right', 'top', 'bottom', 'stop')
     fill_type = Set(values=('linear', 'path'))
-    type = fill_type
+    type = Alias("fill_type")
     degree = Float()
     left = Float()
     right = Float()
@@ -133,13 +120,8 @@ class GradientFill(Fill):
         self.stop = stop
         # cannot use type attribute but allow it is an argument (ie. when parsing)
         if type is not None:
-            self.fill_type = type
-        else:
-            self.fill_type = fill_type
-
-    @property
-    def type(self):
-        return self.fill_type
+            fill_type = type
+        self.fill_type = fill_type
 
     def __iter__(self):
         """
