@@ -49,7 +49,8 @@ if LXML is True:
     fromstring,
     tostring,
     register_namespace,
-    iterparse
+    iterparse,
+    QName
     )
     from xml.etree.cElementTree import iterparse
 else:
@@ -60,7 +61,8 @@ else:
         SubElement,
         fromstring,
         tostring,
-        iterparse
+        iterparse,
+        QName
         )
     except ImportError:
         from xml.etree.ElementTree import (
@@ -69,7 +71,8 @@ else:
         SubElement,
         fromstring,
         tostring,
-        iterparse
+        iterparse,
+        QName
         )
     from .namespace import register_namespace
 
