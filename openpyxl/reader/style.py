@@ -26,10 +26,18 @@ from __future__ import absolute_import
 
 # package imports
 from openpyxl.collections import IndexedList
-from openpyxl.xml.functions import fromstring, safe_iterator
+from openpyxl.xml.functions import fromstring, safe_iterator, localname
 from openpyxl.exceptions import MissingNumberFormat
-from openpyxl.styles import (Style, NumberFormat, Font, PatternFill,
-                             GradientFill, Borders, Protection, Alignment)
+from openpyxl.styles import (
+    Style,
+    NumberFormat,
+    Font,
+    PatternFill,
+    GradientFill,
+    Borders,
+    Protection,
+    Alignment
+)
 from openpyxl.styles.border import Border
 from openpyxl.styles import borders
 from openpyxl.styles.colors import COLOR_INDEX, Color
@@ -169,16 +177,12 @@ class SharedStylesParser(object):
 
     def parse_pattern_fill(self, node):
         fill = dict(node.items())
-        fgColor = node.find('{%s}fgColor' % SHEET_MAIN_NS)
-        if fgColor is not None:
-            color = self._get_relevant_color(fgColor)
-            if color:
-                fill['start_color'] = Color(color)
-        bgColor = node.find('{%s}bgColor' % SHEET_MAIN_NS)
-        if bgColor is not None:
-            color = self._get_relevant_color(bgColor)
-            if color is not None:
-                fill['end_color'] = Color(color)
+        for child in safe_iterator(node):
+            if child is not node:
+                tag = localname(child)
+                color = self._get_relevant_color(child)
+                if color is not None:
+                    fill[tag] = Color(color)
         return PatternFill(**fill)
 
     def parse_gradient_fill(self, node):

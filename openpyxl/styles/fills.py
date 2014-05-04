@@ -74,27 +74,40 @@ class PatternFill(Fill):
     from .descriptors import Color
 
     __fields__ = ('patternType',
-                  'start_color',
-                  'end_color')
+                  'fgColor',
+                  'bgColor')
 
     patternType = Set(values=fills)
     rotation = Float()
-    start_color = Color()
-    end_color = Color()
+    fgColor = Color()
+    bgColor = Color()
 
-    def __init__(self, patternType=FILL_NONE, start_color=None,
-                 end_color=None, fill_type=None):
-        self.start_color = start_color
-        self.end_color = end_color
+    def __init__(self, patternType=FILL_NONE, fgColor=None, bgColor=None,
+                 fill_type=None, start_color=None, end_color=None):
         if fill_type is not None:
             self.patternType = fill_type
         else:
             self.patternType = patternType
-
+        if start_color is not None:
+            self.fgColor = start_color
+        else:
+            self.fgColor = fgColor
+        if end_color is not None:
+            self.bgColor = end_color
+        else:
+            self.bgColor = bgColor
 
     @property
     def fill_type(self):
         return self.patternType
+
+    @property
+    def start_color(self):
+        return self.fgColor
+
+    @property
+    def end_color(self):
+        return self.bgColor
 
 
 class GradientFill(Fill):

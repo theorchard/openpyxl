@@ -30,6 +30,7 @@ Shortcut functions taken from:
 """
 
 # Python stdlib imports
+import re
 from functools import partial
 from xml.sax.saxutils import XMLGenerator
 from xml.sax.xmlreader import AttributesImpl
@@ -177,3 +178,10 @@ def ConditionalElement(node, tag, condition, attr=None):
         else:
             elem = sub()
         return elem
+
+
+NS_REGEX = re.compile("{(?P<namespace>.*)}(?P<localname>.*)")
+
+def localname(node):
+    m = NS_REGEX.match(node.tag)
+    return m.group('localname')
