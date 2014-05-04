@@ -168,8 +168,7 @@ class SharedStylesParser(object):
             return self.parse_gradient_fill(gradient)
 
     def parse_pattern_fill(self, node):
-        fill = {}
-        fill['fill_type'] = node.get('patternType', 'none')
+        fill = dict(node.items())
         fgColor = node.find('{%s}fgColor' % SHEET_MAIN_NS)
         if fgColor is not None:
             color = self._get_relevant_color(fgColor)

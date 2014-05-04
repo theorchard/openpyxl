@@ -73,27 +73,35 @@ class PatternFill(Fill):
 
     from .descriptors import Color
 
-
-    __fields__ = ('fill_type',
+    __fields__ = ('patternType',
                   'start_color',
                   'end_color')
 
-    fill_type = Set(values=fills)
+    patternType = Set(values=fills)
     rotation = Float()
     start_color = Color()
     end_color = Color()
 
-    def __init__(self, fill_type=FILL_NONE, start_color=None,
-                 end_color=None):
-        self.fill_type = fill_type
+    def __init__(self, patternType=FILL_NONE, start_color=None,
+                 end_color=None, fill_type=None):
         self.start_color = start_color
         self.end_color = end_color
+        if fill_type is not None:
+            self.patternType = fill_type
+        else:
+            self.patternType = patternType
+
+
+    @property
+    def fill_type(self):
+        return self.patternType
 
 
 class GradientFill(Fill):
 
     __fields__ = ('fill_type', 'degree', 'left', 'right', 'top', 'bottom', 'stop')
     fill_type = Set(values=('linear', 'path'))
+    type = fill_type
     degree = Float()
     left = Float()
     right = Float()
@@ -104,7 +112,6 @@ class GradientFill(Fill):
 
     def __init__(self, fill_type="linear", degree=0, left=0, right=0, top=0,
                  bottom=0, stop=(), type=None):
-        self.fill_type = fill_type
         self.degree = degree
         self.left = left
         self.right = right
@@ -114,6 +121,8 @@ class GradientFill(Fill):
         # cannot use type attribute but allow it is an argument (ie. when parsing)
         if type is not None:
             self.fill_type = type
+        else:
+            self.fill_type = fill_type
 
     @property
     def type(self):
