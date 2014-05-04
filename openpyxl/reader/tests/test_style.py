@@ -141,7 +141,7 @@ def test_read_complex_style(datadir):
     assert not style('A2').font.italic
     assert style('A3').font.name == 'Arial'
     assert style('A3').font.size == 12
-    assert style('A3').font.bold
+    assert style('A3').font.bold is True
     assert not style('A3').font.italic
     assert style('A4').font.name == 'Arial'
     assert style('A4').font.size == 14

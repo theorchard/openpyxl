@@ -22,7 +22,7 @@ from __future__ import absolute_import
 # @license: http://www.opensource.org/licenses/mit-license.php
 # @author: see AUTHORS file
 
-from openpyxl.descriptors import Strict, Float, Set, Bool, String
+from openpyxl.descriptors import Strict, Float, Integer, Set, Bool, String, Alias
 from .hashable import HashableObject
 from .descriptors import Color
 
@@ -37,35 +37,54 @@ class Font(HashableObject):
 
 
     name = String()
-    size = Float()
-    bold = Bool()
-    italic = Bool()
+    charset = Integer(allow_none=True)
+    family = String(allow_none=True)
+    sz = Float()
+    size = Alias("sz")
+    b = Bool()
+    bold = Alias("b")
+    i = Bool()
+    italic = Alias("i")
+    strike = Bool()
+    strikethrough = Alias("strike")
+    outline = Bool()
+    shadow = Bool()
+    condense = Bool()
+    extend = Bool()
     superscript = Bool()
     subscript = Bool()
-    underline = Set(values=set([UNDERLINE_DOUBLE, UNDERLINE_NONE,
-                                UNDERLINE_DOUBLE_ACCOUNTING, UNDERLINE_SINGLE,
-                                UNDERLINE_SINGLE_ACCOUNTING]))
+    u = Set(values=set([None, UNDERLINE_DOUBLE, UNDERLINE_NONE,
+                        UNDERLINE_DOUBLE_ACCOUNTING, UNDERLINE_SINGLE,
+                        UNDERLINE_SINGLE_ACCOUNTING]))
+    underline = Alias("u")
     color = Color()
+    schema = String(allow_none=True)
 
     __fields__ = ('name',
-                  'size',
-                  'bold',
-                  'italic',
-                  'superscript',
-                  'subscript',
-                  'underline',
-                  'strikethrough',
+                  'sz',
+                  'b',
+                  'i',
+                  'u',
+                  'strike',
                   'color')
 
-    def __init__(self, name='Calibri', size=11, bold=False, italic=False,
-                 superscript=False, subscript=False, underline=UNDERLINE_NONE,
-                 strikethrough=False, color=color()):
+    def __init__(self, name='Calibri', sz=11, b=False, i=False, charset=None,
+                 u=UNDERLINE_NONE, strike=False, color=color(), scheme=None, family=None,
+                 size=None, bold=None, italic=None, strikethrough=None, underline=None):
         self.name = name
-        self.size = size
-        self.bold = bold
-        self.italic = italic
-        self.superscript = superscript
-        self.subscript = subscript
-        self.underline = underline
-        self.strikethrough = strikethrough
+        if size is not None:
+            sz = size
+        self.sz = sz
+        if bold is not None:
+            b = bold
+        self.b = b
+        if italic is not None:
+            i = italic
+        self.i = i
+        if underline is not None:
+            u = underline
+        self.u = u
+        if strikethrough is not None:
+            strike = strikethrough
+        self.strike = strike
         self.color = color

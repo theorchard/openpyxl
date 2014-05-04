@@ -134,29 +134,21 @@ class SharedStylesParser(object):
     def parse_font(self, font_node):
         """Read individual font"""
         font = {}
-        fontSizeEl = font_node.find('{%s}sz' % SHEET_MAIN_NS)
-        if fontSizeEl is not None:
-            font['size'] = fontSizeEl.get('val')
-        fontNameEl = font_node.find('{%s}name' % SHEET_MAIN_NS)
-        if fontNameEl is not None:
-            font['name'] = fontNameEl.get('val')
-        bold = font_node.find('{%s}b' % SHEET_MAIN_NS)
-        if bold is not None:
-            font['bold'] = bool(bold.get('val', True))
-        italic = font_node.find('{%s}i' % SHEET_MAIN_NS)
-        if italic is not None:
-            font['italic'] = bool(italic.get('val', True))
+        for child in safe_iterator(font_node):
+            if child is not font_node:
+                tag = localname(child)
+                font[tag] = child.get("val", True)
+
         underline = font_node.find('{%s}u' % SHEET_MAIN_NS)
         if underline is not None:
-            font['underline'] = underline.get('val', 'single')
-        strikethrough = font_node.find('{%s}strike' % SHEET_MAIN_NS)
-        if strikethrough is not None:
-            font['strikethrough'] = True
+            font['u'] = underline.get('val', 'single')
         color = font_node.find('{%s}color' % SHEET_MAIN_NS)
         if color is not None:
             index = self._get_relevant_color(color)
             if index is not None:
                 font['color'] = Color(index)
+            else:
+                del font['color']
         return Font(**font)
 
     def parse_fills(self):

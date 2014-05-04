@@ -10,8 +10,6 @@ class TestFont:
         assert f.size == 11
         assert f.bold is False
         assert f.italic is False
-        assert f.superscript is False
-        assert f.subscript is False
         assert f.underline == 'none'
         assert f.strikethrough is False
         assert f.color.index == '00000000'
