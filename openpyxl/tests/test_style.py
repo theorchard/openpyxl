@@ -229,13 +229,14 @@ class TestStyleWriter(object):
     @pytest.mark.parametrize("value, expected",
                              [
                                  (Color('FFFFFF'), {'rgb': 'FFFFFF'}),
-                                 (Color('theme:7:'), {'theme': '7'}),
-                                 (Color('theme:7:8'), {'theme':'7', 'tint':'8'})
+                                 (Color(indexed=7), {'indexed': '7'}),
+                                 (Color(theme=7, tint=0.8), {'theme':'7', 'tint':'0.8'}),
+                                 (Color(auto=True), {'auto':'1'}),
                              ])
-    def test_unpack_color(self, value, expected):
+    def test_write_color(self, value, expected):
         w = StyleWriter(self.workbook)
         root = Element("root")
-        w._unpack_color(root, value)
+        w._write_color(root, value)
         assert root.find('color') is not None
         assert root.find('color').attrib == expected
 

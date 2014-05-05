@@ -14,7 +14,7 @@ class DummyWorkbook:
 
 
 def test_write_gradient_fill():
-    fill = GradientFill(degree=90, stop=[Color('theme:0:'), Color('theme:4:')])
+    fill = GradientFill(degree=90, stop=[Color(theme=0), Color(theme=4)])
     writer = StyleWriter(DummyWorkbook())
     writer._write_gradient_fill(writer._root, fill)
     xml = get_xml(writer._root)

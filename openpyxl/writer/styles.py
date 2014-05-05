@@ -62,26 +62,11 @@ class StyleWriter(object):
 
         return get_document_content(xml_node=self._root)
 
-    def _unpack_color(self, node, color, key='color'):
-        """Convert colors encoded as RGB, theme or tints
-        Possible values
-        RGB: #4F81BD
-        Theme: theme:9
-        Tint: theme:9:7 # guess work
+    def _write_color(self, node, color, key='color'):
         """
-        if color is None:
-            return
-        if color.type == "rgb":
-            if not ":" in color.value:
-                attrs = {"rgb": color.value}
-            else:
-                _, theme, tint = color.value.split(":")
-                if tint == '':
-                    attrs = {'theme': theme}
-                else:
-                    attrs = {'theme': theme, 'tint': tint}
-        else:
-            attrs = dict(color)
+        Convert colors encoded as RGB, theme, indexed, auto with tint
+        """
+        attrs = dict(color)
         SubElement(node, key, attrs)
 
     def _write_fonts(self):
@@ -107,7 +92,7 @@ class StyleWriter(object):
                 table[st.font] = index
                 font_node = SubElement(fonts, 'font')
                 SubElement(font_node, 'sz', {'val':str(st.font.size)})
-                self._unpack_color(font_node, st.font.color)
+                self._write_color(font_node, st.font.color)
                 SubElement(font_node, 'name', {'val':st.font.name})
                 SubElement(font_node, 'family', {'val':'2'})
                 # Don't write the 'scheme' element because it appears to prevent
@@ -150,15 +135,15 @@ class StyleWriter(object):
             node = SubElement(node, 'patternFill', {'patternType':
                                                     fill.fill_type})
             if fill.start_color != DEFAULTS.fill.start_color:
-                self._unpack_color(node, fill.start_color, 'fgColor')
+                self._write_color(node, fill.start_color, 'fgColor')
             if fill.end_color != DEFAULTS.fill.end_color:
-                self._unpack_color(node, fill.end_color, 'bgColor')
+                self._write_color(node, fill.end_color, 'bgColor')
 
     def _write_gradient_fill(self, node, fill):
         node = SubElement(node, 'gradientFill', dict(fill))
         for idx, color in enumerate(fill.stop):
             stop = SubElement(node, "stop", {"position":safe_string(idx)})
-            self._unpack_color(stop, color)
+            self._write_color(stop, color)
 
     def _write_borders(self):
         borders = SubElement(self._root, 'borders')
@@ -185,7 +170,7 @@ class StyleWriter(object):
                         node = SubElement(border, side)
                     else:
                         node = SubElement(border, side, {'style':obj.border_style})
-                        self._unpack_color(node, obj.color)
+                        self._write_color(node, obj.color)
 
                 index += 1
 
@@ -287,7 +272,7 @@ class StyleWriter(object):
                 if 'font' in d and d['font'] is not None:
                     font_node = SubElement(dxf, 'font')
                     if d['font'].color is not None:
-                        self._unpack_color(font_node, d['font'].color)
+                        self._write_color(font_node, d['font'].color)
                     ConditionalElement(font_node, 'b', d['font'].bold, 'val')
                     ConditionalElement(font_node, 'i', d['font'].italic, 'val')
                     ConditionalElement(font_node, 'u', d['font'].underline != 'none',
@@ -303,10 +288,10 @@ class StyleWriter(object):
                     else:
                         node = SubElement(fill, 'patternFill')
                     if f.start_color != DEFAULTS.fill.start_color:
-                        self._unpack_color(node, f.start_color, 'fgColor')
+                        self._write_color(node, f.start_color, 'fgColor')
 
                     if f.end_color != DEFAULTS.fill.end_color:
-                        self._unpack_color(node, f.end_color, 'bgColor')
+                        self._write_color(node, f.end_color, 'bgColor')
 
                 if 'border' in d:
                     borders = d['border']
@@ -318,7 +303,7 @@ class StyleWriter(object):
                             node = SubElement(border, side)
                         else:
                             node = SubElement(border, side, {'style': obj.border_style})
-                            self._unpack_color(node, obj.color)
+                            self._write_color(node, obj.color)
         else:
             dxfs = SubElement(self._root, 'dxfs', {'count': '0'})
         return dxfs
