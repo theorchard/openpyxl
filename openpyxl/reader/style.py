@@ -104,30 +104,6 @@ class SharedStylesParser(object):
                 dxf_list.append(dxf_item)
         self.style_prop['dxf_list'] = dxf_list
 
-    def _get_relevant_color(self, color):
-        """Utility method for getting the color from different attributes"""
-        value = None
-        idx = color.get('indexed')
-        theme = color.get('theme')
-        tint = color.get('tint')
-        rgb = color.get('rgb')
-        auto = color.get('auto')
-        if idx is not None:
-            idx = int(idx)
-            if idx < len(self.color_index):
-                value = self.color_index[int(idx)]
-        elif theme is not None:
-            if tint is not None:
-                value = 'theme:%s:%s' % (theme, tint)
-            else:
-                value = 'theme:%s:' % theme  # prefix color with theme
-        elif rgb is not None:
-            value = rgb
-        elif auto is not None:
-            value = auto
-        if value is not None:
-            return Color(value)
-
     def parse_fonts(self):
         """Read in the fonts"""
         fonts = self.root.find('{%s}fonts' % SHEET_MAIN_NS)
