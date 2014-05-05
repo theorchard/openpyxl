@@ -48,7 +48,7 @@ class Convertible(Typed):
 class Max(Typed):
     """Values must be less than a `max` value"""
 
-    expected_type = Number
+    expected_type = float
 
     def __init__(self, name=None, **kw):
         if 'max' not in kw:
@@ -68,7 +68,7 @@ class Max(Typed):
 class Min(Typed):
     """Values must be greater than a `min` value"""
 
-    expected_type = Number
+    expected_type = float
 
     def __init__(self, name=None, **kw):
         if 'min' not in kw:
