@@ -71,6 +71,8 @@ class PatternFill(Fill):
     Caution: if you do not specify a fill_type, other attributes will have
     no effect !"""
 
+    spec = """18.8.32"""
+
     from .descriptors import Color
 
     __fields__ = ('patternType',
@@ -98,6 +100,8 @@ class PatternFill(Fill):
 
 
 class GradientFill(Fill):
+
+    spec = """18.8.24"""
 
     __fields__ = ('fill_type', 'degree', 'left', 'right', 'top', 'bottom', 'stop')
     fill_type = Set(values=('linear', 'path'))

@@ -29,6 +29,9 @@ from .descriptors import Color
 
 class Font(HashableObject):
     """Font options used in styles."""
+
+    spec = """18.8.22, p.3930"""
+
     UNDERLINE_NONE = 'none'
     UNDERLINE_DOUBLE = 'double'
     UNDERLINE_DOUBLE_ACCOUNTING = 'doubleAccounting'
