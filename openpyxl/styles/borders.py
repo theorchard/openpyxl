@@ -22,18 +22,12 @@ from __future__ import absolute_import
 # @license: http://www.opensource.org/licenses/mit-license.php
 # @author: see AUTHORS file
 
-from openpyxl.descriptors import Set, Default, Typed
+from openpyxl.descriptors import Set, Typed
 
 from .colors import Color
 from .hashable import HashableObject
 from .descriptors import Color
 from .border import Border
-
-
-class Border(Default):
-    """Border descriptor"""
-
-    expected_type = Border
 
 
 DIAGONAL_NONE = 0
@@ -59,22 +53,22 @@ class Borders(HashableObject):
                   'vertical',
                   'horizontal')
 
-    left = Border()
-    right = Border()
-    top = Border()
-    bottom = Border()
-    diagonal = Border()
+    left = Typed(expected_type=Border)
+    right = Typed(expected_type=Border)
+    top = Typed(expected_type=Border)
+    bottom = Typed(expected_type=Border)
+    diagonal = Typed(expected_type=Border)
     diagonal_direction = Set(values=diagonals)
-    all_borders = Border()
-    outline = Border()
-    inside = Border()
-    vertical = Border()
-    horizontal = Border()
+    all_borders = Typed(expected_type=Border)
+    outline = Typed(expected_type=Border)
+    inside = Typed(expected_type=Border)
+    vertical = Typed(expected_type=Border)
+    horizontal = Typed(expected_type=Border)
 
-    def __init__(self, left=left(), right=right(), top=top(),
-                 bottom=bottom(), diagonal=diagonal(), diagonal_direction=DIAGONAL_NONE,
-                 all_borders=all_borders(), outline=outline(), inside=inside(),
-                 vertical=vertical(), horizontal=horizontal()):
+    def __init__(self, left=Border(), right=Border(), top=Border(),
+                 bottom=Border(), diagonal=Border(), diagonal_direction=DIAGONAL_NONE,
+                 all_borders=Border(), outline=Border(), inside=Border(),
+                 vertical=Border(), horizontal=Border()):
         self.left = left
         self.right = right
         self.top = top
