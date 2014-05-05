@@ -167,12 +167,12 @@ def test_read_complex_style(datadir):
     assert style('A19').borders.bottom.color.value == 'FF006600'
     assert style('A19').borders.left.color.value == 'FF006600'
     assert style('A19').borders.right.color.value == 'FF006600'
-    assert style('A21').borders.top.color.value == 'theme:7:'
-    assert style('A21').borders.bottom.color.value == 'theme:7:'
-    assert style('A21').borders.left.color.value == 'theme:7:'
-    assert style('A21').borders.right.color.value == 'theme:7:'
+    assert style('A21').borders.top.color.value == 7
+    assert style('A21').borders.bottom.color.value == 7
+    assert style('A21').borders.left.color.value == 7
+    assert style('A21').borders.right.color.value == 7
     assert style('A23').fill.start_color.value == 'FFCCCCFF'
-    assert style('A23').borders.top.color.value == 'theme:6:'
+    assert style('A23').borders.top.color.value == 6
     assert 'A23:B24' in ws._merged_cells
     assert ws.cell('A24').merged
     assert ws.cell('B23').merged
@@ -227,15 +227,15 @@ def test_change_existing_styles(datadir):
                                                                      right=Border(border_style=Border.BORDER_THIN,
                                                                                   color=Color('FF006600'))))
     ws.cell('A21').style = ws.cell('A21').style.copy(borders=Borders(top=Border(border_style=Border.BORDER_THIN,
-                                                                                color=Color('theme:7:')),
+                                                                                color=Color(theme=7)),
                                                                      bottom=Border(border_style=Border.BORDER_THIN,
-                                                                                   color=Color('theme:7:')),
+                                                                                   color=Color(theme=7)),
                                                                      left=Border(border_style=Border.BORDER_THIN,
-                                                                                 color=Color('theme:7:')),
+                                                                                 color=Color(theme=7)),
                                                                      right=Border(border_style=Border.BORDER_THIN,
-                                                                                  color=Color('theme:7:'))))
+                                                                                  color=Color(theme=7))))
     ws.cell('A23').style = ws.cell('A23').style.copy(borders=Borders(top=Border(border_style=Border.BORDER_THIN,
-                                                                                color=Color('theme:6:'))),
+                                                                                color=Color(theme=6))),
                                                      fill=PatternFill(fill_type='solid',
                                                                start_color=Color('FFCCCCFF')))
     ws.unmerge_cells('A23:B24')
@@ -283,12 +283,12 @@ def test_change_existing_styles(datadir):
     assert style('A19').borders.bottom.color.value == 'FF006600'
     assert style('A19').borders.left.color.value == 'FF006600'
     assert style('A19').borders.right.color.value == 'FF006600'
-    assert style('A21').borders.top.color.value == 'theme:7:'
-    assert style('A21').borders.bottom.color.value == 'theme:7:'
-    assert style('A21').borders.left.color.value == 'theme:7:'
-    assert style('A21').borders.right.color.value == 'theme:7:'
+    assert style('A21').borders.top.color.value == 7
+    assert style('A21').borders.bottom.color.value == 7
+    assert style('A21').borders.left.color.value == 7
+    assert style('A21').borders.right.color.value == 7
     assert style('A23').fill.start_color.value == 'FFCCCCFF'
-    assert style('A23').borders.top.color.value == 'theme:6:'
+    assert style('A23').borders.top.color.value == 6
     assert 'A23:B24' not in ws._merged_cells
     assert not ws.cell('A24').merged
     assert not ws.cell('B23').merged
@@ -329,12 +329,12 @@ def test_change_existing_styles(datadir):
     assert style('C19').borders.bottom.color.value == 'FF006600'
     assert style('C19').borders.left.color.value == 'FF006600'
     assert style('C19').borders.right.color.value == 'FF006600'
-    assert style('C21').borders.top.color.value == 'theme:7:'
-    assert style('C21').borders.bottom.color.value == 'theme:7:'
-    assert style('C21').borders.left.color.value == 'theme:7:'
-    assert style('C21').borders.right.color.value == 'theme:7:'
+    assert style('C21').borders.top.color.value == 7
+    assert style('C21').borders.bottom.color.value == 7
+    assert style('C21').borders.left.color.value == 7
+    assert style('C21').borders.right.color.value == 7
     assert style('C23').fill.start_color.value == 'FFCCCCFF'
-    assert style('C23').borders.top.color.value == 'theme:6:'
+    assert style('C23').borders.top.color.value == 6
     assert 'C23:D24' in ws._merged_cells
     assert ws.cell('C24').merged
     assert ws.cell('D23').merged

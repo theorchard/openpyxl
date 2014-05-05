@@ -208,10 +208,11 @@ class SharedStylesParser(object):
                     bside['border_style'] = node.get('style')
                 color = node.find('{%s}color' % SHEET_MAIN_NS)
                 if color is not None:
-                    index = self._get_relevant_color(color)
-                    if index is not None:
-                        bside['color'] = index
-                    # Ignore 'auto'
+                    bside['color'] = Color(**dict(color.items()))
+                    #index = self._get_relevant_color(color)
+                    #if index is not None:
+                        #bside['color'] = index
+                    ## Ignore 'auto'
                 border[side] = Border(**bside)
         return Borders(**border)
 
