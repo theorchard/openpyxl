@@ -62,10 +62,10 @@ def StyleReader():
 
 @pytest.mark.parametrize("value, expected",
                          [
-                             ({'indexed': '62'}, "00333399"),
-                             ({'rgb': "FFFFFFFF"}, "FFFFFFFF"),
-                             ({'theme': '0'}, 'theme:0:'),
-                             ({'theme': '0', 'tint': "0.5"}, "theme:0:0.5")
+                             ({'indexed': '62'}, Color("00333399")),
+                             ({'rgb': "FFFFFFFF"}, Color("FFFFFFFF")),
+                             ({'theme': '0'}, Color('theme:0:')),
+                             ({'theme': '0', 'tint': "0.5"}, Color("theme:0:0.5"))
 ])
 def test_get_color(StyleReader, value, expected):
     reader = StyleReader("""

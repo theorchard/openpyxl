@@ -111,6 +111,7 @@ class SharedStylesParser(object):
         theme = color.get('theme')
         tint = color.get('tint')
         rgb = color.get('rgb')
+        auto = color.get('auto')
         if idx is not None:
             idx = int(idx)
             if idx < len(self.color_index):
@@ -122,7 +123,10 @@ class SharedStylesParser(object):
                 value = 'theme:%s:' % theme  # prefix color with theme
         elif rgb is not None:
             value = rgb
-        return value
+        elif auto is not None:
+            value = auto
+        if value is not None:
+            return Color(value)
 
     def parse_fonts(self):
         """Read in the fonts"""
@@ -146,7 +150,7 @@ class SharedStylesParser(object):
         if color is not None:
             index = self._get_relevant_color(color)
             if index is not None:
-                font['color'] = Color(index)
+                font['color'] = index
             else:
                 del font['color']
         return Font(**font)
@@ -174,13 +178,13 @@ class SharedStylesParser(object):
                 tag = localname(child)
                 color = self._get_relevant_color(child)
                 if color is not None:
-                    fill[tag] = Color(color)
+                    fill[tag] = color
         return PatternFill(**fill)
 
     def parse_gradient_fill(self, node):
         fill = dict(node.items())
         color_nodes = safe_iterator(node, "{%s}color" % SHEET_MAIN_NS)
-        fill['stop'] = [Color(self._get_relevant_color(node)) for node in color_nodes]
+        fill['stop'] = [self._get_relevant_color(node) for node in color_nodes]
         return GradientFill(**fill)
 
     def parse_borders(self):
@@ -212,7 +216,7 @@ class SharedStylesParser(object):
                 if color is not None:
                     index = self._get_relevant_color(color)
                     if index is not None:
-                        bside['color'] = Color(index)
+                        bside['color'] = index
                     # Ignore 'auto'
                 border[side] = Border(**bside)
         return Borders(**border)
