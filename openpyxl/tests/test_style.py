@@ -228,9 +228,9 @@ class TestStyleWriter(object):
 
     @pytest.mark.parametrize("value, expected",
                              [
-                                 ('FFFFFF', {'rgb': 'FFFFFF'}),
-                                 ('theme:7:', {'theme': '7'}),
-                                 ('theme:7:8', {'theme':'7', 'tint':'8'})
+                                 (Color('FFFFFF'), {'rgb': 'FFFFFF'}),
+                                 (Color('theme:7:'), {'theme': '7'}),
+                                 (Color('theme:7:8'), {'theme':'7', 'tint':'8'})
                              ])
     def test_unpack_color(self, value, expected):
         w = StyleWriter(self.workbook)
