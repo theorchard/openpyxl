@@ -56,12 +56,16 @@ class Max(Typed):
         super(Max, self).__init__(name, **kw)
 
     def __set__(self, instance, value):
+        try:
+            value = self.expected_type(value)
+        except:
+            raise TypeError('expected ' + str(self.expected_type))
         if value > self.max:
             raise ValueError('Max value is {0}'.format(self.max))
         super(Max, self).__set__(instance, value)
 
 
-class Min(Descriptor):
+class Min(Typed):
     """Values must be greater than a `min` value"""
 
     expected_type = Number
@@ -72,6 +76,10 @@ class Min(Descriptor):
         super(Min, self).__init__(name, **kw)
 
     def __set__(self, instance, value):
+        try:
+            value = self.expected_type(value)
+        except:
+            raise TypeError('expected ' + str(self.expected_type))
         if value < self.min:
             raise ValueError('Min value is {0}'.format(self.min))
         super(Min, self).__set__(instance, value)

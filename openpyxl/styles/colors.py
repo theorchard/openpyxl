@@ -57,17 +57,17 @@ class Color(HashableObject):
     indexed = Set(values=range(len(COLOR_INDEX)))
     auto = Bool()
     theme = Integer()
-    tint = MinMax(min=-1, max=1)
+    tint = MinMax(min=-1, max=1, expected_type=float)
     type = String()
 
     __fields__ = ('rgb', 'indexed', 'auto', 'theme', 'tint', 'type')
 
-    def __init__(self, rgb=BLACK, indexed=None, auto=None, theme=None, tint=0, index=None, type='rgb'):
+    def __init__(self, rgb=BLACK, indexed=None, auto=None, theme=None, tint=0.0, index=None, type='rgb'):
         if index is not None:
             indexed = index
         if indexed is not None:
             self.type = 'indexed'
-            self.indexed = indexed
+            self.indexed = int(indexed)
         elif theme is not None:
             self.type = 'theme'
             self.theme = theme
@@ -89,7 +89,6 @@ class Color(HashableObject):
             attrs.append(('tint', self.tint))
         for k, v in attrs:
             yield k, v
-
 
     @property
     def index(self):
