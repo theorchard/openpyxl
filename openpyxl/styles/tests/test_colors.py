@@ -6,9 +6,10 @@ class TestColor:
 
     def test_ctor(self):
         c = Color()
-        assert c.index == "00000000"
+        assert c.value == "00000000"
+        assert c.type == "rgb"
 
     def test_validation(self):
         c = Color()
         with pytest.raises(TypeError):
-            c.index = 4
+            c.value = 4

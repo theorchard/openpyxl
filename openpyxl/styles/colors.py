@@ -23,7 +23,7 @@ from __future__ import absolute_import
 # @author: see AUTHORS file
 
 from .hashable import HashableObject
-from openpyxl.descriptors import String
+from openpyxl.descriptors import String, Bool, Float, MinMax, Integer, Alias, Set
 
 # Default Color Index as per 18.8.27 of ECMA Part 4
 COLOR_INDEX = ('00000000', '00FFFFFF', '00FF0000', '0000FF00', '000000FF',
@@ -53,9 +53,42 @@ DARKYELLOW = COLOR_INDEX[11]
 class Color(HashableObject):
     """Named colors for use in styles."""
 
-    index = String('_index')
+    rgb = String()
+    indexed = Set(values=range(len(COLOR_INDEX)))
+    auto = Bool()
+    theme = Integer()
+    tint = MinMax(min=-1, max=1)
+    type = String()
 
-    __fields__ = ('index',)
+    __fields__ = ('rgb', 'indexed', 'auto', 'theme', 'tint', 'type')
 
-    def __init__(self, index=BLACK):
-        self.index = index
+    def __init__(self, rgb=BLACK, indexed=None, auto=None, theme=None, tint=0, index=None, type='rgb'):
+        if index is not None:
+            indexed = index
+            self.type = 'indexed'
+            self.indexed = indexed
+        elif theme is not None:
+            self.type = 'theme'
+            self.theme = theme
+        else:
+            self.rgb = rgb
+            self.type = 'rgb'
+        self.tint = tint
+
+    @property
+    def value(self):
+        return getattr(self, self.type)
+
+    def ___iter__(self):
+        attrs = [(self.type, self.value)]
+        if tint != 0:
+            attrs.append(('tint', self.tint))
+        for pair in attrs:
+            yield k, v
+
+
+    @property
+    def index(self):
+        # legacy
+        return self.value
+

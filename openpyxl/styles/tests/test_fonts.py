@@ -12,4 +12,5 @@ class TestFont:
         assert f.italic is False
         assert f.underline == 'none'
         assert f.strikethrough is False
-        assert f.color.index == '00000000'
+        assert f.color.value == '00000000'
+        assert f.color.type == 'rgb'
