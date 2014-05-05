@@ -34,7 +34,7 @@ Bug fixes
 #275 - Handling auto filters where there are only custom filters
 
 
-1.8.6
+1.8.6 (2014-05-05)
 ==================
 
 Minor changes
