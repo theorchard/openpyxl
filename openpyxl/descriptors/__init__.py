@@ -7,6 +7,7 @@ http://chimera.labs.oreilly.com/books/1230000000393/ch08.html#_discussion_130
 """
 
 from openpyxl.compat import basestring, bytes
+from numbers import Number
 
 class Descriptor(object):
 
@@ -44,8 +45,10 @@ class Convertible(Typed):
         super(Typed, self).__set__(instance, value)
 
 
-class Max(Descriptor):
+class Max(Typed):
     """Values must be less than a `max` value"""
+
+    expected_type = Number
 
     def __init__(self, name=None, **kw):
         if 'max' not in kw:
@@ -60,6 +63,8 @@ class Max(Descriptor):
 
 class Min(Descriptor):
     """Values must be greater than a `min` value"""
+
+    expected_type = Number
 
     def __init__(self, name=None, **kw):
         if 'min' not in kw:
