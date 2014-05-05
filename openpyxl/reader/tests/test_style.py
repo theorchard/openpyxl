@@ -151,7 +151,7 @@ def test_read_complex_style(datadir):
     assert style('A5').font.color.index == 'FF3300FF'
     assert style('A6').font.color.index == 'theme:9:'
     assert style('A7').fill.start_color.index == 'FFFFFF66'
-    assert style('A8').fill.start_color.index == 'theme:8:'
+    assert style('A8').fill.start_color.index == 8
     assert style('A9').alignment.horizontal == 'left'
     assert style('A10').alignment.horizontal == 'right'
     assert style('A11').alignment.horizontal == 'center'
@@ -207,7 +207,7 @@ def test_change_existing_styles(datadir):
     ws.cell('A7').style = ws.cell('A7').style.copy(fill=PatternFill(fill_type='solid',
                                                              start_color=Color('FF330066')))
     ws.cell('A8').style = ws.cell('A8').style.copy(fill=PatternFill(fill_type='solid',
-                                                             start_color=Color('theme:2:')))
+                                                             start_color=Color(theme='2')))
     ws.cell('A9').style = ws.cell('A9').style.copy(alignment=Alignment(horizontal='center'))
     ws.cell('A10').style = ws.cell('A10').style.copy(alignment=Alignment(horizontal='left'))
     ws.cell('A11').style = ws.cell('A11').style.copy(alignment=Alignment(horizontal='right'))
@@ -267,7 +267,7 @@ def test_change_existing_styles(datadir):
     assert style('A5').font.color.index == 'FF66FF66'
     assert style('A6').font.color.index == 'theme:1:'
     assert style('A7').fill.start_color.index == 'FF330066'
-    assert style('A8').fill.start_color.index == 'theme:2:'
+    assert style('A8').fill.start_color.index == 2
     assert style('A9').alignment.horizontal == 'center'
     assert style('A10').alignment.horizontal == 'left'
     assert style('A11').alignment.horizontal == 'right'
@@ -313,7 +313,7 @@ def test_change_existing_styles(datadir):
     assert style('C5').font.color.index == 'FF3300FF'
     assert style('C6').font.color.index == 'theme:9:'
     assert style('C7').fill.start_color.index == 'FFFFFF66'
-    assert style('C8').fill.start_color.index == 'theme:8:'
+    assert style('C8').fill.start_color.index == 8
     assert style('C9').alignment.horizontal == 'left'
     assert style('C10').alignment.horizontal == 'right'
     assert style('C11').alignment.horizontal == 'center'
