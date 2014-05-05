@@ -173,13 +173,9 @@ class StyleWriter(object):
         border = SubElement(node, 'border')
         # caution: respect this order
         for side in ('left', 'right', 'top', 'bottom', 'diagonal'):
-            obj = getattr(borders, side)
-            if obj.border_style is None or obj.border_style == 'none':
-                node = SubElement(border, side)
-            else:
-                node = SubElement(border, side, {'style':obj.border_style})
-                self._write_color(node, obj.color)
-
+            elem = getattr(borders, side)
+            node = SubElement(border, side,  dict(elem))
+            self._write_color(node, elem.color)
 
     def _write_cell_style_xfs(self):
         cell_style_xfs = SubElement(self._root, 'cellStyleXfs', {'count':'1'})

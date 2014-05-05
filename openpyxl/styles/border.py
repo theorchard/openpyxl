@@ -22,14 +22,17 @@ from __future__ import absolute_import
 # @license: http://www.opensource.org/licenses/mit-license.php
 # @author: see AUTHORS file
 
-from openpyxl.descriptors import Set
+from openpyxl.compat import safe_string
+from openpyxl.descriptors import Set, Alias
 
-from .colors import Color
 from .hashable import HashableObject
 from .descriptors import Color
 
 
 class Border(HashableObject):
+
+    spec = """Actually to BorderPr 18.8.6"""
+
     """Border options for use in styles.
     Caution: if you do not specify a border_style, other attributes will
     have no effect !"""
@@ -48,16 +51,25 @@ class Border(HashableObject):
     BORDER_THICK = 'thick'
     BORDER_THIN = 'thin'
 
-    __fields__ = ('border_style',
+    __fields__ = ('style',
                   'color')
 
     color = Color()
-    border_style = Set(values=(BORDER_NONE, BORDER_DASHDOT,
+    style = Set(values=(BORDER_NONE, BORDER_DASHDOT,
                                BORDER_DASHDOTDOT, BORDER_DASHED, BORDER_DOTTED, BORDER_DOUBLE,
                                BORDER_HAIR, BORDER_MEDIUM, BORDER_MEDIUMDASHDOT,
                                BORDER_MEDIUMDASHDOTDOT, BORDER_MEDIUMDASHED, BORDER_SLANTDASHDOT,
                                BORDER_THICK, BORDER_THIN))
+    border_style = Alias('style')
 
-    def __init__(self, border_style=BORDER_NONE, color=color()):
-        self.border_style = border_style
+    def __init__(self, style=BORDER_NONE, color=color(), border_style=None):
+        if border_style is not None:
+            style = border_style
+        self.style = style
         self.color = color
+
+    def __iter__(self):
+        for key in ("style",):
+            value = getattr(self, key)
+            if bool(value):
+                yield key, safe_string(value)
