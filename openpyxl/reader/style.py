@@ -166,22 +166,12 @@ class SharedStylesParser(object):
 
     def parse_border(self, border_node):
         """Read individual border"""
-        border = {}
-        up = border_node.get('diagonalup') and borders.DIAGONAL_UP
-        down = border_node.get('diagonaldown') and borders.DIAGONAL_DOWN
-        if up and down:
-            direction = borders.DIAGONAL_BOTH
-        elif up:
-            direction = up
-        elif down:
-            direction = down
+        border = dict(border_node.items())
 
         for side in ('left', 'right', 'top', 'bottom', 'diagonal'):
             node = border_node.find('{%s}%s' % (SHEET_MAIN_NS, side))
             if node is not None:
-                bside = {}
-                if node.get('style') is not None:
-                    bside['border_style'] = node.get('style')
+                bside = dict(node.items())
                 color = node.find('{%s}color' % SHEET_MAIN_NS)
                 if color is not None:
                     bside['color'] = Color(**dict(color.items()))

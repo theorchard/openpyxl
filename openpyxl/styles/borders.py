@@ -62,11 +62,11 @@ class Borders(HashableObject):
     # attributes
     outline = Bool()
     diagonalUp = Bool()
-    diaganalDown = Bool()
+    diagonalDown = Bool()
 
     def __init__(self, left=Border(), right=Border(), top=Border(),
                  bottom=Border(), diagonal=Border(), diagonal_direction=DIAGONAL_NONE,
-                 vertical=None, horizontal=None, diagonalUp=False, diaganalDown=False,
+                 vertical=None, horizontal=None, diagonalUp=False, diagonalDown=False,
                  outline=True):
         self.left = left
         self.right = right
@@ -77,7 +77,7 @@ class Borders(HashableObject):
         self.horizontal = horizontal
         self.diagonal_direction = diagonal_direction
         self.diagonalUp = diagonalUp
-        self.diaganalDown = diaganalDown
+        self.diagonalDown = diagonalDown
         self.outline = outline
 
     @property
@@ -92,7 +92,7 @@ class Borders(HashableObject):
         """
         Unset outline defaults to True, others default to False
         """
-        for key in ('diagonalUp', 'diaganalDown', 'outline'):
+        for key in ('diagonalUp', 'diagonalDown', 'outline'):
             value = getattr(self, key)
             if (key == "outline" and not value
                 or key != "outline" and value):
