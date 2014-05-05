@@ -56,7 +56,7 @@ class Color(HashableObject):
     """Named colors for use in styles."""
 
     rgb = String()
-    indexed = Set(values=range(len(COLOR_INDEX)))
+    indexed = Integer()
     auto = Bool()
     theme = Integer()
     tint = MinMax(min=-1, max=1, expected_type=float)
