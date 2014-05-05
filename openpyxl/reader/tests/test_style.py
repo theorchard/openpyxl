@@ -134,8 +134,8 @@ def test_read_complex_style(datadir):
     assert ws.column_dimensions['A'].width == 31.1640625
 
     style = partial(ws.get_style)
-    assert style('I').fill.start_color.index == 'FF006600'
-    assert style('I').font.color.index == 'FF3300FF'
+    assert style('I').fill.start_color.value == 'FF006600'
+    assert style('I').font.color.value == 'FF3300FF'
     assert style('A2').font.name == 'Arial'
     assert style('A2').font.size == 10
     assert not style('A2').font.bold
@@ -148,10 +148,10 @@ def test_read_complex_style(datadir):
     assert style('A4').font.size == 14
     assert not style('A4').font.bold
     assert style('A4').font.italic
-    assert style('A5').font.color.index == 'FF3300FF'
-    assert style('A6').font.color.index == 'theme:9:'
-    assert style('A7').fill.start_color.index == 'FFFFFF66'
-    assert style('A8').fill.start_color.index == 'theme:8:'
+    assert style('A5').font.color.value == 'FF3300FF'
+    assert style('A6').font.color.value == 'theme:9:'
+    assert style('A7').fill.start_color.value == 'FFFFFF66'
+    assert style('A8').fill.start_color.value == 8
     assert style('A9').alignment.horizontal == 'left'
     assert style('A10').alignment.horizontal == 'right'
     assert style('A11').alignment.horizontal == 'center'
@@ -163,16 +163,16 @@ def test_read_complex_style(datadir):
     assert style('A17').number_format == '0.00%'
     assert 'A18:B18' in ws._merged_cells
     assert ws.cell('B18').merged
-    assert style('A19').borders.top.color.index == 'FF006600'
-    assert style('A19').borders.bottom.color.index == 'FF006600'
-    assert style('A19').borders.left.color.index == 'FF006600'
-    assert style('A19').borders.right.color.index == 'FF006600'
-    assert style('A21').borders.top.color.index == 'theme:7:'
-    assert style('A21').borders.bottom.color.index == 'theme:7:'
-    assert style('A21').borders.left.color.index == 'theme:7:'
-    assert style('A21').borders.right.color.index == 'theme:7:'
-    assert style('A23').fill.start_color.index == 'FFCCCCFF'
-    assert style('A23').borders.top.color.index == 'theme:6:'
+    assert style('A19').borders.top.color.value == 'FF006600'
+    assert style('A19').borders.bottom.color.value == 'FF006600'
+    assert style('A19').borders.left.color.value == 'FF006600'
+    assert style('A19').borders.right.color.value == 'FF006600'
+    assert style('A21').borders.top.color.value == 'theme:7:'
+    assert style('A21').borders.bottom.color.value == 'theme:7:'
+    assert style('A21').borders.left.color.value == 'theme:7:'
+    assert style('A21').borders.right.color.value == 'theme:7:'
+    assert style('A23').fill.start_color.value == 'FFCCCCFF'
+    assert style('A23').borders.top.color.value == 'theme:6:'
     assert 'A23:B24' in ws._merged_cells
     assert ws.cell('A24').merged
     assert ws.cell('B23').merged
@@ -207,7 +207,7 @@ def test_change_existing_styles(datadir):
     ws.cell('A7').style = ws.cell('A7').style.copy(fill=PatternFill(fill_type='solid',
                                                              start_color=Color('FF330066')))
     ws.cell('A8').style = ws.cell('A8').style.copy(fill=PatternFill(fill_type='solid',
-                                                             start_color=Color('theme:2:')))
+                                                             start_color=Color(theme='2')))
     ws.cell('A9').style = ws.cell('A9').style.copy(alignment=Alignment(horizontal='center'))
     ws.cell('A10').style = ws.cell('A10').style.copy(alignment=Alignment(horizontal='left'))
     ws.cell('A11').style = ws.cell('A11').style.copy(alignment=Alignment(horizontal='right'))
@@ -250,8 +250,8 @@ def test_change_existing_styles(datadir):
 
     style = partial(ws.get_style)
 
-    assert ws.get_style('I').fill.start_color.index == 'FF442200'
-    assert ws.get_style('I').font.color.index == 'FF002244'
+    assert ws.get_style('I').fill.start_color.value == 'FF442200'
+    assert ws.get_style('I').font.color.value == 'FF002244'
     assert style('A2').font.name == 'Times New Roman'
     assert style('A2').font.size == 12
     assert style('A2').font.bold
@@ -264,10 +264,10 @@ def test_change_existing_styles(datadir):
     assert style('A4').font.size == 16
     assert style('A4').font.bold
     assert not style('A4').font.italic
-    assert style('A5').font.color.index == 'FF66FF66'
-    assert style('A6').font.color.index == 'theme:1:'
-    assert style('A7').fill.start_color.index == 'FF330066'
-    assert style('A8').fill.start_color.index == 'theme:2:'
+    assert style('A5').font.color.value == 'FF66FF66'
+    assert style('A6').font.color.value == 'theme:1:'
+    assert style('A7').fill.start_color.value == 'FF330066'
+    assert style('A8').fill.start_color.value == 2
     assert style('A9').alignment.horizontal == 'center'
     assert style('A10').alignment.horizontal == 'left'
     assert style('A11').alignment.horizontal == 'right'
@@ -279,16 +279,16 @@ def test_change_existing_styles(datadir):
     assert style('A17').number_format == 'mm-dd-yy'
     assert 'A18:B18' not in ws._merged_cells
     assert not ws.cell('B18').merged
-    assert style('A19').borders.top.color.index == 'FF006600'
-    assert style('A19').borders.bottom.color.index == 'FF006600'
-    assert style('A19').borders.left.color.index == 'FF006600'
-    assert style('A19').borders.right.color.index == 'FF006600'
-    assert style('A21').borders.top.color.index == 'theme:7:'
-    assert style('A21').borders.bottom.color.index == 'theme:7:'
-    assert style('A21').borders.left.color.index == 'theme:7:'
-    assert style('A21').borders.right.color.index == 'theme:7:'
-    assert style('A23').fill.start_color.index == 'FFCCCCFF'
-    assert style('A23').borders.top.color.index == 'theme:6:'
+    assert style('A19').borders.top.color.value == 'FF006600'
+    assert style('A19').borders.bottom.color.value == 'FF006600'
+    assert style('A19').borders.left.color.value == 'FF006600'
+    assert style('A19').borders.right.color.value == 'FF006600'
+    assert style('A21').borders.top.color.value == 'theme:7:'
+    assert style('A21').borders.bottom.color.value == 'theme:7:'
+    assert style('A21').borders.left.color.value == 'theme:7:'
+    assert style('A21').borders.right.color.value == 'theme:7:'
+    assert style('A23').fill.start_color.value == 'FFCCCCFF'
+    assert style('A23').borders.top.color.value == 'theme:6:'
     assert 'A23:B24' not in ws._merged_cells
     assert not ws.cell('A24').merged
     assert not ws.cell('B23').merged
@@ -310,10 +310,10 @@ def test_change_existing_styles(datadir):
     assert style('C4').font.size == 14
     assert not style('C4').font.bold
     assert style('C4').font.italic
-    assert style('C5').font.color.index == 'FF3300FF'
-    assert style('C6').font.color.index == 'theme:9:'
-    assert style('C7').fill.start_color.index == 'FFFFFF66'
-    assert style('C8').fill.start_color.index == 'theme:8:'
+    assert style('C5').font.color.value == 'FF3300FF'
+    assert style('C6').font.color.value == 'theme:9:'
+    assert style('C7').fill.start_color.value == 'FFFFFF66'
+    assert style('C8').fill.start_color.value == 8
     assert style('C9').alignment.horizontal == 'left'
     assert style('C10').alignment.horizontal == 'right'
     assert style('C11').alignment.horizontal == 'center'
@@ -325,16 +325,16 @@ def test_change_existing_styles(datadir):
     assert style('C17').number_format == '0.00%'
     assert 'C18:D18' in ws._merged_cells
     assert ws.cell('D18').merged
-    assert style('C19').borders.top.color.index == 'FF006600'
-    assert style('C19').borders.bottom.color.index == 'FF006600'
-    assert style('C19').borders.left.color.index == 'FF006600'
-    assert style('C19').borders.right.color.index == 'FF006600'
-    assert style('C21').borders.top.color.index == 'theme:7:'
-    assert style('C21').borders.bottom.color.index == 'theme:7:'
-    assert style('C21').borders.left.color.index == 'theme:7:'
-    assert style('C21').borders.right.color.index == 'theme:7:'
-    assert style('C23').fill.start_color.index == 'FFCCCCFF'
-    assert style('C23').borders.top.color.index == 'theme:6:'
+    assert style('C19').borders.top.color.value == 'FF006600'
+    assert style('C19').borders.bottom.color.value == 'FF006600'
+    assert style('C19').borders.left.color.value == 'FF006600'
+    assert style('C19').borders.right.color.value == 'FF006600'
+    assert style('C21').borders.top.color.value == 'theme:7:'
+    assert style('C21').borders.bottom.color.value == 'theme:7:'
+    assert style('C21').borders.left.color.value == 'theme:7:'
+    assert style('C21').borders.right.color.value == 'theme:7:'
+    assert style('C23').fill.start_color.value == 'FFCCCCFF'
+    assert style('C23').borders.top.color.value == 'theme:6:'
     assert 'C23:D24' in ws._merged_cells
     assert ws.cell('C24').merged
     assert ws.cell('D23').merged

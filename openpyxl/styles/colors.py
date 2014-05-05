@@ -22,6 +22,8 @@ from __future__ import absolute_import
 # @license: http://www.opensource.org/licenses/mit-license.php
 # @author: see AUTHORS file
 
+from openpyxl.compat import safe_string
+
 from .hashable import HashableObject
 from openpyxl.descriptors import String, Bool, Float, MinMax, Integer, Alias, Set
 
@@ -88,7 +90,7 @@ class Color(HashableObject):
         if self.tint != 0:
             attrs.append(('tint', self.tint))
         for k, v in attrs:
-            yield k, v
+            yield k, safe_string(v)
 
     @property
     def index(self):
