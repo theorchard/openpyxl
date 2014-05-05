@@ -148,11 +148,7 @@ class SharedStylesParser(object):
             font['u'] = underline.get('val', 'single')
         color = font_node.find('{%s}color' % SHEET_MAIN_NS)
         if color is not None:
-            index = self._get_relevant_color(color)
-            if index is not None:
-                font['color'] = index
-            else:
-                del font['color']
+            font['color'] = Color(**dict(color.items()))
         return Font(**font)
 
     def parse_fills(self):

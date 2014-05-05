@@ -149,7 +149,7 @@ def test_read_complex_style(datadir):
     assert not style('A4').font.bold
     assert style('A4').font.italic
     assert style('A5').font.color.value == 'FF3300FF'
-    assert style('A6').font.color.value == 'theme:9:'
+    assert style('A6').font.color.value == 9
     assert style('A7').fill.start_color.value == 'FFFFFF66'
     assert style('A8').fill.start_color.value == 8
     assert style('A9').alignment.horizontal == 'left'
@@ -203,7 +203,7 @@ def test_change_existing_styles(datadir):
                                                              bold=True,
                                                              italic=False))
     ws.cell('A5').style = ws.cell('A5').style.copy(font=Font(color=Color('FF66FF66')))
-    ws.cell('A6').style = ws.cell('A6').style.copy(font=Font(color=Color('theme:1:')))
+    ws.cell('A6').style = ws.cell('A6').style.copy(font=Font(color=Color(theme='1')))
     ws.cell('A7').style = ws.cell('A7').style.copy(fill=PatternFill(fill_type='solid',
                                                              start_color=Color('FF330066')))
     ws.cell('A8').style = ws.cell('A8').style.copy(fill=PatternFill(fill_type='solid',
@@ -265,7 +265,7 @@ def test_change_existing_styles(datadir):
     assert style('A4').font.bold
     assert not style('A4').font.italic
     assert style('A5').font.color.value == 'FF66FF66'
-    assert style('A6').font.color.value == 'theme:1:'
+    assert style('A6').font.color.value == 1
     assert style('A7').fill.start_color.value == 'FF330066'
     assert style('A8').fill.start_color.value == 2
     assert style('A9').alignment.horizontal == 'center'
@@ -311,7 +311,7 @@ def test_change_existing_styles(datadir):
     assert not style('C4').font.bold
     assert style('C4').font.italic
     assert style('C5').font.color.value == 'FF3300FF'
-    assert style('C6').font.color.value == 'theme:9:'
+    assert style('C6').font.color.value == 9
     assert style('C7').fill.start_color.value == 'FFFFFF66'
     assert style('C8').fill.start_color.value == 8
     assert style('C9').alignment.horizontal == 'left'
