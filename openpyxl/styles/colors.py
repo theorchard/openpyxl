@@ -65,11 +65,15 @@ class Color(HashableObject):
     def __init__(self, rgb=BLACK, indexed=None, auto=None, theme=None, tint=0, index=None, type='rgb'):
         if index is not None:
             indexed = index
+        if indexed is not None:
             self.type = 'indexed'
             self.indexed = indexed
         elif theme is not None:
             self.type = 'theme'
             self.theme = theme
+        elif auto is not None:
+            self.type = 'auto'
+            self.auto = auto
         else:
             self.rgb = rgb
             self.type = 'rgb'
@@ -79,11 +83,11 @@ class Color(HashableObject):
     def value(self):
         return getattr(self, self.type)
 
-    def ___iter__(self):
+    def __iter__(self):
         attrs = [(self.type, self.value)]
-        if tint != 0:
+        if self.tint != 0:
             attrs.append(('tint', self.tint))
-        for pair in attrs:
+        for k, v in attrs:
             yield k, v
 
 
