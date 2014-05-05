@@ -80,27 +80,28 @@ def test_read_pattern_fill(StyleReader, datadir):
         PatternFill(),
         PatternFill(fill_type='gray125'),
         PatternFill(fill_type='solid',
-             start_color=Color('theme:0:-0.14999847407452621'),
-             end_color=Color('System Background')
+             start_color=Color(theme=0, tint=-0.14999847407452621),
+             end_color=Color(indexed=64)
              ),
         PatternFill(fill_type='solid',
-             start_color=Color('theme:0:'),
-             end_color=Color('System Background')
+             start_color=Color(theme=0),
+             end_color=Color(indexed=64)
              ),
         PatternFill(fill_type='solid',
-             start_color=Color("00333399"),
-             end_color=Color('System Background')
+             start_color=Color(indexed=62),
+             end_color=Color(indexed=64)
              )
     ]
     with open("bug311-styles.xml") as src:
         reader = StyleReader(src.read())
-        assert list(reader.parse_fills()) == expected
+        for val, exp in zip(reader.parse_fills(), expected):
+            assert val == exp
 
 
 def test_read_gradient_fill(StyleReader, datadir):
     datadir.chdir()
     expected = [
-        GradientFill(degree=90, stop=[Color('theme:0:'), Color('theme:4:')])
+        GradientFill(degree=90, stop=[Color(theme=0), Color(theme=4)])
     ]
     with open("bug284-styles.xml") as src:
         reader = StyleReader(src.read())

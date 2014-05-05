@@ -176,15 +176,13 @@ class SharedStylesParser(object):
         for child in safe_iterator(node):
             if child is not node:
                 tag = localname(child)
-                color = self._get_relevant_color(child)
-                if color is not None:
-                    fill[tag] = color
+                fill[tag] = Color(**dict(child.items()))
         return PatternFill(**fill)
 
     def parse_gradient_fill(self, node):
         fill = dict(node.items())
         color_nodes = safe_iterator(node, "{%s}color" % SHEET_MAIN_NS)
-        fill['stop'] = [self._get_relevant_color(node) for node in color_nodes]
+        fill['stop'] = [Color(**dict(node.items())) for node in color_nodes]
         return GradientFill(**fill)
 
     def parse_borders(self):
