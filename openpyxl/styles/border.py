@@ -36,7 +36,7 @@ class Border(HashableObject):
     """Border options for use in styles.
     Caution: if you do not specify a border_style, other attributes will
     have no effect !"""
-    BORDER_NONE = 'none'
+    BORDER_NONE = None
     BORDER_DASHDOT = 'dashDot'
     BORDER_DASHDOTDOT = 'dashDotDot'
     BORDER_DASHED = 'dashed'
@@ -54,15 +54,14 @@ class Border(HashableObject):
     __fields__ = ('style',
                   'color')
 
-    color = Color()
-    style = Set(values=(BORDER_NONE, BORDER_DASHDOT,
-                               BORDER_DASHDOTDOT, BORDER_DASHED, BORDER_DOTTED, BORDER_DOUBLE,
-                               BORDER_HAIR, BORDER_MEDIUM, BORDER_MEDIUMDASHDOT,
-                               BORDER_MEDIUMDASHDOTDOT, BORDER_MEDIUMDASHED, BORDER_SLANTDASHDOT,
-                               BORDER_THICK, BORDER_THIN))
+    color = Color(allow_none=True)
+    style = Set(values=(BORDER_NONE, BORDER_DASHDOT, BORDER_DASHDOTDOT,
+                        BORDER_DASHED, BORDER_DOTTED, BORDER_DOUBLE, BORDER_HAIR, BORDER_MEDIUM,
+                        BORDER_MEDIUMDASHDOT, BORDER_MEDIUMDASHDOTDOT, BORDER_MEDIUMDASHED,
+                        BORDER_SLANTDASHDOT, BORDER_THICK, BORDER_THIN))
     border_style = Alias('style')
 
-    def __init__(self, style=BORDER_NONE, color=color(), border_style=None):
+    def __init__(self, style=None, color=None, border_style=None):
         if border_style is not None:
             style = border_style
         self.style = style
@@ -71,5 +70,5 @@ class Border(HashableObject):
     def __iter__(self):
         for key in ("style",):
             value = getattr(self, key)
-            if bool(value):
+            if value:
                 yield key, safe_string(value)

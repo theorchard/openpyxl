@@ -22,7 +22,8 @@ from __future__ import absolute_import
 # @license: http://www.opensource.org/licenses/mit-license.php
 # @author: see AUTHORS file
 
-from openpyxl.descriptors import Set, Typed
+from openpyxl.compat import safe_string
+from openpyxl.descriptors import Set, Typed, Bool
 
 from .colors import Color
 from .hashable import HashableObject
@@ -47,36 +48,52 @@ class Borders(HashableObject):
                   'bottom',
                   'diagonal',
                   'diagonal_direction',
-                  'all_borders',
-                  'outline',
-                  'inside',
                   'vertical',
                   'horizontal')
 
+    # child elements
     left = Typed(expected_type=Border)
     right = Typed(expected_type=Border)
     top = Typed(expected_type=Border)
     bottom = Typed(expected_type=Border)
     diagonal = Typed(expected_type=Border)
-    diagonal_direction = Set(values=diagonals)
-    all_borders = Typed(expected_type=Border)
-    outline = Typed(expected_type=Border)
-    inside = Typed(expected_type=Border)
-    vertical = Typed(expected_type=Border)
-    horizontal = Typed(expected_type=Border)
+    vertical = Typed(expected_type=Border, allow_none=True)
+    horizontal = Typed(expected_type=Border, allow_none=True)
+    # attributes
+    outline = Bool()
+    diagonalUp = Bool()
+    diaganalDown = Bool()
 
     def __init__(self, left=Border(), right=Border(), top=Border(),
                  bottom=Border(), diagonal=Border(), diagonal_direction=DIAGONAL_NONE,
-                 all_borders=Border(), outline=Border(), inside=Border(),
-                 vertical=Border(), horizontal=Border()):
+                 vertical=None, horizontal=None, diagonalUp=False, diaganalDown=False,
+                 outline=True):
         self.left = left
         self.right = right
         self.top = top
         self.bottom = bottom
         self.diagonal = diagonal
-        self.all_borders = all_borders
-        self.outline = outline
-        self.inside = inside
         self.vertical = vertical
         self.horizontal = horizontal
         self.diagonal_direction = diagonal_direction
+        self.diagonalUp = diagonalUp
+        self.diaganalDown = diaganalDown
+        self.outline = outline
+
+    @property
+    def children(self):
+        for key in ('left', 'right', 'top', 'bottom', 'diagonal', 'vertical',
+                    'horizontal'):
+            value = getattr(self, key)
+            if value is not None:
+                yield key, value
+
+    def __iter__(self):
+        """
+        Unset outline defaults to True, others default to False
+        """
+        for key in ('diagonalUp', 'diaganalDown', 'outline'):
+            value = getattr(self, key)
+            if (key == "outline" and not value
+                or key != "outline" and value):
+                yield key, safe_string(value)

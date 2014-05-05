@@ -168,14 +168,13 @@ class StyleWriter(object):
         borders.attrib["count"] = str(index)
         return table
 
-    def _write_border(self, node, borders):
+    def _write_border(self, node, border):
         """Write the child elements for an individual border section"""
-        border = SubElement(node, 'border')
-        # caution: respect this order
-        for side in ('left', 'right', 'top', 'bottom', 'diagonal'):
-            elem = getattr(borders, side)
-            node = SubElement(border, side,  dict(elem))
-            self._write_color(node, elem.color)
+        border_node = SubElement(node, 'border', dict(border))
+        for tag, elem in border.children:
+            side = SubElement(border_node, tag, dict(elem))
+            if elem.color is not None:
+                self._write_color(side, elem.color)
 
     def _write_cell_style_xfs(self):
         cell_style_xfs = SubElement(self._root, 'cellStyleXfs', {'count':'1'})
