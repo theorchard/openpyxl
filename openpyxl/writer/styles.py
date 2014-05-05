@@ -162,20 +162,24 @@ class StyleWriter(object):
         for st in self.styles:
             if st.borders != DEFAULTS.borders and st.borders not in table:
                 table[st.borders] = index
-                border = SubElement(borders, 'border')
-                # caution: respect this order
-                for side in ('left', 'right', 'top', 'bottom', 'diagonal'):
-                    obj = getattr(st.borders, side)
-                    if obj.border_style is None or obj.border_style == 'none':
-                        node = SubElement(border, side)
-                    else:
-                        node = SubElement(border, side, {'style':obj.border_style})
-                        self._write_color(node, obj.color)
-
+                self._write_border(borders, st.borders)
                 index += 1
 
         borders.attrib["count"] = str(index)
         return table
+
+    def _write_border(self, node, borders):
+        """Write the child elements for an individual border section"""
+        border = SubElement(node, 'border')
+        # caution: respect this order
+        for side in ('left', 'right', 'top', 'bottom', 'diagonal'):
+            obj = getattr(borders, side)
+            if obj.border_style is None or obj.border_style == 'none':
+                node = SubElement(border, side)
+            else:
+                node = SubElement(border, side, {'style':obj.border_style})
+                self._write_color(node, obj.color)
+
 
     def _write_cell_style_xfs(self):
         cell_style_xfs = SubElement(self._root, 'cellStyleXfs', {'count':'1'})

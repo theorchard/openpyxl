@@ -2,6 +2,7 @@
 
 import pytest
 
+from openpyxl.styles.borders import Borders
 from openpyxl.styles.fills import GradientFill
 from openpyxl.styles.colors import Color
 from openpyxl.writer.styles import StyleWriter
@@ -28,6 +29,26 @@ def test_write_gradient_fill():
       <color theme="4"/>
     </stop>
   </gradientFill>
+</styleSheet>
+    """
+    diff = compare_xml(xml, expected)
+    assert diff is None, diff
+
+
+def test_write_borders():
+    borders = Borders()
+    writer = StyleWriter(DummyWorkbook())
+    writer._write_border(writer._root, borders)
+    xml = get_xml(writer._root)
+    expected = """<?xml version="1.0"?>
+<styleSheet xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main">
+  <border>
+    <left/>
+    <right/>
+    <top/>
+    <bottom/>
+    <diagonal/>
+  </border>
 </styleSheet>
     """
     diff = compare_xml(xml, expected)
