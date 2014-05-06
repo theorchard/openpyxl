@@ -6,7 +6,6 @@ from openpyxl.descriptors import Set, Typed, Bool
 
 from .colors import Color
 from .hashable import HashableObject
-from .descriptors import Color
 
 
 DIAGONAL_NONE = 0
@@ -49,7 +48,7 @@ class Side(HashableObject):
     __fields__ = ('style',
                   'color')
 
-    color = Color(allow_none=True)
+    color = Typed(expected_type=Color, allow_none=True)
     style = Set(values=(BORDER_NONE, BORDER_DASHDOT, BORDER_DASHDOTDOT,
                         BORDER_DASHED, BORDER_DOTTED, BORDER_DOUBLE, BORDER_HAIR, BORDER_MEDIUM,
                         BORDER_MEDIUMDASHDOT, BORDER_MEDIUMDASHDOTDOT, BORDER_MEDIUMDASHED,

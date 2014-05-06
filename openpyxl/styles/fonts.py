@@ -22,9 +22,9 @@ from __future__ import absolute_import
 # @license: http://www.opensource.org/licenses/mit-license.php
 # @author: see AUTHORS file
 
-from openpyxl.descriptors import Strict, Float, Integer, Set, Bool, String, Alias
+from openpyxl.descriptors import Strict, Float, Integer, Set, Bool, String, Alias, Typed
 from .hashable import HashableObject
-from .descriptors import Color
+from .colors import Color
 
 
 class Font(HashableObject):
@@ -60,7 +60,7 @@ class Font(HashableObject):
                         UNDERLINE_DOUBLE_ACCOUNTING, UNDERLINE_SINGLE,
                         UNDERLINE_SINGLE_ACCOUNTING]))
     underline = Alias("u")
-    color = Color()
+    color = Typed(expected_type=Color)
     schema = String(allow_none=True)
 
     __fields__ = ('name',
@@ -72,7 +72,7 @@ class Font(HashableObject):
                   'color')
 
     def __init__(self, name='Calibri', sz=11, b=False, i=False, charset=None,
-                 u=UNDERLINE_NONE, strike=False, color=color(), scheme=None, family=None,
+                 u=UNDERLINE_NONE, strike=False, color=Color(), scheme=None, family=None,
                  size=None, bold=None, italic=None, strikethrough=None, underline=None):
         self.name = name
         if size is not None:
