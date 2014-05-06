@@ -38,9 +38,8 @@ from openpyxl.reader.style import read_style_table
 from openpyxl.xml.constants import ARC_STYLE
 from openpyxl.writer.worksheet import write_worksheet_conditional_formatting
 from openpyxl.writer.styles import StyleWriter
-from openpyxl.styles import Color, PatternFill, Font, Borders, HashableObject
+from openpyxl.styles import Color, PatternFill, Font, Border, Side, HashableObject
 from openpyxl.styles import borders, fills, colors
-from openpyxl.styles.border import Border
 
 # test imports
 import pytest
@@ -157,9 +156,9 @@ class TestConditionalFormatting(object):
                     patternType=fills.FILL_SOLID)
         font = Font(name='Arial', size=12, bold=True,
                     underline=Font.UNDERLINE_SINGLE)
-        borders = Borders(top=Border(border_style=Border.BORDER_THIN,
+        borders = Border(top=Side(border_style=Side.BORDER_THIN,
                                      color=Color(colors.DARKYELLOW)),
-                          bottom=Border(border_style=Border.BORDER_THIN,
+                          bottom=Side(border_style=Side.BORDER_THIN,
                                         color=Color(colors.BLACK)))
         cf.add('C1:C10', FormulaRule(formula=['ISBLANK(C1)'], font=font, border=borders, fill=fill))
         cf.add('D1:D10', FormulaRule(formula=['ISBLANK(D1)'], fill=fill))

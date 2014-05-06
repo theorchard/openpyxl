@@ -41,11 +41,11 @@ from openpyxl.styles import (
     Font,
     PatternFill,
     GradientFill,
-    Borders,
+    Border,
+    Side,
     Protection,
     Style
 )
-from openpyxl.styles.border import Border
 from openpyxl.styles import colors
 from openpyxl.styles import fills
 
@@ -204,23 +204,23 @@ def test_change_existing_styles(datadir):
     ws.cell('A16').style = ws.cell('A16').style.copy(number_format=NumberFormat('0.00'))
     ws.cell('A17').style = ws.cell('A17').style.copy(number_format=NumberFormat('mm-dd-yy'))
     ws.unmerge_cells('A18:B18')
-    ws.cell('A19').style = ws.cell('A19').style.copy(borders=Borders(top=Border(border_style=Border.BORDER_THIN,
+    ws.cell('A19').style = ws.cell('A19').style.copy(borders=Border(top=Side(border_style=Side.BORDER_THIN,
                                                                                 color=Color('FF006600')),
-                                                                     bottom=Border(border_style=Border.BORDER_THIN,
+                                                                     bottom=Side(border_style=Side.BORDER_THIN,
                                                                                    color=Color('FF006600')),
-                                                                     left=Border(border_style=Border.BORDER_THIN,
+                                                                     left=Side(border_style=Side.BORDER_THIN,
                                                                                  color=Color('FF006600')),
-                                                                     right=Border(border_style=Border.BORDER_THIN,
+                                                                     right=Side(border_style=Side.BORDER_THIN,
                                                                                   color=Color('FF006600'))))
-    ws.cell('A21').style = ws.cell('A21').style.copy(borders=Borders(top=Border(border_style=Border.BORDER_THIN,
+    ws.cell('A21').style = ws.cell('A21').style.copy(borders=Border(top=Side(border_style=Side.BORDER_THIN,
                                                                                 color=Color(theme=7)),
-                                                                     bottom=Border(border_style=Border.BORDER_THIN,
+                                                                     bottom=Side(border_style=Side.BORDER_THIN,
                                                                                    color=Color(theme=7)),
-                                                                     left=Border(border_style=Border.BORDER_THIN,
+                                                                     left=Side(border_style=Side.BORDER_THIN,
                                                                                  color=Color(theme=7)),
-                                                                     right=Border(border_style=Border.BORDER_THIN,
+                                                                     right=Side(border_style=Side.BORDER_THIN,
                                                                                   color=Color(theme=7))))
-    ws.cell('A23').style = ws.cell('A23').style.copy(borders=Borders(top=Border(border_style=Border.BORDER_THIN,
+    ws.cell('A23').style = ws.cell('A23').style.copy(borders=Border(top=Side(border_style=Side.BORDER_THIN,
                                                                                 color=Color(theme=6))),
                                                      fill=PatternFill(fill_type='solid',
                                                                start_color=Color('FFCCCCFF')))

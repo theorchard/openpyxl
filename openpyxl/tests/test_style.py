@@ -42,13 +42,13 @@ from openpyxl.styles import (
     Color,
     Font,
     PatternFill,
-    Borders,
+    Border,
+    Side,
     Protection,
-    Style
+    Style,
+    colors,
+    fills,
 )
-from openpyxl.styles.border import Border
-from openpyxl.styles import colors
-from openpyxl.styles import fills
 from openpyxl.formatting import ConditionalFormatting
 from openpyxl.formatting.rules import FormulaRule
 from openpyxl.xml.functions import Element, SubElement, tostring
@@ -101,7 +101,7 @@ class TestStyleWriter(object):
         w = StyleWriter(self.workbook)
         assert len(w.styles) == 6  # 5 + the default
 
-        self.worksheet.cell('A10').style = Style(borders=Borders(top=Border(border_style=Border.BORDER_THIN)))
+        self.worksheet.cell('A10').style = Style(borders=Border(top=Side(border_style=Side.BORDER_THIN)))
         w = StyleWriter(self.workbook)
         assert len(w.styles) == 7
 
@@ -196,7 +196,7 @@ class TestStyleWriter(object):
         assert diff is None, diff
 
     def test_borders(self):
-        st = Style(borders=Borders(top=Border(border_style=Border.BORDER_THIN,
+        st = Style(borders=Border(top=Side(border_style=Side.BORDER_THIN,
                                               color=Color(colors.DARKYELLOW))))
         self.worksheet.cell('A1').style = st
         w = StyleWriter(self.workbook)
@@ -311,8 +311,8 @@ class TestStyleWriter(object):
         whiteFont = Font(color=Color("FFFFFFFF"),
                          bold=True, italic=True, underline='single',
                          strikethrough=True)
-        medium_blue = Border(border_style='medium', color=Color(colors.BLUE))
-        blueBorder = Borders(left=medium_blue,
+        medium_blue = Side(border_style='medium', color=Color(colors.BLUE))
+        blueBorder = Border(left=medium_blue,
                              right=medium_blue,
                              top=medium_blue,
                              bottom=medium_blue)

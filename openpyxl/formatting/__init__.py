@@ -3,7 +3,7 @@ from __future__ import absolute_import
 
 from openpyxl.compat import iteritems, OrderedDict
 
-from openpyxl.styles import Font, PatternFill, Borders
+from openpyxl.styles import Font, PatternFill, Border
 from .rules import CellIsRule, ColorScaleRule, FormatRule, FormulaRule
 
 
@@ -82,7 +82,7 @@ class ConditionalFormatting(object):
                     if 'font' in rule['dxf'] and isinstance(rule['dxf']['font'], Font):
                         # DXF font is limited to color, bold, italic, underline and strikethrough
                         dxf['font'] = rule['dxf']['font']
-                    if 'border' in rule['dxf'] and isinstance(rule['dxf']['border'], Borders):
+                    if 'border' in rule['dxf'] and isinstance(rule['dxf']['border'], Border):
                         dxf['border'] = rule['dxf']['border']
                     if 'fill' in rule['dxf'] and isinstance(rule['dxf']['fill'], PatternFill):
                         dxf['fill'] = rule['dxf']['fill']

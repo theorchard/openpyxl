@@ -13,12 +13,12 @@ from openpyxl.styles import (
     Font,
     PatternFill,
     GradientFill,
-    Borders,
+    Border,
+    Side,
     Protection,
-    Alignment
+    Alignment,
+    borders,
 )
-from openpyxl.styles.border import Border
-from openpyxl.styles import borders
 from openpyxl.styles.colors import COLOR_INDEX, Color
 from openpyxl.xml.constants import SHEET_MAIN_NS
 from copy import deepcopy
@@ -154,8 +154,8 @@ class SharedStylesParser(object):
                 color = node.find('{%s}color' % SHEET_MAIN_NS)
                 if color is not None:
                     bside['color'] = Color(**dict(color.items()))
-                border[side] = Border(**bside)
-        return Borders(**border)
+                border[side] = Side(**bside)
+        return Border(**border)
 
     def parse_cell_xfs(self):
         """Read styles from the shared style table"""
