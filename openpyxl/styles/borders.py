@@ -7,7 +7,6 @@ from openpyxl.descriptors import Set, Typed, Bool
 from .colors import Color
 from .hashable import HashableObject
 from .descriptors import Color
-from .border import Border
 
 
 DIAGONAL_NONE = 0
@@ -17,7 +16,59 @@ DIAGONAL_BOTH = 3
 diagonals = (DIAGONAL_NONE, DIAGONAL_UP, DIAGONAL_DOWN, DIAGONAL_BOTH)
 
 
-class Borders(HashableObject):
+from openpyxl.compat import safe_string
+from openpyxl.descriptors import Set, Alias
+
+from .hashable import HashableObject
+from .descriptors import Color
+
+
+class Side(HashableObject):
+
+    spec = """Actually to BorderPr 18.8.6"""
+
+    """Border options for use in styles.
+    Caution: if you do not specify a border_style, other attributes will
+    have no effect !"""
+    BORDER_NONE = None
+    BORDER_DASHDOT = 'dashDot'
+    BORDER_DASHDOTDOT = 'dashDotDot'
+    BORDER_DASHED = 'dashed'
+    BORDER_DOTTED = 'dotted'
+    BORDER_DOUBLE = 'double'
+    BORDER_HAIR = 'hair'
+    BORDER_MEDIUM = 'medium'
+    BORDER_MEDIUMDASHDOT = 'mediumDashDot'
+    BORDER_MEDIUMDASHDOTDOT = 'mediumDashDotDot'
+    BORDER_MEDIUMDASHED = 'mediumDashed'
+    BORDER_SLANTDASHDOT = 'slantDashDot'
+    BORDER_THICK = 'thick'
+    BORDER_THIN = 'thin'
+
+    __fields__ = ('style',
+                  'color')
+
+    color = Color(allow_none=True)
+    style = Set(values=(BORDER_NONE, BORDER_DASHDOT, BORDER_DASHDOTDOT,
+                        BORDER_DASHED, BORDER_DOTTED, BORDER_DOUBLE, BORDER_HAIR, BORDER_MEDIUM,
+                        BORDER_MEDIUMDASHDOT, BORDER_MEDIUMDASHDOTDOT, BORDER_MEDIUMDASHED,
+                        BORDER_SLANTDASHDOT, BORDER_THICK, BORDER_THIN))
+    border_style = Alias('style')
+
+    def __init__(self, style=None, color=None, border_style=None):
+        if border_style is not None:
+            style = border_style
+        self.style = style
+        self.color = color
+
+    def __iter__(self):
+        for key in ("style",):
+            value = getattr(self, key)
+            if value:
+                yield key, safe_string(value)
+
+
+class Border(HashableObject):
     """Border positioning for use in styles."""
 
 
@@ -31,20 +82,20 @@ class Borders(HashableObject):
                   'horizontal')
 
     # child elements
-    left = Typed(expected_type=Border)
-    right = Typed(expected_type=Border)
-    top = Typed(expected_type=Border)
-    bottom = Typed(expected_type=Border)
-    diagonal = Typed(expected_type=Border)
-    vertical = Typed(expected_type=Border, allow_none=True)
-    horizontal = Typed(expected_type=Border, allow_none=True)
+    left = Typed(expected_type=Side)
+    right = Typed(expected_type=Side)
+    top = Typed(expected_type=Side)
+    bottom = Typed(expected_type=Side)
+    diagonal = Typed(expected_type=Side)
+    vertical = Typed(expected_type=Side, allow_none=True)
+    horizontal = Typed(expected_type=Side, allow_none=True)
     # attributes
     outline = Bool()
     diagonalUp = Bool()
     diagonalDown = Bool()
 
-    def __init__(self, left=Border(), right=Border(), top=Border(),
-                 bottom=Border(), diagonal=Border(), diagonal_direction=DIAGONAL_NONE,
+    def __init__(self, left=Side(), right=Side(), top=Side(),
+                 bottom=Side(), diagonal=Side(), diagonal_direction=DIAGONAL_NONE,
                  vertical=None, horizontal=None, diagonalUp=False, diagonalDown=False,
                  outline=True):
         self.left = left

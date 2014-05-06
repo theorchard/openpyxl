@@ -6,7 +6,7 @@ from copy import deepcopy
 from openpyxl.descriptors import Typed
 
 from .alignment import Alignment
-from .borders import Borders, Border
+from .borders import Border, Side
 from .colors import Color
 from .fills import PatternFill, GradientFill, Fill
 from .fonts import Font
@@ -27,12 +27,12 @@ class Style(HashableObject):
 
     font = Typed(expected_type=Font)
     fill = Typed(expected_type=Fill)
-    borders = Typed(expected_type=Borders)
+    borders = Typed(expected_type=Border)
     alignment = Typed(expected_type=Alignment)
     number_format = Typed(expected_type=NumberFormat)
     protection = Typed(expected_type=Protection)
 
-    def __init__(self, font=Font(), fill=PatternFill(), borders=Borders(),
+    def __init__(self, font=Font(), fill=PatternFill(), borders=Border(),
                  alignment=Alignment(), number_format=NumberFormat(),
                  protection=Protection()):
         self.font = font
