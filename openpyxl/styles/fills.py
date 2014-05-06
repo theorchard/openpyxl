@@ -73,8 +73,6 @@ class PatternFill(Fill):
 
     spec = """18.8.32"""
 
-    from .descriptors import Color
-
     __fields__ = ('patternType',
                   'fgColor',
                   'bgColor')

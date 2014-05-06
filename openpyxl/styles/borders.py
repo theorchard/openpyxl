@@ -2,24 +2,11 @@ from __future__ import absolute_import
 # Copyright (c) 2010-2014 openpyxl
 
 from openpyxl.compat import safe_string
-from openpyxl.descriptors import Set, Typed, Bool
+from openpyxl.descriptors import Set, Typed, Bool, Alias
 
 from .colors import Color
 from .hashable import HashableObject
 
-
-DIAGONAL_NONE = 0
-DIAGONAL_UP = 1
-DIAGONAL_DOWN = 2
-DIAGONAL_BOTH = 3
-diagonals = (DIAGONAL_NONE, DIAGONAL_UP, DIAGONAL_DOWN, DIAGONAL_BOTH)
-
-
-from openpyxl.compat import safe_string
-from openpyxl.descriptors import Set, Alias
-
-from .hashable import HashableObject
-from .descriptors import Color
 
 BORDER_NONE = None
 BORDER_DASHDOT = 'dashDot'
@@ -86,7 +73,7 @@ class Border(HashableObject):
     right = Typed(expected_type=Side)
     top = Typed(expected_type=Side)
     bottom = Typed(expected_type=Side)
-    diagonal = Typed(expected_type=Side)
+    diagonal = Typed(expected_type=Side, allow_none=True)
     vertical = Typed(expected_type=Side, allow_none=True)
     horizontal = Typed(expected_type=Side, allow_none=True)
     # attributes
@@ -95,7 +82,7 @@ class Border(HashableObject):
     diagonalDown = Bool()
 
     def __init__(self, left=Side(), right=Side(), top=Side(),
-                 bottom=Side(), diagonal=Side(), diagonal_direction=DIAGONAL_NONE,
+                 bottom=Side(), diagonal=Side(), diagonal_direction=None,
                  vertical=None, horizontal=None, diagonalUp=False, diagonalDown=False,
                  outline=True):
         self.left = left
