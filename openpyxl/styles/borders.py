@@ -22,6 +22,21 @@ from openpyxl.descriptors import Set, Alias
 from .hashable import HashableObject
 from .descriptors import Color
 
+BORDER_NONE = None
+BORDER_DASHDOT = 'dashDot'
+BORDER_DASHDOTDOT = 'dashDotDot'
+BORDER_DASHED = 'dashed'
+BORDER_DOTTED = 'dotted'
+BORDER_DOUBLE = 'double'
+BORDER_HAIR = 'hair'
+BORDER_MEDIUM = 'medium'
+BORDER_MEDIUMDASHDOT = 'mediumDashDot'
+BORDER_MEDIUMDASHDOTDOT = 'mediumDashDotDot'
+BORDER_MEDIUMDASHED = 'mediumDashed'
+BORDER_SLANTDASHDOT = 'slantDashDot'
+BORDER_THICK = 'thick'
+BORDER_THIN = 'thin'
+
 
 class Side(HashableObject):
 
@@ -30,20 +45,6 @@ class Side(HashableObject):
     """Border options for use in styles.
     Caution: if you do not specify a border_style, other attributes will
     have no effect !"""
-    BORDER_NONE = None
-    BORDER_DASHDOT = 'dashDot'
-    BORDER_DASHDOTDOT = 'dashDotDot'
-    BORDER_DASHED = 'dashed'
-    BORDER_DOTTED = 'dotted'
-    BORDER_DOUBLE = 'double'
-    BORDER_HAIR = 'hair'
-    BORDER_MEDIUM = 'medium'
-    BORDER_MEDIUMDASHDOT = 'mediumDashDot'
-    BORDER_MEDIUMDASHDOTDOT = 'mediumDashDotDot'
-    BORDER_MEDIUMDASHED = 'mediumDashed'
-    BORDER_SLANTDASHDOT = 'slantDashDot'
-    BORDER_THICK = 'thick'
-    BORDER_THIN = 'thin'
 
     __fields__ = ('style',
                   'color')

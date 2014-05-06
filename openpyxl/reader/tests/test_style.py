@@ -46,8 +46,7 @@ from openpyxl.styles import (
     Protection,
     Style
 )
-from openpyxl.styles import colors
-from openpyxl.styles import fills
+from openpyxl.styles import colors, fills, borders
 
 # test imports
 from openpyxl.tests.helper import get_xml, compare_xml
@@ -149,16 +148,16 @@ def test_read_complex_style(datadir):
     assert style('A17').number_format == '0.00%'
     assert 'A18:B18' in ws._merged_cells
     assert ws.cell('B18').merged
-    assert style('A19').borders.top.color.value == 'FF006600'
-    assert style('A19').borders.bottom.color.value == 'FF006600'
-    assert style('A19').borders.left.color.value == 'FF006600'
-    assert style('A19').borders.right.color.value == 'FF006600'
-    assert style('A21').borders.top.color.value == 7
-    assert style('A21').borders.bottom.color.value == 7
-    assert style('A21').borders.left.color.value == 7
-    assert style('A21').borders.right.color.value == 7
+    assert style('A19').border.top.color.value == 'FF006600'
+    assert style('A19').border.bottom.color.value == 'FF006600'
+    assert style('A19').border.left.color.value == 'FF006600'
+    assert style('A19').border.right.color.value == 'FF006600'
+    assert style('A21').border.top.color.value == 7
+    assert style('A21').border.bottom.color.value == 7
+    assert style('A21').border.left.color.value == 7
+    assert style('A21').border.right.color.value == 7
     assert style('A23').fill.start_color.value == 'FFCCCCFF'
-    assert style('A23').borders.top.color.value == 6
+    assert style('A23').border.top.color.value == 6
     assert 'A23:B24' in ws._merged_cells
     assert ws.cell('A24').merged
     assert ws.cell('B23').merged
@@ -204,23 +203,23 @@ def test_change_existing_styles(datadir):
     ws.cell('A16').style = ws.cell('A16').style.copy(number_format=NumberFormat('0.00'))
     ws.cell('A17').style = ws.cell('A17').style.copy(number_format=NumberFormat('mm-dd-yy'))
     ws.unmerge_cells('A18:B18')
-    ws.cell('A19').style = ws.cell('A19').style.copy(borders=Border(top=Side(border_style=Side.BORDER_THIN,
+    ws.cell('A19').style = ws.cell('A19').style.copy(border=Border(top=Side(border_style=borders.BORDER_THIN,
                                                                                 color=Color('FF006600')),
-                                                                     bottom=Side(border_style=Side.BORDER_THIN,
+                                                                     bottom=Side(border_style=borders.BORDER_THIN,
                                                                                    color=Color('FF006600')),
-                                                                     left=Side(border_style=Side.BORDER_THIN,
+                                                                     left=Side(border_style=borders.BORDER_THIN,
                                                                                  color=Color('FF006600')),
-                                                                     right=Side(border_style=Side.BORDER_THIN,
+                                                                     right=Side(border_style=borders.BORDER_THIN,
                                                                                   color=Color('FF006600'))))
-    ws.cell('A21').style = ws.cell('A21').style.copy(borders=Border(top=Side(border_style=Side.BORDER_THIN,
+    ws.cell('A21').style = ws.cell('A21').style.copy(border=Border(top=Side(border_style=borders.BORDER_THIN,
                                                                                 color=Color(theme=7)),
-                                                                     bottom=Side(border_style=Side.BORDER_THIN,
+                                                                     bottom=Side(border_style=borders.BORDER_THIN,
                                                                                    color=Color(theme=7)),
-                                                                     left=Side(border_style=Side.BORDER_THIN,
+                                                                     left=Side(border_style=borders.BORDER_THIN,
                                                                                  color=Color(theme=7)),
-                                                                     right=Side(border_style=Side.BORDER_THIN,
+                                                                     right=Side(border_style=borders.BORDER_THIN,
                                                                                   color=Color(theme=7))))
-    ws.cell('A23').style = ws.cell('A23').style.copy(borders=Border(top=Side(border_style=Side.BORDER_THIN,
+    ws.cell('A23').style = ws.cell('A23').style.copy(border=Border(top=Side(border_style=borders.BORDER_THIN,
                                                                                 color=Color(theme=6))),
                                                      fill=PatternFill(fill_type='solid',
                                                                start_color=Color('FFCCCCFF')))
@@ -265,16 +264,16 @@ def test_change_existing_styles(datadir):
     assert style('A17').number_format == 'mm-dd-yy'
     assert 'A18:B18' not in ws._merged_cells
     assert not ws.cell('B18').merged
-    assert style('A19').borders.top.color.value == 'FF006600'
-    assert style('A19').borders.bottom.color.value == 'FF006600'
-    assert style('A19').borders.left.color.value == 'FF006600'
-    assert style('A19').borders.right.color.value == 'FF006600'
-    assert style('A21').borders.top.color.value == 7
-    assert style('A21').borders.bottom.color.value == 7
-    assert style('A21').borders.left.color.value == 7
-    assert style('A21').borders.right.color.value == 7
+    assert style('A19').border.top.color.value == 'FF006600'
+    assert style('A19').border.bottom.color.value == 'FF006600'
+    assert style('A19').border.left.color.value == 'FF006600'
+    assert style('A19').border.right.color.value == 'FF006600'
+    assert style('A21').border.top.color.value == 7
+    assert style('A21').border.bottom.color.value == 7
+    assert style('A21').border.left.color.value == 7
+    assert style('A21').border.right.color.value == 7
     assert style('A23').fill.start_color.value == 'FFCCCCFF'
-    assert style('A23').borders.top.color.value == 6
+    assert style('A23').border.top.color.value == 6
     assert 'A23:B24' not in ws._merged_cells
     assert not ws.cell('A24').merged
     assert not ws.cell('B23').merged
@@ -311,20 +310,19 @@ def test_change_existing_styles(datadir):
     assert style('C17').number_format == '0.00%'
     assert 'C18:D18' in ws._merged_cells
     assert ws.cell('D18').merged
-    assert style('C19').borders.top.color.value == 'FF006600'
-    assert style('C19').borders.bottom.color.value == 'FF006600'
-    assert style('C19').borders.left.color.value == 'FF006600'
-    assert style('C19').borders.right.color.value == 'FF006600'
-    assert style('C21').borders.top.color.value == 7
-    assert style('C21').borders.bottom.color.value == 7
-    assert style('C21').borders.left.color.value == 7
-    assert style('C21').borders.right.color.value == 7
+    assert style('C19').border.top.color.value == 'FF006600'
+    assert style('C19').border.bottom.color.value == 'FF006600'
+    assert style('C19').border.left.color.value == 'FF006600'
+    assert style('C19').border.right.color.value == 'FF006600'
+    assert style('C21').border.top.color.value == 7
+    assert style('C21').border.bottom.color.value == 7
+    assert style('C21').border.left.color.value == 7
+    assert style('C21').border.right.color.value == 7
     assert style('C23').fill.start_color.value == 'FFCCCCFF'
-    assert style('C23').borders.top.color.value == 6
+    assert style('C23').border.top.color.value == 6
     assert 'C23:D24' in ws._merged_cells
     assert ws.cell('C24').merged
     assert ws.cell('D23').merged
     assert ws.cell('D24').merged
     assert style('C25').alignment.wrap_text
     assert style('C26').alignment.shrink_to_fit
-

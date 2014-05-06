@@ -156,15 +156,15 @@ class TestConditionalFormatting(object):
                     patternType=fills.FILL_SOLID)
         font = Font(name='Arial', size=12, bold=True,
                     underline=Font.UNDERLINE_SINGLE)
-        borders = Border(top=Side(border_style=Side.BORDER_THIN,
+        border = Border(top=Side(border_style=borders.BORDER_THIN,
                                      color=Color(colors.DARKYELLOW)),
-                          bottom=Side(border_style=Side.BORDER_THIN,
+                          bottom=Side(border_style=borders.BORDER_THIN,
                                         color=Color(colors.BLACK)))
-        cf.add('C1:C10', FormulaRule(formula=['ISBLANK(C1)'], font=font, border=borders, fill=fill))
+        cf.add('C1:C10', FormulaRule(formula=['ISBLANK(C1)'], font=font, border=border, fill=fill))
         cf.add('D1:D10', FormulaRule(formula=['ISBLANK(D1)'], fill=fill))
         cf.setDxfStyles(self.workbook)
         assert len(self.workbook.style_properties['dxf_list']) == 2
-        assert self.workbook.style_properties['dxf_list'][0] == {'font': font, 'border': borders, 'fill': fill}
+        assert self.workbook.style_properties['dxf_list'][0] == {'font': font, 'border': border, 'fill': fill}
         assert self.workbook.style_properties['dxf_list'][1] == {'fill': fill}
 
     def test_conditional_formatting_update(self):

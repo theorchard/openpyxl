@@ -19,7 +19,7 @@ class Style(HashableObject):
     """Style object containing all formatting details."""
     __fields__ = ('font',
                   'fill',
-                  'borders',
+                  'border',
                   'alignment',
                   'number_format',
                   'protection')
@@ -27,17 +27,17 @@ class Style(HashableObject):
 
     font = Typed(expected_type=Font)
     fill = Typed(expected_type=Fill)
-    borders = Typed(expected_type=Border)
+    border = Typed(expected_type=Border)
     alignment = Typed(expected_type=Alignment)
     number_format = Typed(expected_type=NumberFormat)
     protection = Typed(expected_type=Protection)
 
-    def __init__(self, font=Font(), fill=PatternFill(), borders=Border(),
+    def __init__(self, font=Font(), fill=PatternFill(), border=Border(),
                  alignment=Alignment(), number_format=NumberFormat(),
                  protection=Protection()):
         self.font = font
         self.fill = fill
-        self.borders = borders
+        self.border = border
         self.alignment = alignment
         self.number_format = number_format
         self.protection = protection

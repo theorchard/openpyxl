@@ -48,6 +48,7 @@ from openpyxl.styles import (
     Style,
     colors,
     fills,
+    borders,
 )
 from openpyxl.formatting import ConditionalFormatting
 from openpyxl.formatting.rules import FormulaRule
@@ -101,7 +102,7 @@ class TestStyleWriter(object):
         w = StyleWriter(self.workbook)
         assert len(w.styles) == 6  # 5 + the default
 
-        self.worksheet.cell('A10').style = Style(borders=Border(top=Side(border_style=Side.BORDER_THIN)))
+        self.worksheet.cell('A10').style = Style(border=Border(top=Side(border_style=borders.BORDER_THIN)))
         w = StyleWriter(self.workbook)
         assert len(w.styles) == 7
 
@@ -196,7 +197,7 @@ class TestStyleWriter(object):
         assert diff is None, diff
 
     def test_borders(self):
-        st = Style(borders=Border(top=Side(border_style=Side.BORDER_THIN,
+        st = Style(border=Border(top=Side(border_style=borders.BORDER_THIN,
                                               color=Color(colors.DARKYELLOW))))
         self.worksheet.cell('A1').style = st
         w = StyleWriter(self.workbook)

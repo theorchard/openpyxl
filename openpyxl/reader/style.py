@@ -204,7 +204,7 @@ class SharedStylesParser(object):
                 _style['fill'] = self.fill_list[int(cell_xfs_node.get('fillId'))].copy()
 
             if bool(cell_xfs_node.get('applyBorder')):
-                _style['borders'] = self.border_list[int(cell_xfs_node.get('borderId'))].copy()
+                _style['border'] = self.border_list[int(cell_xfs_node.get('borderId'))].copy()
 
             if bool(cell_xfs_node.get('applyProtection')):
                 protection = {}

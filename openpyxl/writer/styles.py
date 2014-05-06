@@ -139,9 +139,9 @@ class StyleWriter(object):
         table = {}
         index = 1
         for st in self.styles:
-            if st.borders != DEFAULTS.borders and st.borders not in table:
-                table[st.borders] = index
-                self._write_border(borders, st.borders)
+            if st.border != DEFAULTS.border and st.border not in table:
+                table[st.border] = index
+                self._write_border(borders, st.border)
                 index += 1
 
         borders.attrib["count"] = str(index)
@@ -179,8 +179,8 @@ class StyleWriter(object):
                 vals['fontId'] = str(fonts_table[st.font])
                 vals['applyFont'] = '1'
 
-            if st.borders != DEFAULTS.borders:
-                vals['borderId'] = str(borders_table[st.borders])
+            if st.border != DEFAULTS.border:
+                vals['borderId'] = str(borders_table[st.border])
                 vals['applyBorder'] = '1'
 
             if st.fill != DEFAULTS.fill:
