@@ -6,14 +6,19 @@ from openpyxl.cell import get_column_letter, column_index_from_string
 from openpyxl.descriptors import Integer, Float, Bool, Strict, String, Alias
 
 
-class Dimension(Strict):
+class Base(Strict):
+    # Base class for avoiding conflicts between descriptors and slots in Python 3
+    __fields__ = ()
+    __slots__ = __fields__
+
+
+class Dimension(Base):
     """Information about the display properties of a row or column."""
     __fields__ = ('index',
                  'hidden',
                  'outlineLevel',
                  'collapsed',)
 
-    __slots__ = __fields__
     index = Integer()
     hidden = Bool()
     outlineLevel = Integer(allow_none=True)
@@ -104,3 +109,5 @@ class ColumnDimension(Dimension):
     #@property
     #def col_label(self):
         #return get_column_letter(self.index)
+
+del Base
