@@ -37,7 +37,8 @@ class Convertible(Typed):
     """Values must be convertible to a particular type"""
 
     def __set__(self, instance, value):
-        if not self.allow_none:
+        if (self.allow_none is True and value is not None
+            or not self.allow_none):
             try:
                 value = self.expected_type(value)
             except:
