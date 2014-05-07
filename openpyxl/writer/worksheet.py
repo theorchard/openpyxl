@@ -191,15 +191,20 @@ def write_worksheet_sheetviews(doc, worksheet):
 
 def write_worksheet_cols(doc, worksheet, style_table):
     """Write worksheet columns to xml."""
+    cols = []
     if worksheet.column_dimensions:
-        start_tag(doc, 'cols')
-        for column_string, columndimension in \
-            sorted(iteritems(worksheet.column_dimensions)):
-            col_def = dict(columndimension)
-            if column_string in worksheet._styles:
-                col_def['style'] = '%d' % worksheet._styles[column_string]
-            tag(doc, 'col', col_def)
-        end_tag(doc, 'cols')
+        for k, v in iteritems(worksheet.column_dimensions):
+            v = dict(v)
+            print v.keys()
+            if set(v.keys()) != set(['min', 'max']):
+                cols.append((k, v))
+        if cols != []:
+            start_tag(doc, 'cols')
+            for column_string, col_def in sorted(cols):
+                if column_string in worksheet._styles:
+                    col_def['style'] = '%d' % worksheet._styles[column_string]
+                tag(doc, 'col', col_def)
+            end_tag(doc, 'cols')
 
 
 def write_worksheet_conditional_formatting(doc, worksheet):
