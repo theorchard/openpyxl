@@ -5,17 +5,22 @@ Major changes
 -------------
 
 * This is last release that will support Python 3.2
+* Significant speed up when reading files
 * Merged immutable styles
 * Type inference is disabled by default
 * RawCell renamed ReadOnlyCell
 * ReadOnlyCell.internal_value and ReadOnlyCell.value now behave the same as Cell
 * Provide no size information on unsized worksheets
 
+
 Minor changes
 -------------
 
 * All tests converted to pytest
 * Pyflakes used for static code analysis
+* Sample code in the documentation is automatically run
+* Support GradientFills
+* BaseColWidth set
 
 
 Pull requests
