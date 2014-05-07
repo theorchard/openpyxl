@@ -189,22 +189,30 @@ def write_worksheet_sheetviews(doc, worksheet):
     end_tag(doc, 'sheetViews')
 
 
-def write_worksheet_cols(doc, worksheet, style_table):
-    """Write worksheet columns to xml."""
+def write_worksheet_cols(doc, worksheet, style_table=None):
+    """Write worksheet columns to xml.
+
+    style_table is ignored but required
+    for compatibility with the dumped worksheet <cols> may never be empty -
+    spec says must contain at least one child
+    """
     cols = []
-    if worksheet.column_dimensions:
-        for k, v in iteritems(worksheet.column_dimensions):
-            v = dict(v)
-            if (set(v.keys()) != set(['min', 'max'])
-                or k in worksheet._styles):
-                cols.append((k, v))
-        if cols != []:
-            start_tag(doc, 'cols')
-            for column_string, col_def in sorted(cols):
-                if column_string in worksheet._styles:
-                    col_def['style'] = '%d' % worksheet._styles[column_string]
-                tag(doc, 'col', col_def)
-            end_tag(doc, 'cols')
+    for label, dimension in iteritems(worksheet.column_dimensions):
+        col_def = dict(dimension)
+        style = worksheet._styles.get(label)
+        if col_def == {} and style is None:
+            continue
+        elif style is not None:
+            col_def['style'] = '%d' % style
+        cols.append((label, col_def))
+    if cols == []:
+        return
+    start_tag(doc, 'cols')
+    for label, col_def in sorted(cols):
+        v = "%d" % column_index_from_string(label)
+        col_def.update({'min':v, 'max':v})
+        tag(doc, 'col', col_def)
+    end_tag(doc, 'cols')
 
 
 def write_worksheet_conditional_formatting(doc, worksheet):

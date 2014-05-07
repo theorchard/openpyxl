@@ -19,6 +19,4 @@ def test_row_dimension():
 def test_col_dimensions():
     from .. dimensions import ColumnDimension
     cd = ColumnDimension()
-    assert dict(cd) == {'min':'1', 'max':'1'}
-    assert cd.min == 1
-    assert cd.max == 1
+    assert dict(cd) == {}

@@ -90,18 +90,8 @@ class ColumnDimension(Dimension):
         super(ColumnDimension, self).__init__(index, hidden, outline_level,
                                               collapsed)
 
-    @property
-    def min(self):
-        return column_index_from_string(self.index)
-
-    @property
-    def max(self):
-        return self.min
-
     def __iter__(self):
-        attrs = list(self.__fields__) + ['min', 'max']
-        del attrs[0]
-        for key in attrs:
+        for key in self.__fields__[1:]:
             value = getattr(self, key)
             if value:
                 yield key, safe_string(value)
