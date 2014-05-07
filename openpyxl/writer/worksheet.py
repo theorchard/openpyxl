@@ -204,12 +204,13 @@ def write_worksheet_cols(doc, worksheet, style_table=None):
             continue
         elif style is not None:
             col_def['style'] = '%d' % style
-        cols.append((label, col_def))
+        idx = column_index_from_string(label)
+        cols.append((idx, col_def))
     if cols == []:
         return
     start_tag(doc, 'cols')
-    for label, col_def in sorted(cols):
-        v = "%d" % column_index_from_string(label)
+    for idx, col_def in sorted(cols):
+        v = "%d" % idx
         col_def.update({'min':v, 'max':v})
         tag(doc, 'col', col_def)
     end_tag(doc, 'cols')
