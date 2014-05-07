@@ -195,8 +195,8 @@ def write_worksheet_cols(doc, worksheet, style_table):
     if worksheet.column_dimensions:
         for k, v in iteritems(worksheet.column_dimensions):
             v = dict(v)
-            print v.keys()
-            if set(v.keys()) != set(['min', 'max']):
+            if (set(v.keys()) != set(['min', 'max'])
+                or k in worksheet._styles):
                 cols.append((k, v))
         if cols != []:
             start_tag(doc, 'cols')
