@@ -85,7 +85,6 @@ class ColumnDimension(Dimension):
         super(ColumnDimension, self).__init__(index, hidden, outline_level,
                                               collapsed)
 
-
     @property
     def min(self):
         return column_index_from_string(self.index)
