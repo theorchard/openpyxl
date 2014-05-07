@@ -14,7 +14,7 @@
     <col max="6" min="6"/>
   </cols>
   <sheetData>
-    <row r="1" spans="1:6" customHeight="1" ht="30">
+    <row r="1" spans="1:6" customHeight="1" ht="30.0">
       <c r="F1" t="n">
         <v>10</v>
       </c>

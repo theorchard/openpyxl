@@ -137,8 +137,8 @@ class Worksheet(object):
         self.print_gridlines = False
         self.show_summary_below = True
         self.show_summary_right = True
-        self.default_row_dimension = RowDimension(self)
-        self.default_column_dimension = ColumnDimension(self)
+        self.default_row_dimension = RowDimension()
+        self.default_column_dimension = ColumnDimension()
         self._auto_filter = AutoFilter()
         self._freeze_panes = None
         self.paper_size = None
