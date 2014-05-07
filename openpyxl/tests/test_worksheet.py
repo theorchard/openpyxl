@@ -362,10 +362,6 @@ class TestWorkSheetWriter(object):
             </sheetView>
           </sheetViews>
           <sheetFormatPr baseColWidth="10" defaultRowHeight="15"/>
-          <cols>
-            <col min="1" max="1"/>
-            <col min="2" max="2"/>
-          </cols>
           <sheetData>
             <row r="1" spans="1:2">
               <c r="A1" t="s">
@@ -399,10 +395,6 @@ class TestWorkSheetWriter(object):
             </sheetView>
           </sheetViews>
           <sheetFormatPr baseColWidth="10" defaultRowHeight="15"/>
-          <cols>
-            <col min="1" max="1"/>
-            <col min="2" max="2"/>
-          </cols>
           <sheetData>
             <row r="1" spans="1:2">
               <c r="A1" t="s">
@@ -433,10 +425,6 @@ class TestWorkSheetWriter(object):
             </sheetView>
           </sheetViews>
           <sheetFormatPr baseColWidth="10" defaultRowHeight="15"/>
-          <cols>
-            <col min="1" max="1"/>
-            <col min="2" max="2"/>
-          </cols>
           <sheetData>
             <row r="1" spans="1:2">
               <c r="A1" t="s">
