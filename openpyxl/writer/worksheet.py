@@ -195,22 +195,9 @@ def write_worksheet_cols(doc, worksheet, style_table):
         start_tag(doc, 'cols')
         for column_string, columndimension in \
             sorted(iteritems(worksheet.column_dimensions)):
-            col_index = column_index_from_string(column_string)
-            col_def = {'min': str(col_index), 'max': str(col_index)}
-            if columndimension.width is not None:
-                col_def['customWidth'] = '1'
-            if not columndimension.visible:
-                col_def['hidden'] = 'true'
-            if columndimension.outline_level > 0:
-                col_def['outlineLevel'] = str(columndimension.outline_level)
-            if columndimension.collapsed:
-                col_def['collapsed'] = 'true'
-            if columndimension.auto_size:
-                col_def['bestFit'] = 'true'
+            col_def = dict(columndimension)
             if column_string in worksheet._styles:
                 col_def['style'] = '%d' % worksheet._styles[column_string]
-            if columndimension.width is not None:
-                col_def['width'] = str(columndimension.width)
             tag(doc, 'col', col_def)
         end_tag(doc, 'cols')
 
