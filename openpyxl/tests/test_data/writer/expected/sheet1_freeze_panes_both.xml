@@ -13,9 +13,6 @@
     </sheetView>
   </sheetViews>
   <sheetFormatPr baseColWidth="10" defaultRowHeight="15"/>
-  <cols>
-    <col max="6" min="6"/>
-  </cols>
   <sheetData>
     <row r="42" spans="1:6">
       <c r="F42" t="s">
