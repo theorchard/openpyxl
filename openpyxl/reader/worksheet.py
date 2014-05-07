@@ -147,19 +147,13 @@ class WorkSheetParser(object):
         if max != 16384:
             for colId in range(min, max + 1):
                 column = get_column_letter(colId)
-                width = col.get("width")
-                auto_size = col.get('bestFit') == '1'
-                visible = col.get('hidden') != '1'
-                outline = col.get('outlineLevel') or 0
-                collapsed = col.get('collapsed') == '1'
-                style_index = col.get('style')
-                if style_index is not None:
-                    self.ws._styles[column] = self.style_table.get(int(style_index))
+                attrs = dict(col.items())
+                attrs['index'] = column
                 if column not in self.ws.column_dimensions:
-                    new_dim = ColumnDimension(index=column, width=width,
-                                              auto_size=auto_size, visible=visible,
-                                              outline_level=outline, collapsed=collapsed)
-                    self.ws.column_dimensions[column] = new_dim
+                    dim = ColumnDimension(**attrs)
+                    self.ws.column_dimensions[column] = dim
+                    if dim.style is not None:
+                        self.ws._styles[column] = self.style_table.get(dim.style)
 
     def parse_row_dimensions(self, row):
         rowId = int(row.get('r'))

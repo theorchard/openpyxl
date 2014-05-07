@@ -49,6 +49,8 @@ class RowDimension(Dimension):
     __fields__ = Dimension.__fields__ + ('ht',)
     ht = Float(allow_none=True)
     height = Alias('ht')
+    s = Integer(allow_none=True)
+    style = Alias('s')
 
     def __init__(self,
                  index=0,
@@ -56,8 +58,10 @@ class RowDimension(Dimension):
                  hidden=False,
                  outline_level=0,
                  collapsed=False,
+                 style=None,
                  visible=None):
         self.height = height
+        self.style = style
         if visible is not None:
             hidden = not visible
         super(RowDimension, self).__init__(index, hidden, outline_level,
@@ -72,21 +76,35 @@ class ColumnDimension(Dimension):
     auto_size = Alias('bestFit')
     collapsed = Bool()
     index = String()
+    style = Integer(allow_none=True)
+    min = Integer()
+    max = Integer()
+    customWidth = Bool()
 
     __fields__ = Dimension.__fields__ + ('width', 'bestFit')
 
     def __init__(self,
                  index='A',
                  width=None,
-                 auto_size=False,
+                 bestFit=False,
                  hidden=False,
                  outline_level=0,
                  collapsed=False,
-                 visible=None):
+                 style=None,
+                 min=1,
+                 max=1,
+                 customWidth=False,
+                 visible=None,
+                 auto_size=None):
         self.width = width
-        self.auto_size = auto_size
+        self.style = style
+        self.min = min
+        self.max = max
         if visible is not None:
             hidden = not visible
+        if auto_size is not None:
+            bestFit = auto_size
+        self.bestFit = auto_size
         super(ColumnDimension, self).__init__(index, hidden, outline_level,
                                               collapsed)
 
