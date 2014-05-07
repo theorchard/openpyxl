@@ -42,7 +42,7 @@ def ColumnDimension():
 def test_write_no_cols(out, doc, write_cols):
     write_cols(doc, DummyWorksheet())
     doc.endDocument()
-    assert out.getvalue() == ""
+    assert out.getvalue() == b""
 
 
 def test_write_col_widths(out, doc, write_cols, ColumnDimension):
