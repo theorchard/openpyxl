@@ -13,12 +13,12 @@ def test_dimension():
 def test_row_dimension():
     from .. dimensions import RowDimension
     rd = RowDimension()
-    assert dict(rd) == {'collapsed': '0', 'index': '0', 'outline_level': '0',
-                        'hidden': '0'}
+    assert dict(rd) == {}
 
 
 def test_col_dimensions():
     from .. dimensions import ColumnDimension
     cd = ColumnDimension()
-    assert dict(cd) == {'auto_size': '0', 'collapsed': '0', 'hidden': '0',
-                      'index': 'A', 'outline_level': '0'}
+    assert dict(cd) == {'min':'1', 'max':'1'}
+    assert cd.min == 1
+    assert cd.max == 1

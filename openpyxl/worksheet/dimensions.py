@@ -2,7 +2,7 @@ from __future__ import absolute_import
 # Copyright (c) 2010-2014 openpyxl
 
 from openpyxl.compat import safe_string
-from openpyxl.cell import get_column_letter
+from openpyxl.cell import get_column_letter, column_index_from_string
 from openpyxl.descriptors import Integer, Float, Bool, Strict, String, Alias
 
 
@@ -10,26 +10,27 @@ class Dimension(Strict):
     """Information about the display properties of a row or column."""
     __fields__ = ('index',
                  'hidden',
-                 'outline_level',
+                 'outlineLevel',
                  'collapsed',)
 
     __slots__ = __fields__
     index = Integer()
     hidden = Bool()
-    outline_level = Integer(allow_none=True)
+    outlineLevel = Integer(allow_none=True)
+    outline_level = Alias('outlineLevel')
     collapsed = Bool()
 
-    def __init__(self, index, hidden, outline_level,
+    def __init__(self, index, hidden, outlineLevel,
                  collapsed, visible=True):
         self.index = index
         self.hidden = hidden
-        self.outline_level = outline_level
+        self.outlineLevel = outlineLevel
         self.collapsed = collapsed
 
     def __iter__(self):
         for key in self.__fields__:
             value = getattr(self, key)
-            if value is not None:
+            if value:
                 yield key, safe_string(value)
 
     @property
@@ -49,21 +50,25 @@ class RowDimension(Dimension):
                  height=None,
                  hidden=False,
                  outline_level=0,
-                 collapsed=False):
+                 collapsed=False,
+                 visible=None):
+        self.height = height
+        if visible is not None:
+            hidden = not visible
         super(RowDimension, self).__init__(index, hidden, outline_level,
                                            collapsed)
-        self.height = height
 
 
 class ColumnDimension(Dimension):
     """Information about the display properties of a column."""
 
     width = Float(allow_none=True)
-    auto_size = Bool()
+    bestFit = Bool()
+    auto_size = Alias('bestFit')
     collapsed = Bool()
     index = String()
 
-    __fields__ = Dimension.__fields__ + ('width', 'auto_size')
+    __fields__ = Dimension.__fields__ + ('width', 'bestFit')
 
     def __init__(self,
                  index='A',
@@ -71,11 +76,31 @@ class ColumnDimension(Dimension):
                  auto_size=False,
                  hidden=False,
                  outline_level=0,
-                 collapsed=False):
-        super(ColumnDimension, self).__init__(index, hidden, outline_level,
-                                              collapsed)
+                 collapsed=False,
+                 visible=None):
         self.width = width
         self.auto_size = auto_size
+        if visible is not None:
+            hidden = not visible
+        super(ColumnDimension, self).__init__(index, hidden, outline_level,
+                                              collapsed)
+
+
+    @property
+    def min(self):
+        return column_index_from_string(self.index)
+
+    @property
+    def max(self):
+        return self.min
+
+    def __iter__(self):
+        attrs = list(self.__fields__) + ['min', 'max']
+        del attrs[0]
+        for key in attrs:
+            value = getattr(self, key)
+            if value:
+                yield key, safe_string(value)
 
     #@property
     #def col_label(self):
