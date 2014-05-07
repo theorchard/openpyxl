@@ -1,0 +1,4 @@
+ipdb==0.8
+jdcal==1.0
+lxml==3.3.4
+pytest==2.5.2
