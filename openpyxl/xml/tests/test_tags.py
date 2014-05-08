@@ -1,15 +1,15 @@
-from xml.sax.saxutils import XMLGenerator
+# Copyright (c) 2010-2014 openpyxl
 
-from openpyxl.compat import StringIO
+from io import BytesIO
 import pytest
 
-from openpyxl.xml.functions import start_tag, end_tag, tag
+from openpyxl.xml.functions import start_tag, end_tag, tag, XMLGenerator
 from openpyxl.xml.constants import SHEET_MAIN_NS
 
 
 @pytest.fixture(scope="class")
 def doc():
-    return StringIO()
+    return BytesIO()
 
 @pytest.fixture(scope="class")
 def root(doc):

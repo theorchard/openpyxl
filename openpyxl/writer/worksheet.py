@@ -26,13 +26,18 @@ from __future__ import absolute_import
 
 # Python stdlib imports
 import decimal
+from io import BytesIO
 
 # compatibility imports
 
-from openpyxl.compat import StringIO, long
+from openpyxl.compat import long
 
 # package imports
-from openpyxl.cell import coordinate_from_string, column_index_from_string, COORD_RE
+from openpyxl.cell import (
+    coordinate_from_string,
+    column_index_from_string,
+    COORD_RE
+)
 from openpyxl.xml.functions import (
     Element,
     SubElement,
@@ -72,7 +77,7 @@ def write_worksheet(worksheet, shared_strings, style_table):
         vba_root = fromstring(worksheet.xml_source)
     else:
         vba_root = None
-    xml_file = StringIO()
+    xml_file = BytesIO()
     doc = XMLGenerator(out=xml_file, encoding='utf-8')
     start_tag(doc, 'worksheet',
               {'xmlns': SHEET_MAIN_NS,

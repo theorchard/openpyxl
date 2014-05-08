@@ -22,12 +22,11 @@
 # @author: see AUTHORS file
 
 # Python stdlib imports
+from io import BytesIO
 import os.path
-from xml.sax.saxutils import XMLGenerator
 
 # compatibility imports
 from openpyxl import Workbook
-from openpyxl.compat import StringIO
 from openpyxl.formatting import ConditionalFormatting
 from openpyxl.formatting.rules import ColorScaleRule, CellIsRule, FormulaRule
 from openpyxl.compat import iterkeys
@@ -36,6 +35,7 @@ from openpyxl.compat import iterkeys
 from openpyxl.reader.excel import load_workbook
 from openpyxl.reader.style import read_style_table
 from openpyxl.xml.constants import ARC_STYLE
+from openpyxl.xml.functions import XMLGenerator
 from openpyxl.writer.worksheet import write_worksheet_conditional_formatting
 from openpyxl.writer.styles import StyleWriter
 from openpyxl.styles import Color, PatternFill, Font, Border, Side, HashableObject
@@ -133,7 +133,7 @@ class TestConditionalFormatting(object):
         worksheet.conditional_formatting.add('C1:C10', {'type': 'expression', 'formula': ['ISBLANK(C1)'],
                                                         'stopIfTrue': '1', 'dxf': {}})
         worksheet.conditional_formatting.setDxfStyles(self.workbook)
-        temp_buffer = StringIO()
+        temp_buffer = BytesIO()
         doc = XMLGenerator(out=temp_buffer, encoding='utf-8')
         write_worksheet_conditional_formatting(doc, worksheet)
         doc.endDocument()
@@ -176,7 +176,7 @@ class TestConditionalFormatting(object):
                                            [Color('FFFF7128'), Color('FFFFEF9C')]}}]}
         worksheet.conditional_formatting.update(rules)
 
-        temp_buffer = StringIO()
+        temp_buffer = BytesIO()
         doc = XMLGenerator(out=temp_buffer, encoding='utf-8')
         write_worksheet_conditional_formatting(doc, worksheet)
         doc.endDocument()
@@ -212,7 +212,7 @@ class TestConditionalFormatting(object):
         worksheet.conditional_formatting.setDxfStyles(self.workbook)
 
         # First, verify conditional formatting xml
-        temp_buffer = StringIO()
+        temp_buffer = BytesIO()
         doc = XMLGenerator(out=temp_buffer, encoding='utf-8')
         write_worksheet_conditional_formatting(doc, worksheet)
         doc.endDocument()
@@ -518,7 +518,7 @@ class TestFormulaRule(object):
         worksheet = WS()
         worksheet.conditional_formatting.add('C1:C10', FormulaRule(formula=['ISBLANK(C1)'], stopIfTrue=True))
         worksheet.conditional_formatting.setDxfStyles(self.workbook)
-        temp_buffer = StringIO()
+        temp_buffer = BytesIO()
         doc = XMLGenerator(out=temp_buffer, encoding='utf-8')
         write_worksheet_conditional_formatting(doc, worksheet)
         doc.endDocument()
