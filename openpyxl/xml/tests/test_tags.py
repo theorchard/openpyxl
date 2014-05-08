@@ -13,7 +13,7 @@ def doc():
 
 @pytest.fixture(scope="class")
 def root(doc):
-    return XMLGenerator(doc, "utf-8")
+    return XMLGenerator(doc)
 
 
 class TestSimpleTag:

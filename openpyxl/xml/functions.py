@@ -33,6 +33,9 @@ Shortcut functions taken from:
 import re
 from functools import partial
 from xml.sax.saxutils import XMLGenerator
+
+XMLGenerator = partial(XMLGenerator, encoding="utf-8")
+
 from xml.sax.xmlreader import AttributesImpl
 
 

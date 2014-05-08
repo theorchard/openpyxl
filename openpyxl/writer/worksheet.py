@@ -78,7 +78,7 @@ def write_worksheet(worksheet, shared_strings, style_table):
     else:
         vba_root = None
     xml_file = BytesIO()
-    doc = XMLGenerator(out=xml_file, encoding='utf-8')
+    doc = XMLGenerator(out=xml_file)
     start_tag(doc, 'worksheet',
               {'xmlns': SHEET_MAIN_NS,
                'xmlns:r': REL_NS})

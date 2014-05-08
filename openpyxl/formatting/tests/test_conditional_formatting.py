@@ -134,7 +134,7 @@ class TestConditionalFormatting(object):
                                                         'stopIfTrue': '1', 'dxf': {}})
         worksheet.conditional_formatting.setDxfStyles(self.workbook)
         temp_buffer = BytesIO()
-        doc = XMLGenerator(out=temp_buffer, encoding='utf-8')
+        doc = XMLGenerator(out=temp_buffer)
         write_worksheet_conditional_formatting(doc, worksheet)
         doc.endDocument()
         xml = temp_buffer.getvalue()
@@ -177,7 +177,7 @@ class TestConditionalFormatting(object):
         worksheet.conditional_formatting.update(rules)
 
         temp_buffer = BytesIO()
-        doc = XMLGenerator(out=temp_buffer, encoding='utf-8')
+        doc = XMLGenerator(out=temp_buffer)
         write_worksheet_conditional_formatting(doc, worksheet)
         doc.endDocument()
         xml = temp_buffer.getvalue()
@@ -213,7 +213,7 @@ class TestConditionalFormatting(object):
 
         # First, verify conditional formatting xml
         temp_buffer = BytesIO()
-        doc = XMLGenerator(out=temp_buffer, encoding='utf-8')
+        doc = XMLGenerator(out=temp_buffer)
         write_worksheet_conditional_formatting(doc, worksheet)
         doc.endDocument()
         xml = temp_buffer.getvalue()
@@ -519,7 +519,7 @@ class TestFormulaRule(object):
         worksheet.conditional_formatting.add('C1:C10', FormulaRule(formula=['ISBLANK(C1)'], stopIfTrue=True))
         worksheet.conditional_formatting.setDxfStyles(self.workbook)
         temp_buffer = BytesIO()
-        doc = XMLGenerator(out=temp_buffer, encoding='utf-8')
+        doc = XMLGenerator(out=temp_buffer)
         write_worksheet_conditional_formatting(doc, worksheet)
         doc.endDocument()
         xml = temp_buffer.getvalue()

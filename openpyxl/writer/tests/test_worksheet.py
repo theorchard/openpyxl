@@ -23,7 +23,7 @@ def out():
 
 @pytest.fixture
 def doc(out):
-    doc = XMLGenerator(out, encoding="utf-8")
+    doc = XMLGenerator(out)
     return doc
 
 

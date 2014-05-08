@@ -47,7 +47,7 @@ def create_string_table(workbook):
 def write_string_table(string_table):
     """Write the string table xml."""
     temp_buffer = StringIO()
-    doc = XMLGenerator(out=temp_buffer, encoding='utf-8')
+    doc = XMLGenerator(out=temp_buffer)
     start_tag(doc, 'sst', {'xmlns':
             'http://schemas.openxmlformats.org/spreadsheetml/2006/main',
             'uniqueCount': '%d' % len(string_table)})

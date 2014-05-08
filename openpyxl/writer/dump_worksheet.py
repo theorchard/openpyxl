@@ -159,7 +159,7 @@ class DumpWorksheet(Worksheet):
     def write_header(self):
 
         fobj = self.get_temporary_file(filename=self._fileobj_header_name)
-        doc = XMLGenerator(fobj, 'utf-8')
+        doc = XMLGenerator(fobj)
 
         start_tag(doc, 'worksheet',
                 {
