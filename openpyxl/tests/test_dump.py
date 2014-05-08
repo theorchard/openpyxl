@@ -33,7 +33,7 @@ from openpyxl.workbook import Workbook
 from openpyxl.writer import dump_worksheet
 from openpyxl.cell import get_column_letter
 from openpyxl.reader.excel import load_workbook
-from openpyxl.compat import xrange
+from openpyxl.compat import range
 from openpyxl.exceptions import WorkbookAlreadySaved
 from openpyxl.styles.fonts import Font
 from openpyxl.styles import Style
@@ -61,10 +61,10 @@ def test_dump_string_table():
     test_filename = _get_test_filename()
     wb = Workbook(optimized_write=True)
     ws = wb.create_sheet()
-    letters = [get_column_letter(x + 1) for x in xrange(10)]
+    letters = [get_column_letter(x + 1) for x in range(10)]
     expected_rows = []
 
-    for row in xrange(5):
+    for row in range(5):
         ws.append(['%s%d' % (letter, row + 1) for letter in letters])
     table = list(wb.shared_strings)
     assert table == ['A1', 'B1', 'C1', 'D1', 'E1', 'F1', 'G1', 'H1', 'I1', 'J1',
@@ -79,19 +79,19 @@ def test_dump_sheet_with_styles():
     test_filename = _get_test_filename()
     wb = Workbook(optimized_write=True)
     ws = wb.create_sheet()
-    letters = [get_column_letter(x + 1) for x in xrange(20)]
+    letters = [get_column_letter(x + 1) for x in range(20)]
     expected_rows = []
 
-    for row in xrange(20):
+    for row in range(20):
         expected_rows.append(['%s%d' % (letter, row + 1) for letter in letters])
 
-    for row in xrange(20):
+    for row in range(20):
         expected_rows.append([(row + 1) for letter in letters])
 
-    for row in xrange(10):
+    for row in range(10):
         expected_rows.append([datetime(2010, ((x % 12) + 1), row + 1) for x in range(len(letters))])
 
-    for row in xrange(20):
+    for row in range(20):
         expected_rows.append(['=%s%d' % (letter, row + 1) for letter in letters])
 
     for row in expected_rows:

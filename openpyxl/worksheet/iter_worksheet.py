@@ -30,7 +30,7 @@ import operator
 from itertools import groupby
 
 # compatibility
-from openpyxl.compat import xrange
+from openpyxl.compat import range
 from openpyxl.xml.functions import iterparse
 
 # package
@@ -166,7 +166,7 @@ class IterableWorksheet(Worksheet):
         Missing cells will be created.
         """
         if max_col is not None:
-            expected_columns = [get_column_letter(ci) for ci in xrange(min_col, max_col)]
+            expected_columns = [get_column_letter(ci) for ci in range(min_col, max_col)]
         else:
             expected_columns = []
         row_counter = min_row
@@ -178,7 +178,7 @@ class IterableWorksheet(Worksheet):
             full_row = []
             if row_counter < row:
                 # Rows requested before those in the worksheet
-                for gap_row in xrange(row_counter, row):
+                for gap_row in range(row_counter, row):
                     yield tuple(EMPTY_CELL for column in expected_columns)
                     row_counter = row
 

@@ -35,7 +35,7 @@ from .strings import (
     )
 from .numbers import long
 from .itertools import (
-    xrange,
+    range,
     ifilter,
     iteritems,
     iterkeys,

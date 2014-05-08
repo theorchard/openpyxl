@@ -9,9 +9,9 @@ except ImportError:
     izip = zip
 
 try:
-    xrange = xrange
+    range = xrange
 except NameError:
-    xrange = range
+    range = range
 
 def iteritems(iterable):
     if hasattr(iterable, 'iteritems'):

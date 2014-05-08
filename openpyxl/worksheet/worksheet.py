@@ -49,7 +49,7 @@ from openpyxl.units import (
 from openpyxl.styles import Style, DEFAULTS as DEFAULTS_STYLE
 from openpyxl.formatting import ConditionalFormatting
 from openpyxl.namedrange import NamedRangeContainingValue
-from openpyxl.compat import OrderedDict, unicode, xrange, basestring
+from openpyxl.compat import OrderedDict, unicode, range, basestring
 from openpyxl.compat.itertools import iteritems
 
 from .header_footer import HeaderFooter
@@ -365,10 +365,10 @@ class Worksheet(object):
             min_col = column_index_from_string(min_col)
             max_col = column_index_from_string(max_col)
             cache_cols = {}
-            for col in xrange(min_col, max_col + 1):
+            for col in range(min_col, max_col + 1):
                 cache_cols[col] = get_column_letter(col)
-            rows = xrange(min_row + row, max_row + row + 1)
-            cols = xrange(min_col, max_col + 1)
+            rows = range(min_row + row, max_row + row + 1)
+            cols = range(min_col, max_col + 1)
             for row in rows:
                 new_row = []
                 for col in cols:
@@ -488,8 +488,8 @@ class Worksheet(object):
         min_col = column_index_from_string(min_col)
         max_col = column_index_from_string(max_col)
         # Blank out the rest of the cells in the range
-        for col in xrange(min_col, max_col + 1):
-            for row in xrange(min_row, max_row + 1):
+        for col in range(min_col, max_col + 1):
+            for row in range(min_row, max_row + 1):
                 if not (row == min_row and col == min_col):
                     # PHPExcel adds cell and specifically blanks it out if it doesn't exist
                     self._get_cell('%s%s' % (get_column_letter(col), row)).value = None
@@ -520,8 +520,8 @@ class Worksheet(object):
             min_col = column_index_from_string(min_col)
             max_col = column_index_from_string(max_col)
             # Mark cell as unmerged
-            for col in xrange(min_col, max_col + 1):
-                for row in xrange(min_row, max_row + 1):
+            for col in range(min_col, max_col + 1):
+                for row in range(min_row, max_row + 1):
                     if not (row == min_row and col == min_col):
                         self._get_cell('%s%s' % (get_column_letter(col), row)).merged = False
         else:

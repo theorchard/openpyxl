@@ -1,5 +1,7 @@
 "Benchmark some different implementations for cells"
 
+from openpyxl.compat import range
+
 from openpyxl.cell import Cell
 from openpyxl.cell.read_only import ReadOnlyCell
 from memory_profiler import memory_usage
@@ -21,7 +23,7 @@ if __name__ == '__main__':
     for fn in (standard, iterative, dictionary):
         t = time.time()
         container = []
-        for i in xrange(1000000):
+        for i in range(1000000):
             container.append(fn())
         print "{0} {1} MB, {2:.2f}s".format(
             fn.func_name,

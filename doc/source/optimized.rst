@@ -34,13 +34,14 @@ by a faster alternative, the :class:`openpyxl.writer.dump_worksheet.DumpWorkshee
 When you want to dump large amounts of data, you might find optimized writer helpful::
 
     from openpyxl import Workbook
+    from openpyxl.compat import range
     wb = Workbook(optimized_write = True)
 
     ws = wb.create_sheet()
 
     # now we'll fill it with 10k rows x 200 columns
-    for irow in xrange(10000):
-        ws.append(['%d' % i for i in xrange(200)])
+    for irow in range(10000):
+        ws.append(['%d' % i for i in range(200)])
 
     wb.save('new_big_file.xlsx') # don't forget to save !
 

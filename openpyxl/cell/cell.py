@@ -38,7 +38,7 @@ import datetime
 import re
 import warnings
 
-from openpyxl.compat import lru_cache, xrange
+from openpyxl.compat import lru_cache, range
 from openpyxl.units import (
     DEFAULT_ROW_HEIGHT,
     DEFAULT_COLUMN_WIDTH
@@ -118,7 +118,7 @@ def get_column_letter(col_idx):
     return ''.join(reversed(letters))
 
 
-_COL_STRING_CACHE = dict((get_column_letter(i), i) for i in xrange(1, 18279))
+_COL_STRING_CACHE = dict((get_column_letter(i), i) for i in range(1, 18279))
 def column_index_from_string(str_col, cache=_COL_STRING_CACHE):
     # we use a function argument to get indexed name lookup
     col = cache.get(str_col.upper())

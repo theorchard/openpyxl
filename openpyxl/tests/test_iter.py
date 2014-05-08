@@ -29,7 +29,7 @@ import pytest
 from openpyxl.tests.helper import DATADIR
 from openpyxl.worksheet.iter_worksheet import get_range_boundaries, read_dimension
 from openpyxl.reader.excel import load_workbook
-from openpyxl.compat import xrange, izip
+from openpyxl.compat import range, izip
 
 
 def test_open_many_sheets(datadir):
@@ -144,7 +144,7 @@ class TestText(TestWorksheet):
 class TestIntegers(TestWorksheet):
 
     sheet_name = 'Sheet2 - Numbers'
-    expected = [[x + 1] for x in xrange(30)]
+    expected = [[x + 1] for x in range(30)]
     query_range = 'D1:D30'
 
     def test_read_fast_integrated(self):
@@ -159,7 +159,7 @@ class TestFloats(TestWorksheet):
 
     sheet_name = 'Sheet2 - Numbers'
     query_range = 'K1:K30'
-    expected = expected = [[(x + 1) / 100.0] for x in xrange(30)]
+    expected = expected = [[(x + 1) / 100.0] for x in range(30)]
 
     def test_read_fast_integrated(self):
         wb = self._open_wb()
