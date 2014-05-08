@@ -107,9 +107,9 @@ def write_worksheet(worksheet, shared_strings, style_table):
             {'objects': '1', 'scenarios': '1', 'sheet': '1'})
     write_worksheet_autofilter(doc, worksheet)
     write_worksheet_mergecells(doc, worksheet)
+    write_worksheet_conditional_formatting(doc, worksheet)
     write_worksheet_datavalidations(doc, worksheet)
     write_worksheet_hyperlinks(doc, worksheet)
-    write_worksheet_conditional_formatting(doc, worksheet)
 
     options = worksheet.page_setup.options
     if options:
