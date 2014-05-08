@@ -33,7 +33,7 @@ from tempfile import NamedTemporaryFile
 import pytest
 
 # compatibility imports
-from openpyxl.compat import unicode, tempfile #, StringIO #, BytesIO
+from openpyxl.compat import unicode, tempfile
 
 # package imports
 from openpyxl.collections import IndexedList
