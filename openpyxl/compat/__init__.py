@@ -29,9 +29,7 @@ from .strings import (
     basestring,
     unicode,
     bytes,
-    StringIO,
     file,
-    BytesIO,
     tempfile,
     safe_string
     )
