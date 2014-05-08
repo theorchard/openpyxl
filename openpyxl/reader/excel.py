@@ -27,11 +27,12 @@ from __future__ import absolute_import
 # Python stdlib imports
 from zipfile import ZipFile, ZIP_DEFLATED, BadZipfile
 from sys import exc_info
+from io import BytesIO
 import os.path
 import warnings
 
 # compatibility imports
-from openpyxl.compat import unicode, file, StringIO, BytesIO
+from openpyxl.compat import unicode, file
 
 # Allow blanket setting of KEEP_VBA for testing
 try:
@@ -65,7 +66,7 @@ from openpyxl.reader.comments import read_comments, get_comments_file
 # Use exc_info for Python 2 compatibility with "except Exception[,/ as] e"
 
 
-CENTRAL_DIRECTORY_SIGNATURE = '\x50\x4b\x05\x06'
+CENTRAL_DIRECTORY_SIGNATURE = b'\x50\x4b\x05\x06'
 SUPPORTED_FORMATS = ('.xlsx', '.xlsm')
 
 
@@ -76,11 +77,9 @@ def repair_central_directory(zipFile, is_file_instance):
 
     f = zipFile if is_file_instance else open(zipFile, 'r+b')
     data = f.read()
-    if hasattr(data, "decode"):
-        data = data.decode("utf-8")
     pos = data.find(CENTRAL_DIRECTORY_SIGNATURE)  # End of central directory signature
     if (pos > 0):
-        sio = StringIO(data)
+        sio = BytesIO(data)
         sio.seek(pos + 22)  # size of 'ZIP end of central directory record'
         sio.truncate()
         sio.seek(0)

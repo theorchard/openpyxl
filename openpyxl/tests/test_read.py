@@ -24,6 +24,7 @@
 # @author: see AUTHORS file
 
 # Python stdlib imports
+from io import BytesIO, StringIO
 import os.path
 from datetime import datetime
 import zipfile
@@ -32,7 +33,7 @@ from tempfile import NamedTemporaryFile
 import pytest
 
 # compatibility imports
-from openpyxl.compat import BytesIO, StringIO, unicode, tempfile
+from openpyxl.compat import unicode, tempfile #, StringIO #, BytesIO
 
 # package imports
 from openpyxl.collections import IndexedList
@@ -180,15 +181,15 @@ class TestReadBaseDateFormat(object):
 def test_repair_central_directory():
     from openpyxl.reader.excel import repair_central_directory, CENTRAL_DIRECTORY_SIGNATURE
 
-    data_a = "foobarbaz" + CENTRAL_DIRECTORY_SIGNATURE
-    data_b = "bazbarfoo1234567890123456890"
+    data_a = b"foobarbaz" + CENTRAL_DIRECTORY_SIGNATURE
+    data_b = b"bazbarfoo1234567890123456890"
 
     # The repair_central_directory looks for a magic set of bytes
     # (CENTRAL_DIRECTORY_SIGNATURE) and strips off everything 18 bytes past the sequence
-    f = repair_central_directory(StringIO(data_a + data_b), True)
+    f = repair_central_directory(BytesIO(data_a + data_b), True)
     assert f.read() == data_a + data_b[:18]
 
-    f = repair_central_directory(StringIO(data_b), True)
+    f = repair_central_directory(BytesIO(data_b), True)
     assert f.read() == data_b
 
 
@@ -382,7 +383,7 @@ def test_get_xml_iter():
     from openpyxl.reader.worksheet import _get_xml_iter
     from tempfile import TemporaryFile
     FUT = _get_xml_iter
-    s = ""
+    s = b""
     stream = FUT(s)
     assert isinstance(stream, BytesIO), type(stream)
 

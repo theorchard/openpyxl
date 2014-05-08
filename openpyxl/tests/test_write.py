@@ -23,11 +23,9 @@
 
 # stdlib imports
 import decimal
+from io import BytesIO
 import os.path
 import zipfile
-
-# compatibility imports
-from openpyxl.compat import BytesIO
 
 import pytest
 

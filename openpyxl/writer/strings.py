@@ -25,9 +25,6 @@ from __future__ import absolute_import
 """Write the shared string table."""
 from io import BytesIO
 
-# compatibility imports
-from openpyxl.compat import StringIO
-
 # package imports
 from openpyxl.xml.functions import start_tag, end_tag, tag, XMLGenerator
 from openpyxl.collections import IndexedList
@@ -46,7 +43,7 @@ def create_string_table(workbook):
 
 def write_string_table(string_table):
     """Write the string table xml."""
-    temp_buffer = StringIO()
+    temp_buffer = BytesIO()
     doc = XMLGenerator(out=temp_buffer)
     start_tag(doc, 'sst', {'xmlns':
             'http://schemas.openxmlformats.org/spreadsheetml/2006/main',

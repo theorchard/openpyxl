@@ -25,10 +25,8 @@ from __future__ import absolute_import
 """Write a .xlsx file."""
 
 # Python stdlib imports
+from io import BytesIO
 from zipfile import ZipFile, ZIP_DEFLATED
-
-# compatibility imports
-from openpyxl.compat import BytesIO
 
 # package imports
 from openpyxl.xml.constants import (

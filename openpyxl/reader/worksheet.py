@@ -23,9 +23,9 @@ from __future__ import absolute_import
 # @author: see AUTHORS file
 
 """Reader for a single worksheet."""
+from io import BytesIO, StringIO
 
 # compatibility imports
-from openpyxl.compat import BytesIO
 from openpyxl.xml.functions import iterparse
 
 # package imports
@@ -42,10 +42,11 @@ from openpyxl.formatting import ConditionalFormatting
 
 def _get_xml_iter(xml_source):
     if not hasattr(xml_source, 'read'):
-        if hasattr(xml_source, 'decode'):
-            return BytesIO(xml_source)
-        else:
-            return BytesIO(xml_source.encode('utf-8'))
+        try:
+            xml_source = xml_source.encode("utf-8")
+        except (AttributeError, UnicodeDecodeError):
+            pass
+        return BytesIO(xml_source)
     else:
         try:
             xml_source.seek(0)

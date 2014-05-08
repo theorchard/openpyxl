@@ -22,10 +22,8 @@
 # @author: see AUTHORS file
 
 # Python stdlib imports
+from io import BytesIO
 import zipfile
-
-# compatibility imports
-from openpyxl.compat import BytesIO
 
 # package imports
 from openpyxl.tests.helper import compare_xml
