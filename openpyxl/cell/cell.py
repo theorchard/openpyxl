@@ -224,9 +224,6 @@ class Cell(object):
         value = value[:32767]
         if next(ILLEGAL_CHARACTERS_RE.finditer(value), None):
             raise IllegalCharacterError
-        # we require that newline is represented as "\n" in core,
-        # not as "\r\n" or "\r"
-        value = value.replace('\r\n', '\n')
         return value
 
     def check_error(self, value):
