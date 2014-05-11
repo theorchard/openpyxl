@@ -76,10 +76,10 @@ def test_get_comments_file(datadir):
 def test_comments_cell_association(datadir):
     datadir.chdir()
     wb = load_workbook('comments.xlsx')
-    assert wb.worksheets[0].cell(coordinate="A1").comment.author == "Cuke"
-    assert wb.worksheets[0].cell(coordinate="A1").comment.text == "Cuke:\nFirst Comment"
-    assert wb.worksheets[1].cell(coordinate="A1").comment is None
-    assert wb.worksheets[0].cell(coordinate="D1").comment.text == "Cuke:\nSecond Comment"
+    assert wb['Sheet1'].cell(coordinate="A1").comment.author == "Cuke"
+    assert wb['Sheet1'].cell(coordinate="A1").comment.text == "Cuke:\nFirst Comment"
+    assert wb['Sheet2'].cell(coordinate="A1").comment is None
+    assert wb['Sheet1'].cell(coordinate="D1").comment.text == "Cuke:\nSecond Comment"
 
 def test_comments_with_iterators(datadir):
     datadir.chdir()
