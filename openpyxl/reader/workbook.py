@@ -111,7 +111,7 @@ def read_rels(archive):
         # normalise path
         if pth.startswith("/xl"):
             pth = pth.replace("/xl", "xl")
-        elif not pth.startswith("xl") or not pth.startswith(".."):
+        elif not pth.startswith("xl") and not pth.startswith(".."):
             pth = "xl/" + pth
         yield rId, {'path':pth}
 
