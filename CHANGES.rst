@@ -35,8 +35,12 @@ Bug fixes
 ---------
 #46  - ColumnDimension style error
 #137 - Workbooks with chartsheets
+#243 - IndexError when loading workbook
+#263 - Forded conversion of line breaks
 #269 - Handling unsized worksheets in IterableWorksheet
+#270 - Handling Workbooks with non-standard references
 #275 - Handling auto filters where there are only custom filters
+#304 - Handling Workbooks with absolute paths for worksheets (from Sharepoint)
 
 
 1.8.6 (2014-05-05)
