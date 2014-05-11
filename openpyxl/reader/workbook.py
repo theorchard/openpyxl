@@ -32,6 +32,7 @@ from openpyxl.xml.constants import (
     DCTERMS_NS,
     SHEET_MAIN_NS,
     CONTYPES_NS,
+    PACKAGE_XL,
     PKG_REL_NS,
     REL_NS,
     ARC_CONTENT_TYPES,
@@ -51,6 +52,7 @@ from openpyxl.namedrange import (
     refers_to_range
     )
 
+import os
 import datetime
 import re
 
@@ -96,18 +98,22 @@ def read_content_types(archive):
     root = fromstring(xml_source)
     contents_root = root.findall('{%s}Override' % CONTYPES_NS)
     for type in contents_root:
-        yield  type.get('PartName'), type.get('ContentType')
+        yield type.get('PartName'), type.get('ContentType')
 
 
 def read_rels(archive):
     """Read relationships for a workbook"""
     xml_source = archive.read(ARC_WORKBOOK_RELS)
-    rels = {}
     tree = fromstring(xml_source)
     for element in safe_iterator(tree, '{%s}Relationship' % PKG_REL_NS):
-        rId = int(element.get('Id').replace("rId", ""))
-        rels[rId] = {'path':element.get('Target')}
-    return rels
+        rId = element.get('Id')
+        pth = element.get("Target")
+        # normalise path
+        if pth.startswith("/xl"):
+            pth = pth.replace("/xl", "xl")
+        elif not pth.startswith("xl") or not pth.startswith(".."):
+            pth = "xl/" + pth
+        yield rId, {'path':pth}
 
 
 def read_sheets(archive):
@@ -115,8 +121,8 @@ def read_sheets(archive):
     xml_source = archive.read(ARC_WORKBOOK)
     tree = fromstring(xml_source)
     for element in safe_iterator(tree, '{%s}sheet' % SHEET_MAIN_NS):
-        rId = int(element.get("{%s}id" % REL_NS).replace("rId", ""))
-        yield element.get('name'), rId
+        rId = element.get("{%s}id" % REL_NS)
+        yield rId, element.get('name')
 
 
 def detect_worksheets(archive):
@@ -126,16 +132,14 @@ def detect_worksheets(archive):
     # workbook_rels has a list of relIds and paths but no titles
     # rels = {'id':{'title':'', 'path':''} }
     from openpyxl.reader.workbook import read_rels, read_sheets
-    content_types = list(read_content_types(archive))
-    rels = read_rels(archive)
-    sheets = read_sheets(archive)
-    for sheet in sheets:
-        rels[sheet[1]]['title'] = sheet[0]
-    for rId in sorted(rels):
-        for ct in content_types:
-            if ct[1] == VALID_WORKSHEET:
-                if '/xl/' + rels[rId]['path'] == ct[0]:
-                    yield rels[rId]
+    content_types = read_content_types(archive)
+    valid_sheets = dict((path, ct) for path, ct in content_types if ct == VALID_WORKSHEET)
+    rels = dict(read_rels(archive))
+    for rId, title in read_sheets(archive):
+        rels[rId]['title'] = title
+    for rel in rels.values():
+        if "/" + rel['path'] in valid_sheets:
+            yield rel
 
 
 def read_named_ranges(xml_source, workbook):

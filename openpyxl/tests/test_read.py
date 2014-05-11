@@ -92,7 +92,7 @@ def test_read_standard_workbook_from_fileobj():
 def test_read_worksheet():
     path = os.path.join(DATADIR, 'genuine', 'empty.xlsx')
     wb = load_workbook(path)
-    sheet2 = wb.get_sheet_by_name('Sheet2 - Numbers')
+    sheet2 = wb['Sheet2 - Numbers']
     assert isinstance(sheet2, Worksheet)
     assert 'This is cell G5' == sheet2['G5'].value
     assert 18 == sheet2['D18'].value
@@ -287,12 +287,12 @@ def test_data_only():
 
 workbooks = [
     ("bug137.xlsx", [
-        {'path': 'worksheets/sheet1.xml', 'title': 'Sheet1'}
+        {'path': 'xl/worksheets/sheet1.xml', 'title': 'Sheet1'}
         ]
      ),
     ("contains_chartsheets.xlsx", [
-        {'path': 'worksheets/sheet1.xml', 'title': 'data'},
-        {'path': 'worksheets/sheet2.xml', 'title': 'moredata'}
+        {'path': 'xl/worksheets/sheet2.xml', 'title': 'moredata'},
+        {'path': 'xl/worksheets/sheet1.xml', 'title': 'data'},
         ])
             ]
 @pytest.mark.parametrize("excel_file, expected", workbooks)
@@ -314,7 +314,7 @@ def test_read_contains_chartsheet(excel_file, expected):
     path = os.path.join(DATADIR, 'reader', excel_file)
     wb = load_workbook(path)
     sheet_names = wb.get_sheet_names()
-    assert sheet_names == [sheet['title'] for sheet in expected]
+    assert set(sheet_names) == set([sheet['title'] for sheet in expected])
 
 
 @pytest.mark.parametrize("excel_file, expected", workbooks)
@@ -325,17 +325,21 @@ def test_detect_worksheets(excel_file, expected):
     assert list(detect_worksheets(archive)) == expected
 
 
-def test_read_rels():
+@pytest.mark.parametrize("excel_file, expected", [
+    ("bug137.xlsx", {
+        "rId1": {'path': 'xl/chartsheets/sheet1.xml'},
+        "rId2": {'path': 'xl/worksheets/sheet1.xml'},
+        "rId3": {'path': 'xl/theme/theme1.xml'},
+        "rId4": {'path': 'xl/styles.xml'},
+        "rId5": {'path': 'xl/sharedStrings.xml'}
+    })
+]
+                         )
+def test_read_rels(datadir, excel_file, expected):
+    datadir.join("reader").chdir()
     from openpyxl.reader.workbook import read_rels
-    fname = os.path.join(DATADIR, "reader", "bug137.xlsx")
-    archive = zipfile.ZipFile(fname)
-    assert read_rels(archive) == {
-        1: {'path': 'chartsheets/sheet1.xml'},
-        2: {'path': 'worksheets/sheet1.xml'},
-        3: {'path': 'theme/theme1.xml'},
-        4: {'path': 'styles.xml'},
-        5: {'path': 'sharedStrings.xml'}
-    }
+    archive = zipfile.ZipFile(excel_file)
+    assert dict(read_rels(archive)) == expected
 
 
 def test_read_content_types():
@@ -364,7 +368,7 @@ def test_read_sheets():
     from openpyxl.reader.workbook import read_sheets
     fname = os.path.join(DATADIR, "reader", "bug137.xlsx")
     archive = zipfile.ZipFile(fname)
-    assert list(read_sheets(archive)) == [("Chart1", 1), ("Sheet1",2)]
+    assert dict(read_sheets(archive)) == {"rId1":"Chart1", "rId2":"Sheet1"}
 
 
 def test_guess_types():

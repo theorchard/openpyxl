@@ -65,7 +65,7 @@ class TestReaderProps(object):
 
     def test_read_sheets_titles(self):
         from openpyxl.reader.workbook import read_sheets
-        sheet_titles = [s[0] for s in read_sheets(self.archive)]
+        sheet_titles = [s[1] for s in read_sheets(self.archive)]
         assert sheet_titles == ['Sheet1 - Text', 'Sheet2 - Numbers', 'Sheet3 - Formulas', 'Sheet4 - Dates']
 
 
@@ -90,7 +90,7 @@ class TestLibreOfficeCompat(object):
 
     def test_read_sheets_titles(self):
         from openpyxl.reader.workbook import read_sheets
-        sheet_titles = [s[0] for s in read_sheets(self.archive)]
+        sheet_titles = [s[1] for s in read_sheets(self.archive)]
         assert sheet_titles == ['Sheet1 - Text', 'Sheet2 - Numbers', 'Sheet3 - Formulas', 'Sheet4 - Dates']
 
 

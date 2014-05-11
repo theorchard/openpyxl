@@ -220,7 +220,7 @@ def _load_workbook(wb, archive, filename, use_iterators, keep_vba):
     wb.worksheets = []  # remove preset worksheet
     for sheet in detect_worksheets(archive):
         sheet_name = sheet['title']
-        worksheet_path = '%s/%s' % (PACKAGE_XL, sheet['path'])
+        worksheet_path = sheet['path']
         if not worksheet_path in valid_files:
             continue
 
