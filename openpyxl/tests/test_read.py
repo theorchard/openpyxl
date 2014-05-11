@@ -24,11 +24,12 @@
 # @author: see AUTHORS file
 
 # Python stdlib imports
+from datetime import datetime
 from io import BytesIO, StringIO
 import os.path
-from datetime import datetime
-import zipfile
+from operator import itemgetter
 from tempfile import NamedTemporaryFile
+import zipfile
 
 import pytest
 
@@ -325,7 +326,7 @@ def test_detect_worksheets(datadir, excel_file, expected):
     from openpyxl.reader.excel import detect_worksheets
     datadir.join("reader").chdir()
     archive = zipfile.ZipFile(excel_file)
-    assert list(detect_worksheets(archive)) == expected
+    assert sorted(detect_worksheets(archive), key=itemgetter("title")) == sorted(expected, key=itemgetter("title"))
 
 
 @pytest.mark.parametrize("excel_file, expected", [
