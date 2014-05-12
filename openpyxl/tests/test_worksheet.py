@@ -312,7 +312,6 @@ class TestWorkSheetWriter(object):
           </sheetViews>
           <sheetFormatPr baseColWidth="10" defaultRowHeight="15"/>
           <sheetData/>
-          <pageMargins left="0.75" right="0.75" top="1" bottom="1" header="0.5" footer="0.5"/>
         </worksheet>
         """
         diff = compare_xml(xml, expected)
@@ -341,7 +340,7 @@ class TestWorkSheetWriter(object):
           </sheetViews>
           <sheetFormatPr baseColWidth="10" defaultRowHeight="15"/>
           <sheetData/>
-          <pageMargins left="2" right="2" top="2" bottom="2" header="1.5" footer="1.5"/>
+          <pageMargins left="2.00" right="2.00" top="2.00" bottom="2.00" header="1.50" footer="1.50"/>
         </worksheet>
         """
         diff = compare_xml(xml, expected)
@@ -373,7 +372,6 @@ class TestWorkSheetWriter(object):
               </c>
             </row>
           </sheetData>
-          <pageMargins left="0.75" right="0.75" top="1" bottom="1" header="0.5" footer="0.5"/>
         </worksheet>
         """
 
@@ -408,7 +406,6 @@ class TestWorkSheetWriter(object):
           <mergeCells count="1">
             <mergeCell ref="A1:B1"/>
           </mergeCells>
-          <pageMargins left="0.75" right="0.75" top="1" bottom="1" header="0.5" footer="0.5"/>
         </worksheet>
         """
         diff = compare_xml(xml, expected)
@@ -436,7 +433,6 @@ class TestWorkSheetWriter(object):
               <c r="B1" t="s"/>
             </row>
           </sheetData>
-          <pageMargins left="0.75" right="0.75" top="1" bottom="1" header="0.5" footer="0.5"/>
         </worksheet>
         """
         diff = compare_xml(xml, expected)
@@ -467,7 +463,6 @@ class TestWorkSheetWriter(object):
           <sheetFormatPr baseColWidth="10" defaultRowHeight="15"/>
           <sheetData/>
           <printOptions horizontalCentered="1" verticalCentered="1"/>
-          <pageMargins left="0.75" right="0.75" top="1" bottom="1" header="0.5" footer="0.5"/>
           <pageSetup orientation="landscape" paperSize="3" fitToHeight="0" fitToWidth="1"/>
         </worksheet>
         """
@@ -512,7 +507,6 @@ class TestWorkSheetWriter(object):
           </sheetViews>
           <sheetFormatPr baseColWidth="10" defaultRowHeight="15"/>
           <sheetData/>
-          <pageMargins left="0.75" right="0.75" top="1" bottom="1" header="0.5" footer="0.5"/>
           <headerFooter>
             <oddHeader>&amp;L&amp;"Calibri,Regular"&amp;K000000Left Header Text&amp;C&amp;"Arial,Regular"&amp;6&amp;K445566Center Header Text&amp;R&amp;"Arial,Bold"&amp;8&amp;K112233Right Header Text</oddHeader>
             <oddFooter>&amp;L&amp;"Times New Roman,Regular"&amp;10&amp;K445566Left Footer Text_x000D_And &amp;D and &amp;T&amp;C&amp;"Times New Roman,Bold"&amp;12&amp;K778899Center Footer Text &amp;Z&amp;F on &amp;A&amp;R&amp;"Times New Roman,Italic"&amp;14&amp;KAABBCCRight Footer Text &amp;P of &amp;N</oddFooter>
@@ -536,7 +530,6 @@ class TestWorkSheetWriter(object):
           </sheetViews>
           <sheetFormatPr baseColWidth="10" defaultRowHeight="15"/>
           <sheetData/>
-          <pageMargins left="0.75" right="0.75" top="1" bottom="1" header="0.5" footer="0.5"/>
         </worksheet>
         """)
         assert diff is None, diff
