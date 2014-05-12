@@ -28,10 +28,14 @@ from __future__ import absolute_import
 # Python stdlib imports
 import re
 
+# compatibility imports
+from openpyxl.compat import range
+
 # package imports
 import openpyxl.cell
 from openpyxl.cell import (
     coordinate_from_string,
+    COORD_RE,
     column_index_from_string,
     get_column_letter
 )
@@ -484,7 +488,9 @@ class Worksheet(object):
                                               start_row + 1,
                                               get_column_letter(end_column + 1),
                                               end_row + 1)
-        elif len(range_string.split(':')) != 2:
+        elif ":" not in range_string:
+            if COORD_RE.match(range_string):
+                return # Single cell
             msg = "Range must be a cell range (e.g. A1:E1)"
             raise InsufficientCoordinatesException(msg)
         else:
