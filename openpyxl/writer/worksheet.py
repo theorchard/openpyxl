@@ -115,9 +115,7 @@ def write_worksheet(worksheet, shared_strings, style_table):
     if options:
         tag(doc, 'printOptions', options)
 
-    margins = worksheet.page_margins.margins
-    if margins:
-        tag(doc, 'pageMargins', margins)
+    tag(doc, 'pageMargins', dict(worksheet.page_margins))
 
     setup = worksheet.page_setup.setup
     if setup:

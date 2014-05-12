@@ -32,4 +32,5 @@
       <sortCondtion ref="A2:A3" descending="1" />
     </sortState>
   </autoFilter>
+    <pageMargins left="0.75" right="0.75" top="1" bottom="1" header="0.5" footer="0.5"/>
 </worksheet>

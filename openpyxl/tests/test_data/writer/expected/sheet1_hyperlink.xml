@@ -20,4 +20,5 @@
   <hyperlinks>
     <hyperlink display="http://test.com" ref="A1" r:id="rId1"/>
   </hyperlinks>
+    <pageMargins left="0.75" right="0.75" top="1" bottom="1" header="0.5" footer="0.5"/>
 </worksheet>
