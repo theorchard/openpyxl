@@ -37,9 +37,11 @@ Bug fixes
 #137 - Workbooks with chartsheets
 #243 - IndexError when loading workbook
 #263 - Forded conversion of line breaks
+#267 - Raise exceptions when passed invalid types
 #269 - Handling unsized worksheets in IterableWorksheet
 #270 - Handling Workbooks with non-standard references
 #275 - Handling auto filters where there are only custom filters
+#300 - Missing column width causes load_workbook() exception
 #304 - Handling Workbooks with absolute paths for worksheets (from Sharepoint)
 
 
