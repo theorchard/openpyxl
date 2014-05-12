@@ -24,4 +24,5 @@
       </filters>
     </filterColumn>
   </autoFilter>
+ <pageMargins left="0.75" right="0.75" top="1" bottom="1" header="0.5" footer="0.5"/>
 </worksheet>

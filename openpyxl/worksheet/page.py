@@ -23,7 +23,8 @@ from __future__ import absolute_import
 # @author: see AUTHORS file
 
 
-from openpyxl.compat import OrderedDict
+from openpyxl.compat import OrderedDict, safe_string
+from openpyxl.descriptors import Strict, Float
 
 
 class PageSetup(object):
@@ -68,20 +69,31 @@ class PageSetup(object):
         return optionsGroup
 
 
-class PageMargins(object):
-    """Information about page margins for view/print layouts."""
+class PageMargins(Strict):
+    """
+    Information about page margins for view/print layouts.
+    Standard values (in inches)
+    left, right = 0.75
+    top, bottom = 1
+    header, footer = 0.5
+    """
 
-    valid_margins = ("left", "right", "top", "bottom", "header", "footer")
+    left = Float()
+    right = Float()
+    top = Float()
+    bottom = Float()
+    header = Float()
+    footer = Float()
 
-    def __init__(self):
-        self.left = self.right = self.top = self.bottom = self.header = self.footer = None
+    def __init__(self, left=0.75, right=0.75, top=1, bottom=1, header=0.5, footer=0.5):
+        self.left = left
+        self.right = right
+        self.top = top
+        self.bottom =  bottom
+        self.header = header
+        self.footer = footer
 
-    @property
-    def margins(self):
-        margins = OrderedDict()
-        for margin_name in self.valid_margins:
-            margin_value = getattr(self, margin_name)
-            if margin_value:
-                margins[margin_name] = "%0.2f" % margin_value
-
-        return margins
+    def __iter__(self):
+        for key in ("left", "right", "top", "bottom", "header", "footer"):
+            value = getattr(self, key)
+            yield key, safe_string(value)
