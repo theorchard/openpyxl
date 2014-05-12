@@ -2,19 +2,19 @@ Roadmap for next version
 ========================
 [X] Bugfix # 46
 
-[ ] Bugfix # 85
+[X] Bugfix # 85
 
-[ ] Bugfix # 88
+[ ] Bugfix # 88 Using hyperlinks causes charts to break
 
-[ ] Bugfix # 95
+[ ] Bugfix # 95 add row height and col width functionality
 
-[ ] Bugfix # 99
+[ ] Bugfix # 96 adds fit-to-page functionality
 
-[ ] Bugfix # 98
+[ ] Bugfix # 97 adds pie charts and combination charts
 
-[ ] Bugfix # 97
+[X] Bugfix # 98 Auto sizing column widths does not work
 
-[ ] Bugfix # 96
+[ ] Bugfix # 99 adds ticks around multi-word titles in chart references
 
 [ ] Bugfix # 101
 
@@ -36,17 +36,17 @@ Roadmap for next version
 
 [ ] Bugfix # 198
 
-[ ] Bugfix # 216
+[X] Bugfix # 216
 
 [ ] Bugfix # 215
 
-[ ] Bugfix # 230
+[X] Bugfix # 230
 
-[ ] Bugfix # 243
+[X] Bugfix # 243
 
-[ ] Add fixture for datadir
+[X] Add fixture for datadir
 
-[x] Migrate tests from nose to pytest
+[X] Migrate tests from nose to pytest
 
 [ ] Cleanup API of IterableWorksheet
 

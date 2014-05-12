@@ -26,6 +26,7 @@ Minor changes
 Pull requests
 -------------
 #70 Add filterColumn, sortCondition support to AutoFilter
+#80 Reorder worksheets parts
 #82 Update API for conditional formatting
 #87 Add support for writing Protection styles, others
 #89 Better handling of content types when preserving macros
@@ -34,8 +35,11 @@ Pull requests
 Bug fixes
 ---------
 #46  - ColumnDimension style error
+#86 - reader.worksheet.fast_parse sets booleans to integers
+#98 - Auto sizing column widths does not work
 #137 - Workbooks with chartsheets
 #185 - Invalid PageMargins
+#230 - Using \v in cells creates invalid files
 #243 - IndexError when loading workbook
 #263 - Forded conversion of line breaks
 #267 - Raise exceptions when passed invalid types
