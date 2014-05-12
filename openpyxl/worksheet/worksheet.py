@@ -34,18 +34,18 @@ from openpyxl.cell import (
     coordinate_from_string,
     column_index_from_string,
     get_column_letter
-    )
+)
 from openpyxl.exceptions import (
     SheetTitleException,
     InsufficientCoordinatesException,
     CellCoordinatesException,
     NamedRangeException
-    )
+)
 from openpyxl.units import (
     points_to_pixels,
     DEFAULT_COLUMN_WIDTH,
     DEFAULT_ROW_HEIGHT
-    )
+)
 from openpyxl.styles import Style, DEFAULTS as DEFAULTS_STYLE
 from openpyxl.formatting import ConditionalFormatting
 from openpyxl.namedrange import NamedRangeContainingValue
@@ -160,10 +160,12 @@ class Worksheet(object):
 
     def garbage_collect(self):
         """Delete cells that are not storing a value."""
-        delete_list = [coordinate for coordinate, cell in \
-            iteritems(self._cells) if (not cell.merged and cell.value in ('', None) and \
-            cell.comment is None and (coordinate not in self._styles or
-            cell.style == DEFAULTS_STYLE))]
+        delete_list = []
+        for coordinate, cell in iteritems(self._cells):
+            if (not cell.merged and cell.value in ('', None)
+            and cell.comment is None
+            and (coordinate not in self._styles or cell.style == DEFAULTS_STYLE)):
+                delete_list.append(coordinate)
         for coordinate in delete_list:
             del self._cells[coordinate]
 
@@ -272,7 +274,7 @@ class Worksheet(object):
         if coordinate is None:
             if (row is None or column is None):
                 msg = "You have to provide a value either for " \
-                        "'coordinate' or for 'row' *and* 'column'"
+                    "'coordinate' or for 'row' *and* 'column'"
                 raise InsufficientCoordinatesException(msg)
             else:
                 coordinate = '%s%s' % (get_column_letter(column), row)
@@ -323,7 +325,7 @@ class Worksheet(object):
         """
         if self.column_dimensions:
             return max([column_index_from_string(column_index)
-                            for column_index in self.column_dimensions])
+                        for column_index in self.column_dimensions])
         else:
             return 1
 
@@ -359,9 +361,9 @@ class Worksheet(object):
             max_col, max_row = coordinate_from_string(max_range)
             if column:
                 min_col = get_column_letter(
-                        column_index_from_string(min_col) + column)
+                    column_index_from_string(min_col) + column)
                 max_col = get_column_letter(
-                        column_index_from_string(max_col) + column)
+                    column_index_from_string(max_col) + column)
             min_col = column_index_from_string(min_col)
             max_col = column_index_from_string(max_col)
             cache_cols = {}
@@ -378,7 +380,7 @@ class Worksheet(object):
         else:
             try:
                 return self.cell(coordinate=range_string, row=row,
-                        column=column)
+                                 column=column)
             except CellCoordinatesException:
                 pass
 
@@ -398,7 +400,7 @@ class Worksheet(object):
 
                 if worksheet is not self:
                     msg = 'Range %s is not defined on worksheet %s' % \
-                            (cells_range, self.title)
+                        (cells_range, self.title)
                     raise NamedRangeException(msg)
 
                 content = self.range(cells_range)
@@ -470,15 +472,21 @@ class Worksheet(object):
     def merge_cells(self, range_string=None, start_row=None, start_column=None, end_row=None, end_column=None):
         """ Set merge on a cell range.  Range is a cell range (e.g. A1:E1) """
         if not range_string:
-            if  start_row is None or start_column is None or end_row is None or end_column is None:
+            if (start_row is None
+                or start_column is None
+                or end_row is None
+                or end_column is None):
                 msg = "You have to provide a value either for "\
-                      "'coordinate' or for 'start_row', 'start_column', 'end_row' *and* 'end_column'"
+                    "'coordinate' or for 'start_row', 'start_column', 'end_row' *and* 'end_column'"
                 raise InsufficientCoordinatesException(msg)
             else:
-                range_string = '%s%s:%s%s' % (get_column_letter(start_column + 1), start_row + 1, get_column_letter(end_column + 1), end_row + 1)
+                range_string = '%s%s:%s%s' % (get_column_letter(start_column + 1),
+                                              start_row + 1,
+                                              get_column_letter(end_column + 1),
+                                              end_row + 1)
         elif len(range_string.split(':')) != 2:
-                msg = "Range must be a cell range (e.g. A1:E1)"
-                raise InsufficientCoordinatesException(msg)
+            msg = "Range must be a cell range (e.g. A1:E1)"
+            raise InsufficientCoordinatesException(msg)
         else:
             range_string = range_string.replace('$', '')
 
@@ -503,7 +511,7 @@ class Worksheet(object):
         if not range_string:
             if start_row is None or start_column is None or end_row is None or end_column is None:
                 msg = "You have to provide a value either for "\
-                      "'coordinate' or for 'start_row', 'start_column', 'end_row' *and* 'end_column'"
+                    "'coordinate' or for 'start_row', 'start_column', 'end_row' *and* 'end_column'"
                 raise InsufficientCoordinatesException(msg)
             else:
                 range_string = '%s%s:%s%s' % (get_column_letter(start_column + 1), start_row + 1, get_column_letter(end_column + 1), end_row + 1)
@@ -609,4 +617,3 @@ class Worksheet(object):
             top_pos += default_height
 
         return (letter, row)
-
