@@ -35,6 +35,7 @@ Bug fixes
 ---------
 #46  - ColumnDimension style error
 #137 - Workbooks with chartsheets
+#185 - Invalid PageMargins
 #243 - IndexError when loading workbook
 #263 - Forded conversion of line breaks
 #267 - Raise exceptions when passed invalid types
