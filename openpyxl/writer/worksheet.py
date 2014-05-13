@@ -243,14 +243,7 @@ def write_worksheet_conditional_formatting(doc, worksheet):
                 for cfvo in rule['colorScale']['cfvo']:
                     tag(doc, 'cfvo', cfvo)
                 for color in rule['colorScale']['color']:
-                    if str(color.index).split(':')[0] == 'theme':  # strip prefix theme if marked as such
-                        if str(color.index).split(':')[2]:
-                            tag(doc, 'color', {'theme': str(color.index).split(':')[1],
-                                               'tint': str(color.index).split(':')[2]})
-                        else:
-                            tag(doc, 'color', {'theme': str(color.index).split(':')[1]})
-                    else:
-                        tag(doc, 'color', {'rgb': str(color.index)})
+                    tag(doc, 'color', dict(color))
                 end_tag(doc, 'colorScale')
             if 'iconSet' in rule:
                 iconAttr = {}

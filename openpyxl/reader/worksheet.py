@@ -240,20 +240,9 @@ class WorkSheetParser(object):
                         rule['colorScale']['cfvo'].append(cfvo)
                     colorNodes = colorScale.findall('{%s}color' % SHEET_MAIN_NS)
                     for color in colorNodes:
-                        index = colors.BLACK
-                        if (self.color_index
-                            and color.get('indexed') is not None
-                            and 0 <= int(color.get('indexed')) < len(self.color_index)):
-                            index = self.color_index[int(color.get('indexed'))]
-                        if color.get('theme') is not None:
-                            if color.get('tint') is not None:
-                                index = 'theme:%s:%s' % (color.get('theme'),
-                                                         color.get('tint'))
-                            else:
-                                index = 'theme:%s:' % color.get('theme')  # prefix color with theme
-                        elif color.get('rgb'):
-                            index = color.get('rgb')
-                        rule['colorScale']['color'].append(Color(index))
+                        attrs = dict(color.items())
+                        color = Color(**attrs)
+                        rule['colorScale']['color'].append(color)
 
                 iconSet = cfRule.find('{%s}iconSet' % SHEET_MAIN_NS)
                 if iconSet is not None:
