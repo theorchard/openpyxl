@@ -1,16 +1,20 @@
 2.0.0 (unreleased)
 ==================
 
+
 Major changes
 -------------
 
 * This is last release that will support Python 3.2
+* Cells are referenced with 1-indexing: A1 == cell(row=1, column=1)
+* Use jdcal for more efficient and reliable conversion of datetimes
 * Significant speed up when reading files
 * Merged immutable styles
 * Type inference is disabled by default
 * RawCell renamed ReadOnlyCell
 * ReadOnlyCell.internal_value and ReadOnlyCell.value now behave the same as Cell
 * Provide no size information on unsized worksheets
+* Lower memory footprint when reading files
 
 
 Minor changes
@@ -43,9 +47,14 @@ Bug fixes
 #243 - IndexError when loading workbook
 #263 - Forded conversion of line breaks
 #267 - Raise exceptions when passed invalid types
+#270 - Cannot open files which use non-standard sheet names or reference Ids
 #269 - Handling unsized worksheets in IterableWorksheet
 #270 - Handling Workbooks with non-standard references
 #275 - Handling auto filters where there are only custom filters
+#277 - Harmonise chart and cell coordinates
+#280 - Explicit exception raising for invalid characters
+#286 - Optimized writer can not handle a datetime.time value
+#296 - Cell coordinates not consistent with documentation
 #300 - Missing column width causes load_workbook() exception
 #304 - Handling Workbooks with absolute paths for worksheets (from Sharepoint)
 
