@@ -1,62 +1,63 @@
+from __future__ import absolute_import
 # Copyright (c) 2010-2014 openpyxl
-#
-# Permission is hereby granted, free of charge, to any person obtaining a copy
-# of this software and associated documentation files (the "Software"), to deal
-# in the Software without restriction, including without limitation the rights
-# to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-# copies of the Software, and to permit persons to whom the Software is
-# furnished to do so, subject to the following conditions:
-#
-# The above copyright notice and this permission notice shall be included in
-# all copies or substantial portions of the Software.
-#
-# THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-# IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-# FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-# AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-# LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-# OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
-# THE SOFTWARE.
-#
-# @license: http://www.opensource.org/licenses/mit-license.php
-# @author: see AUTHORS file
+
+from openpyxl.compat import safe_string
+from openpyxl.descriptors import Set, Typed, Bool, Alias
 
 from .colors import Color
 from .hashable import HashableObject
 
 
-class Border(HashableObject):
-    """Border options for use in styles."""
-    BORDER_NONE = 'none'
-    BORDER_DASHDOT = 'dashDot'
-    BORDER_DASHDOTDOT = 'dashDotDot'
-    BORDER_DASHED = 'dashed'
-    BORDER_DOTTED = 'dotted'
-    BORDER_DOUBLE = 'double'
-    BORDER_HAIR = 'hair'
-    BORDER_MEDIUM = 'medium'
-    BORDER_MEDIUMDASHDOT = 'mediumDashDot'
-    BORDER_MEDIUMDASHDOTDOT = 'mediumDashDotDot'
-    BORDER_MEDIUMDASHED = 'mediumDashed'
-    BORDER_SLANTDASHDOT = 'slantDashDot'
-    BORDER_THICK = 'thick'
-    BORDER_THIN = 'thin'
+BORDER_NONE = None
+BORDER_DASHDOT = 'dashDot'
+BORDER_DASHDOTDOT = 'dashDotDot'
+BORDER_DASHED = 'dashed'
+BORDER_DOTTED = 'dotted'
+BORDER_DOUBLE = 'double'
+BORDER_HAIR = 'hair'
+BORDER_MEDIUM = 'medium'
+BORDER_MEDIUMDASHDOT = 'mediumDashDot'
+BORDER_MEDIUMDASHDOTDOT = 'mediumDashDotDot'
+BORDER_MEDIUMDASHED = 'mediumDashed'
+BORDER_SLANTDASHDOT = 'slantDashDot'
+BORDER_THICK = 'thick'
+BORDER_THIN = 'thin'
 
-    __fields__ = ('border_style',
+
+class Side(HashableObject):
+
+    spec = """Actually to BorderPr 18.8.6"""
+
+    """Border options for use in styles.
+    Caution: if you do not specify a border_style, other attributes will
+    have no effect !"""
+
+    __fields__ = ('style',
                   'color')
-    __slots__ = __fields__
 
-    def __init__(self):
-        self.border_style = self.BORDER_NONE
-        self.color = Color(Color.BLACK)
+    color = Typed(expected_type=Color, allow_none=True)
+    style = Set(values=(BORDER_NONE, BORDER_DASHDOT, BORDER_DASHDOTDOT,
+                        BORDER_DASHED, BORDER_DOTTED, BORDER_DOUBLE, BORDER_HAIR, BORDER_MEDIUM,
+                        BORDER_MEDIUMDASHDOT, BORDER_MEDIUMDASHDOTDOT, BORDER_MEDIUMDASHED,
+                        BORDER_SLANTDASHDOT, BORDER_THICK, BORDER_THIN))
+    border_style = Alias('style')
+
+    def __init__(self, style=None, color=None, border_style=None):
+        if border_style is not None:
+            style = border_style
+        self.style = style
+        self.color = color
+
+    def __iter__(self):
+        for key in ("style",):
+            value = getattr(self, key)
+            if value:
+                yield key, safe_string(value)
 
 
-class Borders(HashableObject):
+class Border(HashableObject):
     """Border positioning for use in styles."""
-    DIAGONAL_NONE = 0
-    DIAGONAL_UP = 1
-    DIAGONAL_DOWN = 2
-    DIAGONAL_BOTH = 3
+
 
     __fields__ = ('left',
                   'right',
@@ -64,23 +65,52 @@ class Borders(HashableObject):
                   'bottom',
                   'diagonal',
                   'diagonal_direction',
-                  'all_borders',
-                  'outline',
-                  'inside',
                   'vertical',
                   'horizontal')
-    __slots__ = __fields__
 
-    def __init__(self):
-        self.left = Border()
-        self.right = Border()
-        self.top = Border()
-        self.bottom = Border()
-        self.diagonal = Border()
-        self.diagonal_direction = self.DIAGONAL_NONE
+    # child elements
+    left = Typed(expected_type=Side)
+    right = Typed(expected_type=Side)
+    top = Typed(expected_type=Side)
+    bottom = Typed(expected_type=Side)
+    diagonal = Typed(expected_type=Side, allow_none=True)
+    vertical = Typed(expected_type=Side, allow_none=True)
+    horizontal = Typed(expected_type=Side, allow_none=True)
+    # attributes
+    outline = Bool()
+    diagonalUp = Bool()
+    diagonalDown = Bool()
 
-        self.all_borders = Border()
-        self.outline = Border()
-        self.inside = Border()
-        self.vertical = Border()
-        self.horizontal = Border()
+    def __init__(self, left=Side(), right=Side(), top=Side(),
+                 bottom=Side(), diagonal=Side(), diagonal_direction=None,
+                 vertical=None, horizontal=None, diagonalUp=False, diagonalDown=False,
+                 outline=True):
+        self.left = left
+        self.right = right
+        self.top = top
+        self.bottom = bottom
+        self.diagonal = diagonal
+        self.vertical = vertical
+        self.horizontal = horizontal
+        self.diagonal_direction = diagonal_direction
+        self.diagonalUp = diagonalUp
+        self.diagonalDown = diagonalDown
+        self.outline = outline
+
+    @property
+    def children(self):
+        for key in ('left', 'right', 'top', 'bottom', 'diagonal', 'vertical',
+                    'horizontal'):
+            value = getattr(self, key)
+            if value is not None:
+                yield key, value
+
+    def __iter__(self):
+        """
+        Unset outline defaults to True, others default to False
+        """
+        for key in ('diagonalUp', 'diagonalDown', 'outline'):
+            value = getattr(self, key)
+            if (key == "outline" and not value
+                or key != "outline" and value):
+                yield key, safe_string(value)

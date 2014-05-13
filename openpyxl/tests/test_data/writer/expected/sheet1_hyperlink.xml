@@ -9,10 +9,7 @@
       <selection activeCell="A1" sqref="A1"/>
     </sheetView>
   </sheetViews>
-  <sheetFormatPr defaultRowHeight="15"/>
-  <cols>
-    <col max="1" min="1" width="9.10"/>
-  </cols>
+  <sheetFormatPr baseColWidth="10" defaultRowHeight="15"/>
   <sheetData>
     <row r="1" spans="1:1">
       <c r="A1" t="s">
@@ -23,4 +20,5 @@
   <hyperlinks>
     <hyperlink display="http://test.com" ref="A1" r:id="rId1"/>
   </hyperlinks>
+    <pageMargins left="0.75" right="0.75" top="1" bottom="1" header="0.5" footer="0.5"/>
 </worksheet>

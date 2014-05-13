@@ -1,5 +1,5 @@
 :mod:`openpyxl` - A Python library to read/write Excel 2007 xlsx/xlsm files
-=============================================================================
+===========================================================================
 
 .. module:: openpyxl
 .. moduleauthor:: Eric Gazoni
@@ -32,7 +32,7 @@ How to Contribute Code
 Any help will be greatly appreciated, just follow those steps:
 
     1. Please start a new fork
-    (https://bitbucket.org/ericgazoni/openpyxl/fork) for each independant
+    (https://bitbucket.org/ericgazoni/openpyxl/fork) for each independent
     feature, don't try to fix all problems at the same time, it's easier for
     those who will review and merge your changes ;-)
 
@@ -91,7 +91,7 @@ virtualenv without system packages::
 
 or ::
 
-    $ easy_install install openpyxl
+    $ easy_install openpyxl
 
 .. note::
 

@@ -22,16 +22,16 @@
 # @author: see AUTHORS file
 
 # 3rd party imports
-from nose.tools import eq_, raises, assert_raises
 import pytest
+from .helper import compare_xml
+
 
 # package imports
 from openpyxl.workbook import Workbook
 from openpyxl.worksheet import Worksheet, Relationship, flatten
-from openpyxl.writer.worksheet import write_worksheet
 from openpyxl.cell import Cell, coordinate_from_string
 from openpyxl.comments import Comment
-from openpyxl.shared.exc import (
+from openpyxl.exceptions import (
     CellCoordinatesException,
     SheetTitleException,
     InsufficientCoordinatesException,
@@ -47,21 +47,21 @@ class TestWorksheet(object):
 
     def test_new_worksheet(self):
         ws = Worksheet(self.wb)
-        eq_(self.wb, ws._parent)
+        assert self.wb == ws._parent
 
     def test_new_sheet_name(self):
         self.wb.worksheets = []
         ws = Worksheet(self.wb, title='')
-        eq_(repr(ws), '<Worksheet "Sheet1">')
+        assert repr(ws) == '<Worksheet "Sheet1">'
 
     def test_get_cell(self):
         ws = Worksheet(self.wb)
-        cell = ws.cell('A1')
-        eq_(cell.get_coordinate(), 'A1')
+        cell = ws.cell(row=1, column=1)
+        assert cell.coordinate == 'A1'
 
-    @raises(SheetTitleException)
     def test_set_bad_title(self):
-        Worksheet(self.wb, 'X' * 50)
+        with pytest.raises(SheetTitleException):
+            Worksheet(self.wb, 'X' * 50)
 
     def test_increment_title(self):
         ws1 = self.wb.create_sheet(title="Test")
@@ -69,14 +69,10 @@ class TestWorksheet(object):
         ws2 = self.wb.create_sheet(title="Test")
         assert ws2.title == "Test1"
 
-    def test_set_bad_title_character(self):
-        assert_raises(SheetTitleException, Worksheet, self.wb, '[')
-        assert_raises(SheetTitleException, Worksheet, self.wb, ']')
-        assert_raises(SheetTitleException, Worksheet, self.wb, '*')
-        assert_raises(SheetTitleException, Worksheet, self.wb, ':')
-        assert_raises(SheetTitleException, Worksheet, self.wb, '?')
-        assert_raises(SheetTitleException, Worksheet, self.wb, '/')
-        assert_raises(SheetTitleException, Worksheet, self.wb, '\\')
+    @pytest.mark.parametrize("value", ["[", "]", "*", ":", "?", "/", "\\"])
+    def test_set_bad_title_character(self, value):
+        with pytest.raises(SheetTitleException):
+            Worksheet(self.wb, value)
 
 
     def test_unique_sheet_title(self):
@@ -86,67 +82,65 @@ class TestWorksheet(object):
 
     def test_worksheet_dimension(self):
         ws = Worksheet(self.wb)
-        eq_('A1:A1', ws.calculate_dimension())
+        assert 'A1:A1' == ws.calculate_dimension()
         ws.cell('B12').value = 'AAA'
-        eq_('A1:B12', ws.calculate_dimension())
+        assert 'A1:B12' == ws.calculate_dimension()
 
     def test_worksheet_range(self):
         ws = Worksheet(self.wb)
         xlrange = ws.range('A1:C4')
         assert isinstance(xlrange, tuple)
-        eq_(4, len(xlrange))
-        eq_(3, len(xlrange[0]))
+        assert 4 == len(xlrange)
+        assert 3 == len(xlrange[0])
 
     def test_worksheet_named_range(self):
         ws = Worksheet(self.wb)
         self.wb.create_named_range('test_range', ws, 'C5')
         xlrange = ws.range('test_range')
         assert isinstance(xlrange, Cell)
-        eq_(5, xlrange.row)
+        assert 5 == xlrange.row
 
-    @raises(NamedRangeException)
     def test_bad_named_range(self):
         ws = Worksheet(self.wb)
-        ws.range('bad_range')
+        with pytest.raises(NamedRangeException):
+            ws.range('bad_range')
 
-    @raises(NamedRangeException)
     def test_named_range_wrong_sheet(self):
         ws1 = Worksheet(self.wb)
         ws2 = Worksheet(self.wb)
         self.wb.create_named_range('wrong_sheet_range', ws1, 'C5')
-        ws2.range('wrong_sheet_range')
-
-    def test_cell_offset(self):
-        ws = Worksheet(self.wb)
-        eq_('C17', ws.cell('B15').offset(2, 1).get_coordinate())
+        with pytest.raises(NamedRangeException):
+            ws2.range('wrong_sheet_range')
 
     def test_range_offset(self):
         ws = Worksheet(self.wb)
         xlrange = ws.range('A1:C4', 1, 3)
         assert isinstance(xlrange, tuple)
-        eq_(4, len(xlrange))
-        eq_(3, len(xlrange[0]))
-        eq_('D2', xlrange[0][0].get_coordinate())
+        assert 4 == len(xlrange)
+        assert 3 == len(xlrange[0])
+        assert 'D2' == xlrange[0][0].coordinate
+        assert xlrange[-1][-1].coordinate == 'F5'
 
     def test_cell_alternate_coordinates(self):
         ws = Worksheet(self.wb)
         cell = ws.cell(row=8, column=4)
-        eq_('E9', cell.get_coordinate())
+        assert 'D8' == cell.coordinate
 
-    @raises(InsufficientCoordinatesException)
     def test_cell_insufficient_coordinates(self):
         ws = Worksheet(self.wb)
-        cell = ws.cell(row=8)
+        with pytest.raises(InsufficientCoordinatesException):
+            ws.cell(row=8)
 
     def test_cell_range_name(self):
         ws = Worksheet(self.wb)
         self.wb.create_named_range('test_range_single', ws, 'B12')
-        assert_raises(CellCoordinatesException, ws.cell, 'test_range_single')
+        with pytest.raises(CellCoordinatesException):
+            ws.cell('test_range_single')
         c_range_name = ws.range('test_range_single')
         c_range_coord = ws.range('B12')
         c_cell = ws.cell('B12')
-        eq_(c_range_coord, c_range_name)
-        eq_(c_range_coord, c_cell)
+        assert c_range_coord == c_range_name
+        assert c_range_coord == c_cell
 
     def test_garbage_collect(self):
         ws = Worksheet(self.wb)
@@ -155,58 +149,58 @@ class TestWorksheet(object):
         ws.cell('C4').value = 0
         ws.cell('D1').comment = Comment('Comment', 'Comment')
         ws.garbage_collect()
-        eq_(set(ws.get_cell_collection()), set([ws.cell('B2'), ws.cell('C4'), ws.cell('D1')]))
+        assert set(ws.get_cell_collection()), set([ws.cell('B2'), ws.cell('C4') == ws.cell('D1')])
 
     def test_hyperlink_relationships(self):
         ws = Worksheet(self.wb)
-        eq_(len(ws.relationships), 0)
+        assert len(ws.relationships) == 0
 
         ws.cell('A1').hyperlink = "http://test.com"
-        eq_(len(ws.relationships), 1)
-        eq_("rId1", ws.cell('A1').hyperlink_rel_id)
-        eq_("rId1", ws.relationships[0].id)
-        eq_("http://test.com", ws.relationships[0].target)
-        eq_("External", ws.relationships[0].target_mode)
+        assert len(ws.relationships) == 1
+        assert "rId1" == ws.cell('A1').hyperlink_rel_id
+        assert "rId1" == ws.relationships[0].id
+        assert "http://test.com" == ws.relationships[0].target
+        assert "External" == ws.relationships[0].target_mode
 
         ws.cell('A2').hyperlink = "http://test2.com"
-        eq_(len(ws.relationships), 2)
-        eq_("rId2", ws.cell('A2').hyperlink_rel_id)
-        eq_("rId2", ws.relationships[1].id)
-        eq_("http://test2.com", ws.relationships[1].target)
-        eq_("External", ws.relationships[1].target_mode)
+        assert len(ws.relationships) == 2
+        assert "rId2" == ws.cell('A2').hyperlink_rel_id
+        assert "rId2" == ws.relationships[1].id
+        assert "http://test2.com" == ws.relationships[1].target
+        assert "External" == ws.relationships[1].target_mode
 
-    @raises(ValueError)
     def test_bad_relationship_type(self):
-        rel = Relationship('bad_type')
+        with pytest.raises(ValueError):
+            Relationship('bad_type')
 
     def test_append_list(self):
         ws = Worksheet(self.wb)
 
         ws.append(['This is A1', 'This is B1'])
 
-        eq_('This is A1', ws.cell('A1').value)
-        eq_('This is B1', ws.cell('B1').value)
+        assert 'This is A1' == ws.cell('A1').value
+        assert 'This is B1' == ws.cell('B1').value
 
     def test_append_dict_letter(self):
         ws = Worksheet(self.wb)
 
         ws.append({'A' : 'This is A1', 'C' : 'This is C1'})
 
-        eq_('This is A1', ws.cell('A1').value)
-        eq_('This is C1', ws.cell('C1').value)
+        assert 'This is A1' == ws.cell('A1').value
+        assert 'This is C1' == ws.cell('C1').value
 
     def test_append_dict_index(self):
         ws = Worksheet(self.wb)
 
-        ws.append({0 : 'This is A1', 2 : 'This is C1'})
+        ws.append({1 : 'This is A1', 3 : 'This is C1'})
 
-        eq_('This is A1', ws.cell('A1').value)
-        eq_('This is C1', ws.cell('C1').value)
+        assert 'This is A1' == ws.cell('A1').value
+        assert 'This is C1' == ws.cell('C1').value
 
-    @raises(TypeError)
     def test_bad_append(self):
         ws = Worksheet(self.wb)
-        ws.append("test")
+        with pytest.raises(TypeError):
+            ws.append("test")
 
     def test_append_2d_list(self):
 
@@ -232,10 +226,10 @@ class TestWorksheet(object):
 
         rows = ws.rows
 
-        eq_(len(rows), 9)
+        assert len(rows) == 9
 
-        eq_(rows[0][0].value, 'first')
-        eq_(rows[-1][-1].value, 'last')
+        assert rows[0][0].value == 'first'
+        assert rows[-1][-1].value == 'last'
 
     def test_cols(self):
 
@@ -246,54 +240,40 @@ class TestWorksheet(object):
 
         cols = ws.columns
 
-        eq_(len(cols), 3)
+        assert len(cols) == 3
 
-        eq_(cols[0][0].value, 'first')
-        eq_(cols[-1][-1].value, 'last')
+        assert cols[0][0].value == 'first'
+        assert cols[-1][-1].value == 'last'
 
     def test_auto_filter(self):
         ws = Worksheet(self.wb)
-        ws.auto_filter = ws.range('a1:f1')
-        assert ws.auto_filter == 'A1:F1'
+        ws.auto_filter.ref = ws.range('a1:f1')
+        assert ws.auto_filter.ref == 'A1:F1'
 
-        ws.auto_filter = ''
-        assert ws.auto_filter is None
+        ws.auto_filter.ref = ''
+        assert ws.auto_filter.ref is None
 
-        ws.auto_filter = 'c1:g9'
-        assert ws.auto_filter == 'C1:G9'
+        ws.auto_filter.ref = 'c1:g9'
+        assert ws.auto_filter.ref == 'C1:G9'
 
-    def test_page_margins(self):
+    def test_getitem(self):
         ws = Worksheet(self.wb)
-        ws.page_margins.left = 2.0
-        ws.page_margins.right = 2.0
-        ws.page_margins.top = 2.0
-        ws.page_margins.bottom = 2.0
-        ws.page_margins.header = 1.5
-        ws.page_margins.footer = 1.5
-        xml_string = write_worksheet(ws, None, None)
-        assert '<pageMargins left="2.00" right="2.00" top="2.00" bottom="2.00" header="1.50" footer="1.50"></pageMargins>' in xml_string
+        c = ws['A1']
+        assert isinstance(c, Cell)
+        assert c.coordinate == "A1"
+        assert ws['A1'].value is None
 
+    def test_setitem(self):
         ws = Worksheet(self.wb)
-        xml_string = write_worksheet(ws, None, None)
-        assert '<pageMargins' not in xml_string
+        ws['A12'] = 5
+        assert ws['A12'].value == 5
 
-    def test_merge(self):
+    def test_getslice(self):
         ws = Worksheet(self.wb)
-        string_table = {'':'', 'Cell A1':'Cell A1', 'Cell B1':'Cell B1'}
+        cell_range = ws['A1':'B2']
+        assert isinstance(cell_range, tuple)
+        assert (cell_range) == ((ws['A1'], ws['B1']), (ws['A2'], ws['B2']))
 
-        ws.cell('A1').value = 'Cell A1'
-        ws.cell('B1').value = 'Cell B1'
-        xml_string = write_worksheet(ws, string_table, None)
-        assert '<v>Cell B1</v>' in xml_string
-
-        ws.merge_cells('A1:B1')
-        xml_string = write_worksheet(ws, string_table, None)
-        assert '<v>Cell B1</v>' not in xml_string
-        assert '<mergeCells count="1"><mergeCell ref="A1:B1"></mergeCell></mergeCells>' in xml_string
-
-        ws.unmerge_cells('A1:B1')
-        xml_string = write_worksheet(ws, string_table, None)
-        assert '<mergeCell ref="A1:B1"/>' not in xml_string
 
     def test_freeze(self):
         ws = Worksheet(self.wb)
@@ -309,6 +289,159 @@ class TestWorksheet(object):
         ws.freeze_panes = ws.cell('A1')
         assert ws.freeze_panes is None
 
+
+class TestWorkSheetWriter(object):
+
+    @classmethod
+    def setup_class(cls):
+        cls.wb = Workbook()
+
+    def test_write_empty(self):
+        ws = Worksheet(self.wb)
+        xml = write_worksheet(ws, None, None)
+        expected = """
+        <worksheet xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main" xmlns:r="http://schemas.openxmlformats.org/officeDocument/2006/relationships">
+          <sheetPr>
+            <outlinePr summaryRight="1" summaryBelow="1"/>
+          </sheetPr>
+          <dimension ref="A1:A1"/>
+          <sheetViews>
+            <sheetView workbookViewId="0">
+              <selection sqref="A1" activeCell="A1"/>
+            </sheetView>
+          </sheetViews>
+          <sheetFormatPr baseColWidth="10" defaultRowHeight="15"/>
+          <sheetData/>
+          <pageMargins left="0.75" right="0.75" top="1" bottom="1" header="0.5" footer="0.5"/>
+        </worksheet>
+        """
+        diff = compare_xml(xml, expected)
+        assert diff is None, diff
+
+
+    def test_page_margins(self):
+        ws = Worksheet(self.wb)
+        ws.page_margins.left = 2.0
+        ws.page_margins.right = 2.0
+        ws.page_margins.top = 2.0
+        ws.page_margins.bottom = 2.0
+        ws.page_margins.header = 1.5
+        ws.page_margins.footer = 1.5
+        xml = write_worksheet(ws, None, None)
+        expected = """
+        <worksheet xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main" xmlns:r="http://schemas.openxmlformats.org/officeDocument/2006/relationships">
+          <sheetPr>
+            <outlinePr summaryRight="1" summaryBelow="1"/>
+          </sheetPr>
+          <dimension ref="A1:A1"/>
+          <sheetViews>
+            <sheetView workbookViewId="0">
+              <selection sqref="A1" activeCell="A1"/>
+            </sheetView>
+          </sheetViews>
+          <sheetFormatPr baseColWidth="10" defaultRowHeight="15"/>
+          <sheetData/>
+          <pageMargins left="2" right="2" top="2" bottom="2" header="1.5" footer="1.5"/>
+        </worksheet>
+        """
+        diff = compare_xml(xml, expected)
+        assert diff is None, diff
+
+
+    def test_merge(self):
+        ws = Worksheet(self.wb)
+        string_table = ['Cell A1', 'Cell B1']
+        expected = """
+        <worksheet xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main" xmlns:r="http://schemas.openxmlformats.org/officeDocument/2006/relationships">
+          <sheetPr>
+            <outlinePr summaryRight="1" summaryBelow="1"/>
+          </sheetPr>
+          <dimension ref="A1:B1"/>
+          <sheetViews>
+            <sheetView workbookViewId="0">
+              <selection sqref="A1" activeCell="A1"/>
+            </sheetView>
+          </sheetViews>
+          <sheetFormatPr baseColWidth="10" defaultRowHeight="15"/>
+          <sheetData>
+            <row r="1" spans="1:2">
+              <c r="A1" t="s">
+                <v>0</v>
+              </c>
+              <c r="B1" t="s">
+                <v>1</v>
+              </c>
+            </row>
+          </sheetData>
+          <pageMargins left="0.75" right="0.75" top="1" bottom="1" header="0.5" footer="0.5"/>
+        </worksheet>
+        """
+
+        ws.cell('A1').value = 'Cell A1'
+        ws.cell('B1').value = 'Cell B1'
+        xml = write_worksheet(ws, string_table, None)
+        diff = compare_xml(xml, expected)
+        assert diff is None, diff
+
+        ws.merge_cells('A1:B1')
+        xml = write_worksheet(ws, string_table, None)
+        expected = """
+        <worksheet xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main" xmlns:r="http://schemas.openxmlformats.org/officeDocument/2006/relationships">
+          <sheetPr>
+            <outlinePr summaryRight="1" summaryBelow="1"/>
+          </sheetPr>
+          <dimension ref="A1:B1"/>
+          <sheetViews>
+            <sheetView workbookViewId="0">
+              <selection sqref="A1" activeCell="A1"/>
+            </sheetView>
+          </sheetViews>
+          <sheetFormatPr baseColWidth="10" defaultRowHeight="15"/>
+          <sheetData>
+            <row r="1" spans="1:2">
+              <c r="A1" t="s">
+                <v>0</v>
+              </c>
+              <c r="B1" t="s"/>
+            </row>
+          </sheetData>
+          <mergeCells count="1">
+            <mergeCell ref="A1:B1"/>
+          </mergeCells>
+          <pageMargins left="0.75" right="0.75" top="1" bottom="1" header="0.5" footer="0.5"/>
+        </worksheet>
+        """
+        diff = compare_xml(xml, expected)
+        assert diff is None, diff
+
+        ws.unmerge_cells('A1:B1')
+        xml = write_worksheet(ws, string_table, None)
+        expected = """
+        <worksheet xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main" xmlns:r="http://schemas.openxmlformats.org/officeDocument/2006/relationships">
+          <sheetPr>
+            <outlinePr summaryRight="1" summaryBelow="1"/>
+          </sheetPr>
+          <dimension ref="A1:B1"/>
+          <sheetViews>
+            <sheetView workbookViewId="0">
+              <selection sqref="A1" activeCell="A1"/>
+            </sheetView>
+          </sheetViews>
+          <sheetFormatPr baseColWidth="10" defaultRowHeight="15"/>
+          <sheetData>
+            <row r="1" spans="1:2">
+              <c r="A1" t="s">
+                <v>0</v>
+              </c>
+              <c r="B1" t="s"/>
+            </row>
+          </sheetData>
+          <pageMargins left="0.75" right="0.75" top="1" bottom="1" header="0.5" footer="0.5"/>
+        </worksheet>
+        """
+        diff = compare_xml(xml, expected)
+        assert diff is None, diff
+
     def test_printer_settings(self):
         ws = Worksheet(self.wb)
         ws.page_setup.orientation = ws.ORIENTATION_LANDSCAPE
@@ -318,16 +451,29 @@ class TestWorksheet(object):
         ws.page_setup.fitToWidth = 1
         ws.page_setup.horizontalCentered = True
         ws.page_setup.verticalCentered = True
-        xml_string = write_worksheet(ws, None, None)
-        assert '<pageSetup orientation="landscape" paperSize="3" fitToHeight="0" fitToWidth="1"></pageSetup>' in xml_string
-        assert '<pageSetUpPr fitToPage="1"></pageSetUpPr>' in xml_string
-        assert '<printOptions horizontalCentered="1" verticalCentered="1">' in xml_string
+        xml = write_worksheet(ws, None, None)
+        expected = """
+        <worksheet xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main" xmlns:r="http://schemas.openxmlformats.org/officeDocument/2006/relationships">
+          <sheetPr>
+            <outlinePr summaryRight="1" summaryBelow="1"/>
+            <pageSetUpPr fitToPage="1"/>
+          </sheetPr>
+          <dimension ref="A1:A1"/>
+          <sheetViews>
+            <sheetView workbookViewId="0">
+              <selection sqref="A1" activeCell="A1"/>
+            </sheetView>
+          </sheetViews>
+          <sheetFormatPr baseColWidth="10" defaultRowHeight="15"/>
+          <sheetData/>
+          <printOptions horizontalCentered="1" verticalCentered="1"/>
+          <pageMargins left="0.75" right="0.75" top="1" bottom="1" header="0.5" footer="0.5"/>
+          <pageSetup orientation="landscape" paperSize="3" fitToHeight="0" fitToWidth="1"/>
+        </worksheet>
+        """
+        diff = compare_xml(xml, expected)
+        assert diff is None, diff
 
-        ws = Worksheet(self.wb)
-        xml_string = write_worksheet(ws, None, None)
-        assert "<pageSetup" not in xml_string
-        assert "<pageSetUpPr" not in xml_string
-        assert "<printOptions" not in xml_string
 
     def test_header_footer(self):
         ws = Worksheet(self.wb)
@@ -353,48 +499,60 @@ class TestWorksheet(object):
         ws.header_footer.right_footer.font_size = 14
         ws.header_footer.right_footer.font_color = "AABBCC"
         xml_string = write_worksheet(ws, None, None)
-        assert '<headerFooter>' in xml_string
-        assert '<oddHeader>&amp;L&amp;"Calibri,Regular"&amp;K000000Left Header Text&amp;C&amp;"Arial,Regular"&amp;6&amp;K445566Center Header Text&amp;R&amp;"Arial,Bold"&amp;8&amp;K112233Right Header Text</oddHeader>' in xml_string
-        assert '<oddFooter>&amp;L&amp;"Times New Roman,Regular"&amp;10&amp;K445566Left Footer Text_x000D_And &amp;D and &amp;T&amp;C&amp;"Times New Roman,Bold"&amp;12&amp;K778899Center Footer Text &amp;Z&amp;F on &amp;A&amp;R&amp;"Times New Roman,Italic"&amp;14&amp;KAABBCCRight Footer Text &amp;P of &amp;N</oddFooter></headerFooter>' in xml_string
-        assert '</headerFooter>' in xml_string
+        diff = compare_xml(xml_string, """
+        <worksheet xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main" xmlns:r="http://schemas.openxmlformats.org/officeDocument/2006/relationships">
+          <sheetPr>
+            <outlinePr summaryRight="1" summaryBelow="1"/>
+          </sheetPr>
+          <dimension ref="A1:A1"/>
+          <sheetViews>
+            <sheetView workbookViewId="0">
+              <selection sqref="A1" activeCell="A1"/>
+            </sheetView>
+          </sheetViews>
+          <sheetFormatPr baseColWidth="10" defaultRowHeight="15"/>
+          <sheetData/>
+          <pageMargins left="0.75" right="0.75" top="1" bottom="1" header="0.5" footer="0.5"/>
+          <headerFooter>
+            <oddHeader>&amp;L&amp;"Calibri,Regular"&amp;K000000Left Header Text&amp;C&amp;"Arial,Regular"&amp;6&amp;K445566Center Header Text&amp;R&amp;"Arial,Bold"&amp;8&amp;K112233Right Header Text</oddHeader>
+            <oddFooter>&amp;L&amp;"Times New Roman,Regular"&amp;10&amp;K445566Left Footer Text_x000D_And &amp;D and &amp;T&amp;C&amp;"Times New Roman,Bold"&amp;12&amp;K778899Center Footer Text &amp;Z&amp;F on &amp;A&amp;R&amp;"Times New Roman,Italic"&amp;14&amp;KAABBCCRight Footer Text &amp;P of &amp;N</oddFooter>
+          </headerFooter>
+        </worksheet>
+        """)
+        assert diff is None, diff
 
         ws = Worksheet(self.wb)
         xml_string = write_worksheet(ws, None, None)
-        assert "<headerFooter>" not in xml_string
-        assert "<oddHeader>" not in xml_string
-        assert "<oddFooter>" not in xml_string
-
-    def test_getitem(self):
-        ws = Worksheet(self.wb)
-        c = ws['A1']
-        assert isinstance(c, Cell)
-        assert c.get_coordinate() == "A1"
-        assert ws['A1'].value is None
-
-    def test_setitem(self):
-        ws = Worksheet(self.wb)
-        ws['A12'] = 5
-        assert ws['A12'].value == 5
-
-    def test_getslice(self):
-        ws = Worksheet(self.wb)
-        cell_range = ws['A1':'B2']
-        assert isinstance(cell_range, tuple)
-        assert (cell_range) == ((ws['A1'], ws['B1']), (ws['A2'], ws['B2']))
+        diff = compare_xml(xml_string, """
+        <worksheet xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main" xmlns:r="http://schemas.openxmlformats.org/officeDocument/2006/relationships">
+          <sheetPr>
+            <outlinePr summaryRight="1" summaryBelow="1"/>
+          </sheetPr>
+          <dimension ref="A1:A1"/>
+          <sheetViews>
+            <sheetView workbookViewId="0">
+              <selection sqref="A1" activeCell="A1"/>
+            </sheetView>
+          </sheetViews>
+          <sheetFormatPr baseColWidth="10" defaultRowHeight="15"/>
+          <sheetData/>
+          <pageMargins left="0.75" right="0.75" top="1" bottom="1" header="0.5" footer="0.5"/>
+        </worksheet>
+        """)
+        assert diff is None, diff
 
 
 class TestPositioning(object):
     def test_point(self):
         wb = Workbook()
         ws = wb.get_active_sheet()
-        eq_(ws.point_pos(top=40, left=150), ('C', 3))
+        assert ws.point_pos(top=40, left=150), ('C' == 3)
 
-    def test_roundtrip(self):
+    @pytest.mark.parametrize("value", ('A1', 'D52', 'X11'))
+    def test_roundtrip(self, value):
         wb = Workbook()
         ws = wb.get_active_sheet()
-        for address in ('A1', 'D52', 'X11'):
-            eq_(ws.point_pos(*ws.cell(address).anchor),
-                coordinate_from_string(address))
+        assert ws.point_pos(*ws.cell(value).anchor) == coordinate_from_string(value)
 
 
 @pytest.fixture

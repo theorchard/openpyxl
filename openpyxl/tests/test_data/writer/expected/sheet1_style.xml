@@ -9,9 +9,9 @@
       <selection sqref="A1" activeCell="A1"/>
     </sheetView>
   </sheetViews>
-  <sheetFormatPr defaultRowHeight="15"/>
+  <sheetFormatPr baseColWidth="10" defaultRowHeight="15"/>
   <cols>
-    <col min="6" max="6" style="1" width="9.10"/>
+    <col min="6" max="6" style="1"/>
   </cols>
   <sheetData>
     <row spans="1:6" r="1">
@@ -20,4 +20,5 @@
       </c>
     </row>
   </sheetData>
+    <pageMargins left="0.75" right="0.75" top="1" bottom="1" header="0.5" footer="0.5"/>
 </worksheet>

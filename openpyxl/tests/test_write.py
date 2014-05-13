@@ -23,38 +23,33 @@
 
 # stdlib imports
 import decimal
+from io import BytesIO
 import os.path
 import zipfile
 
-# compatibility imports
-from openpyxl.shared.compat import BytesIO, StringIO
-
-# 3rd party imports
-from nose.tools import eq_, with_setup, raises
 import pytest
 
 # package imports
 from openpyxl.tests.helper import (
-    TMPDIR,
     DATADIR,
-    clean_tmpdir,
-    make_tmpdir,
     compare_xml,
     )
 from openpyxl.workbook import Workbook
 from openpyxl.reader.excel import load_workbook
-from openpyxl.writer.excel import save_workbook, save_virtual_workbook, \
-        ExcelWriter
+from openpyxl.writer.excel import (
+    save_workbook,
+    save_virtual_workbook,
+    ExcelWriter
+    )
 from openpyxl.writer.workbook import write_workbook, write_workbook_rels
 from openpyxl.writer.worksheet import write_worksheet, write_worksheet_rels
-from openpyxl.writer.strings import write_string_table
+from openpyxl.writer.strings import write_string_table, create_string_table
 from openpyxl.writer.styles import StyleWriter
 
-
-@with_setup(setup = make_tmpdir, teardown = clean_tmpdir)
-def test_write_empty_workbook():
+def test_write_empty_workbook(tmpdir):
+    tmpdir.chdir()
     wb = Workbook()
-    dest_filename = os.path.join(TMPDIR, 'empty_book.xlsx')
+    dest_filename = 'empty_book.xlsx'
     save_workbook(wb, dest_filename)
     assert os.path.isfile(dest_filename)
 
@@ -85,7 +80,7 @@ def test_write_workbook():
 
 
 def test_write_string_table():
-    table = {'hello': 1, 'world': 2, 'nice': 3}
+    table = ['hello', 'world', 'nice']
     content = write_string_table(table)
     reference_file = os.path.join(DATADIR, 'writer', 'expected', 'sharedStrings.xml')
     with open(reference_file) as expected:
@@ -97,7 +92,8 @@ def test_write_worksheet():
     wb = Workbook()
     ws = wb.create_sheet()
     ws.cell('F42').value = 'hello'
-    content = write_worksheet(ws, {'hello': 0}, {})
+    strings = create_string_table(wb)
+    content = write_worksheet(ws, strings, {})
     reference_file = os.path.join(DATADIR, 'writer', 'expected', 'sheet1.xml')
     with open(reference_file) as expected:
         diff = compare_xml(content, expected.read())
@@ -109,7 +105,8 @@ def test_write_hidden_worksheet():
     ws = wb.create_sheet()
     ws.sheet_state = ws.SHEETSTATE_HIDDEN
     ws.cell('F42').value = 'hello'
-    content = write_worksheet(ws, {'hello': 0}, {})
+    strings = create_string_table(wb)
+    content = write_worksheet(ws, strings, {})
     reference_file = os.path.join(DATADIR, 'writer', 'expected', 'sheet1.xml')
     with open(reference_file) as expected:
         diff = compare_xml(content, expected.read())
@@ -148,12 +145,12 @@ def test_write_formula():
 
 
 def test_write_style():
-    wb = Workbook()
+    wb = Workbook(guess_types=True)
     ws = wb.create_sheet()
     ws.cell('F1').value = '13%'
-    ws.column_dimensions['F'].style_index = ws._styles['F1']
-    style_id_by_hash = StyleWriter(wb).get_style_by_hash()
-    content = write_worksheet(ws, {}, style_id_by_hash)
+    ws._styles['F'] = ws._styles['F1']
+    styles = StyleWriter(wb).styles
+    content = write_worksheet(ws, {}, styles)
     reference_file = os.path.join(DATADIR, 'writer', 'expected', 'sheet1_style.xml')
     with open(reference_file) as expected:
         diff = compare_xml(content, expected.read())
@@ -177,7 +174,8 @@ def test_write_hyperlink():
     ws = wb.create_sheet()
     ws.cell('A1').value = "test"
     ws.cell('A1').hyperlink = "http://test.com"
-    content = write_worksheet(ws, {'test': 0}, {})
+    strings = create_string_table(wb)
+    content = write_worksheet(ws, strings, {})
     reference_file = os.path.join(DATADIR, 'writer', 'expected', 'sheet1_hyperlink.xml')
     with open(reference_file) as expected:
         diff = compare_xml(content, expected.read())
@@ -187,13 +185,13 @@ def test_write_hyperlink():
 def test_write_hyperlink_rels():
     wb = Workbook()
     ws = wb.create_sheet()
-    eq_(0, len(ws.relationships))
+    assert 0 == len(ws.relationships)
     ws.cell('A1').value = "test"
     ws.cell('A1').hyperlink = "http://test.com/"
-    eq_(1, len(ws.relationships))
+    assert 1 == len(ws.relationships)
     ws.cell('A2').value = "test"
     ws.cell('A2').hyperlink = "http://test2.com/"
-    eq_(2, len(ws.relationships))
+    assert 2 == len(ws.relationships)
     content = write_worksheet_rels(ws, 1, 1)
     reference_file = os.path.join(DATADIR, 'writer', 'expected', 'sheet1_hyperlink.xml.rels')
     with open(reference_file) as expected:
@@ -220,16 +218,18 @@ def test_hyperlink_value():
     wb = Workbook()
     ws = wb.create_sheet()
     ws.cell('A1').hyperlink = "http://test.com"
-    eq_("http://test.com", ws.cell('A1').value)
+    assert "http://test.com" == ws.cell('A1').value
     ws.cell('A1').value = "test"
-    eq_("test", ws.cell('A1').value)
+    assert "test" == ws.cell('A1').value
+
 
 def test_write_auto_filter():
     wb = Workbook()
     ws = wb.worksheets[0]
     ws.cell('F42').value = 'hello'
-    ws.auto_filter = 'A1:F1'
-    content = write_worksheet(ws, {'hello': 0}, {})
+    ws.auto_filter.ref = 'A1:F1'
+    strings = create_string_table(wb)
+    content = write_worksheet(ws, strings, {})
     reference_file = os.path.join(DATADIR, 'writer', 'expected', 'sheet1_auto_filter.xml')
     with open(reference_file) as expected:
         diff = compare_xml(content, expected.read())
@@ -241,13 +241,52 @@ def test_write_auto_filter():
         diff = compare_xml(content, expected.read())
         assert diff is None, diff
 
+def test_write_auto_filter_filter_column():
+    wb = Workbook()
+    ws = wb.worksheets[0]
+    ws.cell('F42').value = 'hello'
+    ws.auto_filter.ref = 'A1:F1'
+    ws.auto_filter.add_filter_column(0, ["0"], blank=True)
+    strings = create_string_table(wb)
+    content = write_worksheet(ws, strings, {})
+    reference_file = os.path.join(DATADIR, 'writer', 'expected', 'sheet1_auto_filter_filter_column.xml')
+    with open(reference_file) as expected:
+        diff = compare_xml(content, expected.read())
+        assert diff is None
+
+    content = write_workbook(wb)
+    reference_file = os.path.join(DATADIR, 'writer', 'expected', 'workbook_auto_filter.xml')
+    with open(reference_file) as expected:
+        diff = compare_xml(content, expected.read())
+        assert diff is None, diff
+
+def test_write_auto_filter_sort_condition():
+    wb = Workbook()
+    ws = wb.worksheets[0]
+    ws.cell('A1').value = 'header'
+    ws.cell('A2').value = 1
+    ws.cell('A3').value = 0
+    ws.auto_filter.ref = 'A2:A3'
+    ws.auto_filter.add_sort_condition('A2:A3', descending=True)
+    strings = create_string_table(wb)
+    content = write_worksheet(ws, strings, {})
+    reference_file = os.path.join(DATADIR, 'writer', 'expected', 'sheet1_auto_filter_sort_condition.xml')
+    with open(reference_file) as expected:
+        diff = compare_xml(content, expected.read())
+        assert diff is None
+
+    content = write_workbook(wb)
+    reference_file = os.path.join(DATADIR, 'writer', 'expected', 'workbook_auto_filter.xml')
+    with open(reference_file) as expected:
+        diff = compare_xml(content, expected.read())
 
 def test_freeze_panes_horiz():
     wb = Workbook()
     ws = wb.create_sheet()
     ws.cell('F42').value = 'hello'
     ws.freeze_panes = 'A4'
-    content = write_worksheet(ws, {'hello': 0}, {})
+    strings = create_string_table(wb)
+    content = write_worksheet(ws, strings, {})
     reference_file = os.path.join(DATADIR, 'writer', 'expected', 'sheet1_freeze_panes_horiz.xml')
     with open(reference_file) as expected:
         diff = compare_xml(content, expected.read())
@@ -258,7 +297,8 @@ def test_freeze_panes_vert():
     ws = wb.create_sheet()
     ws.cell('F42').value = 'hello'
     ws.freeze_panes = 'D1'
-    content = write_worksheet(ws, {'hello': 0}, {})
+    strings = create_string_table(wb)
+    content = write_worksheet(ws, strings, {})
     reference_file = os.path.join(DATADIR, 'writer', 'expected', 'sheet1_freeze_panes_vert.xml')
     with open(reference_file) as expected:
         diff = compare_xml(content, expected.read())
@@ -269,7 +309,8 @@ def test_freeze_panes_both():
     ws = wb.create_sheet()
     ws.cell('F42').value = 'hello'
     ws.freeze_panes = 'D4'
-    content = write_worksheet(ws, {'hello': 0}, {})
+    strings = create_string_table(wb)
+    content = write_worksheet(ws, strings, {})
     reference_file = os.path.join(DATADIR, 'writer', 'expected', 'sheet1_freeze_panes_both.xml')
     with open(reference_file) as expected:
         diff = compare_xml(content, expected.read())

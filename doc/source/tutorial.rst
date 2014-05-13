@@ -92,8 +92,8 @@ You can also access a cell using row and column notation::
 
     Something like ::
 
-        >>> for i in xrange(0,100):
-        ...        for j in xrange(0,100):
+        >>> for i in range(0,100):
+        ...        for j in range(0,100):
         ...            ws.cell(row = i, column = j)
 
     will create 100x100 cells in memory, for nothing.

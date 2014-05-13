@@ -1,3 +1,4 @@
+from __future__ import absolute_import
 # Copyright (c) 2010-2014 openpyxl
 #
 # Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -22,34 +23,32 @@
 # @author: see AUTHORS file
 
 """Write the shared string table."""
-
-# compatibility imports
-from openpyxl.shared.compat import BytesIO, StringIO
+from io import BytesIO
 
 # package imports
-from openpyxl.shared.xmltools import start_tag, end_tag, tag, XMLGenerator
+from openpyxl.xml.functions import start_tag, end_tag, tag, XMLGenerator
+from openpyxl.collections import IndexedList
 
 
 def create_string_table(workbook):
     """Compile the string table for a workbook."""
+
     strings = set()
     for sheet in workbook.worksheets:
         for cell in sheet.get_cell_collection():
             if cell.data_type == cell.TYPE_STRING and cell._value is not None:
                 strings.add(cell.value)
-    return dict((key, i) for i, key in enumerate(sorted(strings)))
+    return IndexedList(sorted(strings))
 
 
 def write_string_table(string_table):
     """Write the string table xml."""
-    temp_buffer = StringIO()
-    doc = XMLGenerator(out=temp_buffer, encoding='utf-8')
+    temp_buffer = BytesIO()
+    doc = XMLGenerator(out=temp_buffer)
     start_tag(doc, 'sst', {'xmlns':
             'http://schemas.openxmlformats.org/spreadsheetml/2006/main',
             'uniqueCount': '%d' % len(string_table)})
-    strings_to_write = sorted(string_table.items(),
-            key=lambda pair: pair[1])
-    for key in [pair[0] for pair in strings_to_write]:
+    for key in string_table:
         start_tag(doc, 'si')
         if key.strip() != key:
             attr = {'xml:space': 'preserve'}
@@ -61,24 +60,3 @@ def write_string_table(string_table):
     string_table_xml = temp_buffer.getvalue()
     temp_buffer.close()
     return string_table_xml
-
-class StringTableBuilder(object):
-
-    def __init__(self):
-
-        self.counter = 0
-        self.dct = {}
-
-    def add(self, key):
-
-        key = key.strip()
-        try:
-            return self.dct[key]
-        except KeyError:
-            res = self.dct[key] = self.counter
-            self.counter += 1
-            return res
-
-    def get_table(self):
-
-        return self.dct

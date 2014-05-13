@@ -6,7 +6,7 @@ Write a workbook
 ::
 
     from openpyxl import Workbook
-
+    from openpyx.compat import range
     from openpyxl.cell import get_column_letter
 
     wb = Workbook()
@@ -17,9 +17,9 @@ Write a workbook
 
     ws.title = "range names"
 
-    for col_idx in xrange(1, 40):
+    for col_idx in range(1, 40):
         col = get_column_letter(col_idx)
-        for row in xrange(1, 600):
+        for row in range(1, 600):
             ws.cell('%s%s'%(col, row)).value = '%s%s' % (col, row)
 
     ws = wb.create_sheet()
@@ -48,7 +48,7 @@ Read an existing workbook
 
     There are several flags that can be used in load_workbook.
 
-    - `guess_types` will enable (default) or disable type inference when
+    - `guess_types` will enable or disable (default) type inference when
       reading cells.
 
     - `data_only` controls whether cells with formulae have either the

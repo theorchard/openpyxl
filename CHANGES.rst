@@ -1,3 +1,66 @@
+2.0.2 (2013-05-13)
+2.0.1 (2013-05-13) # brown bag
+2.0.0 (2013-05-13) # brown bag
+==================
+
+
+Major changes
+-------------
+
+* This is last release that will support Python 3.2
+* Cells are referenced with 1-indexing: A1 == cell(row=1, column=1)
+* Use jdcal for more efficient and reliable conversion of datetimes
+* Significant speed up when reading files
+* Merged immutable styles
+* Type inference is disabled by default
+* RawCell renamed ReadOnlyCell
+* ReadOnlyCell.internal_value and ReadOnlyCell.value now behave the same as Cell
+* Provide no size information on unsized worksheets
+* Lower memory footprint when reading files
+
+
+Minor changes
+-------------
+
+* All tests converted to pytest
+* Pyflakes used for static code analysis
+* Sample code in the documentation is automatically run
+* Support GradientFills
+* BaseColWidth set
+
+
+Pull requests
+-------------
+#70 Add filterColumn, sortCondition support to AutoFilter
+#80 Reorder worksheets parts
+#82 Update API for conditional formatting
+#87 Add support for writing Protection styles, others
+#89 Better handling of content types when preserving macros
+
+
+Bug fixes
+---------
+#46  - ColumnDimension style error
+#86 - reader.worksheet.fast_parse sets booleans to integers
+#98 - Auto sizing column widths does not work
+#137 - Workbooks with chartsheets
+#185 - Invalid PageMargins
+#230 - Using \v in cells creates invalid files
+#243 - IndexError when loading workbook
+#263 - Forded conversion of line breaks
+#267 - Raise exceptions when passed invalid types
+#270 - Cannot open files which use non-standard sheet names or reference Ids
+#269 - Handling unsized worksheets in IterableWorksheet
+#270 - Handling Workbooks with non-standard references
+#275 - Handling auto filters where there are only custom filters
+#277 - Harmonise chart and cell coordinates
+#280 - Explicit exception raising for invalid characters
+#286 - Optimized writer can not handle a datetime.time value
+#296 - Cell coordinates not consistent with documentation
+#300 - Missing column width causes load_workbook() exception
+#304 - Handling Workbooks with absolute paths for worksheets (from Sharepoint)
+
+
 1.8.6 (2014-05-05)
 ==================
 
@@ -15,8 +78,8 @@ Bugfixes
 
 Minor changes
 -------------
-The '=' string is no longer interpreted as a formula
-When a client writes empty xml tags for cells (e.g. <c r='A1'></c>), reader will not crash
+* The '=' string is no longer interpreted as a formula
+* When a client writes empty xml tags for cells (e.g. <c r='A1'></c>), reader will not crash
 
 
 1.8.4 (2014-02-25)

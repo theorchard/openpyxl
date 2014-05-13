@@ -25,8 +25,7 @@ if sys.version_info < (2, 6):
     raise Exception("Python >= 2.6 is required.")
 
 from setuptools import setup, Extension, find_packages
-import openpyxl  # to fetch __version__ etc
-
+import re
 
 here = os.path.abspath(os.path.dirname(__file__))
 try:
@@ -37,21 +36,43 @@ try:
 except IOError:
     README = CHANGES = ''
 
-setup(name = 'openpyxl',
-    packages = find_packages(),
+
+__author__ = 'See AUTHORS'
+__license__ = 'MIT/Expat'
+__author_email__ = 'eric.gazoni@gmail.com'
+__maintainer_email__ = 'openpyxl-users@googlegroups.com'
+__url__ = 'http://openpyxl.readthedocs.org'
+__downloadUrl__ = "http://bitbucket.org/ericgazoni/openpyxl/downloads"
+
+
+def get_version():
+    f = open(os.path.join(here, 'openpyxl', '__init__.py'))
+    version_file = f.read()
+    f.close()
+    version_match = re.search(r"^__version__ = ['\"]([^'\"]*)['\"]",
+                              version_file, re.M)
+    if version_match:
+        return version_match.group(1)
+    raise RuntimeError("Unable to find version string.")
+
+setup(name='openpyxl',
+    packages=find_packages(),
     # metadata
-    version = openpyxl.__version__,
-    description = "A Python library to read/write Excel 2007 xlsx/xlsm files",
-    long_description = README + '\n\n' +  CHANGES,
-    author = openpyxl.__author__,
-    author_email = openpyxl.__author_email__,
-    url = openpyxl.__url__,
-    license = openpyxl.__license__,
-    download_url = openpyxl.__downloadUrl__,
-    requires = [
+    version=get_version(),
+    description="A Python library to read/write Excel 2007 xlsx/xlsm files",
+    long_description=README + '\n\n' + CHANGES,
+    author=__author__,
+    author_email=__author_email__,
+    url=__url__,
+    license=__license__,
+    download_url=__downloadUrl__,
+    requires=[
           'python (>=2.6.0)',
           ],
-    classifiers = ['Development Status :: 4 - Beta',
+    install_requires=[
+        'jdcal',
+    ],
+    classifiers=['Development Status :: 4 - Beta',
           'Operating System :: MacOS :: MacOS X',
           'Operating System :: Microsoft :: Windows',
           'Operating System :: POSIX',
@@ -61,5 +82,6 @@ setup(name = 'openpyxl',
           'Programming Language :: Python :: 2.7',
           'Programming Language :: Python :: 3.2',
           'Programming Language :: Python :: 3.3',
+          'Programming Language :: Python :: 3.4',
           ],
     )

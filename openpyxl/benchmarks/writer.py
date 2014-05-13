@@ -14,7 +14,7 @@ def writer(optimised, cols, rows):
     wb = openpyxl.Workbook(optimized_write=optimised)
     ws = wb.create_sheet()
     row = range(cols)
-    for idx in xrange(rows):
+    for idx in range(rows):
         if not (idx + 1) % rows/10:
             progress = "." * ((idx + 1) / (1 + rows/10))
             sys.stdout.write("\r" + progress)

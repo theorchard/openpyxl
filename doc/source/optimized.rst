@@ -6,7 +6,7 @@ and the common routines in openpyxl won't be able to handle that load.
 Hopefully, there are two modes that enable you to read and write unlimited
 amounts of data with (near) constant memory consumption.
 
-Introducing :class:`openpyxl.reader.iter_worksheet.IterableWorksheet`::
+Introducing :class:`openpyxl.worksheet.iter_worksheet.IterableWorksheet`::
 
     from openpyxl import load_workbook
     wb = load_workbook(filename = 'large_file.xlsx', use_iterators = True)
@@ -16,16 +16,15 @@ Introducing :class:`openpyxl.reader.iter_worksheet.IterableWorksheet`::
 
         for cell in row:
 
-            print cell.internal_value
+            print cell.value
 
 .. warning::
 
-    * As you can see, we are using cell.internal_value instead of .value.
-    * :class:`openpyxl.reader.iter_worksheet.IterableWorksheet` are read-only
-    * cell, range, rows, columns methods and properties are disabled
+    * :class:`openpyxl.worksheet.iter_worksheet.IterableWorksheet` are read-only
+    * range, rows, columns methods and properties are disabled
 
 Cells returned by iter_rows() are not regular :class:`openpyxl.cell.Cell` but
-:class:`openpyxl.reader.iter_worksheet.RawCell`.
+:class:`openpyxl.worksheet.iter_worksheet.RawCell`.
 
 Optimized writer
 ================
@@ -35,15 +34,22 @@ by a faster alternative, the :class:`openpyxl.writer.dump_worksheet.DumpWorkshee
 When you want to dump large amounts of data, you might find optimized writer helpful::
 
     from openpyxl import Workbook
+    from openpyxl.compat import range
     wb = Workbook(optimized_write = True)
 
     ws = wb.create_sheet()
 
     # now we'll fill it with 10k rows x 200 columns
-    for irow in xrange(10000):
-        ws.append(['%d' % i for i in xrange(200)])
+    for irow in range(10000):
+        ws.append(['%d' % i for i in range(200)])
 
     wb.save('new_big_file.xlsx') # don't forget to save !
+
+You can also use user-defined styles in this mode, by appending a `tuple` containing the actual value and the style::
+
+    ws.append([('hello', Style(font=Font(name='Courrier', size=36))), 3.14, None])
+
+This will append one new row with 3 cells, one text cell with custom font and font size, a float and an empty cell that will be discarded anyway.
 
 .. warning::
 

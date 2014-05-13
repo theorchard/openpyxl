@@ -1,5 +1,6 @@
 # coding=UTF-8
 
+from __future__ import absolute_import
 # Copyright (c) 2010-2014 openpyxl
 #
 # Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -23,9 +24,8 @@
 # @license: http://www.opensource.org/licenses/mit-license.php
 # @author: see AUTHORS file
 
-from openpyxl.shared.xmltools import Element, SubElement, get_document_content
-from openpyxl.shared.ooxml import (
-    SHEET_MAIN_NS,
+from openpyxl.xml.functions import Element, SubElement, get_document_content
+from openpyxl.xml.constants import (
     DRAWING_NS,
     SHEET_DRAWING_NS,
     CHART_NS,
@@ -33,7 +33,7 @@ from openpyxl.shared.ooxml import (
     CHART_DRAWING_NS,
     PKG_REL_NS
 )
-from openpyxl.shared.compat.strings import safe_string
+from openpyxl.compat.strings import safe_string
 
 
 class DrawingWriter(object):

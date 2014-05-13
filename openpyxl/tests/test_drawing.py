@@ -1,3 +1,4 @@
+from __future__ import absolute_import
 # Copyright (c) 2010-2014 openpyxl
 #
 # Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -24,8 +25,8 @@ import os
 
 import pytest
 
-from openpyxl.shared.ooxml import CHART_DRAWING_NS, SHEET_DRAWING_NS, DRAWING_NS
-from openpyxl.shared.xmltools import Element, SubElement, fromstring
+from openpyxl.xml.constants import CHART_DRAWING_NS, SHEET_DRAWING_NS
+from openpyxl.xml.functions import Element, fromstring
 
 from .helper import compare_xml, get_xml, DATADIR
 from .schema import drawing_schema, chart_schema
@@ -193,7 +194,7 @@ class TestShadow(object):
         assert s.distance == 2
         assert s.direction == 0
         assert s.alignment == "br"
-        assert s.color.index == "FF000000"
+        assert s.color.index == "00000000"
         assert s.alpha == 50
 
 
@@ -218,7 +219,7 @@ class DummyCell(object):
 class TestImage(object):
 
     def setup(self):
-        self.img = img = os.path.join(DATADIR, "plain.png")
+        self.img = os.path.join(DATADIR, "plain.png")
 
     def make_one(self):
         from openpyxl.drawing import Image
@@ -228,7 +229,7 @@ class TestImage(object):
     def test_import(self):
         Image = self.make_one()
         with pytest.raises(ImportError):
-            i = Image._import_image(self.img)
+            Image._import_image(self.img)
 
     @pytest.mark.pil_required
     def test_ctor(self):
@@ -274,6 +275,7 @@ class TestDrawingWriter(object):
         diff = compare_xml(xml, expected)
         assert diff is None, diff
 
+    @pytest.mark.lxml_required
     def test_write_chart(self):
         from openpyxl.drawing import Drawing
         root = Element("{%s}wsDr" % SHEET_DRAWING_NS)
@@ -309,6 +311,7 @@ class TestDrawingWriter(object):
         diff = compare_xml(xml, expected)
         assert diff is None, diff
 
+    @pytest.mark.lxml_required
     @pytest.mark.pil_required
     def test_write_images(self):
         from openpyxl.drawing import Image
@@ -410,6 +413,7 @@ class TestShapeWriter(object):
         self.shape = Shape(chart=chart, text="My first chart")
         self.sw = ShapeWriter(shapes=[self.shape])
 
+    @pytest.mark.lxml_required
     def test_write(self):
         xml = self.sw.write(0)
         tree = fromstring(xml)
@@ -485,7 +489,6 @@ class TestShapeWriter(object):
         assert diff is None, diff
 
     def test_write_text(self):
-        from openpyxl.drawing import Shape
         root = Element("{%s}test" % CHART_DRAWING_NS)
         self.sw._write_text(root, self.shape)
         xml = get_xml(root)

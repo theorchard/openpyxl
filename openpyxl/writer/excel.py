@@ -1,3 +1,4 @@
+from __future__ import absolute_import
 # Copyright (c) 2010-2014 openpyxl
 #
 # Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -24,13 +25,11 @@
 """Write a .xlsx file."""
 
 # Python stdlib imports
+from io import BytesIO
 from zipfile import ZipFile, ZIP_DEFLATED
 
-# compatibility imports
-from openpyxl.shared.compat import BytesIO, StringIO
-
 # package imports
-from openpyxl.shared.ooxml import (
+from openpyxl.xml.constants import (
     ARC_SHARED_STRINGS,
     ARC_CONTENT_TYPES,
     ARC_ROOT_RELS,
@@ -73,7 +72,6 @@ class ExcelWriter(object):
     def write_data(self, archive):
         """Write the various xml files into the zip archive."""
         # cleanup all worksheets
-        shared_string_table = self._write_string_table(archive)
 
         archive.writestr(ARC_CONTENT_TYPES, write_content_types(self.workbook))
         archive.writestr(ARC_ROOT_RELS, write_root_rels(self.workbook))
@@ -95,17 +93,15 @@ class ExcelWriter(object):
                         archive.writestr(name, vba_archive.read(name))
                         break
 
-        self._write_worksheets(archive, shared_string_table, self.style_writer)
+        self._write_string_table(archive)
+        self._write_worksheets(archive, self.style_writer)
 
     def _write_string_table(self, archive):
-
         for ws in self.workbook.worksheets:
             ws.garbage_collect()
-        shared_string_table = create_string_table(self.workbook)
+        self.shared_strings = create_string_table(self.workbook)
         archive.writestr(ARC_SHARED_STRINGS,
-                write_string_table(shared_string_table))
-
-        return shared_string_table
+                write_string_table(self.shared_strings))
 
     def _write_images(self, images, archive, image_id):
         for img in images:
@@ -115,7 +111,7 @@ class ExcelWriter(object):
             image_id += 1
         return image_id
 
-    def _write_worksheets(self, archive, shared_string_table, style_writer):
+    def _write_worksheets(self, archive, style_writer):
         drawing_id = 1
         chart_id = 1
         image_id = 1
@@ -124,9 +120,11 @@ class ExcelWriter(object):
 
         for i, sheet in enumerate(self.workbook.worksheets):
             archive.writestr(PACKAGE_WORKSHEETS + '/sheet%d.xml' % (i + 1),
-                    write_worksheet(sheet, shared_string_table,
-                            style_writer.get_style_by_hash()))
-            if sheet._charts or sheet._images or sheet.relationships or sheet._comment_count > 0:
+                             write_worksheet(sheet, self.shared_strings,
+                                             style_writer.styles))
+            if (sheet._charts or sheet._images
+                or sheet.relationships
+                or sheet._comment_count > 0):
                 archive.writestr(PACKAGE_WORKSHEETS +
                         '/_rels/sheet%d.xml.rels' % (i + 1),
                         write_worksheet_rels(sheet, drawing_id, comments_id))

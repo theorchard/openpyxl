@@ -1,3 +1,4 @@
+from __future__ import absolute_import
 # Copyright (c) 2010-2014 openpyxl
 #
 # Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -22,10 +23,10 @@
 # @author: see AUTHORS file
 
 import threading
+from io import BytesIO
 
 from openpyxl.workbook import Workbook
 
-from openpyxl.shared.compat import StringIO
 
 def test_thread_safe_dump():
 
@@ -33,7 +34,7 @@ def test_thread_safe_dump():
         wb = Workbook(optimized_write=True)
         ws = wb.create_sheet()
         ws.append(range(30))
-        wb.save(filename=StringIO())
+        wb.save(filename=BytesIO())
 
     for thread_idx in range(400):
         thread = threading.Thread(target=dump_workbook)

@@ -1,3 +1,4 @@
+from __future__ import absolute_import
 # Copyright (c) 2010-2014 openpyxl
 #
 # Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -24,23 +25,41 @@
 """Read in global settings to be maintained by the workbook object."""
 
 # package imports
-from openpyxl.shared.xmltools import fromstring
-from openpyxl.shared.ooxml import NAMESPACES, DCORE_NS, COREPROPS_NS, DCTERMS_NS, SHEET_MAIN_NS, CONTYPES_NS
+from openpyxl.xml.functions import fromstring, safe_iterator
+from openpyxl.xml.constants import (
+    DCORE_NS,
+    COREPROPS_NS,
+    DCTERMS_NS,
+    SHEET_MAIN_NS,
+    CONTYPES_NS,
+    PACKAGE_XL,
+    PKG_REL_NS,
+    REL_NS,
+    ARC_CONTENT_TYPES,
+    ARC_WORKBOOK,
+    ARC_WORKBOOK_RELS,
+)
 from openpyxl.workbook import DocumentProperties
-from openpyxl.shared.date_time import W3CDTF_to_datetime,CALENDAR_WINDOWS_1900,CALENDAR_MAC_1904
-from openpyxl.namedrange import NamedRange, NamedRangeContainingValue, split_named_range, refers_to_range
+from openpyxl.date_time import (
+    W3CDTF_to_datetime,
+    CALENDAR_WINDOWS_1900,
+    CALENDAR_MAC_1904
+    )
+from openpyxl.namedrange import (
+    NamedRange,
+    NamedRangeContainingValue,
+    split_named_range,
+    refers_to_range
+    )
 
+import os
 import datetime
+import re
 
 # constants
-BUGGY_NAMED_RANGES = ['NA()', '#REF!']
-DISCARDED_RANGES = ['Excel_BuiltIn', 'Print_Area']
-
-def get_sheet_ids(xml_source):
-
-    sheet_names = read_sheets_titles(xml_source)
-
-    return dict((sheet, 'sheet%d.xml' % (i + 1)) for i, sheet in enumerate(sheet_names))
+BUGGY_NAMED_RANGES = re.compile("|".join(['NA()', '#REF!']))
+DISCARDED_RANGES = re.compile("|".join(['Excel_BuiltIn', 'Print_Area']))
+VALID_WORKSHEET = "application/vnd.openxmlformats-officedocument.spreadsheetml.worksheet+xml"
 
 
 def read_properties_core(xml_source):
@@ -70,71 +89,92 @@ def read_excel_base_date(xml_source):
     wbPr = root.find('{%s}workbookPr' % SHEET_MAIN_NS)
     if wbPr is not None and wbPr.get('date1904') in ('1', 'true'):
         return CALENDAR_MAC_1904
-
     return CALENDAR_WINDOWS_1900
 
 
-# Mark Mikofski, 2013-06-03
-def read_content_types(xml_source):
+def read_content_types(archive):
     """Read content types."""
+    xml_source = archive.read(ARC_CONTENT_TYPES)
     root = fromstring(xml_source)
     contents_root = root.findall('{%s}Override' % CONTYPES_NS)
     for type in contents_root:
         yield type.get('PartName'), type.get('ContentType')
 
-def read_sheets_titles(xml_source):
-    """Read titles for all sheets."""
-    root = fromstring(xml_source)
-    titles_root = root.find('{%s}sheets' % SHEET_MAIN_NS)
 
-    return [sheet.get('name') for sheet in titles_root]
+def read_rels(archive):
+    """Read relationships for a workbook"""
+    xml_source = archive.read(ARC_WORKBOOK_RELS)
+    tree = fromstring(xml_source)
+    for element in safe_iterator(tree, '{%s}Relationship' % PKG_REL_NS):
+        rId = element.get('Id')
+        pth = element.get("Target")
+        # normalise path
+        if pth.startswith("/xl"):
+            pth = pth.replace("/xl", "xl")
+        elif not pth.startswith("xl") and not pth.startswith(".."):
+            pth = "xl/" + pth
+        yield rId, {'path':pth}
+
+
+def read_sheets(archive):
+    """Read worksheet titles and ids for a workbook"""
+    xml_source = archive.read(ARC_WORKBOOK)
+    tree = fromstring(xml_source)
+    for element in safe_iterator(tree, '{%s}sheet' % SHEET_MAIN_NS):
+        rId = element.get("{%s}id" % REL_NS)
+        yield rId, element.get('name')
+
+
+def detect_worksheets(archive):
+    """Return a list of worksheets"""
+    # content types has a list of paths but no titles
+    # workbook has a list of titles and relIds but no paths
+    # workbook_rels has a list of relIds and paths but no titles
+    # rels = {'id':{'title':'', 'path':''} }
+    from openpyxl.reader.workbook import read_rels, read_sheets
+    content_types = read_content_types(archive)
+    valid_sheets = dict((path, ct) for path, ct in content_types if ct == VALID_WORKSHEET)
+    rels = dict(read_rels(archive))
+    for rId, title in read_sheets(archive):
+        rels[rId]['title'] = title
+    for rel in rels.values():
+        if "/" + rel['path'] in valid_sheets:
+            yield rel
+
 
 def read_named_ranges(xml_source, workbook):
     """Read named ranges, excluding poorly defined ranges."""
-    named_ranges = []
     root = fromstring(xml_source)
     names_root = root.find('{%s}definedNames' %SHEET_MAIN_NS)
     if names_root is not None:
         for name_node in names_root:
             range_name = name_node.get('name')
             node_text = name_node.text or ''
-
-            if name_node.get("hidden", '0') == '1':
+            if bool(name_node.get("hidden", False)):
                 continue
 
-            valid = True
+            if DISCARDED_RANGES.search(range_name) or BUGGY_NAMED_RANGES.search(range_name):
+                continue
 
-            for discarded_range in DISCARDED_RANGES:
-                if discarded_range in range_name:
-                    valid = False
+            if refers_to_range(node_text):
+                destinations = split_named_range(node_text)
 
-            for bad_range in BUGGY_NAMED_RANGES:
-                if bad_range in node_text:
-                    valid = False
+                new_destinations = []
+                for worksheet, cells_range in destinations:
+                    # it can happen that a valid named range references
+                    # a missing worksheet, when Excel didn't properly maintain
+                    # the named range list
+                    #
+                    # we just ignore them here
+                    worksheet = workbook[worksheet]
+                    if worksheet:
+                        new_destinations.append((worksheet, cells_range))
 
-            if valid:
-                if refers_to_range(node_text):
-                    destinations = split_named_range(node_text)
+                named_range = NamedRange(range_name, new_destinations)
+            else:
+                named_range = NamedRangeContainingValue(range_name, node_text)
 
-                    new_destinations = []
-                    for worksheet, cells_range in destinations:
-                        # it can happen that a valid named range references
-                        # a missing worksheet, when Excel didn't properly maintain
-                        # the named range list
-                        #
-                        # we just ignore them here
-                        worksheet = workbook.get_sheet_by_name(worksheet)
-                        if worksheet:
-                            new_destinations.append((worksheet, cells_range))
-
-                    named_range = NamedRange(range_name, new_destinations)
-                else:
-                    named_range = NamedRangeContainingValue(range_name, node_text)
-
-                location_id = name_node.get("localSheetId")
-                if location_id:
-                    named_range.scope = workbook.worksheets[int(location_id)]
-
-                named_ranges.append(named_range)
-
-    return named_ranges
+            location_id = name_node.get("localSheetId")
+            if location_id:
+                named_range.scope = workbook.worksheets[int(location_id)]
+            yield named_range

@@ -9,15 +9,13 @@
       <selection activeCell="A1" sqref="A1"/>
     </sheetView>
   </sheetViews>
-  <sheetFormatPr defaultRowHeight="15"/>
-  <cols>
-    <col max="6" min="6" width="9.10"/>
-  </cols>
+  <sheetFormatPr baseColWidth="10" defaultRowHeight="15"/>
   <sheetData>
-    <row r="1" spans="1:6" customHeight="1" ht="30">
+    <row r="1" spans="1:6" customHeight="1" ht="30.0">
       <c r="F1" t="n">
         <v>10</v>
       </c>
     </row>
   </sheetData>
+    <pageMargins left="0.75" right="0.75" top="1" bottom="1" header="0.5" footer="0.5"/>
 </worksheet>

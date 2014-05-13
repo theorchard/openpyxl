@@ -10,13 +10,19 @@ Module :mod:`openpyxl.worksheet` -- Worksheet
 .. autoclass:: openpyxl.worksheet.Worksheet
        :members:
 
-Module :mod:`openpyxl.reader.iter_worksheet` -- Optimized reader
-================================================================
+.. autoclass:: openpyxl.worksheet.AutoFilter
+       :members:
 
-.. autoclass:: openpyxl.reader.iter_worksheet.IterableWorksheet
+Module :mod:`.iter_worksheet` -- Optimized reader
+===================================================================
+
+.. autoclass:: openpyxl.worksheet.iter_worksheet.IterableWorksheet
     :members:
 
-.. autoclass:: openpyxl.reader.iter_worksheet.RawCell
+Module :mod:`openpyxl.cell.read_only` -- ReadOnlyCell
+=====================================================
+
+.. autoclass:` openpyxl.cell.read_only.ReadOnlyCell
     :members:
 
 Module :mod:`openpyxl.cell` -- Worksheet Cell
