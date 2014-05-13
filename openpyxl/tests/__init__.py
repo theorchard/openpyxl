@@ -23,9 +23,5 @@ from __future__ import absolute_import
 # @author: see AUTHORS file
 
 import os
-from ..xml import LXML
-
-if not LXML:
-    raise Exception('unable to perform tests if LXML is not available')
 
 KEEP_VBA = os.environ.get("OPENPYXL_KEEP_VBA", "False") == "True"
