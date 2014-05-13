@@ -55,24 +55,24 @@ def get_version():
         return version_match.group(1)
     raise RuntimeError("Unable to find version string.")
 
-setup(name = 'openpyxl',
-    packages = find_packages(),
+setup(name='openpyxl',
+    packages=find_packages(),
     # metadata
-    version = get_version(),
-    description = "A Python library to read/write Excel 2007 xlsx/xlsm files",
-    long_description = README + '\n\n' +  CHANGES,
-    author = __author__,
-    author_email = __author_email__,
-    url = __url__,
-    license = __license__,
-    download_url = __downloadUrl__,
-    requires = [
+    version=get_version(),
+    description="A Python library to read/write Excel 2007 xlsx/xlsm files",
+    long_description=README + '\n\n' + CHANGES,
+    author=__author__,
+    author_email=__author_email__,
+    url=__url__,
+    license=__license__,
+    download_url=__downloadUrl__,
+    requires=[
           'python (>=2.6.0)',
           ],
-    install_requires = [
+    install_requires=[
         'jdcal',
     ],
-    classifiers = ['Development Status :: 4 - Beta',
+    classifiers=['Development Status :: 4 - Beta',
           'Operating System :: MacOS :: MacOS X',
           'Operating System :: Microsoft :: Windows',
           'Operating System :: POSIX',
