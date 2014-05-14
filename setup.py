@@ -21,8 +21,11 @@ them here.
 
 import sys
 import os
+import warnings
 if sys.version_info < (2, 6):
     raise Exception("Python >= 2.6 is required.")
+elif sys.version_info[:2] == (3, 2):
+    warnings.warn("Python 3.2 is no longer officially supported")
 
 from setuptools import setup, Extension, find_packages
 import re
@@ -80,7 +83,6 @@ setup(name='openpyxl',
           'Programming Language :: Python',
           'Programming Language :: Python :: 2.6',
           'Programming Language :: Python :: 2.7',
-          'Programming Language :: Python :: 3.2',
           'Programming Language :: Python :: 3.3',
           'Programming Language :: Python :: 3.4',
           ],
