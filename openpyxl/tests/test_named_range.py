@@ -69,6 +69,15 @@ def test_read_named_ranges(datadir):
         named_ranges = read_named_ranges(content, DummyWB(ws))
         assert ["My Sheeet!$D$8"] == [str(range) for range in named_ranges]
 
+def test_read_named_ranges_missing_sheet(datadir):
+    ws = DummyWS('NOT My Sheeet')
+    datadir.join("reader").chdir()
+
+    with open("workbook.xml") as src:
+        content = src.read()
+        named_ranges = read_named_ranges(content, DummyWB(ws))
+        assert [""] == [str(range) for range in named_ranges]
+
 
 ranges_counts = (
     (4, 'TEST_RANGE'),
