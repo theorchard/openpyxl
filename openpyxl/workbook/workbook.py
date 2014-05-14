@@ -187,25 +187,23 @@ class Workbook(object):
         :type name: string
 
         """
-        requested_sheet = None
-        for sheet in self.worksheets:
-            if sheet.title == name:
-                requested_sheet = sheet
-                break
-        return requested_sheet
+        try:
+            return self[name]
+        except KeyError:
+            return
 
     def __contains__(self, key):
-        return self.get_sheet_by_name(key) and True or False
+        return key in set(sheet.title for sheet in self.worksheets)
 
     def get_index(self, worksheet):
         """Return the index of the worksheet."""
         return self.worksheets.index(worksheet)
 
     def __getitem__(self, key):
-        sheet = self.get_sheet_by_name(key)
-        if sheet is None:
-            raise KeyError("Worksheet {0} does not exist.".format(key))
-        return sheet
+        for sheet in self.worksheets:
+            if sheet.title == key:
+                return sheet
+        raise KeyError("Worksheet {0} does not exist.".format(key))
 
     def __delitem__(self, key):
         sheet = self[key]
