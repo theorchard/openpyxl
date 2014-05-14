@@ -29,6 +29,9 @@ class DummyWB:
         if key == self.ws.title:
             return self.ws
 
+    def get_sheet_names(self):
+        return [self.ws.title]
+
 
 def test_split():
     assert [('My Sheet', '$D$8'), ] == split_named_range("'My Sheet'!$D$8")
