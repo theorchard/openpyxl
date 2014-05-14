@@ -24,26 +24,24 @@ class DummyWB:
 
     def __init__(self, ws):
         self.ws = ws
+        self.worksheets = [ws]
 
     def __getitem__(self, key):
         if key == self.ws.title:
             return self.ws
 
-    def get_sheet_names(self):
-        return [self.ws.title]
-
 
 def test_split():
-    assert [('My Sheet', '$D$8'), ] == split_named_range("'My Sheet'!$D$8")
+    assert [('My Sheet', '$D$8'), ] == list(split_named_range("'My Sheet'!$D$8"))
 
 
 def test_split_no_quotes():
-    assert [('HYPOTHESES', '$B$3:$L$3'), ] == split_named_range('HYPOTHESES!$B$3:$L$3')
+    assert [('HYPOTHESES', '$B$3:$L$3'), ] == list(split_named_range('HYPOTHESES!$B$3:$L$3'))
 
 
 def test_bad_range_name():
     with pytest.raises(NamedRangeException):
-        split_named_range('HYPOTHESES$B$3')
+        list(split_named_range('HYPOTHESES$B$3'))
 
 
 def test_range_name_worksheet_special_chars(datadir):
