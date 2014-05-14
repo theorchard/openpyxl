@@ -51,7 +51,7 @@ You can review the names of all worksheets of the workbook with the
 You can loop through worksheets ::
 
     >>> for sheet in wb:
-    ...     print wb.name
+    ...     print sheet.title
 
 
 Playing with data
