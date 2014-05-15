@@ -45,13 +45,13 @@ using the :func:`openpyxl.workbook.Workbook.get_sheet_by_name` method ::
 You can review the names of all worksheets of the workbook with the
 :func:`openpyxl.workbook.Workbook.get_sheet_names` method ::
 
-    >>> print wb.get_sheet_names()
+    >>> print()wb.get_sheet_names())
     ['Sheet2', 'New Title', 'Sheet1']
 
 You can loop through worksheets ::
 
     >>> for sheet in wb:
-    ...     print sheet.title
+    ...     print(sheet.title)
 
 
 Playing with data
@@ -99,6 +99,7 @@ You can also access a cell using row and column notation::
     will create 100x100 cells in memory, for nothing.
 
     However, there is a way to clean all those unwanted cells, we'll see that later.
+
 
 Accessing many cells
 ++++++++++++++++++++
@@ -169,17 +170,17 @@ Data storage
 Once we have a :class:`openpyxl.cell.Cell`, we can assign it a value::
 
     >>> c.value = 'hello, world'
-    >>> print c.value
+    >>> print(c.value)
     'hello, world'
 
     >>> d.value = 3.14
-    >>> print d.value
+    >>> print(d.value)
     3.14
 
 There is also a neat format detection feature that converts data on the fly::
 
     >>> c.value = '12%'
-    >>> print c.value
+    >>> print(c.value)
     0.12
 
     >>> import datetime
@@ -188,8 +189,9 @@ There is also a neat format detection feature that converts data on the fly::
     datetime.datetime(2010, 9, 10, 22, 25, 18)
 
     >>> c.value = '31.50'
-    >>> print c.value
+    >>> print(c.value)
     31.5
+
 
 Saving to a file
 ================
@@ -213,6 +215,7 @@ The simplest and safest way to save a workbook is by using the
 
     As OOXML files are basically ZIP files, you can also end the filename
     with .zip and open it with your favourite ZIP archive manager.
+
 
 Loading from a file
 ===================

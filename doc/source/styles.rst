@@ -27,26 +27,26 @@ This is what the default `Style` looks like::
                     start_color=Color(index='FFFFFFFF'),
                     end_color=Color(index='FF000000')),
           borders=Borders(left=Border(border_style='none',
-                                      color=Color(index='FF000000')),
+                                      color=Color(rgb='FF000000')),
                           right=Border(border_style='none',
-                                       color=Color(index='FF000000')),
+                                       color=Color(rgb='FF000000')),
                           top=Border(border_style='none',
-                                     color=Color(index='FF000000')),
+                                     color=Color(rgb='FF000000')),
                           bottom=Border(border_style='none',
-                                        color=Color(index='FF000000')),
+                                        color=Color(rgb='FF000000')),
                           diagonal=Border(border_style='none',
-                                          color=Color(index='FF000000')),
+                                          color=Color(rgb='FF000000')),
                           diagonal_direction=0,
                           all_borders=Border(border_style='none',
-                                             color=Color(index='FF000000')),
+                                             color=Color(rgb='FF000000')),
                           outline=Border(border_style='none',
-                                         color=Color(index='FF000000')),
+                                         color=Color(rgb='FF000000')),
                           inside=Border(border_style='none',
-                                        color=Color(index='FF000000')),
+                                        color=Color(rgb='FF000000')),
                           vertical=Border(border_style='none',
-                                          color=Color(index='FF000000')),
+                                          color=Color(rgb='FF000000')),
                           horizontal=Border(border_style='none',
-                                            color=Color(index='FF000000'))),
+                                            color=Color(rgb='FF000000'))),
           alignment=Alignment(horizontal='general',
                               vertical='bottom',
                               text_rotation=0,
@@ -68,15 +68,15 @@ As you can see from the above box, there is a hierarchy between elements::
 
 So if you want to change the color of a Font, you have to redefine a Style, with a new Font, with a new Color::
 
->>> s = Style(font=Font(color=Color(Color.RED)))
+>>> s = Style(font=Font(color=Color(colors.RED)))
 >>> s.font.color = Color.BLUE # this will not work
->>> blue_s = Style(font=Font(color=Color(Color.BLUE)))
+>>> blue_s = Style(font=Font(color=Color(colors.BLUE)))
 
 However, if you have a Font you want to use multiple times, you are allowed to::
 
 >>> from openpyxl.styles import Font, Color
 >>>
->>> ft = Font(color=Color(Color.RED))
+>>> ft = Font(color=Color(colors.RED))
 >>> s1 = Style(font=ft, number_format=NumberFormat('0%'))
 >>> s2 = Style(font=ft, number_format=NumberFormat('dd-mm-yyyy'))
 
@@ -109,10 +109,11 @@ Basic Font Colors
 
 >>> from openpyxl.workbook import Workbook
 >>> from openpyxl.styles import Style, Color, Font
+>>> from openpyxl.colors import RED
 >>> wb = Workbook()
 >>> ws = wb.active
 >>> ws['A1'] = 'This is red'
->>> ws['A1'].styles = Style(font=Font(color=Color(Color.RED)))
+>>> ws['A1'].styles = Style(font=Font(color=Color(RED)))
 
 
 Edit Print Settings
