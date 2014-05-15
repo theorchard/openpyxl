@@ -3,12 +3,6 @@ import pytest
 
 # objects under test
 
-@pytest.fixture
-def NumberFormat():
-    """NumberFormat Class"""
-    from openpyxl.styles import NumberFormat
-    return NumberFormat
-
 
 @pytest.fixture
 def Image():
