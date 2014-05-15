@@ -112,7 +112,7 @@ Basic Font Colors
 >>> wb = Workbook()
 >>> ws = wb.active
 >>> ws['A1'] = 'This is red'
->>> ws['A1'].style = Style(font=Font(color=Color(Color.RED)))
+>>> ws['A1'].styles = Style(font=Font(color=Color(Color.RED)))
 
 
 Edit Print Settings
