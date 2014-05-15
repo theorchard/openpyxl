@@ -144,39 +144,32 @@ def detect_worksheets(archive):
 
 def read_named_ranges(xml_source, workbook):
     """Read named ranges, excluding poorly defined ranges."""
+    sheetnames = set(sheet.title for sheet in workbook.worksheets)
     root = fromstring(xml_source)
-    names_root = root.find('{%s}definedNames' %SHEET_MAIN_NS)
-    existing_sheets = workbook.get_sheet_names()
-    if names_root is not None:
-        for name_node in names_root:
-            range_name = name_node.get('name')
-            node_text = name_node.text or ''
-            if bool(name_node.get("hidden", False)):
+    for name_node in safe_iterator(root, '{%s}definedName' %SHEET_MAIN_NS):
+
+        range_name = name_node.get('name')
+        if DISCARDED_RANGES.search(range_name) or BUGGY_NAMED_RANGES.search(range_name):
+            continue
+
+        node_text = name_node.text
+
+        if node_text is None:
+            named_range = NamedRangeContainingValue(range_name, node_text)
+
+        elif refers_to_range(node_text):
+            destinations = split_named_range(node_text)
+            # it can happen that a valid named range references
+            # a missing worksheet, when Excel didn't properly maintain
+            # the named range list
+            destinations = [(workbook[sheet], cells) for sheet, cells in destinations
+                            if sheet in sheetnames]
+            if not destinations:
                 continue
+            named_range = NamedRange(range_name, destinations)
 
-            if DISCARDED_RANGES.search(range_name) or BUGGY_NAMED_RANGES.search(range_name):
-                continue
+        location_id = name_node.get("localSheetId")
+        if location_id is not None:
+            named_range.scope = workbook.worksheets[int(location_id)]
 
-            if refers_to_range(node_text):
-                destinations = split_named_range(node_text)
-
-                new_destinations = []
-                for worksheet_name, cells_range in destinations:
-                    # it can happen that a valid named range references
-                    # a missing worksheet, when Excel didn't properly maintain
-                    # the named range list
-                    #
-                    # we just ignore them here
-                    if worksheet_name in existing_sheets:
-                        worksheet = workbook[worksheet_name]
-                        new_destinations.append((worksheet, cells_range))
-                if not new_destinations:
-                    continue
-                named_range = NamedRange(range_name, new_destinations)
-            else:
-                named_range = NamedRangeContainingValue(range_name, node_text)
-
-            location_id = name_node.get("localSheetId")
-            if location_id:
-                named_range.scope = workbook.worksheets[int(location_id)]
-            yield named_range
+        yield named_range
