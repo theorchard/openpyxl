@@ -170,7 +170,8 @@ def read_named_ranges(xml_source, workbook):
                     if worksheet_name in existing_sheets:
                         worksheet = workbook[worksheet_name]
                         new_destinations.append((worksheet, cells_range))
-
+                if not new_destinations:
+                    continue
                 named_range = NamedRange(range_name, new_destinations)
             else:
                 named_range = NamedRangeContainingValue(range_name, node_text)
