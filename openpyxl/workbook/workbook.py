@@ -193,13 +193,19 @@ class Workbook(object):
             return
 
     def __contains__(self, key):
-        return key in set(sheet.title for sheet in self.worksheets)
+        return key in set(self.worksheets)
 
     def get_index(self, worksheet):
         """Return the index of the worksheet."""
         return self.worksheets.index(worksheet)
 
     def __getitem__(self, key):
+        """Returns a worksheet by its name.
+
+        :param name: the name of the worksheet to look for
+        :type name: string
+
+        """
         for sheet in self.worksheets:
             if sheet.title == key:
                 return sheet
@@ -213,6 +219,10 @@ class Workbook(object):
         return iter(self.worksheets)
 
     def get_sheet_names(self):
+        return self.sheetnames
+
+    @property
+    def sheetnames(self):
         """Returns the list of the names of worksheets in the workbook.
 
         Names are returned in the worksheets order.
@@ -221,6 +231,7 @@ class Workbook(object):
 
         """
         return [s.title for s in self.worksheets]
+
 
     def create_named_range(self, name, worksheet, range, scope=None):
         """Create a new named_range on a worksheet"""
