@@ -43,22 +43,6 @@ def test_W3CDTF_to_datetime():
     assert W3CDTF_to_datetime(value) == datetime(2013, 3, 4, 12, 19, 1)
 
 
-@pytest.fixture
-def sd():
-    from openpyxl.date_time import SharedDate
-    return SharedDate()
-
-
-@pytest.mark.parametrize("value, expected",
-                         [
-                             (40167, datetime(2009, 12, 20)),
-                             (21980, datetime(1960,  3,  5)),
-                             (40196.5939815, datetime(2010, 1, 18, 14, 15, 20, 1600)),
-                         ])
-def test_convert_date_from_julian(sd, value, expected):
-    assert sd.from_julian(value) == expected
-
-
 @pytest.mark.parametrize("value, expected",
                          [
                              (date(1899, 12, 31), 0),

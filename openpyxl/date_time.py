@@ -63,44 +63,6 @@ def W3CDTF_to_datetime(formatted_string):
     return datetime.datetime(*dt)
 
 
-class SharedDate(object):
-    """Date formatting utilities for Excel with shared state.
-
-    Excel has a two primary date tracking schemes:
-      Windows - Day 1 == 1900-01-01
-      Mac - Day 1 == 1904-01-01
-
-    SharedDate stores which system we are using and converts dates between
-    Python and Excel accordingly.
-
-    """
-    datetime_object_type = 'DateTime'
-
-    def __init__(self,base_date=CALENDAR_WINDOWS_1900):
-        warnings.warn("Use module functions directly fo conversion")
-        if base_date not in (CALENDAR_MAC_1904, CALENDAR_WINDOWS_1900):
-            raise ValueError("base_date:%s invalid" % base_date)
-        else:
-            self.excel_base_date = base_date
-
-    def datetime_to_julian(self, date):
-        """Convert from python datetime to excel julian date representation."""
-
-        if isinstance(date, datetime.datetime):
-            return to_excel(date, self.excel_base_date)
-        elif isinstance(date, datetime.date):
-            return to_excel(date, self.excel_base_date)
-        elif isinstance(date, datetime.time):
-            return time_to_days(date)
-        elif isinstance(date, datetime.timedelta):
-            return timedelta_to_days(date)
-
-    def time_to_julian(self, hours, minutes, seconds):
-        return ((hours * 3600) + (minutes * 60) + seconds) / SECS_PER_DAY
-
-    def from_julian(self, value=0):
-        return from_excel(value, self.excel_base_date)
-
 @lru_cache()
 def to_excel(dt, offset=CALENDAR_WINDOWS_1900):
     jul = sum(gcal2jd(dt.year, dt.month, dt.day)) - offset
