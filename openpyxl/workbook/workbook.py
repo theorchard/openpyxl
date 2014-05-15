@@ -74,26 +74,30 @@ class DocumentSecurity(object):
 class Workbook(object):
     """Workbook is the container for all other parts of the document."""
 
-    def __init__(self, optimized_write=False, encoding='utf-8',
+    _optimized_worksheet_class = DumpWorksheet
+
+    def __init__(self,
+                 optimized_write=False,
+                 encoding='utf-8',
                  worksheet_class=Worksheet,
-                 optimized_worksheet_class=DumpWorksheet,
                  guess_types=False,
-                 data_only=False):
+                 data_only=False,
+                 read_only=False,
+                 write_only=False):
         self.worksheets = []
         self._active_sheet_index = 0
         self._named_ranges = []
         self.properties = DocumentProperties()
         self.style = Style()
         self.security = DocumentSecurity()
-        self.__optimized_write = optimized_write
-        self.__optimized_read = False
+        self.__write_only = write_only or optimized_write
+        self.__read_only = read_only
         self.__thread_local_data = threading.local()
         self.shared_strings = IndexedList()
         self.shared_styles = IndexedList()
         self.shared_styles.add(Style())
         self.loaded_theme = None
         self._worksheet_class = worksheet_class
-        self._optimized_worksheet_class = optimized_worksheet_class
         self.vba_archive = None
         self.style_properties = None
         self._guess_types = guess_types
@@ -103,7 +107,7 @@ class Workbook(object):
 
         self.encoding = encoding
 
-        if not optimized_write:
+        if not self.write_only:
             self.worksheets.append(self._worksheet_class(parent_workbook=self))
 
     def read_workbook_settings(self, xml_source):
@@ -123,8 +127,13 @@ class Workbook(object):
     def excel_base_date(self):
         return self.properties.excel_base_date
 
-    def _set_optimized_read(self):
-        self.__optimized_read = True
+    @property
+    def read_only(self):
+        return self.__read_only
+
+    @property
+    def write_only(self):
+        return self.__write_only
 
     def get_active_sheet(self):
         """Returns the current active sheet."""
@@ -148,12 +157,12 @@ class Workbook(object):
 
         """
 
-        if self.__optimized_read:
+        if self.read_only:
             raise ReadOnlyWorkbookException('Cannot create new sheet in a read-only workbook')
 
-        if self.__optimized_write :
-            new_ws = self._optimized_worksheet_class(
-                parent_workbook=self, title=title)
+        if self.write_only :
+            new_ws = self._optimized_worksheet_class(parent_workbook=self,
+                                                      title=title)
         else:
             if title is not None:
                 new_ws = self._worksheet_class(
@@ -193,7 +202,7 @@ class Workbook(object):
             return
 
     def __contains__(self, key):
-        return key in set(self.worksheets)
+        return key in set(self.sheetnames)
 
     def get_index(self, worksheet):
         """Return the index of the worksheet."""
@@ -266,11 +275,11 @@ class Workbook(object):
         Use this function instead of using an `ExcelWriter`.
 
         .. warning::
-            When creating your workbook using `optimized_write` set to True,
+            When creating your workbook using `write_only` set to True,
             you will only be able to call this function once. Subsequents attempts to
             modify or save the file will raise an :class:`openpyxl.shared.exc.WorkbookAlreadySaved` exception.
         """
-        if self.__optimized_write:
+        if self.write_only:
             save_dump(self, filename)
         else:
             save_workbook(self, filename)

@@ -9,22 +9,22 @@ amounts of data with (near) constant memory consumption.
 Introducing :class:`openpyxl.worksheet.iter_worksheet.IterableWorksheet`::
 
     from openpyxl import load_workbook
-    wb = load_workbook(filename = 'large_file.xlsx', use_iterators = True)
-    ws = wb.get_sheet_by_name(name = 'big_data') # ws is now an IterableWorksheet
+    wb = load_workbook(filename = 'large_file.xlsx', read_only = True)
+    ws = wb['big_data'] # ws is now an IterableWorksheet
 
     for row in ws.iter_rows(): # it brings a new method: iter_rows()
-
         for cell in row:
-
-            print cell.value
+            print(cell.value)
 
 .. warning::
 
-    * :class:`openpyxl.worksheet.iter_worksheet.IterableWorksheet` are read-only
-    * range, rows, columns methods and properties are disabled
+    :class:`openpyxl.worksheet.iter_worksheet.IterableWorksheet` are read-only
+
+    range, rows, columns methods and properties are disabled
 
 Cells returned by iter_rows() are not regular :class:`openpyxl.cell.Cell` but
-:class:`openpyxl.worksheet.iter_worksheet.RawCell`.
+:class:`openpyxl.cell.read_only.ReadOnlyCell`.
+
 
 Optimized writer
 ================
@@ -35,26 +35,32 @@ When you want to dump large amounts of data, you might find optimized writer hel
 
     from openpyxl import Workbook
     from openpyxl.compat import range
-    wb = Workbook(optimized_write = True)
+    wb = Workbook(write_only = True)
 
     ws = wb.create_sheet()
-
     # now we'll fill it with 10k rows x 200 columns
-    for irow in range(10000):
+    for row in range(10000):
         ws.append(['%d' % i for i in range(200)])
-
     wb.save('new_big_file.xlsx') # don't forget to save !
 
-You can also use user-defined styles in this mode, by appending a `tuple` containing the actual value and the style::
+You can also use user-defined styles in this mode, by appending a `tuple`
+containing the actual value and the style::
 
     ws.append([('hello', Style(font=Font(name='Courrier', size=36))), 3.14, None])
 
-This will append one new row with 3 cells, one text cell with custom font and font size, a float and an empty cell that will be discarded anyway.
+This will append one new row with 3 cells, one text cell with custom font and
+font size, a float and an empty cell that will be discarded anyway.
 
 .. warning::
 
-    * Those worksheet only have an append() method, it's not possible to access independent cells directly (through cell() or range()). They are write-only.
-    * It is able to export unlimited amount of data (even more than Excel can handle actually), while keeping memory usage under 10Mb.
-    * A workbook using the optimized writer can only be saved once. After that, every attempt to save the workbook or append() to an existing worksheet will raise an :class:`openpyxl.shared.exc.WorkbookAlreadySaved` exception.
+    Those worksheet only have an append() method, it's not possible to
+    access independent cells directly (through cell() or range()). They are
+    write-only.
 
+    It is able to export unlimited amount of data (even more than Excel can
+    handle actually), while keeping memory usage under 10Mb.
 
+    A workbook using the optimized writer can only be saved once. After
+    that, every attempt to save the workbook or append() to an existing
+    worksheet will raise an :class:`openpyxl.shared.exc.WorkbookAlreadySaved`
+    exception.
