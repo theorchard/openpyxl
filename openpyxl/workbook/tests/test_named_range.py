@@ -5,7 +5,7 @@
 import pytest
 
 # package imports
-from openpyxl.namedrange import split_named_range, NamedRange
+from ..named_range import split_named_range, NamedRange
 from openpyxl.reader.workbook import read_named_ranges
 from openpyxl.exceptions import NamedRangeException
 from openpyxl.reader.excel import load_workbook
@@ -49,7 +49,7 @@ def test_range_name_worksheet_special_chars(datadir):
     ws = DummyWS('My Sheeet with a , and \'')
     wb = DummyWB(ws)
 
-    datadir.join("reader").chdir()
+    datadir.chdir()
     with open('workbook_namedrange.xml') as src:
         content = src.read()
         named_ranges = list(read_named_ranges(content, DummyWB(ws)))
@@ -60,7 +60,7 @@ def test_range_name_worksheet_special_chars(datadir):
 
 def test_read_named_ranges(datadir):
     ws = DummyWS('My Sheeet')
-    datadir.join("reader").chdir()
+    datadir.chdir()
 
     with open("workbook.xml") as src:
         content = src.read()
@@ -69,7 +69,7 @@ def test_read_named_ranges(datadir):
 
 def test_read_named_ranges_missing_sheet(datadir):
     ws = DummyWS('NOT My Sheeet')
-    datadir.join("reader").chdir()
+    datadir.chdir()
 
     with open("workbook.xml") as src:
         content = src.read()
@@ -85,14 +85,14 @@ ranges_counts = (
 @pytest.mark.parametrize("count, range_name", ranges_counts)
 def test_oddly_shaped_named_ranges(datadir, count, range_name):
 
-    datadir.join("genuine").chdir()
+    datadir.chdir()
     wb = load_workbook('merge_range.xlsx')
     ws = wb.worksheets[0]
     assert len(ws.range(range_name)) == count
 
 
 def test_merged_cells_named_range(datadir):
-    datadir.join("genuine").chdir()
+    datadir.chdir()
 
     wb = load_workbook('merge_range.xlsx')
     ws = wb.worksheets[0]

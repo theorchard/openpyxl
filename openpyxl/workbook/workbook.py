@@ -34,7 +34,7 @@ import threading
 from openpyxl.collections import IndexedList
 from openpyxl.worksheet import Worksheet
 from openpyxl.writer.dump_worksheet import DumpWorksheet, save_dump
-from openpyxl.namedrange import NamedRange
+from .named_range import NamedRange
 from openpyxl.styles import Style
 from openpyxl.writer.excel import save_workbook
 from openpyxl.exceptions import ReadOnlyWorkbookException

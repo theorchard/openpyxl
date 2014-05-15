@@ -28,7 +28,7 @@ import datetime
 # package imports
 from openpyxl.workbook import Workbook
 from openpyxl.reader.excel import load_workbook
-from openpyxl.namedrange import NamedRange
+from ..named_range import NamedRange
 from openpyxl.exceptions import ReadOnlyWorkbookException
 
 # test imports

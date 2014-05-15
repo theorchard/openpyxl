@@ -29,7 +29,14 @@ from __future__ import absolute_import
 import re
 
 # compatibility imports
-from openpyxl.compat import range
+from openpyxl.compat import (
+    OrderedDict,
+    unicode,
+    range,
+    basestring,
+    iteritems
+    )
+
 
 # package imports
 import openpyxl.cell
@@ -52,9 +59,7 @@ from openpyxl.units import (
 )
 from openpyxl.styles import Style, DEFAULTS as DEFAULTS_STYLE
 from openpyxl.formatting import ConditionalFormatting
-from openpyxl.namedrange import NamedRangeContainingValue
-from openpyxl.compat import OrderedDict, unicode, range, basestring
-from openpyxl.compat.itertools import iteritems
+from openpyxl.workbook.named_range import NamedRangeContainingValue
 
 from .header_footer import HeaderFooter
 from .relationship import Relationship
