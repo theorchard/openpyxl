@@ -53,3 +53,30 @@ def test_write_borders():
     """
     diff = compare_xml(xml, expected)
     assert diff is None, diff
+
+
+def test_write_font():
+    wb = DummyWorkbook()
+    from openpyxl.styles import Font
+    from openpyxl.styles import Style
+    ft = Font(name='Calibri', charset=204, vertAlign='superscript')
+    st = Style(font=ft)
+    wb.shared_styles = [st]
+
+    writer = StyleWriter(wb)
+    writer._write_fonts()
+    xml = get_xml(writer._root)
+    expected = """<?xml version="1.0"?>
+<styleSheet xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main">
+  <fonts count="1">
+    <font>
+      <sz val="11"/>
+      <color theme="1"/>
+      <name val="Calibri"/>
+      <family val="2"/>
+      <scheme val="minor"/>
+    </font>
+  </fonts>
+</styleSheet>"""
+    diff = compare_xml(xml, expected)
+    assert diff is None, diff
