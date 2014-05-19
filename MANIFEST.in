@@ -1,0 +1,7 @@
+prune openpyxl/tests
+prune openpyxl/sample
+prune openpyxl/benchmarks
+include LICENCE
+include AUTHORS
+include README
+include CHANGES
