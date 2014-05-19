@@ -68,25 +68,29 @@ class StyleWriter(object):
         index = 1
         for st in self.styles:
             if st.font != DEFAULTS.font and st.font not in table:
-                table[st.font] = index
                 font_node = SubElement(fonts, 'font')
-                SubElement(font_node, 'sz', {'val':str(st.font.size)})
-                self._write_color(font_node, st.font.color)
-                SubElement(font_node, 'name', {'val':st.font.name})
-                SubElement(font_node, 'family', {'val': '%d' % st.font.family})
-                # Don't write the 'scheme' element because it appears to prevent
-                # the font name from being applied in Excel.
-                #SubElement(font_node, 'scheme', {'val':'minor'})
-                ConditionalElement(font_node, "b", st.font.bold)
-                ConditionalElement(font_node, "i", st.font.italic)
-                ConditionalElement(font_node, "u",  st.font.underline=='single')
-                ConditionalElement(font_node, "vertAlign", st.font.vertAlign, {'val':st.font.vertAlign})
-                ConditionalElement(font_node, "charset", st.font.charset, {'val':str(st.font.charset)})
-
+                table[st.font] = index
                 index += 1
+                self._write_font(font_node, st.font)
 
         fonts.attrib["count"] = "%d" % index
         return table
+
+
+    def _write_font(self, node, font):
+        SubElement(node, 'sz', {'val':str(font.size)})
+        self._write_color(node, font.color)
+        SubElement(node, 'name', {'val':font.name})
+        SubElement(node, 'family', {'val': '%d' % font.family})
+        # Don't write the 'scheme' element because it appears to prevent
+        # the font name from being applied in Excel.
+        #SubElement(font_node, 'scheme', {'val':'minor'})
+        ConditionalElement(node, "b", font.bold)
+        ConditionalElement(node, "i", font.italic)
+        ConditionalElement(node, "u", font.underline=='single')
+        ConditionalElement(node, "vertAlign", font.vertAlign, {'val':font.vertAlign})
+        ConditionalElement(node, "charset", font.charset, {'val':str(font.charset)})
+
 
     def _write_fills(self):
         fills = SubElement(self._root, 'fills', {'count':'2'})
