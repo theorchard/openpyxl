@@ -71,11 +71,15 @@ class Font(HashableObject):
                   'color',
                   'vertAlign',
                   'charset',
+                  'outline',
+                  'shadow',
+                  'condense',
                   )
 
     def __init__(self, name='Calibri', sz=11, b=False, i=False, charset=None,
                  u=None, strike=False, color=Color(), scheme=None, family=None,
-                 size=None, bold=None, italic=None, strikethrough=None, underline=UNDERLINE_NONE, vertAlign=None):
+                 size=None, bold=None, italic=None, strikethrough=None, underline=UNDERLINE_NONE, vertAlign=None,
+                 outline=None, shadow=None, condense=None):
         self.name = name
         if size is not None:
             sz = size
