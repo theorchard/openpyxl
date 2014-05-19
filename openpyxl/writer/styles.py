@@ -85,8 +85,11 @@ class StyleWriter(object):
         # Don't write the 'scheme' element because it appears to prevent
         # the font name from being applied in Excel.
         #SubElement(font_node, 'scheme', {'val':'minor'})
-        ConditionalElement(node, "b", font.bold)
-        ConditionalElement(node, "i", font.italic)
+
+        # boolean attrs
+        for attr in ("b", "i", "outline", "shadow", "condense"):
+            ConditionalElement(node, attr, getattr(font, attr))
+
         ConditionalElement(node, "u", font.underline=='single')
         ConditionalElement(node, "vertAlign", font.vertAlign, {'val':font.vertAlign})
         ConditionalElement(node, "charset", font.charset, {'val':str(font.charset)})
