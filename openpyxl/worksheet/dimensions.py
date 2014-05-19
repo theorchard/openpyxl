@@ -56,7 +56,8 @@ class RowDimension(Dimension):
                  index=0,
                  height=None,
                  hidden=False,
-                 outline_level=0,
+                 outlineLevel=0,
+                 outline_level=None,
                  collapsed=False,
                  style=None,
                  visible=None):
@@ -64,7 +65,9 @@ class RowDimension(Dimension):
         self.style = style
         if visible is not None:
             hidden = not visible
-        super(RowDimension, self).__init__(index, hidden, outline_level,
+        if outline_level is not None:
+            outlineLevel = outlineLevel
+        super(RowDimension, self).__init__(index, hidden, outlineLevel,
                                            collapsed)
 
 
@@ -88,7 +91,8 @@ class ColumnDimension(Dimension):
                  width=None,
                  bestFit=False,
                  hidden=False,
-                 outline_level=0,
+                 outlineLevel=0,
+                 outline_level=None,
                  collapsed=False,
                  style=None,
                  min=1,
@@ -105,7 +109,9 @@ class ColumnDimension(Dimension):
         if auto_size is not None:
             bestFit = auto_size
         self.bestFit = auto_size
-        super(ColumnDimension, self).__init__(index, hidden, outline_level,
+        if outline_level is not None:
+            outlineLevel = outline_level
+        super(ColumnDimension, self).__init__(index, hidden, outlineLevel,
                                               collapsed)
 
     def __iter__(self):
