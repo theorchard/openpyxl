@@ -14,3 +14,5 @@ class TestFont:
         assert f.strikethrough is False
         assert f.color.value == '00000000'
         assert f.color.type == 'rgb'
+        assert f.vertAlign is None
+        assert f.charset is None
