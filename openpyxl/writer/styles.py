@@ -79,7 +79,8 @@ class StyleWriter(object):
                 #SubElement(font_node, 'scheme', {'val':'minor'})
                 ConditionalElement(font_node, "b", st.font.bold)
                 ConditionalElement(font_node, "i", st.font.italic)
-                ConditionalElement(font_node, "u",  st.font.underline == 'single')
+                ConditionalElement(font_node, "u",  st.font.underline)
+                ConditionalElement(font_node, "vertAlign", st.font.vertAlign)
 
                 index += 1
 

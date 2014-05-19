@@ -54,12 +54,11 @@ class Font(HashableObject):
     shadow = Bool()
     condense = Bool()
     extend = Bool()
-    superscript = Bool()
-    subscript = Bool()
     u = Set(values=set([None, UNDERLINE_DOUBLE, UNDERLINE_NONE,
                         UNDERLINE_DOUBLE_ACCOUNTING, UNDERLINE_SINGLE,
                         UNDERLINE_SINGLE_ACCOUNTING]))
     underline = Alias("u")
+    vertAlign = Set(values=set(['superscript', 'subscript', 'baseline', None]))
     color = Typed(expected_type=Color)
     schema = String(allow_none=True)
 
@@ -72,8 +71,8 @@ class Font(HashableObject):
                   'color')
 
     def __init__(self, name='Calibri', sz=11, b=False, i=False, charset=None,
-                 u=UNDERLINE_NONE, strike=False, color=Color(), scheme=None, family=None,
-                 size=None, bold=None, italic=None, strikethrough=None, underline=None):
+                 u=None, strike=False, color=Color(), scheme=None, family=None,
+                 size=None, bold=None, italic=None, strikethrough=None, underline=None, vertAlign=None):
         self.name = name
         if size is not None:
             sz = size
@@ -91,3 +90,4 @@ class Font(HashableObject):
             strike = strikethrough
         self.strike = strike
         self.color = color
+        self.vertAlign = vertAlign

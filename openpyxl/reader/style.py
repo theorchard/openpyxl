@@ -97,7 +97,6 @@ class SharedStylesParser(object):
             if child is not font_node:
                 tag = localname(child)
                 font[tag] = child.get("val", True)
-
         underline = font_node.find('{%s}u' % SHEET_MAIN_NS)
         if underline is not None:
             font['u'] = underline.get('val', 'single')
