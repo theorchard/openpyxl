@@ -73,7 +73,7 @@ class StyleWriter(object):
                 SubElement(font_node, 'sz', {'val':str(st.font.size)})
                 self._write_color(font_node, st.font.color)
                 SubElement(font_node, 'name', {'val':st.font.name})
-                SubElement(font_node, 'family', {'val':'2'})
+                SubElement(font_node, 'family', {'val': '%d' % st.font.family})
                 # Don't write the 'scheme' element because it appears to prevent
                 # the font name from being applied in Excel.
                 #SubElement(font_node, 'scheme', {'val':'minor'})

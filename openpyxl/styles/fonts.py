@@ -22,7 +22,7 @@ from __future__ import absolute_import
 # @license: http://www.opensource.org/licenses/mit-license.php
 # @author: see AUTHORS file
 
-from openpyxl.descriptors import Strict, Float, Integer, Set, Bool, String, Alias, Typed
+from openpyxl.descriptors import Strict, Float, Integer, Set, Bool, String, Alias, Typed, MinMax
 from .hashable import HashableObject
 from .colors import Color
 
@@ -41,7 +41,7 @@ class Font(HashableObject):
 
     name = String()
     charset = Integer(allow_none=True)
-    family = String(allow_none=True)
+    family = MinMax(min=0, max=14)
     sz = Float()
     size = Alias("sz")
     b = Bool()
@@ -77,10 +77,11 @@ class Font(HashableObject):
                   )
 
     def __init__(self, name='Calibri', sz=11, b=False, i=False, charset=None,
-                 u=None, strike=False, color=Color(), scheme=None, family=None,
+                 u=None, strike=False, color=Color(), scheme=None, family=2,
                  size=None, bold=None, italic=None, strikethrough=None, underline=UNDERLINE_NONE, vertAlign=None,
                  outline=None, shadow=None, condense=None):
         self.name = name
+        self.family = family
         if size is not None:
             sz = size
         self.sz = sz
