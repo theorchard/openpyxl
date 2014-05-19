@@ -60,7 +60,7 @@ class Font(HashableObject):
     underline = Alias("u")
     vertAlign = Set(values=set(['superscript', 'subscript', 'baseline', None]))
     color = Typed(expected_type=Color)
-    schema = String(allow_none=True)
+    scheme = Set(values=(None, "major", "minor"))
 
     __fields__ = ('name',
                   'sz',
@@ -74,12 +74,13 @@ class Font(HashableObject):
                   'outline',
                   'shadow',
                   'condense',
+                  'family',
                   )
 
     def __init__(self, name='Calibri', sz=11, b=False, i=False, charset=None,
-                 u=None, strike=False, color=Color(), scheme=None, family=2,
-                 size=None, bold=None, italic=None, strikethrough=None, underline=UNDERLINE_NONE, vertAlign=None,
-                 outline=False, shadow=False, condense=False):
+                 u=None, strike=False, color=Color(), scheme=None, family=2, size=None,
+                 bold=None, italic=None, strikethrough=None, underline=UNDERLINE_NONE,
+                 vertAlign=None, outline=False, shadow=False, condense=False):
         self.name = name
         self.family = family
         if size is not None:
@@ -103,3 +104,4 @@ class Font(HashableObject):
         self.outline = outline
         self.shadow = shadow
         self.condense = condense
+        self.scheme = scheme

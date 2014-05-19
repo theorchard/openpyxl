@@ -64,11 +64,11 @@ def test_write_font():
     xml = get_xml(writer._root)
     expected = """<?xml version="1.0"?>
 <styleSheet xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main">
+      <vertAlign val="superscript"></vertAlign>
       <sz val="11.0"></sz>
       <color rgb="00000000"></color>
       <name val="Calibri"></name>
       <family val="2"></family>
-      <vertAlign val="superscript"></vertAlign>
       <charset val="204"></charset>
 </styleSheet>
 """
