@@ -312,13 +312,13 @@ def test_data_only(datadir):
         ]
      ),
     ("contains_chartsheets.xlsx", [
-        {'path': 'xl/worksheets/sheet2.xml', 'title': 'moredata'},
         {'path': 'xl/worksheets/sheet1.xml', 'title': 'data'},
+        {'path': 'xl/worksheets/sheet2.xml', 'title': 'moredata'},
         ]),
     ("bug304.xlsx", [
-    {'path': 'xl/worksheets/sheet.xml', 'title': 'Sheet3'},
-    {'path': 'xl/worksheets/sheet2.xml', 'title': 'Sheet2'},
     {'path': 'xl/worksheets/sheet3.xml', 'title': 'Sheet1'},
+    {'path': 'xl/worksheets/sheet2.xml', 'title': 'Sheet2'},
+    {'path': 'xl/worksheets/sheet.xml', 'title': 'Sheet3'},
     ])
 ]
                          )
@@ -326,7 +326,7 @@ def test_detect_worksheets(datadir, excel_file, expected):
     from openpyxl.reader.excel import detect_worksheets
     datadir.join("reader").chdir()
     archive = zipfile.ZipFile(excel_file)
-    assert sorted(detect_worksheets(archive), key=itemgetter("title")) == sorted(expected, key=itemgetter("title"))
+    assert list(detect_worksheets(archive)) == expected
 
 
 @pytest.mark.parametrize("excel_file, expected", [

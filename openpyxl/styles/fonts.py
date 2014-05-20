@@ -22,7 +22,7 @@ from __future__ import absolute_import
 # @license: http://www.opensource.org/licenses/mit-license.php
 # @author: see AUTHORS file
 
-from openpyxl.descriptors import Strict, Float, Integer, Set, Bool, String, Alias, Typed
+from openpyxl.descriptors import Strict, Float, Integer, Set, Bool, String, Alias, Typed, MinMax
 from .hashable import HashableObject
 from .colors import Color
 
@@ -41,7 +41,7 @@ class Font(HashableObject):
 
     name = String()
     charset = Integer(allow_none=True)
-    family = String(allow_none=True)
+    family = MinMax(min=0, max=14)
     sz = Float()
     size = Alias("sz")
     b = Bool()
@@ -54,14 +54,13 @@ class Font(HashableObject):
     shadow = Bool()
     condense = Bool()
     extend = Bool()
-    superscript = Bool()
-    subscript = Bool()
     u = Set(values=set([None, UNDERLINE_DOUBLE, UNDERLINE_NONE,
                         UNDERLINE_DOUBLE_ACCOUNTING, UNDERLINE_SINGLE,
                         UNDERLINE_SINGLE_ACCOUNTING]))
     underline = Alias("u")
+    vertAlign = Set(values=set(['superscript', 'subscript', 'baseline', None]))
     color = Typed(expected_type=Color)
-    schema = String(allow_none=True)
+    scheme = Set(values=(None, "major", "minor"))
 
     __fields__ = ('name',
                   'sz',
@@ -69,12 +68,21 @@ class Font(HashableObject):
                   'i',
                   'u',
                   'strike',
-                  'color')
+                  'color',
+                  'vertAlign',
+                  'charset',
+                  'outline',
+                  'shadow',
+                  'condense',
+                  'family',
+                  )
 
     def __init__(self, name='Calibri', sz=11, b=False, i=False, charset=None,
-                 u=UNDERLINE_NONE, strike=False, color=Color(), scheme=None, family=None,
-                 size=None, bold=None, italic=None, strikethrough=None, underline=None):
+                 u=None, strike=False, color=Color(), scheme=None, family=2, size=None,
+                 bold=None, italic=None, strikethrough=None, underline=UNDERLINE_NONE,
+                 vertAlign=None, outline=False, shadow=False, condense=False):
         self.name = name
+        self.family = family
         if size is not None:
             sz = size
         self.sz = sz
@@ -91,3 +99,9 @@ class Font(HashableObject):
             strike = strikethrough
         self.strike = strike
         self.color = color
+        self.vertAlign = vertAlign
+        self.charset = charset
+        self.outline = outline
+        self.shadow = shadow
+        self.condense = condense
+        self.scheme = scheme

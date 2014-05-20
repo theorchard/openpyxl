@@ -180,8 +180,9 @@ API Documentation
 ------------------
 
 .. toctree::
+    :maxdepth: 2
 
-       api
+    openpyxl
 
 Information for Developers
 --------------------------
