@@ -121,18 +121,6 @@ class StyleWriter(object):
         SubElement(border, 'diagonal')
         return borders
 
-        # others
-        table = {}
-        index = 1
-        for st in self.styles:
-            if st.border != DEFAULTS.border and st.border not in table:
-                table[st.border] = index
-                self._write_border(borders, st.border)
-                index += 1
-
-        borders.attrib["count"] = str(index)
-        return table
-
     def _write_border(self, node, border):
         """Write the child elements for an individual border section"""
         border_node = SubElement(node, 'border', dict(border))
