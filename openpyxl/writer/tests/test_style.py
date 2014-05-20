@@ -74,3 +74,19 @@ def test_write_font():
 """
     diff = compare_xml(xml, expected)
     assert diff is None, diff
+
+
+def test_write_number_formats():
+    wb = DummyWorkbook()
+    from openpyxl.styles import NumberFormat, Style
+    wb.shared_styles = [Style()]
+    writer = StyleWriter(wb)
+    writer._write_number_formats()
+    xml = get_xml(writer._root)
+    expected = """<?xml version="1.0"?>
+<styleSheet xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main">
+  <numFmts count="0"/>
+</styleSheet>
+"""
+    diff = compare_xml(xml, expected)
+    assert diff is None, diff
