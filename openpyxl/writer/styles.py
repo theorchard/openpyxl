@@ -223,7 +223,6 @@ class StyleWriter(object):
         fills_node.attrib["count"] = "%d" % fills_idx
 
 
-
     def _write_alignment(self, node, alignment):
         alignments = {}
 
@@ -246,6 +245,7 @@ class StyleWriter(object):
                 alignments['textRotation'] = '%s' % (90 - alignment.text_rotation)
 
         SubElement(node, 'alignment', alignments)
+
 
     def _write_protection(self, node, protection):
         protections = {}
