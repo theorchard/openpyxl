@@ -276,8 +276,8 @@ def write_worksheet_data(doc, worksheet, string_table, style_table):
                  'spans': '1:%d' % max_column}
         if not row_dimension.visible:
             attrs['hidden'] = '1'
-        if row_dimension.height is not None:
-            attrs['ht'] = str(row_dimension.height)
+        if row_dimension.ht is not None:
+            attrs['ht'] = str(row_dimension.ht)
             attrs['customHeight'] = '1'
         if row_idx in worksheet._styles:
             attrs['s'] = '%d' % worksheet._styles[row_idx]

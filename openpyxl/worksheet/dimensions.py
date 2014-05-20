@@ -22,7 +22,7 @@ class Dimension(Base):
     index = Integer()
     hidden = Bool()
     outlineLevel = Integer(allow_none=True)
-    outline_level = Alias('outlineLevel')
+    #outline_level = Alias('outlineLevel')
     collapsed = Bool()
 
     def __init__(self, index, hidden, outlineLevel,
@@ -48,21 +48,27 @@ class RowDimension(Dimension):
 
     __fields__ = Dimension.__fields__ + ('ht',)
     ht = Float(allow_none=True)
-    height = Alias('ht')
+    #height = Alias('ht')
     s = Integer(allow_none=True)
-    style = Alias('s')
+    #style = Alias('s')
 
     def __init__(self,
                  index=0,
-                 height=None,
+                 ht=None,
+                 s=None,
                  hidden=False,
                  outlineLevel=0,
                  outline_level=None,
                  collapsed=False,
                  style=None,
-                 visible=None):
-        self.height = height
-        self.style = style
+                 visible=None,
+                 height=None):
+        if height is not None:
+            ht = height
+        self.ht = ht
+        if style is not None:
+            s = style
+        self.s = s
         if visible is not None:
             hidden = not visible
         if outline_level is not None:
@@ -76,7 +82,7 @@ class ColumnDimension(Dimension):
 
     width = Float(allow_none=True)
     bestFit = Bool()
-    auto_size = Alias('bestFit')
+    #auto_size = Alias('bestFit')
     collapsed = Bool()
     index = String()
     style = Integer(allow_none=True)
@@ -108,7 +114,7 @@ class ColumnDimension(Dimension):
             hidden = not visible
         if auto_size is not None:
             bestFit = auto_size
-        self.bestFit = auto_size
+        self.bestFit = bestFit
         if outline_level is not None:
             outlineLevel = outline_level
         super(ColumnDimension, self).__init__(index, hidden, outlineLevel,
