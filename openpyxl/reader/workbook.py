@@ -136,8 +136,8 @@ def detect_worksheets(archive):
     valid_sheets = dict((path, ct) for path, ct in content_types if ct == VALID_WORKSHEET)
     rels = dict(read_rels(archive))
     for rId, title in read_sheets(archive):
-        rels[rId]['title'] = title
-    for rel in rels.values():
+        rel = rels[rId]
+        rel['title'] = title
         if "/" + rel['path'] in valid_sheets:
             yield rel
 
