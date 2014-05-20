@@ -211,42 +211,50 @@ class StyleWriter(object):
             node = SubElement(cell_xfs, 'xf', vals)
 
             if st.alignment != DEFAULTS.alignment:
-                alignments = {}
-
-                for align_attr in ['horizontal', 'vertical']:
-                    if getattr(st.alignment, align_attr) != getattr(DEFAULTS.alignment, align_attr):
-                        alignments[align_attr] = getattr(st.alignment, align_attr)
-
-                    if st.alignment.wrap_text != DEFAULTS.alignment.wrap_text:
-                        alignments['wrapText'] = '1'
-
-                    if st.alignment.shrink_to_fit != DEFAULTS.alignment.shrink_to_fit:
-                        alignments['shrinkToFit'] = '1'
-
-                    if st.alignment.indent > 0:
-                        alignments['indent'] = '%s' % st.alignment.indent
-
-                    if st.alignment.text_rotation > 0:
-                        alignments['textRotation'] = '%s' % st.alignment.text_rotation
-                    elif st.alignment.text_rotation < 0:
-                        alignments['textRotation'] = '%s' % (90 - st.alignment.text_rotation)
-
-                SubElement(node, 'alignment', alignments)
+                self._write_alignment(node, st.alignment)
 
             if st.protection != DEFAULTS.protection:
-                protections = {}
+                self._write_protection(node, st.protection)
 
-                if st.protection.locked == Protection.PROTECTION_PROTECTED:
-                    protections['locked'] = '1'
-                elif st.protection.locked == Protection.PROTECTION_UNPROTECTED:
-                    protections['locked'] = '0'
+    def _write_alignment(self, node, alignment):
+        alignments = {}
 
-                if st.protection.hidden == Protection.PROTECTION_PROTECTED:
-                    protections['hidden'] = '1'
-                elif st.protection.hidden == Protection.PROTECTION_UNPROTECTED:
-                    protections['hidden'] = '0'
+        for align_attr in ['horizontal', 'vertical']:
+            if getattr(alignment, align_attr) != getattr(DEFAULTS.alignment, align_attr):
+                alignments[align_attr] = getattr(alignment, align_attr)
 
-                SubElement(node, 'protection', protections)
+            if st.alignment.wrap_text != DEFAULTS.alignment.wrap_text:
+                alignments['wrapText'] = '1'
+
+            if st.alignment.shrink_to_fit != DEFAULTS.alignment.shrink_to_fit:
+                alignments['shrinkToFit'] = '1'
+
+            if st.alignment.indent > 0:
+                alignments['indent'] = '%s' % alignment.indent
+
+            if st.alignment.text_rotation > 0:
+                alignments['textRotation'] = '%s' % alignment.text_rotation
+            elif st.alignment.text_rotation < 0:
+                alignments['textRotation'] = '%s' % (90 - alignment.text_rotation)
+
+        SubElement(node, 'alignment', alignments)
+
+    def _write_protection(self, node, protection):
+        protections = {}
+
+        if protection.locked == Protection.PROTECTION_PROTECTED:
+            protections['locked'] = '1'
+        elif protection.locked == Protection.PROTECTION_UNPROTECTED:
+            protections['locked'] = '0'
+
+        if protection.hidden == Protection.PROTECTION_PROTECTED:
+            protections['hidden'] = '1'
+        elif protection.hidden == Protection.PROTECTION_UNPROTECTED:
+            protections['hidden'] = '0'
+
+        SubElement(node, 'protection', protections)
+
+
 
     def _write_cell_style(self):
         cell_styles = SubElement(self._root, 'cellStyles', {'count':'1'})
