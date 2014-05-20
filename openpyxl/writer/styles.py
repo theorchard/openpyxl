@@ -30,11 +30,11 @@ class StyleWriter(object):
 
     def write_table(self):
         number_format_table = self._write_number_formats()
-        fonts_table = self._write_fonts()
+        fonts_node = self._write_fonts()
         fills_table = self._write_fills()
         borders_table = self._write_borders()
         self._write_cell_style_xfs()
-        self._write_cell_xfs(number_format_table, fonts_table, fills_table, borders_table)
+        self._write_cell_xfs(number_format_table, fonts_node, fills_table, borders_table)
         self._write_cell_style()
         self._write_dxfs()
         self._write_table_styles()
@@ -63,18 +63,7 @@ class StyleWriter(object):
         SubElement(font_node, 'family', {'val':'2'})
         SubElement(font_node, 'scheme', {'val':'minor'})
 
-        # others
-        table = {}
-        index = 1
-        for st in self.styles:
-            if st.font != DEFAULTS.font and st.font not in table:
-                font_node = SubElement(fonts, 'font')
-                table[st.font] = index
-                index += 1
-                self._write_font(font_node, st.font)
-
-        fonts.attrib["count"] = "%d" % index
-        return table
+        return fonts
 
 
     def _write_font(self, node, font):
@@ -171,7 +160,7 @@ class StyleWriter(object):
         xf = SubElement(cell_style_xfs, 'xf',
             {'numFmtId':"0", 'fontId':"0", 'fillId':"0", 'borderId':"0"})
 
-    def _write_cell_xfs(self, number_format_table, fonts_table, fills_table, borders_table):
+    def _write_cell_xfs(self, number_format_table, fonts_node, fills_table, borders_table):
         """ write styles combinations based on ids found in tables """
 
         # writing the cellXfs
@@ -182,13 +171,16 @@ class StyleWriter(object):
         def _get_default_vals():
             return dict(numFmtId='0', fontId='0', fillId='0',
                         xfId='0', borderId='0')
+        fonts_idx = 1
 
         for st in self.styles:
             vals = _get_default_vals()
 
             if st.font != DEFAULTS.font:
-                vals['fontId'] = str(fonts_table[st.font])
+                vals['fontId'] = fonts_idx
                 vals['applyFont'] = '1'
+                fonts_idx += 1
+                self._write_fonts(fonts_node, 'font', st.font)
 
             if st.border != DEFAULTS.border:
                 vals['borderId'] = str(borders_table[st.border])
@@ -215,6 +207,9 @@ class StyleWriter(object):
 
             if st.protection != DEFAULTS.protection:
                 self._write_protection(node, st.protection)
+
+        fonts_node.attrib["count"] = "%d" % fonts_idx
+
 
     def _write_alignment(self, node, alignment):
         alignments = {}
