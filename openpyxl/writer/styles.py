@@ -31,10 +31,10 @@ class StyleWriter(object):
     def write_table(self):
         number_format_table = self._write_number_formats()
         fonts_node = self._write_fonts()
-        fills_table = self._write_fills()
+        fills_node = self._write_fills()
         borders_table = self._write_borders()
         self._write_cell_style_xfs()
-        self._write_cell_xfs(number_format_table, fonts_node, fills_table, borders_table)
+        self._write_cell_xfs(number_format_table, fonts_node, fills_node, borders_table)
         self._write_cell_style()
         self._write_dxfs()
         self._write_table_styles()
@@ -92,22 +92,23 @@ class StyleWriter(object):
         SubElement(fill, 'patternFill', {'patternType':'none'})
         fill = SubElement(fills, 'fill')
         SubElement(fill, 'patternFill', {'patternType':'gray125'})
+        return fills
 
-        table = {}
-        index = 2
-        for st in self.styles:
-            if st.fill != DEFAULTS.fill and st.fill not in table:
+        #table = {}
+        #index = 2
+        #for st in self.styles:
+            #if st.fill != DEFAULTS.fill and st.fill not in table:
 
-                table[st.fill] = index
-                node = SubElement(fills, 'fill')
-                if isinstance(st.fill, PatternFill):
-                    self._write_pattern_fill(node, st.fill)
-                elif isinstance(st.fill, GradientFill):
-                    self._write_gradient_fill(node, st.fill)
-                index += 1
+                #table[st.fill] = index
+                #node = SubElement(fills, 'fill')
+                #if isinstance(st.fill, PatternFill):
+                    #self._write_pattern_fill(node, st.fill)
+                #elif isinstance(st.fill, GradientFill):
+                    #self._write_gradient_fill(node, st.fill)
+                #index += 1
 
-        fills.attrib["count"] = str(index)
-        return table
+        #fills.attrib["count"] = str(index)
+        #return table
 
     def _write_pattern_fill(self, node, fill):
         if fill != DEFAULTS.fill and fill.fill_type is not None:
@@ -160,7 +161,7 @@ class StyleWriter(object):
         xf = SubElement(cell_style_xfs, 'xf',
             {'numFmtId':"0", 'fontId':"0", 'fillId':"0", 'borderId':"0"})
 
-    def _write_cell_xfs(self, number_format_table, fonts_node, fills_table, borders_table):
+    def _write_cell_xfs(self, number_format_table, fonts_node, fills_node, borders_table):
         """ write styles combinations based on ids found in tables """
 
         # writing the cellXfs
@@ -171,24 +172,34 @@ class StyleWriter(object):
         def _get_default_vals():
             return dict(numFmtId='0', fontId='0', fillId='0',
                         xfId='0', borderId='0')
+        _styles = set()
         fonts_idx = 1
+        fills_idx = 2
 
         for st in self.styles:
             vals = _get_default_vals()
 
-            if st.font != DEFAULTS.font:
-                vals['fontId'] = fonts_idx
+            if st.font != DEFAULTS.font and st.font not in _styles:
+                vals['fontId'] = "%d" % fonts_idx
                 vals['applyFont'] = '1'
                 fonts_idx += 1
-                self._write_fonts(fonts_node, 'font', st.font)
+                _styles.add(st.font)
+                self._write_font(fonts_node, st.font)
 
             if st.border != DEFAULTS.border:
                 vals['borderId'] = str(borders_table[st.border])
                 vals['applyBorder'] = '1'
 
-            if st.fill != DEFAULTS.fill:
-                vals['fillId'] = str(fills_table[st.fill])
+            if st.fill != DEFAULTS.fill and st.fill not in _styles:
+                vals['fillId'] =  "%d" % fills_idx
                 vals['applyFill'] = '1'
+                fills_idx += 1
+                _styles.add(st.fill)
+                fill_node = SubElement(fills_node, 'fill')
+                if isinstance(st.fill, PatternFill):
+                    self._write_pattern_fill(fill_node, st.fill)
+                elif isinstance(st.fill, GradientFill):
+                    self._write_gradient_fill(fill_node, st.fill)
 
             if st.number_format != DEFAULTS.number_format:
                 vals['numFmtId'] = '%d' % number_format_table[st.number_format]
@@ -209,6 +220,8 @@ class StyleWriter(object):
                 self._write_protection(node, st.protection)
 
         fonts_node.attrib["count"] = "%d" % fonts_idx
+        fills_node.attrib["count"] = "%d" % fills_idx
+
 
 
     def _write_alignment(self, node, alignment):
@@ -218,18 +231,18 @@ class StyleWriter(object):
             if getattr(alignment, align_attr) != getattr(DEFAULTS.alignment, align_attr):
                 alignments[align_attr] = getattr(alignment, align_attr)
 
-            if st.alignment.wrap_text != DEFAULTS.alignment.wrap_text:
+            if alignment.wrap_text != DEFAULTS.alignment.wrap_text:
                 alignments['wrapText'] = '1'
 
-            if st.alignment.shrink_to_fit != DEFAULTS.alignment.shrink_to_fit:
+            if alignment.shrink_to_fit != DEFAULTS.alignment.shrink_to_fit:
                 alignments['shrinkToFit'] = '1'
 
-            if st.alignment.indent > 0:
+            if alignment.indent > 0:
                 alignments['indent'] = '%s' % alignment.indent
 
-            if st.alignment.text_rotation > 0:
+            if alignment.text_rotation > 0:
                 alignments['textRotation'] = '%s' % alignment.text_rotation
-            elif st.alignment.text_rotation < 0:
+            elif alignment.text_rotation < 0:
                 alignments['textRotation'] = '%s' % (90 - alignment.text_rotation)
 
         SubElement(node, 'alignment', alignments)
