@@ -22,7 +22,7 @@ class Dimension(Base):
     index = Integer()
     hidden = Bool()
     outlineLevel = Integer(allow_none=True)
-    #outline_level = Alias('outlineLevel')
+    outline_level = Alias('outlineLevel')
     collapsed = Bool()
 
     def __init__(self, index, hidden, outlineLevel,
@@ -48,9 +48,9 @@ class RowDimension(Dimension):
 
     __fields__ = Dimension.__fields__ + ('ht',)
     ht = Float(allow_none=True)
-    #height = Alias('ht')
+    height = Alias('ht')
     s = Integer(allow_none=True)
-    #style = Alias('s')
+    style = Alias('s')
 
     def __init__(self,
                  index=0,
@@ -82,7 +82,7 @@ class ColumnDimension(Dimension):
 
     width = Float(allow_none=True)
     bestFit = Bool()
-    #auto_size = Alias('bestFit')
+    auto_size = Alias('bestFit')
     collapsed = Bool()
     index = String()
     style = Integer(allow_none=True)
