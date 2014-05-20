@@ -79,13 +79,18 @@ def test_write_font():
 def test_write_number_formats():
     wb = DummyWorkbook()
     from openpyxl.styles import NumberFormat, Style
-    wb.shared_styles = [Style()]
+    wb.shared_styles = [
+        Style(),
+        Style(number_format=NumberFormat('YYYY'))
+    ]
     writer = StyleWriter(wb)
     writer._write_number_formats()
     xml = get_xml(writer._root)
     expected = """<?xml version="1.0"?>
 <styleSheet xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main">
-  <numFmts count="0"/>
+  <numFmts count="1">
+    <numFmt formatCode="YYYY" numFmtId="165"/>
+  </numFmts>
 </styleSheet>
 """
     diff = compare_xml(xml, expected)
