@@ -183,20 +183,11 @@ class TestStyleWriter(object):
         xml = get_xml(w._root)
         diff = compare_xml(xml, """
         <styleSheet xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main">
-          <borders count="2">
+          <borders>
             <border>
               <left />
               <right />
               <top />
-              <bottom />
-              <diagonal />
-            </border>
-            <border>
-              <left />
-              <right />
-              <top style="thin">
-                <color rgb="0000FF00" />
-              </top>
               <bottom />
               <diagonal />
             </border>
@@ -222,10 +213,9 @@ class TestStyleWriter(object):
     def test_write_cell_xfs(self):
         self.worksheet.cell('A1').style = Style(font=Font(size=12))
         w = StyleWriter(self.workbook)
-        ft = w._write_fonts()
         nft = w._write_number_formats()
-        fills = Element('fills')
-        w._write_cell_xfs(nft, ft, fills, {})
+        fonts = borders = fills = Element('empty')
+        w._write_cell_xfs(nft, fonts, fills, borders)
         xml = get_xml(w._root)
         assert 'applyFont="1"' in xml
         assert 'applyFill="1"' not in xml
@@ -237,8 +227,8 @@ class TestStyleWriter(object):
         self.worksheet.cell('A1').style = st
         w = StyleWriter(self.workbook)
         nft = w._write_number_formats()
-        fonts = fills = Element("empty")
-        w._write_cell_xfs(nft, fonts, fills, {})
+        fonts = borders = fills = Element('empty')
+        w._write_cell_xfs(nft, fonts, fills, borders)
         xml = get_xml(w._root)
         assert 'applyAlignment="1"' in xml
         assert 'horizontal="center"' in xml
@@ -250,8 +240,8 @@ class TestStyleWriter(object):
         self.worksheet.cell('A3').style = Style(alignment=Alignment(text_rotation=-34))
         w = StyleWriter(self.workbook)
         nft = w._write_number_formats()
-        fonts = fills = Element("empty")
-        w._write_cell_xfs(nft,fonts, fills, {})
+        fonts = borders = fills = Element('empty')
+        w._write_cell_xfs(nft,fonts, fills, borders)
         xml = get_xml(w._root)
         assert 'textRotation="90"' in xml
         assert 'textRotation="135"' in xml
@@ -264,8 +254,8 @@ class TestStyleWriter(object):
         self.worksheet.cell('A3').style = Style(alignment=Alignment(indent=-1))
         w = StyleWriter(self.workbook)
         nft = w._write_number_formats()
-        fonts = fills = Element("empty")
-        w._write_cell_xfs(nft, fonts, fills, {})
+        fonts = borders = fills = Element('empty')
+        w._write_cell_xfs(nft, fonts, fills, borders)
         xml = get_xml(w._root)
         assert 'indent="1"' in xml
         assert 'indent="4"' in xml
@@ -353,8 +343,8 @@ class TestStyleWriter(object):
                                                                       hidden=Protection.PROTECTION_UNPROTECTED))
         w = StyleWriter(self.workbook)
         nft = w._write_number_formats()
-        fonts = fills = Element("empty")
-        w._write_cell_xfs(nft, fonts, fills, {})
+        fonts = borders = fills = Element('empty')
+        w._write_cell_xfs(nft, fonts, fills, borders)
         xml = get_xml(w._root)
         assert 'protection' in xml
         assert 'locked="0"' in xml

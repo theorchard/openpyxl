@@ -32,9 +32,9 @@ class StyleWriter(object):
         number_format_table = self._write_number_formats()
         fonts_node = self._write_fonts()
         fills_node = self._write_fills()
-        borders_table = self._write_borders()
+        borders_node = self._write_borders()
         self._write_cell_style_xfs()
-        self._write_cell_xfs(number_format_table, fonts_node, fills_node, borders_table)
+        self._write_cell_xfs(number_format_table, fonts_node, fills_node, borders_node)
         self._write_cell_style()
         self._write_dxfs()
         self._write_table_styles()
@@ -94,22 +94,6 @@ class StyleWriter(object):
         SubElement(fill, 'patternFill', {'patternType':'gray125'})
         return fills
 
-        #table = {}
-        #index = 2
-        #for st in self.styles:
-            #if st.fill != DEFAULTS.fill and st.fill not in table:
-
-                #table[st.fill] = index
-                #node = SubElement(fills, 'fill')
-                #if isinstance(st.fill, PatternFill):
-                    #self._write_pattern_fill(node, st.fill)
-                #elif isinstance(st.fill, GradientFill):
-                    #self._write_gradient_fill(node, st.fill)
-                #index += 1
-
-        #fills.attrib["count"] = str(index)
-        #return table
-
     def _write_pattern_fill(self, node, fill):
         if fill != DEFAULTS.fill and fill.fill_type is not None:
             node = SubElement(node, 'patternFill', {'patternType':
@@ -135,6 +119,7 @@ class StyleWriter(object):
         SubElement(border, 'top')
         SubElement(border, 'bottom')
         SubElement(border, 'diagonal')
+        return borders
 
         # others
         table = {}
@@ -161,7 +146,7 @@ class StyleWriter(object):
         xf = SubElement(cell_style_xfs, 'xf',
             {'numFmtId':"0", 'fontId':"0", 'fillId':"0", 'borderId':"0"})
 
-    def _write_cell_xfs(self, number_format_table, fonts_node, fills_node, borders_table):
+    def _write_cell_xfs(self, number_format_table, fonts_node, fills_node, borders_node):
         """ write styles combinations based on ids found in tables """
 
         # writing the cellXfs
@@ -175,6 +160,7 @@ class StyleWriter(object):
         _styles = set()
         fonts_idx = 1
         fills_idx = 2
+        borders_idx = 1
 
         for st in self.styles:
             vals = _get_default_vals()
@@ -186,9 +172,12 @@ class StyleWriter(object):
                 _styles.add(st.font)
                 self._write_font(fonts_node, st.font)
 
-            if st.border != DEFAULTS.border:
-                vals['borderId'] = str(borders_table[st.border])
+            if st.border != DEFAULTS.border and st.border not in _styles:
+                vals['borderId'] = borders_idx
                 vals['applyBorder'] = '1'
+                borders_idx += 1
+                _styles.add(st.border)
+                self._write_border(borders_node, st.border)
 
             if st.fill != DEFAULTS.fill and st.fill not in _styles:
                 vals['fillId'] =  "%d" % fills_idx
@@ -220,6 +209,7 @@ class StyleWriter(object):
                 self._write_protection(node, st.protection)
 
         fonts_node.attrib["count"] = "%d" % fonts_idx
+        borders_node.attrib["count"] = "%d" % borders_idx
         fills_node.attrib["count"] = "%d" % fills_idx
 
 
