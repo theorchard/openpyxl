@@ -29,7 +29,7 @@ Handling Shared and Array Formulae
 
 class SharedFormula(object):
 
-    __slots__ = ('range', 'key', 'expression')
+    #__slots__ = ('range', 'key', 'expression')
 
     def __init__(self, range, key, expression):
         self.range = range
@@ -52,10 +52,13 @@ class SharedFormula(object):
 
 # Creating - first incidence
 
-if key not in ws.formula_attributes:
-    shared = SharedFormula(range, key, expression)
-    ws.formula_attributes[key] = shared
-else:
-    # expression already stored
-    pass
-cell.value = ws.formula_attributes[key].expression
+
+if __name__ == "__main__":
+
+    if 'key' not in ws.formula_attributes:
+        shared = SharedFormula(range, key, expression)
+        ws.formula_attributes[key] = shared
+    else:
+        # expression already stored
+        pass
+    cell.value = ws.formula_attributes[key].expression
