@@ -321,6 +321,7 @@ class DumpCommentWriter(CommentWriter):
 
 
 class ExcelDumpWriter(ExcelWriter):
+
     def __init__(self, workbook):
         self.workbook = workbook
         self.style_writer = StyleWriter(workbook)
