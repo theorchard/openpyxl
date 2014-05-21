@@ -32,5 +32,5 @@ def test_parse_col_dimensions(datadir):
             cols = safe_iterator(tag, '{%s}col' % SHEET_MAIN_NS)
             for col in cols:
                 parser.parse_column_dimensions(col)
-    assert ws.column_dimensions.keys() == set(['A', 'C', 'E', 'I', 'G'])
+    assert set(ws.column_dimensions.keys()) == set(['A', 'C', 'E', 'I', 'G'])
     assert ws.column_dimensions['A'].width == 31.1640625
