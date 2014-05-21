@@ -78,10 +78,9 @@ def test_write_font():
 
 def test_complex_styles(datadir):
     """Hold on to your hats"""
-    import os
     from openpyxl import load_workbook
-    pth = os.path.join("openpyxl", "reader", "tests", "data", "complex-styles.xlsx")
-    wb = load_workbook(pth)
+    datadir.join("..", "..", "..", "reader", "tests", "data").chdir()
+    wb = load_workbook("complex-styles.xlsx")
 
     datadir.chdir()
     with open("complex-styles.xml") as reference:
