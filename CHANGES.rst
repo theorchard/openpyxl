@@ -9,6 +9,7 @@ Major changes
 Minor changes
 -------------
 Create all style tags in a single pass
+Preserve column widths
 
 
 2.0.2 (2013-05-13)
