@@ -168,6 +168,23 @@ class TestStyleWriter(object):
         w = StyleWriter(self.workbook)
         assert len(w.styles) == 7
 
+
+    def test_default_xfs(self):
+        w = StyleWriter(self.workbook)
+        fonts = nft = borders = fills = DummyElement()
+        w._write_cell_xfs(nft, fonts, fills, borders)
+        xml = get_xml(w._root)
+        expected = """
+        <styleSheet xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main">
+        <cellXfs count="1">
+          <xf borderId="0" fillId="0" fontId="0" numFmtId="0" xfId="0"/>
+        </cellXfs>
+        </styleSheet>
+        """
+        diff = compare_xml(xml, expected)
+        assert diff is None, diff
+
+
     def test_fonts(self):
         st = Style(font=Font(size=12, bold=True))
         self.worksheet.cell('A1').style = st
@@ -388,7 +405,7 @@ class TestStyleWriter(object):
         expected = """
         <styleSheet xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main">
           <protection hidden="0" locked="0"/>
-          <cellXfs count="3">
+          <cellXfs count="2">
             <xf borderId="0" fillId="0" fontId="0" numFmtId="0" xfId="0"/>
             <xf applyProtection="1" borderId="0" fillId="0" fontId="0" numFmtId="0" xfId="0">
               <protection hidden="0" locked="0"/>
