@@ -83,14 +83,13 @@ class ColumnDimension(Dimension):
     width = Float(allow_none=True)
     bestFit = Bool()
     auto_size = Alias('bestFit')
-    collapsed = Bool()
     index = String()
     style = Integer(allow_none=True)
     min = Integer()
     max = Integer()
     customWidth = Bool()
 
-    __fields__ = Dimension.__fields__ + ('width', 'bestFit', 'customWidth', 'collapsed')
+    __fields__ = Dimension.__fields__ + ('width', 'bestFit', 'customWidth')
 
     def __init__(self,
                  index='A',
