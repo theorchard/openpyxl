@@ -198,7 +198,7 @@ class TestStyleWriter(object):
         assert """fontId="1" """ in xml
 
         expected = """
-        <fonts count="1">
+        <fonts count="2">
         <font>
             <sz val="12.0" />
             <color rgb="00000000"></color>
@@ -446,3 +446,20 @@ class TestCreateStyle(object):
             xml = self.writer.write_table()
             diff = compare_xml(xml, reference_file.read())
             assert diff is None, diff
+
+
+def test_complex_styles(datadir):
+    """Hold on to your hats"""
+    import os
+    from openpyxl import load_workbook
+    print(os.getcwd())
+    pth = os.path.join("..", "..", "..", "reader", "tests", "data", "complex-styles.xlsx")
+    wb = load_workbook(pth)
+
+    datadir.chdir()
+    with open("complex-styles.xml") as reference:
+        writer = StyleWriter(wb)
+        xml = writer.write_table()
+        expected = reference.read()
+        diff = compare_xml(xml, expected)
+        assert diff is None, diff

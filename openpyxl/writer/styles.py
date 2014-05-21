@@ -147,49 +147,65 @@ class StyleWriter(object):
         def _get_default_vals():
             return dict(numFmtId='0', fontId='0', fillId='0',
                         xfId='0', borderId='0')
+
         _fonts = IndexedList()
         _fills = IndexedList()
         _borders = IndexedList()
         _custom_fmts = IndexedList()
-        fonts_idx = 1
-        fills_idx = 2
-        borders_idx = 1
-        fmt_id = 0
 
         for st in self.styles:
             vals = _get_default_vals()
 
-            if st.font != DEFAULTS.font:
-                fonts_idx = _fonts.add(st.font) + 1
-                vals['fontId'] = "%d" % fonts_idx
+            font = st.font
+            if font != DEFAULTS.font:
+                # There is one default font
+                if font not in _fonts:
+                    font_id = _fonts.add(font)
+                    self._write_font(fonts_node, st.font)
+                else:
+                    font_id = _fonts.index(font)
+                vals['fontId'] = "%d" % (font_id + 1)
                 vals['applyFont'] = '1'
-                self._write_font(fonts_node, st.font)
 
+            border = st.border
             if st.border != DEFAULTS.border:
-                borders_idx = _borders.add(st.border) + 1
-                vals['borderId'] = "%d" % borders_idx
+                # There is one default border
+                if border not in _borders:
+                    border_id = _borders.add(border) + 1
+                    self._write_border(borders_node, border)
+                else:
+                    border_id = _borders.index(border)
+                vals['borderId'] = "%d" % (border_id + 1)
                 vals['applyBorder'] = '1'
-                self._write_border(borders_node, st.border)
 
-            if st.fill != DEFAULTS.fill:
-                fills_idx = _fills.add(st.fill) + 2
-                vals['fillId'] =  "%d" % fills_idx
+
+            fill = st.fill
+            if fill != DEFAULTS.fill:
+                # There are two default fills
+                if fill not in _fills:
+                    fill_id = _fills.add(st.fill)
+                else:
+                    fill_id = _fills.index(fill)
+                vals['fillId'] =  "%d" % fill_id
                 vals['applyFill'] = '1'
                 fill_node = SubElement(fills_node, 'fill')
-                if isinstance(st.fill, PatternFill):
-                    self._write_pattern_fill(fill_node, st.fill)
-                elif isinstance(st.fill, GradientFill):
-                    self._write_gradient_fill(fill_node, st.fill)
 
-            if st.number_format != DEFAULTS.number_format:
-                nf = st.number_format
+                if isinstance(fill, PatternFill):
+                    self._write_pattern_fill(fill_node, fill)
+                elif isinstance(fill, GradientFill):
+                    self._write_gradient_fill(fill_node, fill)
+
+            nf = st.number_format
+            if nf != DEFAULTS.number_format:
                 fmt_id = nf.builtin_format_id(nf.format_code)
                 if fmt_id is None:
-                    fmt_id = _custom_fmts.add(nf) + 165
-                    self._write_number_format(number_format_node, fmt_id, nf.format_code)
+                    if nf not in _custom_fmts:
+                        fmt_id = _custom_fmts.add(nf) + 165
+                        self._write_number_format(number_format_node, fmt_id, nf.format_code)
+                    else:
+                        fmt_id = _custom_fmts.index(nf)
                 vals['numFmtId'] = '%d' % fmt_id
                 vals['applyNumberFormat'] = '1'
-
 
             if st.alignment != DEFAULTS.alignment:
                 vals['applyAlignment'] = '1'
@@ -205,9 +221,9 @@ class StyleWriter(object):
             if st.protection != DEFAULTS.protection:
                 self._write_protection(node, st.protection)
 
-        fonts_node.attrib["count"] = "%d" % fonts_idx
-        borders_node.attrib["count"] = "%d" % borders_idx
-        fills_node.attrib["count"] = "%d" % fills_idx
+        fonts_node.attrib["count"] = "%d" % (len(_fonts) + 1)
+        borders_node.attrib["count"] = "%d" % (len(_borders) + 1)
+        fills_node.attrib["count"] = "%d" % (len(_fills) + 2)
         number_format_node.attrib['count'] = '%d' % len(_custom_fmts)
 
     def _write_number_format(self, node, fmt_id, format_code):
