@@ -185,7 +185,7 @@ class TestStyleWriter(object):
         assert diff is None, diff
 
 
-    def test_fonts(self):
+    def test_xfs_fonts(self):
         st = Style(font=Font(size=12, bold=True))
         self.worksheet.cell('A1').style = st
         w = StyleWriter(self.workbook)
@@ -213,47 +213,77 @@ class TestStyleWriter(object):
         assert diff is None, diff
 
 
-    def test_fills(self):
-        st = Style(fill=PatternFill(fill_type='solid',
-                             start_color=Color(colors.DARKYELLOW)))
+    def test_xfs_fills(self):
+        st = Style(fill=PatternFill(
+            fill_type='solid',
+            start_color=Color(colors.DARKYELLOW))
+                   )
         self.worksheet.cell('A1').style = st
         w = StyleWriter(self.workbook)
-        w._write_fills()
+        nft = borders = fonts = DummyElement()
+        fills = Element("fills")
+        w._write_cell_xfs(nft, fonts, fills, borders)
+
         xml = get_xml(w._root)
-        diff = compare_xml(xml, """
-        <styleSheet xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main">
-          <fills count="2">
-            <fill>
-              <patternFill patternType="none" />
-            </fill>
-            <fill>
-              <patternFill patternType="gray125" />
-            </fill>
-          </fills>
+        expected = """ <styleSheet xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main">
+        <cellXfs count="2">
+          <xf borderId="0" fillId="0" fontId="0" numFmtId="0" xfId="0"/>
+          <xf applyFill="1" borderId="0" fillId="0" fontId="0" numFmtId="0" xfId="0"/>
+        </cellXfs>
         </styleSheet>
-        """)
+        """
+        diff = compare_xml(xml, expected)
         assert diff is None, diff
 
-    def test_borders(self):
+        expected = """<fills count="3">
+            <fill>
+              <patternFill patternType="solid">
+                <fgColor rgb="0000FF00"></fgColor>
+               </patternFill>
+            </fill>
+          </fills>
+        """
+        xml = get_xml(fills)
+        diff = compare_xml(xml, expected)
+        assert diff is None, diff
+
+
+    def test_xfs_borders(self):
         st = Style(border=Border(top=Side(border_style=borders.BORDER_THIN,
                                               color=Color(colors.DARKYELLOW))))
         self.worksheet.cell('A1').style = st
         w = StyleWriter(self.workbook)
-        w._write_borders()
+        fonts = nft = fills = DummyElement()
+        border_node = Element("borders")
+        w._write_cell_xfs(nft, fonts, fills, border_node)
+
         xml = get_xml(w._root)
-        diff = compare_xml(xml, """
+        expected = """
         <styleSheet xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main">
-          <borders>
+        <cellXfs count="2">
+          <xf borderId="0" fillId="0" fontId="0" numFmtId="0" xfId="0"/>
+          <xf applyBorder="1" borderId="2" fillId="0" fontId="0" numFmtId="0" xfId="0"/>
+        </cellXfs>
+        </styleSheet>
+        """
+        diff = compare_xml(xml, expected)
+        assert diff is None, diff
+
+        xml = get_xml(border_node)
+        expected = """
+          <borders count="2">
             <border>
               <left />
               <right />
-              <top />
+              <top style="thin">
+                <color rgb="0000FF00"></color>
+              </top>
               <bottom />
               <diagonal />
             </border>
           </borders>
-        </styleSheet>
-        """)
+        """
+        diff = compare_xml(xml, expected)
         assert diff is None, diff
 
     @pytest.mark.parametrize("value, expected",
