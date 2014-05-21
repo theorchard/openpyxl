@@ -184,16 +184,16 @@ class StyleWriter(object):
                 # There are two default fills
                 if fill not in _fills:
                     fill_id = _fills.add(st.fill)
+                    fill_node = SubElement(fills_node, 'fill')
+                    if isinstance(fill, PatternFill):
+                        self._write_pattern_fill(fill_node, fill)
+                    elif isinstance(fill, GradientFill):
+                        self._write_gradient_fill(fill_node, fill)
                 else:
                     fill_id = _fills.index(fill)
                 vals['fillId'] =  "%d" % fill_id
                 vals['applyFill'] = '1'
-                fill_node = SubElement(fills_node, 'fill')
 
-                if isinstance(fill, PatternFill):
-                    self._write_pattern_fill(fill_node, fill)
-                elif isinstance(fill, GradientFill):
-                    self._write_gradient_fill(fill_node, fill)
 
             nf = st.number_format
             if nf != DEFAULTS.number_format:
