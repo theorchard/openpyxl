@@ -132,11 +132,11 @@ def test_write_number_formats():
     writer = StyleWriter(wb)
     writer._write_number_format(writer._root, 0, "YYYY")
     xml = get_xml(writer._root)
-    expected = """<?xml version="1.0"?>
-<styleSheet xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main">
-       <numFmt formatCode="YYYY" numFmtId="165"></numFmt>
-</styleSheet>
-"""
+    expected = """
+    <styleSheet xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main">
+           <numFmt formatCode="YYYY" numFmtId="165"></numFmt>
+    </styleSheet>
+    """
     diff = compare_xml(xml, expected)
     assert diff is None, diff
 
@@ -395,27 +395,27 @@ class TestStyleWriter(object):
         w = StyleWriter(self.workbook)
         w._write_protection(w._root, prot)
         xml = get_xml(w._root)
-        expected = """<?xml version="1.0"?>
-<styleSheet xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main">
-  <protection hidden="0" locked="0"/>
-</styleSheet>
-        """
+        expected = """
+        <styleSheet xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main">
+          <protection hidden="0" locked="0"/>
+        </styleSheet>
+                """
         diff = compare_xml(xml, expected)
         assert diff is None, diff
 
         nft = fonts = borders = fills = Element('empty')
         w._write_cell_xfs(nft, fonts, fills, borders)
         xml = get_xml(w._root)
-        expected = """<?xml version="1.0"?>
-<styleSheet xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main">
-  <protection hidden="0" locked="0"/>
-  <cellXfs count="3">
-    <xf borderId="0" fillId="0" fontId="0" numFmtId="0" xfId="0"/>
-    <xf applyProtection="1" borderId="0" fillId="0" fontId="0" numFmtId="0" xfId="0">
-      <protection hidden="0" locked="0"/>
-    </xf>
-  </cellXfs>
-</styleSheet>
+        expected = """
+        <styleSheet xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main">
+          <protection hidden="0" locked="0"/>
+          <cellXfs count="3">
+            <xf borderId="0" fillId="0" fontId="0" numFmtId="0" xfId="0"/>
+            <xf applyProtection="1" borderId="0" fillId="0" fontId="0" numFmtId="0" xfId="0">
+              <protection hidden="0" locked="0"/>
+            </xf>
+          </cellXfs>
+        </styleSheet>
         """
         diff = compare_xml(xml, expected)
         assert diff is None, diff
