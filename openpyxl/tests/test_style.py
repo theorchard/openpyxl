@@ -80,9 +80,13 @@ class TestCreateStyle(object):
     def test_create_style_table(self):
         assert len(self.writer.styles) == 5
 
-    @pytest.mark.xfail
-    def test_write_style_table(self):
-        reference_file = os.path.join(DATADIR, 'writer', 'expected', 'simple-styles.xml')
+    def test_write_style_table(self, datadir):
+        datadir.join("writer").join("expected").chdir()
+        with open('simple-styles.xml') as reference_file:
+            xml = self.writer.write_table()
+            diff = compare_xml(xml, reference_file.read())
+            assert diff is None, diff
+
 
 class TestStyleWriter(object):
 
