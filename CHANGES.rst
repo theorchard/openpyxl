@@ -1,6 +1,15 @@
 2.1.0 (unreleased)
 ==================
 
+Major changes
+-------------
+"read_only" and "write_only" new flags for workbooks
+
+
+Minor changes
+-------------
+Create all style tags in a single pass
+
 
 2.0.2 (2013-05-13)
 2.0.1 (2013-05-13) # brown bag
