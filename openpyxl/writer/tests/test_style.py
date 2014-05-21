@@ -142,12 +142,6 @@ class TestStyleWriter(object):
         w = StyleWriter(self.workbook)
         assert len(w.styles) == 7
 
-    def test_style_unicity(self):
-        for i in range(1, 6):
-            self.worksheet.cell(row=1, column=i).style = Style(font=Font(bold=True))
-        w = StyleWriter(self.workbook)
-        assert len(w.styles) == 2
-
     def test_fonts(self):
         st = Style(font=Font(size=12, bold=True))
         self.worksheet.cell('A1').style = st
@@ -168,6 +162,12 @@ class TestStyleWriter(object):
         </styleSheet>
         """)
         assert diff is None, diff
+
+        nft = fonts = borders = fills = Element('empty')
+        w._write_cell_xfs(nft, fonts, fills, borders)
+        xml = get_xml(w._root)
+        assert """applyFont="1" """ in xml
+
 
     def test_fonts_with_underline(self):
         st = Style(font=Font(size=12, bold=True,
@@ -190,6 +190,12 @@ class TestStyleWriter(object):
         </styleSheet>
         """)
         assert diff is None, diff
+
+        nft = fonts = borders = fills = Element('empty')
+        w._write_cell_xfs(nft, fonts, fills, borders)
+        xml = get_xml(w._root)
+        assert """applyFont="1" """ in xml
+
 
     def test_fills(self):
         st = Style(fill=PatternFill(fill_type='solid',
@@ -248,16 +254,6 @@ class TestStyleWriter(object):
         assert root.find('color') is not None
         assert root.find('color').attrib == expected
 
-    def test_write_cell_xfs(self):
-        self.worksheet.cell('A1').style = Style(font=Font(size=12))
-        w = StyleWriter(self.workbook)
-        nft = fonts = borders = fills = Element('empty')
-        w._write_cell_xfs(nft, fonts, fills, borders)
-        xml = get_xml(w._root)
-        assert 'applyFont="1"' in xml
-        assert 'applyFill="1"' not in xml
-        assert 'applyBorder="1"' not in xml
-        assert 'applyAlignment="1"' not in xml
 
     def test_alignment(self):
         st = Style(alignment=Alignment(horizontal='center', vertical='center'))
@@ -269,6 +265,7 @@ class TestStyleWriter(object):
         assert 'applyAlignment="1"' in xml
         assert 'horizontal="center"' in xml
         assert 'vertical="center"' in xml
+
 
     def test_alignment_rotation(self):
         self.worksheet.cell('A1').style = Style(alignment=Alignment(vertical='center', text_rotation=90))
