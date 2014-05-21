@@ -25,6 +25,8 @@ def ws(Workbook):
 @pytest.fixture
 def datadir():
     """DATADIR as a LocalPath"""
-    from openpyxl.tests.helper import DATADIR
+    import os
     from py._path.local import LocalPath
+    here = os.path.split(__file__)[0]
+    DATADIR = os.path.join(here, "test_data")
     return LocalPath(DATADIR)
