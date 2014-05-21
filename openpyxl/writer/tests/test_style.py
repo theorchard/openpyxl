@@ -373,9 +373,20 @@ class TestStyleWriter(object):
         assert diff is None, diff
 
     def test_protection(self):
-        self.worksheet.cell('A1').style = Style(protection=Protection(locked=Protection.PROTECTION_UNPROTECTED,
-                                                                      hidden=Protection.PROTECTION_UNPROTECTED))
+        prot = Protection(locked=Protection.PROTECTION_UNPROTECTED,
+                          hidden=Protection.PROTECTION_UNPROTECTED)
+        self.worksheet.cell('A1').style = Style(protection=prot)
         w = StyleWriter(self.workbook)
+        w._write_protection(w._root, prot)
+        xml = get_xml(w._root)
+        expected = """<?xml version="1.0"?>
+<styleSheet xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main">
+  <protection hidden="0" locked="0"/>
+</styleSheet>
+        """
+        diff = compare_xml(xml, expected)
+        assert diff is None, diff
+
         nft = fonts = borders = fills = Element('empty')
         w._write_cell_xfs(nft, fonts, fills, borders)
         xml = get_xml(w._root)
