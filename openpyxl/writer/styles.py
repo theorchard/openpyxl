@@ -67,6 +67,7 @@ class StyleWriter(object):
 
 
     def _write_font(self, node, font):
+        node = SubElement(node, "font")
         # if present vertAlign has to be at the start otherwise Excel has a problem
         ConditionalElement(node, "vertAlign", font.vertAlign, {'val':font.vertAlign})
         SubElement(node, 'sz', {'val':str(font.size)})

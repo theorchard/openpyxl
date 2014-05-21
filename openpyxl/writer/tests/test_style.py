@@ -88,16 +88,18 @@ def test_write_font():
     writer = StyleWriter(wb)
     writer._write_font(writer._root, ft)
     xml = get_xml(writer._root)
-    expected = """<?xml version="1.0"?>
-<styleSheet xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main">
-      <vertAlign val="superscript"></vertAlign>
-      <sz val="11.0"></sz>
-      <color rgb="00000000"></color>
-      <name val="Calibri"></name>
-      <family val="2"></family>
-      <charset val="204"></charset>
-</styleSheet>
-"""
+    expected = """
+    <styleSheet xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main">
+        <font>
+          <vertAlign val="superscript"></vertAlign>
+          <sz val="11.0"></sz>
+          <color rgb="00000000"></color>
+          <name val="Calibri"></name>
+          <family val="2"></family>
+          <charset val="204"></charset>
+         </font>
+    </styleSheet>
+    """
     diff = compare_xml(xml, expected)
     assert diff is None, diff
 
@@ -146,19 +148,17 @@ class TestStyleWriter(object):
         st = Style(font=Font(size=12, bold=True))
         self.worksheet.cell('A1').style = st
         w = StyleWriter(self.workbook)
-        w._write_fonts()
+        w._write_font(w._root, st.font)
         xml = get_xml(w._root)
         diff = compare_xml(xml, """
         <styleSheet xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main">
-          <fonts>
-            <font>
-              <sz val="11" />
-              <color theme="1" />
-              <name val="Calibri" />
-              <family val="2" />
-              <scheme val="minor" />
-            </font>
-          </fonts>
+        <font>
+            <sz val="12.0" />
+            <color rgb="00000000"></color>
+            <name val="Calibri" />
+            <family val="2" />
+            <b></b>
+        </font>
         </styleSheet>
         """)
         assert diff is None, diff
@@ -170,23 +170,25 @@ class TestStyleWriter(object):
 
 
     def test_fonts_with_underline(self):
-        st = Style(font=Font(size=12, bold=True,
-                             underline=Font.UNDERLINE_SINGLE))
+        st = Style(font=Font(
+            size=12,
+            bold=True,
+            underline=Font.UNDERLINE_SINGLE)
+                   )
         self.worksheet.cell('A1').style = st
         w = StyleWriter(self.workbook)
-        w._write_fonts()
+        w._write_font(w._root, st.font)
         xml = get_xml(w._root)
         diff = compare_xml(xml, """
         <styleSheet xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main">
-          <fonts>
-            <font>
-              <sz val="11" />
-              <color theme="1" />
-              <name val="Calibri" />
-              <family val="2" />
-              <scheme val="minor" />
-            </font>
-          </fonts>
+        <font>
+          <sz val="12.0"></sz>
+          <color rgb="00000000"></color>
+          <name val="Calibri"></name>
+          <family val="2"></family>
+          <b></b>
+          <u></u>
+        </font>
         </styleSheet>
         """)
         assert diff is None, diff
