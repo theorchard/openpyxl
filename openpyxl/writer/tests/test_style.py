@@ -74,3 +74,19 @@ def test_write_font():
 """
     diff = compare_xml(xml, expected)
     assert diff is None, diff
+
+
+def test_complex_styles(datadir):
+    """Hold on to your hats"""
+    import os
+    from openpyxl import load_workbook
+    pth = os.path.join("openpyxl", "reader", "tests", "data", "complex-styles.xlsx")
+    wb = load_workbook(pth)
+
+    datadir.chdir()
+    with open("complex-styles.xml") as reference:
+        writer = StyleWriter(wb)
+        xml = writer.write_table()
+        expected = reference.read()
+        diff = compare_xml(xml, expected)
+        assert diff is None, diff
