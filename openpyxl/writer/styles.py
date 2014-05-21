@@ -4,13 +4,15 @@ from __future__ import absolute_import
 """Write the shared style table."""
 
 # package imports
+
+from openpyxl.compat import safe_string
+from openpyxl.collections import IndexedList
 from openpyxl.xml.functions import (
     Element,
     SubElement,
     ConditionalElement,
     get_document_content,
     )
-from openpyxl.compat import safe_string
 from openpyxl.xml.constants import SHEET_MAIN_NS
 
 from openpyxl.styles import DEFAULTS, Protection
@@ -137,7 +139,6 @@ class StyleWriter(object):
 
     def _write_cell_xfs(self, number_format_node, fonts_node, fills_node, borders_node):
         """ write styles combinations based on ids found in tables """
-        from openpyxl.collections import IndexedList
         # writing the cellXfs
         cell_xfs = SubElement(self._root, 'cellXfs',
             {'count':'%d' % (len(self.styles) + 1)})
