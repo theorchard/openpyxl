@@ -213,8 +213,7 @@ class TestStyleWriter(object):
     def test_write_cell_xfs(self):
         self.worksheet.cell('A1').style = Style(font=Font(size=12))
         w = StyleWriter(self.workbook)
-        nft = w._write_number_formats()
-        fonts = borders = fills = Element('empty')
+        nft = fonts = borders = fills = Element('empty')
         w._write_cell_xfs(nft, fonts, fills, borders)
         xml = get_xml(w._root)
         assert 'applyFont="1"' in xml
@@ -226,8 +225,7 @@ class TestStyleWriter(object):
         st = Style(alignment=Alignment(horizontal='center', vertical='center'))
         self.worksheet.cell('A1').style = st
         w = StyleWriter(self.workbook)
-        nft = w._write_number_formats()
-        fonts = borders = fills = Element('empty')
+        nft = fonts = borders = fills = Element('empty')
         w._write_cell_xfs(nft, fonts, fills, borders)
         xml = get_xml(w._root)
         assert 'applyAlignment="1"' in xml
@@ -239,8 +237,7 @@ class TestStyleWriter(object):
         self.worksheet.cell('A2').style = Style(alignment=Alignment(vertical='center', text_rotation=135))
         self.worksheet.cell('A3').style = Style(alignment=Alignment(text_rotation=-34))
         w = StyleWriter(self.workbook)
-        nft = w._write_number_formats()
-        fonts = borders = fills = Element('empty')
+        nft = fonts = borders = fills = Element('empty')
         w._write_cell_xfs(nft,fonts, fills, borders)
         xml = get_xml(w._root)
         assert 'textRotation="90"' in xml
@@ -253,8 +250,7 @@ class TestStyleWriter(object):
         self.worksheet.cell('A3').style = Style(alignment=Alignment(indent=0))
         self.worksheet.cell('A3').style = Style(alignment=Alignment(indent=-1))
         w = StyleWriter(self.workbook)
-        nft = w._write_number_formats()
-        fonts = borders = fills = Element('empty')
+        nft = fonts = borders = fills = Element('empty')
         w._write_cell_xfs(nft, fonts, fills, borders)
         xml = get_xml(w._root)
         assert 'indent="1"' in xml
@@ -342,8 +338,7 @@ class TestStyleWriter(object):
         self.worksheet.cell('A1').style = Style(protection=Protection(locked=Protection.PROTECTION_UNPROTECTED,
                                                                       hidden=Protection.PROTECTION_UNPROTECTED))
         w = StyleWriter(self.workbook)
-        nft = w._write_number_formats()
-        fonts = borders = fills = Element('empty')
+        nft = fonts = borders = fills = Element('empty')
         w._write_cell_xfs(nft, fonts, fills, borders)
         xml = get_xml(w._root)
         assert 'protection' in xml

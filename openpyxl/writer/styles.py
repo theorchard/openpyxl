@@ -29,12 +29,12 @@ class StyleWriter(object):
         return self.workbook.shared_styles
 
     def write_table(self):
-        number_format_table = self._write_number_formats()
+        number_format_node = SubElement(self._root, 'numFmts')
         fonts_node = self._write_fonts()
         fills_node = self._write_fills()
         borders_node = self._write_borders()
         self._write_cell_style_xfs()
-        self._write_cell_xfs(number_format_table, fonts_node, fills_node, borders_node)
+        self._write_cell_xfs(number_format_node, fonts_node, fills_node, borders_node)
         self._write_cell_style()
         self._write_dxfs()
         self._write_table_styles()
@@ -134,9 +134,9 @@ class StyleWriter(object):
         xf = SubElement(cell_style_xfs, 'xf',
             {'numFmtId':"0", 'fontId':"0", 'fillId':"0", 'borderId':"0"})
 
-    def _write_cell_xfs(self, number_format_table, fonts_node, fills_node, borders_node):
+    def _write_cell_xfs(self, number_format_node, fonts_node, fills_node, borders_node):
         """ write styles combinations based on ids found in tables """
-
+        from openpyxl.collections import IndexedList
         # writing the cellXfs
         cell_xfs = SubElement(self._root, 'cellXfs',
             {'count':'%d' % (len(self.styles) + 1)})
@@ -149,25 +149,27 @@ class StyleWriter(object):
         fonts_idx = 1
         fills_idx = 2
         borders_idx = 1
+        custom_fmts = IndexedList()
+        fmt_id = 0
 
         for st in self.styles:
             vals = _get_default_vals()
 
-            if st.font != DEFAULTS.font and st.font not in _styles:
+            if st.font != DEFAULTS.font:
                 vals['fontId'] = "%d" % fonts_idx
                 vals['applyFont'] = '1'
                 fonts_idx += 1
                 _styles.add(st.font)
                 self._write_font(fonts_node, st.font)
 
-            if st.border != DEFAULTS.border and st.border not in _styles:
-                vals['borderId'] = borders_idx
+            if st.border != DEFAULTS.border:
+                vals['borderId'] = "%d" % borders_idx
                 vals['applyBorder'] = '1'
                 borders_idx += 1
                 _styles.add(st.border)
                 self._write_border(borders_node, st.border)
 
-            if st.fill != DEFAULTS.fill and st.fill not in _styles:
+            if st.fill != DEFAULTS.fill:
                 vals['fillId'] =  "%d" % fills_idx
                 vals['applyFill'] = '1'
                 fills_idx += 1
@@ -179,8 +181,14 @@ class StyleWriter(object):
                     self._write_gradient_fill(fill_node, st.fill)
 
             if st.number_format != DEFAULTS.number_format:
-                vals['numFmtId'] = '%d' % number_format_table[st.number_format]
+                nf = st.number_format
+                fmt_id = nf.builtin_format_id(nf.format_code)
+                if fmt_id is None:
+                    fmt_id = custom_fmts.add(nf)
+                    self._write_number_format(number_format_node, fmt_id, nf.format_code)
+                vals['numFmtId'] = '%d' % fmt_id
                 vals['applyNumberFormat'] = '1'
+
 
             if st.alignment != DEFAULTS.alignment:
                 vals['applyAlignment'] = '1'
@@ -199,6 +207,13 @@ class StyleWriter(object):
         fonts_node.attrib["count"] = "%d" % fonts_idx
         borders_node.attrib["count"] = "%d" % borders_idx
         fills_node.attrib["count"] = "%d" % fills_idx
+        number_format_node.attrib['count'] = '%d' % fmt_id
+
+    def _write_number_format(self, node, fmt_id, format_code):
+        fmt_node = SubElement(node, 'numFmt',
+                              {'numFmtId':'%d' % (fmt_id + 165),
+                               'formatCode':'%s' % format_code}
+                              )
 
 
     def _write_alignment(self, node, alignment):
@@ -296,37 +311,3 @@ class StyleWriter(object):
         table_styles = SubElement(self._root, 'tableStyles',
             {'count':'0', 'defaultTableStyle':'TableStyleMedium9',
             'defaultPivotStyle':'PivotStyleLight16'})
-
-    def _write_number_formats(self):
-
-        number_format_table = {}
-
-        number_format_list = []
-        exceptions_list = []
-        num_fmt_id = 165 # start at a greatly higher value as any builtin can go
-        num_fmt_offset = 0
-
-        for style in self.styles:
-
-            if not style.number_format in number_format_list  :
-                number_format_list.append(style.number_format)
-
-        for number_format in number_format_list:
-
-            if number_format.is_builtin():
-                btin = number_format.builtin_format_id(number_format.format_code)
-                number_format_table[number_format] = btin
-            else:
-                number_format_table[number_format] = num_fmt_id + num_fmt_offset
-                num_fmt_offset += 1
-                exceptions_list.append(number_format)
-
-        num_fmts = SubElement(self._root, 'numFmts',
-            {'count':'%d' % len(exceptions_list)})
-
-        for number_format in exceptions_list :
-            SubElement(num_fmts, 'numFmt',
-                {'numFmtId':'%d' % number_format_table[number_format],
-                'formatCode':'%s' % number_format.format_code})
-
-        return number_format_table
