@@ -90,7 +90,7 @@ class ColumnDimension(Dimension):
     max = Integer()
     customWidth = Bool()
 
-    __fields__ = Dimension.__fields__ + ('width', 'bestFit')
+    __fields__ = Dimension.__fields__ + ('width', 'bestFit', 'customWidth', 'collapsed')
 
     def __init__(self,
                  index='A',
@@ -107,6 +107,9 @@ class ColumnDimension(Dimension):
                  visible=None,
                  auto_size=None):
         self.width = width
+        if width is not None:
+            customWidth = True
+        self.customWidth = customWidth
         self.style = style
         self.min = min
         self.max = max
@@ -117,6 +120,7 @@ class ColumnDimension(Dimension):
         self.bestFit = bestFit
         if outline_level is not None:
             outlineLevel = outline_level
+        self.collapsed = collapsed
         super(ColumnDimension, self).__init__(index, hidden, outlineLevel,
                                               collapsed)
 
