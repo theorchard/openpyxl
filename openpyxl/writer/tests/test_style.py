@@ -141,7 +141,7 @@ def test_write_number_formats():
     xml = get_xml(writer._root)
     expected = """
     <styleSheet xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main">
-           <numFmt formatCode="YYYY" numFmtId="165"></numFmt>
+           <numFmt formatCode="YYYY" numFmtId="0"></numFmt>
     </styleSheet>
     """
     diff = compare_xml(xml, expected)
@@ -440,7 +440,6 @@ class TestCreateStyle(object):
     def test_create_style_table(self):
         assert len(self.writer.styles) == 5
 
-    @pytest.mark.xfail
     def test_write_style_table(self, datadir):
         datadir.chdir()
         with open('simple-styles.xml') as reference_file:

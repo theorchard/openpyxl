@@ -151,7 +151,7 @@ class StyleWriter(object):
         _fills = IndexedList()
         _borders = IndexedList()
         _custom_fmts = IndexedList()
-        fonts_idx = 0
+        fonts_idx = 1
         fills_idx = 2
         borders_idx = 1
         fmt_id = 0
@@ -185,7 +185,7 @@ class StyleWriter(object):
                 nf = st.number_format
                 fmt_id = nf.builtin_format_id(nf.format_code)
                 if fmt_id is None:
-                    fmt_id = _custom_fmts.add(nf)
+                    fmt_id = _custom_fmts.add(nf) + 165
                     self._write_number_format(number_format_node, fmt_id, nf.format_code)
                 vals['numFmtId'] = '%d' % fmt_id
                 vals['applyNumberFormat'] = '1'
@@ -208,11 +208,11 @@ class StyleWriter(object):
         fonts_node.attrib["count"] = "%d" % fonts_idx
         borders_node.attrib["count"] = "%d" % borders_idx
         fills_node.attrib["count"] = "%d" % fills_idx
-        number_format_node.attrib['count'] = '%d' % fmt_id
+        number_format_node.attrib['count'] = '%d' % len(_custom_fmts)
 
     def _write_number_format(self, node, fmt_id, format_code):
         fmt_node = SubElement(node, 'numFmt',
-                              {'numFmtId':'%d' % (fmt_id + 165),
+                              {'numFmtId':'%d' % (fmt_id),
                                'formatCode':'%s' % format_code}
                               )
 
