@@ -195,6 +195,7 @@ class TestStyleWriter(object):
         w._write_cell_xfs(nft, fonts, fills, borders)
         xml = get_xml(w._root)
         assert """applyFont="1" """ in xml
+        assert """fontId="1" """ in xml
 
         expected = """
         <fonts count="1">
