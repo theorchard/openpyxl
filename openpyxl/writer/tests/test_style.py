@@ -390,9 +390,19 @@ class TestStyleWriter(object):
         nft = fonts = borders = fills = Element('empty')
         w._write_cell_xfs(nft, fonts, fills, borders)
         xml = get_xml(w._root)
-        assert 'protection' in xml
-        assert 'locked="0"' in xml
-        assert 'hidden="0"' in xml
+        expected = """<?xml version="1.0"?>
+<styleSheet xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main">
+  <protection hidden="0" locked="0"/>
+  <cellXfs count="3">
+    <xf borderId="0" fillId="0" fontId="0" numFmtId="0" xfId="0"/>
+    <xf applyProtection="1" borderId="0" fillId="0" fontId="0" numFmtId="0" xfId="0">
+      <protection hidden="0" locked="0"/>
+    </xf>
+  </cellXfs>
+</styleSheet>
+        """
+        diff = compare_xml(xml, expected)
+        assert diff is None, diff
 
 
 class TestCreateStyle(object):
