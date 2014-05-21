@@ -145,35 +145,34 @@ class StyleWriter(object):
         def _get_default_vals():
             return dict(numFmtId='0', fontId='0', fillId='0',
                         xfId='0', borderId='0')
-        _styles = set()
-        fonts_idx = 1
+        _fonts = IndexedList()
+        _fills = IndexedList()
+        _borders = IndexedList()
+        _custom_fmts = IndexedList()
+        fonts_idx = 0
         fills_idx = 2
         borders_idx = 1
-        custom_fmts = IndexedList()
         fmt_id = 0
 
         for st in self.styles:
             vals = _get_default_vals()
 
             if st.font != DEFAULTS.font:
+                fonts_idx = _fonts.add(st.font) + 1
                 vals['fontId'] = "%d" % fonts_idx
                 vals['applyFont'] = '1'
-                fonts_idx += 1
-                _styles.add(st.font)
                 self._write_font(fonts_node, st.font)
 
             if st.border != DEFAULTS.border:
+                borders_idx = _borders.add(st.border) + 1
                 vals['borderId'] = "%d" % borders_idx
                 vals['applyBorder'] = '1'
-                borders_idx += 1
-                _styles.add(st.border)
                 self._write_border(borders_node, st.border)
 
             if st.fill != DEFAULTS.fill:
+                fills_idx = _fills.add(st.fill) + 2
                 vals['fillId'] =  "%d" % fills_idx
                 vals['applyFill'] = '1'
-                fills_idx += 1
-                _styles.add(st.fill)
                 fill_node = SubElement(fills_node, 'fill')
                 if isinstance(st.fill, PatternFill):
                     self._write_pattern_fill(fill_node, st.fill)
@@ -184,7 +183,7 @@ class StyleWriter(object):
                 nf = st.number_format
                 fmt_id = nf.builtin_format_id(nf.format_code)
                 if fmt_id is None:
-                    fmt_id = custom_fmts.add(nf)
+                    fmt_id = _custom_fmts.add(nf)
                     self._write_number_format(number_format_node, fmt_id, nf.format_code)
                 vals['numFmtId'] = '%d' % fmt_id
                 vals['applyNumberFormat'] = '1'
