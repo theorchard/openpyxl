@@ -35,6 +35,12 @@ from openpyxl.xml.functions import Element
 from openpyxl.tests.helper import get_xml, compare_xml
 
 
+class DummyElement:
+
+    def __init__(self):
+        self.attrib = {}
+
+
 class DummyWorkbook:
 
     style_properties = []
@@ -101,7 +107,7 @@ def test_write_borders():
 def test_write_font():
     wb = DummyWorkbook()
     from openpyxl.styles import Font
-    ft = Font(name='Calibri', charset=204, vertAlign='superscript')
+    ft = Font(name='Calibri', charset=204, vertAlign='superscript', underline=Font.UNDERLINE_SINGLE)
     writer = StyleWriter(wb)
     writer._write_font(writer._root, ft)
     xml = get_xml(writer._root)
@@ -113,6 +119,7 @@ def test_write_font():
           <color rgb="00000000"></color>
           <name val="Calibri"></name>
           <family val="2"></family>
+          <u></u>
           <charset val="204"></charset>
          </font>
     </styleSheet>
@@ -165,10 +172,15 @@ class TestStyleWriter(object):
         st = Style(font=Font(size=12, bold=True))
         self.worksheet.cell('A1').style = st
         w = StyleWriter(self.workbook)
-        w._write_font(w._root, st.font)
+
+        nft = borders = fills = DummyElement()
+        fonts = Element("fonts")
+        w._write_cell_xfs(nft, fonts, fills, borders)
         xml = get_xml(w._root)
-        diff = compare_xml(xml, """
-        <styleSheet xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main">
+        assert """applyFont="1" """ in xml
+
+        expected = """
+        <fonts count="1">
         <font>
             <sz val="12.0" />
             <color rgb="00000000"></color>
@@ -176,44 +188,11 @@ class TestStyleWriter(object):
             <family val="2" />
             <b></b>
         </font>
-        </styleSheet>
-        """)
+        </fonts>
+        """
+        xml = get_xml(fonts)
+        diff = compare_xml(xml, expected)
         assert diff is None, diff
-
-        nft = fonts = borders = fills = Element('empty')
-        w._write_cell_xfs(nft, fonts, fills, borders)
-        xml = get_xml(w._root)
-        assert """applyFont="1" """ in xml
-
-
-    def test_fonts_with_underline(self):
-        st = Style(font=Font(
-            size=12,
-            bold=True,
-            underline=Font.UNDERLINE_SINGLE)
-                   )
-        self.worksheet.cell('A1').style = st
-        w = StyleWriter(self.workbook)
-        w._write_font(w._root, st.font)
-        xml = get_xml(w._root)
-        diff = compare_xml(xml, """
-        <styleSheet xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main">
-        <font>
-          <sz val="12.0"></sz>
-          <color rgb="00000000"></color>
-          <name val="Calibri"></name>
-          <family val="2"></family>
-          <b></b>
-          <u></u>
-        </font>
-        </styleSheet>
-        """)
-        assert diff is None, diff
-
-        nft = fonts = borders = fills = Element('empty')
-        w._write_cell_xfs(nft, fonts, fills, borders)
-        xml = get_xml(w._root)
-        assert """applyFont="1" """ in xml
 
 
     def test_fills(self):
