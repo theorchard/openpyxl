@@ -401,10 +401,9 @@ class DumpStyleWriter(StyleWriter):
         index = 1
         for st in self.styles:
             if st.font != DEFAULTS.font and st.font not in table:
-                font_node = SubElement(fonts, 'font')
                 table[st.font] = index
                 index += 1
-                self._write_font(font_node, st.font)
+                self._write_font(fonts, st.font)
 
         fonts.attrib["count"] = "%d" % index
         return table
