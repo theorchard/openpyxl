@@ -61,6 +61,23 @@ def test_write_gradient_fill():
     assert diff is None, diff
 
 
+def test_write_pattern_fill():
+    fill = PatternFill(fill_type='solid',
+                       start_color=Color(colors.DARKYELLOW))
+    writer = StyleWriter(DummyWorkbook())
+    writer._write_pattern_fill(writer._root, fill)
+    xml = get_xml(writer._root)
+    expected = """<?xml version="1.0" ?>
+<styleSheet xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main">
+  <patternFill patternType="solid">
+     <fgColor rgb="0000FF00" />
+  </patternFill>
+</styleSheet>
+    """
+    diff = compare_xml(xml, expected)
+    assert diff is None, diff
+
+
 def test_write_borders():
     borders = Border()
     writer = StyleWriter(DummyWorkbook())
