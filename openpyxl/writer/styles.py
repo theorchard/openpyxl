@@ -158,30 +158,28 @@ class StyleWriter(object):
 
             font = st.font
             if font != DEFAULTS.font:
-                # There is one default font
                 if font not in _fonts:
                     font_id = _fonts.add(font)
                     self._write_font(fonts_node, st.font)
                 else:
                     font_id = _fonts.index(font)
-                vals['fontId'] = "%d" % (font_id + 1)
+                vals['fontId'] = "%d" % (font_id + 1) # There is one default font
+
                 vals['applyFont'] = '1'
 
             border = st.border
             if st.border != DEFAULTS.border:
-                # There is one default border
                 if border not in _borders:
-                    border_id = _borders.add(border) + 1
+                    border_id = _borders.add(border)
                     self._write_border(borders_node, border)
                 else:
                     border_id = _borders.index(border)
-                vals['borderId'] = "%d" % (border_id + 1)
+                vals['borderId'] = "%d" % (border_id + 1) # There is one default border
                 vals['applyBorder'] = '1'
 
 
             fill = st.fill
             if fill != DEFAULTS.fill:
-                # There are two default fills
                 if fill not in _fills:
                     fill_id = _fills.add(st.fill)
                     fill_node = SubElement(fills_node, 'fill')
@@ -191,9 +189,8 @@ class StyleWriter(object):
                         self._write_gradient_fill(fill_node, fill)
                 else:
                     fill_id = _fills.index(fill)
-                vals['fillId'] =  "%d" % fill_id
+                vals['fillId'] =  "%d" % (fill_id + 2) # There are two default fills
                 vals['applyFill'] = '1'
-
 
             nf = st.number_format
             if nf != DEFAULTS.number_format:
