@@ -21,8 +21,6 @@ from __future__ import absolute_import
 #
 # @license: http://www.opensource.org/licenses/mit-license.php
 # @author: see AUTHORS file
-from __future__ import absolute_import
-
 from tempfile import NamedTemporaryFile
 
 from .strings import (
@@ -51,3 +49,25 @@ try:
     from collections import OrderedDict
 except ImportError:
     from .odict import OrderedDict
+
+import warnings
+from functools import wraps
+
+
+class deprecated(object):
+    def __init__(self, reason):
+        self.reason = reason
+
+    def __call__(self, f, *args, **kwargs):
+        @wraps(f)
+        def new_func(*args, **kwargs):
+            msg = "Call to deprecated function {} ({})".format(f.__name__,
+                                                               self.reason)
+            warnings.warn_explicit(
+                '{}.'.format(msg),
+                category=UserWarning,
+                filename=f.func_code.co_filename,
+                lineno=f.func_code.co_firstlineno + 1
+            )
+            return f(*args, **kwargs)
+        return new_func

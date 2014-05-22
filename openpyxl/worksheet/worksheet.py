@@ -35,7 +35,7 @@ from openpyxl.compat import (
     range,
     basestring,
     iteritems
-    )
+    , deprecated)
 
 
 # package imports
@@ -167,7 +167,11 @@ class Worksheet(object):
     def encoding(self):
         return self._parent.encoding
 
+    @deprecated('this method is private and should not be called directly')
     def garbage_collect(self):
+        self._garbage_collect()
+
+    def _garbage_collect(self):
         """Delete cells that are not storing a value."""
         delete_list = []
         for coordinate, cell in iteritems(self._cells):
@@ -194,13 +198,17 @@ class Worksheet(object):
         if self.bad_title_char_re.search(value):
             msg = 'Invalid character found in sheet title'
             raise SheetTitleException(msg)
-        value = self.unique_sheet_name(value)
+        value = self._unique_sheet_name(value)
         if len(value) > 31:
             msg = 'Maximum 31 characters allowed in sheet title'
             raise SheetTitleException(msg)
         self._title = value
 
+    @deprecated('this method is private and should not be called directly')
     def unique_sheet_name(self, value):
+        return self._unique_sheet_name(value)
+
+    def _unique_sheet_name(self, value):
         # check if sheet_name already exists
         # do this *before* length check
         sheets = self._parent.get_sheet_names()
@@ -442,7 +450,11 @@ class Worksheet(object):
             raise ValueError("Values should be %s or %s" % (self.ORIENTATION_PORTRAIT, self.ORIENTATION_LANDSCAPE))
         self.page_setup.orientation = orientation
 
+    @deprecated('this method is private and should not be called directly')
     def create_relationship(self, rel_type):
+        return self._create_relationship(rel_type)
+
+    def _create_relationship(self, rel_type):
         """Add a relationship for this sheet."""
         rel = Relationship(rel_type)
         self.relationships.append(rel)

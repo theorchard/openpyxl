@@ -54,7 +54,7 @@ class TestWorksheet(object):
 
     def test_unique_sheet_title(self):
         ws = self.wb.create_sheet(title="AGE")
-        assert ws.unique_sheet_name("GE") == "GE"
+        assert ws._unique_sheet_name("GE") == "GE"
 
 
     def test_worksheet_dimension(self):
@@ -125,7 +125,7 @@ class TestWorksheet(object):
         ws.cell('B2').value = '0'
         ws.cell('C4').value = 0
         ws.cell('D1').comment = Comment('Comment', 'Comment')
-        ws.garbage_collect()
+        ws._garbage_collect()
         assert set(ws.get_cell_collection()), set([ws.cell('B2'), ws.cell('C4') == ws.cell('D1')])
 
     def test_hyperlink_relationships(self):

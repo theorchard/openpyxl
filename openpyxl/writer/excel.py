@@ -98,7 +98,7 @@ class ExcelWriter(object):
 
     def _write_string_table(self, archive):
         for ws in self.workbook.worksheets:
-            ws.garbage_collect()
+            ws._garbage_collect()
         self.shared_strings = create_string_table(self.workbook)
         archive.writestr(ARC_SHARED_STRINGS,
                 write_string_table(self.shared_strings))

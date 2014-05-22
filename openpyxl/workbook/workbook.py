@@ -41,6 +41,7 @@ from openpyxl.exceptions import ReadOnlyWorkbookException
 from openpyxl.date_time import CALENDAR_WINDOWS_1900
 from openpyxl.xml.functions import fromstring
 from openpyxl.xml.constants import SHEET_MAIN_NS
+from openpyxl.compat import deprecated
 
 
 class DocumentProperties(object):
@@ -110,7 +111,11 @@ class Workbook(object):
         if not self.write_only:
             self.worksheets.append(self._worksheet_class(parent_workbook=self))
 
+    @deprecated('this method is private and should not be called directly')
     def read_workbook_settings(self, xml_source):
+        self._read_workbook_settings(xml_source)
+
+    def _read_workbook_settings(self, xml_source):
         root = fromstring(xml_source)
         view = root.find('*/' '{%s}workbookView' % SHEET_MAIN_NS)
         if view is None:
@@ -170,10 +175,14 @@ class Workbook(object):
             else:
                 new_ws = self._worksheet_class(parent_workbook=self)
 
-        self.add_sheet(worksheet=new_ws, index=index)
+        self._add_sheet(worksheet=new_ws, index=index)
         return new_ws
 
+    @deprecated("you probably want to use Workbook.create_sheet('sheet name') instead")
     def add_sheet(self, worksheet, index=None):
+        self._add_sheet(worksheet, index)
+
+    def _add_sheet(self, worksheet, index=None):
         """Add an existing worksheet (at an optional index)."""
         if not isinstance(worksheet, self._worksheet_class):
             raise TypeError("The parameter you have given is not of the type '%s'" % self._worksheet_class.__name__)
@@ -240,7 +249,6 @@ class Workbook(object):
 
         """
         return [s.title for s in self.worksheets]
-
 
     def create_named_range(self, name, worksheet, range, scope=None):
         """Create a new named_range on a worksheet"""

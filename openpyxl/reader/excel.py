@@ -198,7 +198,7 @@ def _load_workbook(wb, archive, filename, read_only, keep_vba):
     # get workbook-level information
     try:
         wb.properties = read_properties_core(archive.read(ARC_CORE))
-        wb.read_workbook_settings(archive.read(ARC_WORKBOOK))
+        wb._read_workbook_settings(archive.read(ARC_WORKBOOK))
     except KeyError:
         wb.properties = DocumentProperties()
 
@@ -237,7 +237,7 @@ def _load_workbook(wb, archive, filename, read_only, keep_vba):
                                     style_table,
                                     color_index=style_properties['color_index'],
                                     worksheet_path=worksheet_path)
-        wb.add_sheet(new_ws)
+        wb._add_sheet(new_ws)
 
         if not read_only:
         # load comments into the worksheet cells

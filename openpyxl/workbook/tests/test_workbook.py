@@ -55,13 +55,13 @@ def test_create_sheet_with_name():
 def test_add_correct_sheet():
     wb = Workbook()
     new_sheet = wb.create_sheet(0)
-    wb.add_sheet(new_sheet)
+    wb._add_sheet(new_sheet)
     assert new_sheet == wb.worksheets[2]
 
 def test_add_incorrect_sheet():
     wb = Workbook()
     with pytest.raises(TypeError):
-        wb.add_sheet("Test")
+        wb._add_sheet("Test")
 
 def test_create_sheet_readonly():
     wb = Workbook(read_only=True)
@@ -218,4 +218,4 @@ def test_add_invalid_worksheet_class_instance():
     wb = Workbook()
     ws = AlternativeWorksheet(parent_workbook=wb)
     with pytest.raises(TypeError):
-        wb.add_sheet(worksheet=ws)
+        wb._add_sheet(worksheet=ws)

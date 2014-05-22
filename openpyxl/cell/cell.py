@@ -372,7 +372,7 @@ class Cell(object):
         but you can modify it afterwards by setting the `value`
         property, and the hyperlink will remain.\n\n' ':rtype: string"""
         if self._hyperlink_rel is None:
-            self._hyperlink_rel = self.parent.create_relationship("hyperlink")
+            self._hyperlink_rel = self.parent._create_relationship("hyperlink")
         self._hyperlink_rel.target = val
         self._hyperlink_rel.target_mode = "External"
         if self._value is None:
