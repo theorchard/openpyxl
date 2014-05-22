@@ -25,7 +25,7 @@ if __name__ == '__main__':
         container = []
         for i in range(1000000):
             container.append(fn())
-        print "{0} {1} MB, {2:.2f}s".format(
+        print("{0} {1} MB, {2:.2f}s".format(
             fn.func_name,
             memory_usage(proc=-1, interval=1)[0] - initial_use,
-            time.time() - t)
+            time.time() - t))
