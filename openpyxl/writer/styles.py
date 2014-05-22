@@ -4,13 +4,15 @@ from __future__ import absolute_import
 """Write the shared style table."""
 
 # package imports
+
+from openpyxl.compat import safe_string
+from openpyxl.collections import IndexedList
 from openpyxl.xml.functions import (
     Element,
     SubElement,
     ConditionalElement,
     get_document_content,
     )
-from openpyxl.compat import safe_string
 from openpyxl.xml.constants import SHEET_MAIN_NS
 
 from openpyxl.styles import DEFAULTS, Protection
@@ -29,12 +31,12 @@ class StyleWriter(object):
         return self.workbook.shared_styles
 
     def write_table(self):
-        number_format_table = self._write_number_formats()
-        fonts_table = self._write_fonts()
-        fills_table = self._write_fills()
-        borders_table = self._write_borders()
+        number_format_node = SubElement(self._root, 'numFmts')
+        fonts_node = self._write_fonts()
+        fills_node = self._write_fills()
+        borders_node = self._write_borders()
         self._write_cell_style_xfs()
-        self._write_cell_xfs(number_format_table, fonts_table, fills_table, borders_table)
+        self._write_cell_xfs(number_format_node, fonts_node, fills_node, borders_node)
         self._write_cell_style()
         self._write_dxfs()
         self._write_table_styles()
@@ -63,21 +65,11 @@ class StyleWriter(object):
         SubElement(font_node, 'family', {'val':'2'})
         SubElement(font_node, 'scheme', {'val':'minor'})
 
-        # others
-        table = {}
-        index = 1
-        for st in self.styles:
-            if st.font != DEFAULTS.font and st.font not in table:
-                font_node = SubElement(fonts, 'font')
-                table[st.font] = index
-                index += 1
-                self._write_font(font_node, st.font)
-
-        fonts.attrib["count"] = "%d" % index
-        return table
+        return fonts
 
 
     def _write_font(self, node, font):
+        node = SubElement(node, "font")
         # if present vertAlign has to be at the start otherwise Excel has a problem
         ConditionalElement(node, "vertAlign", font.vertAlign, {'val':font.vertAlign})
         SubElement(node, 'sz', {'val':str(font.size)})
@@ -103,22 +95,7 @@ class StyleWriter(object):
         SubElement(fill, 'patternFill', {'patternType':'none'})
         fill = SubElement(fills, 'fill')
         SubElement(fill, 'patternFill', {'patternType':'gray125'})
-
-        table = {}
-        index = 2
-        for st in self.styles:
-            if st.fill != DEFAULTS.fill and st.fill not in table:
-
-                table[st.fill] = index
-                node = SubElement(fills, 'fill')
-                if isinstance(st.fill, PatternFill):
-                    self._write_pattern_fill(node, st.fill)
-                elif isinstance(st.fill, GradientFill):
-                    self._write_gradient_fill(node, st.fill)
-                index += 1
-
-        fills.attrib["count"] = str(index)
-        return table
+        return fills
 
     def _write_pattern_fill(self, node, fill):
         if fill != DEFAULTS.fill and fill.fill_type is not None:
@@ -145,18 +122,7 @@ class StyleWriter(object):
         SubElement(border, 'top')
         SubElement(border, 'bottom')
         SubElement(border, 'diagonal')
-
-        # others
-        table = {}
-        index = 1
-        for st in self.styles:
-            if st.border != DEFAULTS.border and st.border not in table:
-                table[st.border] = index
-                self._write_border(borders, st.border)
-                index += 1
-
-        borders.attrib["count"] = str(index)
-        return table
+        return borders
 
     def _write_border(self, node, border):
         """Write the child elements for an individual border section"""
@@ -171,35 +137,71 @@ class StyleWriter(object):
         xf = SubElement(cell_style_xfs, 'xf',
             {'numFmtId':"0", 'fontId':"0", 'fillId':"0", 'borderId':"0"})
 
-    def _write_cell_xfs(self, number_format_table, fonts_table, fills_table, borders_table):
+    def _write_cell_xfs(self, number_format_node, fonts_node, fills_node, borders_node):
         """ write styles combinations based on ids found in tables """
-
         # writing the cellXfs
         cell_xfs = SubElement(self._root, 'cellXfs',
-            {'count':'%d' % (len(self.styles) + 1)})
+            {'count':'%d' % len(self.styles)})
 
         # default
         def _get_default_vals():
             return dict(numFmtId='0', fontId='0', fillId='0',
                         xfId='0', borderId='0')
 
+        _fonts = IndexedList()
+        _fills = IndexedList()
+        _borders = IndexedList()
+        _custom_fmts = IndexedList()
+
         for st in self.styles:
             vals = _get_default_vals()
 
-            if st.font != DEFAULTS.font:
-                vals['fontId'] = str(fonts_table[st.font])
+            font = st.font
+            if font != DEFAULTS.font:
+                if font not in _fonts:
+                    font_id = _fonts.add(font)
+                    self._write_font(fonts_node, st.font)
+                else:
+                    font_id = _fonts.index(font)
+                vals['fontId'] = "%d" % (font_id + 1) # There is one default font
+
                 vals['applyFont'] = '1'
 
+            border = st.border
             if st.border != DEFAULTS.border:
-                vals['borderId'] = str(borders_table[st.border])
+                if border not in _borders:
+                    border_id = _borders.add(border)
+                    self._write_border(borders_node, border)
+                else:
+                    border_id = _borders.index(border)
+                vals['borderId'] = "%d" % (border_id + 1) # There is one default border
                 vals['applyBorder'] = '1'
 
-            if st.fill != DEFAULTS.fill:
-                vals['fillId'] = str(fills_table[st.fill])
+
+            fill = st.fill
+            if fill != DEFAULTS.fill:
+                if fill not in _fills:
+                    fill_id = _fills.add(st.fill)
+                    fill_node = SubElement(fills_node, 'fill')
+                    if isinstance(fill, PatternFill):
+                        self._write_pattern_fill(fill_node, fill)
+                    elif isinstance(fill, GradientFill):
+                        self._write_gradient_fill(fill_node, fill)
+                else:
+                    fill_id = _fills.index(fill)
+                vals['fillId'] =  "%d" % (fill_id + 2) # There are two default fills
                 vals['applyFill'] = '1'
 
-            if st.number_format != DEFAULTS.number_format:
-                vals['numFmtId'] = '%d' % number_format_table[st.number_format]
+            nf = st.number_format
+            if nf != DEFAULTS.number_format:
+                fmt_id = nf.builtin_format_id(nf.format_code)
+                if fmt_id is None:
+                    if nf not in _custom_fmts:
+                        fmt_id = _custom_fmts.add(nf) + 165
+                        self._write_number_format(number_format_node, fmt_id, nf.format_code)
+                    else:
+                        fmt_id = _custom_fmts.index(nf)
+                vals['numFmtId'] = '%d' % fmt_id
                 vals['applyNumberFormat'] = '1'
 
             if st.alignment != DEFAULTS.alignment:
@@ -211,42 +213,63 @@ class StyleWriter(object):
             node = SubElement(cell_xfs, 'xf', vals)
 
             if st.alignment != DEFAULTS.alignment:
-                alignments = {}
-
-                for align_attr in ['horizontal', 'vertical']:
-                    if getattr(st.alignment, align_attr) != getattr(DEFAULTS.alignment, align_attr):
-                        alignments[align_attr] = getattr(st.alignment, align_attr)
-
-                    if st.alignment.wrap_text != DEFAULTS.alignment.wrap_text:
-                        alignments['wrapText'] = '1'
-
-                    if st.alignment.shrink_to_fit != DEFAULTS.alignment.shrink_to_fit:
-                        alignments['shrinkToFit'] = '1'
-
-                    if st.alignment.indent > 0:
-                        alignments['indent'] = '%s' % st.alignment.indent
-
-                    if st.alignment.text_rotation > 0:
-                        alignments['textRotation'] = '%s' % st.alignment.text_rotation
-                    elif st.alignment.text_rotation < 0:
-                        alignments['textRotation'] = '%s' % (90 - st.alignment.text_rotation)
-
-                SubElement(node, 'alignment', alignments)
+                self._write_alignment(node, st.alignment)
 
             if st.protection != DEFAULTS.protection:
-                protections = {}
+                self._write_protection(node, st.protection)
 
-                if st.protection.locked == Protection.PROTECTION_PROTECTED:
-                    protections['locked'] = '1'
-                elif st.protection.locked == Protection.PROTECTION_UNPROTECTED:
-                    protections['locked'] = '0'
+        fonts_node.attrib["count"] = "%d" % (len(_fonts) + 1)
+        borders_node.attrib["count"] = "%d" % (len(_borders) + 1)
+        fills_node.attrib["count"] = "%d" % (len(_fills) + 2)
+        number_format_node.attrib['count'] = '%d' % len(_custom_fmts)
 
-                if st.protection.hidden == Protection.PROTECTION_PROTECTED:
-                    protections['hidden'] = '1'
-                elif st.protection.hidden == Protection.PROTECTION_UNPROTECTED:
-                    protections['hidden'] = '0'
+    def _write_number_format(self, node, fmt_id, format_code):
+        fmt_node = SubElement(node, 'numFmt',
+                              {'numFmtId':'%d' % (fmt_id),
+                               'formatCode':'%s' % format_code}
+                              )
 
-                SubElement(node, 'protection', protections)
+
+    def _write_alignment(self, node, alignment):
+        alignments = {}
+
+        for align_attr in ['horizontal', 'vertical']:
+            if getattr(alignment, align_attr) != getattr(DEFAULTS.alignment, align_attr):
+                alignments[align_attr] = getattr(alignment, align_attr)
+
+            if alignment.wrap_text != DEFAULTS.alignment.wrap_text:
+                alignments['wrapText'] = '1'
+
+            if alignment.shrink_to_fit != DEFAULTS.alignment.shrink_to_fit:
+                alignments['shrinkToFit'] = '1'
+
+            if alignment.indent > 0:
+                alignments['indent'] = '%s' % alignment.indent
+
+            if alignment.text_rotation > 0:
+                alignments['textRotation'] = '%s' % alignment.text_rotation
+            elif alignment.text_rotation < 0:
+                alignments['textRotation'] = '%s' % (90 - alignment.text_rotation)
+
+        SubElement(node, 'alignment', alignments)
+
+
+    def _write_protection(self, node, protection):
+        protections = {}
+
+        if protection.locked == Protection.PROTECTION_PROTECTED:
+            protections['locked'] = '1'
+        elif protection.locked == Protection.PROTECTION_UNPROTECTED:
+            protections['locked'] = '0'
+
+        if protection.hidden == Protection.PROTECTION_PROTECTED:
+            protections['hidden'] = '1'
+        elif protection.hidden == Protection.PROTECTION_UNPROTECTED:
+            protections['hidden'] = '0'
+
+        SubElement(node, 'protection', protections)
+
+
 
     def _write_cell_style(self):
         cell_styles = SubElement(self._root, 'cellStyles', {'count':'1'})
@@ -302,37 +325,3 @@ class StyleWriter(object):
         table_styles = SubElement(self._root, 'tableStyles',
             {'count':'0', 'defaultTableStyle':'TableStyleMedium9',
             'defaultPivotStyle':'PivotStyleLight16'})
-
-    def _write_number_formats(self):
-
-        number_format_table = {}
-
-        number_format_list = []
-        exceptions_list = []
-        num_fmt_id = 165 # start at a greatly higher value as any builtin can go
-        num_fmt_offset = 0
-
-        for style in self.styles:
-
-            if not style.number_format in number_format_list  :
-                number_format_list.append(style.number_format)
-
-        for number_format in number_format_list:
-
-            if number_format.is_builtin():
-                btin = number_format.builtin_format_id(number_format.format_code)
-                number_format_table[number_format] = btin
-            else:
-                number_format_table[number_format] = num_fmt_id + num_fmt_offset
-                num_fmt_offset += 1
-                exceptions_list.append(number_format)
-
-        num_fmts = SubElement(self._root, 'numFmts',
-            {'count':'%d' % len(exceptions_list)})
-
-        for number_format in exceptions_list :
-            SubElement(num_fmts, 'numFmt',
-                {'numFmtId':'%d' % number_format_table[number_format],
-                'formatCode':'%s' % number_format.format_code})
-
-        return number_format_table

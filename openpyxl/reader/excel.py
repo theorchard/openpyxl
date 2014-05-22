@@ -89,11 +89,14 @@ def repair_central_directory(zipFile, is_file_instance):
     return f
 
 
-def load_workbook(filename, use_iterators=False, keep_vba=KEEP_VBA, guess_types=False, data_only=False):
+def load_workbook(filename, read_only=False, use_iterators=False, keep_vba=KEEP_VBA, guess_types=False, data_only=False):
     """Open the given filename and return the workbook
 
     :param filename: the path to open or a file-like object
     :type filename: string or a file-like object open in binary mode c.f., :class:`zipfile.ZipFile`
+
+    :param read_only: optimised for reading, content cannot be edited
+    :type read_only: bool
 
     :param use_iterators: use lazy load for cells
     :type use_iterators: bool
@@ -117,6 +120,8 @@ def load_workbook(filename, use_iterators=False, keep_vba=KEEP_VBA, guess_types=
     """
 
     is_file_instance = isinstance(filename, file)
+
+    read_only = read_only or use_iterators
 
     if is_file_instance:
         # fileobject must have been opened with 'rb' flag
@@ -154,15 +159,13 @@ def load_workbook(filename, use_iterators=False, keep_vba=KEEP_VBA, guess_types=
     except (BadZipfile, RuntimeError, IOError, ValueError):
         e = exc_info()[1]
         raise InvalidFileException(unicode(e))
-    wb = Workbook(guess_types=guess_types, data_only=data_only)
+    wb = Workbook(guess_types=guess_types, data_only=data_only, read_only=read_only)
 
-    if use_iterators:
-        wb._set_optimized_read()
-        if guess_types:
-            warnings.warn('Data types are not guessed when using iterator reader')
+    if read_only and guess_types:
+        warnings.warn('Data types are not guessed when using iterator reader')
 
     try:
-        _load_workbook(wb, archive, filename, use_iterators, keep_vba)
+        _load_workbook(wb, archive, filename, read_only, keep_vba)
     except KeyError:
         e = exc_info()[1]
         raise InvalidFileException(unicode(e))
@@ -171,7 +174,7 @@ def load_workbook(filename, use_iterators=False, keep_vba=KEEP_VBA, guess_types=
     return wb
 
 
-def _load_workbook(wb, archive, filename, use_iterators, keep_vba):
+def _load_workbook(wb, archive, filename, read_only, keep_vba):
 
     valid_files = archive.namelist()
 
@@ -189,7 +192,7 @@ def _load_workbook(wb, archive, filename, use_iterators, keep_vba):
             filename.seek(pos)
         wb.vba_archive = ZipFile(BytesIO(s), 'r')
 
-    if use_iterators:
+    if read_only:
         wb._archive = ZipFile(filename)
 
     # get workbook-level information
@@ -224,7 +227,7 @@ def _load_workbook(wb, archive, filename, use_iterators, keep_vba):
         if not worksheet_path in valid_files:
             continue
 
-        if not use_iterators:
+        if not read_only:
             new_ws = read_worksheet(archive.read(worksheet_path), wb,
                                     sheet_name, shared_strings, style_table,
                                     color_index=style_properties['color_index'],
@@ -236,7 +239,7 @@ def _load_workbook(wb, archive, filename, use_iterators, keep_vba):
                                     worksheet_path=worksheet_path)
         wb.add_sheet(new_ws)
 
-        if not use_iterators:
+        if not read_only:
         # load comments into the worksheet cells
             comments_file = get_comments_file(worksheet_path, archive, valid_files)
             if comments_file is not None:

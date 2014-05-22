@@ -35,10 +35,16 @@ from openpyxl.compat import OrderedDict, unicode
 
 from openpyxl.cell import  get_column_letter, Cell, TIME_TYPES
 from openpyxl.worksheet import Worksheet
+from openpyxl.xml.constants import SHEET_MAIN_NS
 from openpyxl.xml.functions import (
     XMLGenerator,
     start_tag,
-    end_tag, tag
+    end_tag,
+    tag,
+    Element,
+    SubElement,
+    ConditionalElement,
+    get_document_content,
 )
 from openpyxl.date_time import (
     to_excel,
@@ -321,6 +327,7 @@ class DumpCommentWriter(CommentWriter):
 
 
 class ExcelDumpWriter(ExcelWriter):
+
     def __init__(self, workbook):
         self.workbook = workbook
         self.style_writer = StyleWriter(workbook)

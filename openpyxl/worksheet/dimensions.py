@@ -83,7 +83,6 @@ class ColumnDimension(Dimension):
     width = Float(allow_none=True)
     bestFit = Bool()
     auto_size = Alias('bestFit')
-    collapsed = Bool()
     index = String()
     style = Integer(allow_none=True)
     min = Integer()
@@ -120,6 +119,7 @@ class ColumnDimension(Dimension):
         self.bestFit = bestFit
         if outline_level is not None:
             outlineLevel = outline_level
+        self.collapsed = collapsed
         super(ColumnDimension, self).__init__(index, hidden, outlineLevel,
                                               collapsed)
 

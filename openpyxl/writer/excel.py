@@ -67,7 +67,7 @@ class ExcelWriter(object):
 
     def __init__(self, workbook):
         self.workbook = workbook
-        self.style_writer = StyleWriter(self.workbook)
+        self.style_writer = StyleWriter(workbook)
 
     def write_data(self, archive):
         """Write the various xml files into the zip archive."""

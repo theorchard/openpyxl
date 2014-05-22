@@ -1,8 +1,23 @@
 openpyxl.workbook package
 =========================
 
+Subpackages
+-----------
+
+.. toctree::
+
+    openpyxl.workbook.tests
+
 Submodules
 ----------
+
+openpyxl.workbook.named_range module
+------------------------------------
+
+.. automodule:: openpyxl.workbook.named_range
+    :members:
+    :undoc-members:
+    :show-inheritance:
 
 openpyxl.workbook.workbook module
 ---------------------------------

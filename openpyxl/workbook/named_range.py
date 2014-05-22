@@ -37,6 +37,7 @@ NAMED_RANGE_RE = re.compile("""
 !(?P<range>(\$([A-Za-z]+))?(\$([0-9]+))?(:(\$([A-Za-z]+))?(\$([0-9]+))?)?)""", re.VERBOSE)
 SPLIT_NAMED_RANGE_RE = re.compile(r"((?:[^,']|'(?:[^']|'')*')+)")
 
+
 class NamedRange(object):
     """A named group of cells
 
@@ -58,6 +59,7 @@ class NamedRange(object):
     def __repr__(self):
         return  self.repr_format % (self.__class__.__name__, str(self))
 
+
 class NamedRangeContainingValue(object):
     """A named value"""
     __slots__ = ('name', 'value', 'scope')
@@ -71,20 +73,18 @@ class NamedRangeContainingValue(object):
 def split_named_range(range_string):
     """Separate a named range into its component parts"""
 
-    destinations = []
     for range_string in SPLIT_NAMED_RANGE_RE.split(range_string)[1::2]: # Skip first and from there every second item
 
         match = NAMED_RANGE_RE.match(range_string)
-        if not match:
+        if match is None:
             raise NamedRangeException('Invalid named range string: "%s"' % range_string)
         else:
             match = match.groupdict()
             sheet_name = match['quoted'] or match['notquoted']
             xlrange = match['range']
             sheet_name = sheet_name.replace("''", "'") # Unescape '
-            destinations.append((sheet_name, xlrange))
+            yield sheet_name, xlrange
 
-    return destinations
 
 def refers_to_range(range_string):
     return range_string and bool(NAMED_RANGE_RE.match(range_string))
