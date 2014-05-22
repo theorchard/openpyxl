@@ -87,7 +87,7 @@ class PatternFill(Fill):
     def __init__(self, patternType=FILL_NONE, fgColor=None, bgColor=None,
                  fill_type=None, start_color=None, end_color=None):
         if fill_type is not None:
-           patternType = fill_type
+            patternType = fill_type
         self.patternType = patternType
         if start_color is not None:
             fgColor = start_color
