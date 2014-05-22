@@ -51,7 +51,7 @@ def test_write_col_widths(out, doc, write_cols, ColumnDimension):
     write_cols(doc, worksheet)
     doc.endDocument()
     xml = out.getvalue()
-    expected = """<cols><col width="4" min="1" max="1"></col></cols>"""
+    expected = """<cols><col width="4" min="1" max="1" customWidth="1"></col></cols>"""
     diff = compare_xml(xml, expected)
     assert diff is None, diff
 
