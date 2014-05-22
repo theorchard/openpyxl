@@ -45,9 +45,17 @@ When you want to dump large amounts of data, you might find optimized writer hel
 
     wb.save('new_big_file.xlsx') # don't forget to save !
 
-You can also use user-defined styles in this mode, by appending a `tuple` containing the actual value and the style::
+You can also use user-defined styles in this mode, by appending a `dict` containing the actual value and the style::
 
-    ws.append([('hello', Style(font=Font(name='Courrier', size=36))), 3.14, None])
+    ws.append([{'value': 'hello', 'style': Style(font=Font(name='Courrier', size=36))}, 3.14, None])
+
+.. note::
+
+    Available keys here are currently:
+        
+        * value
+        * style
+        * comment
 
 This will append one new row with 3 cells, one text cell with custom font and font size, a float and an empty cell that will be discarded anyway.
 
