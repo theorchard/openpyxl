@@ -1,15 +1,21 @@
-2.0.3 (unreleased)
+2.0.3 (2014-05-22)
 ==================
+
+Minor changes
+-------------
+
+Updated docs
 
 
 Bug fixes
 ---------
+
 #319 Cannot load Workbooks with vertAlign styling for fonts
 
 
-2.0.2 (2013-05-13)
-2.0.1 (2013-05-13) # brown bag
-2.0.0 (2013-05-13) # brown bag
+2.0.2 (2014-05-13)
+2.0.1 (2014-05-13) # brown bag
+2.0.0 (2014-05-13) # brown bag
 ==================
 
 
