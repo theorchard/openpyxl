@@ -62,7 +62,7 @@ def non_optimized_workbook(styles):
 def to_profile(wb, f, n):
     t = -time.time()
     wb.save(f)
-    print 'took %.4fs for %d styles' % (t + time.time(), n)
+    print('took %.4fs for %d styles' % (t + time.time(), n))
 
 for func in (optimized_workbook, non_optimized_workbook):
     print '%s: ' % func.__name__,

@@ -21,7 +21,7 @@ def writer(optimised, cols, rows):
             sys.stdout.flush()
         ws.append(row)
     folder = os.path.split(__file__)[0]
-    print
+    print()
     wb.save(os.path.join(folder, "files", "large.xlsx"))
 
 
@@ -43,10 +43,10 @@ def timer(fn, **kw):
                               number = 1,
                               repeat = 3
         )
-        print "{:.2f}s".format(min(times))
+        print("{:.2f}s".format(min(times)))
         result.append(min(times))
     std, opt = result
-    print "Optimised takes {:.2%} time\n".format(opt/std)
+    print("Optimised takes {:.2%} time\n".format(opt/std))
     return std, opt
 
 
