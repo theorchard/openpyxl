@@ -3,3 +3,9 @@ directory = shippable/codecoverage
 
 [xml]
 output = shippable/codecoverage/coverage.xml
+
+[report]
+omit = 
+	*/benchmarks/*
+	*/tests/*
+	*/test_*
