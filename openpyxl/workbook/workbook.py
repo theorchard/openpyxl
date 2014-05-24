@@ -186,6 +186,8 @@ class Workbook(object):
         """Add an existing worksheet (at an optional index)."""
         if not isinstance(worksheet, self._worksheet_class):
             raise TypeError("The parameter you have given is not of the type '%s'" % self._worksheet_class.__name__)
+        if worksheet.parent != self:
+            raise ValueError("You cannot add worksheets from another workbook.")
 
         if index is None:
             self.worksheets.append(worksheet)

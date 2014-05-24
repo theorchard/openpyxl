@@ -28,7 +28,7 @@ import datetime
 # package imports
 from openpyxl.workbook import Workbook
 from openpyxl.reader.excel import load_workbook
-from ..named_range import NamedRange
+from openpyxl.workbook.named_range import NamedRange
 from openpyxl.exceptions import ReadOnlyWorkbookException
 
 # test imports
@@ -58,10 +58,19 @@ def test_add_correct_sheet():
     wb._add_sheet(new_sheet)
     assert new_sheet == wb.worksheets[2]
 
-def test_add_incorrect_sheet():
+def test_add_sheetname():
     wb = Workbook()
     with pytest.raises(TypeError):
         wb._add_sheet("Test")
+
+
+def test_add_sheet_from_other_workbook():
+    wb1 = Workbook()
+    wb2 = Workbook()
+    ws = wb1.active
+    with pytest.raises(ValueError):
+        wb2._add_sheet(ws)
+
 
 def test_create_sheet_readonly():
     wb = Workbook(read_only=True)
