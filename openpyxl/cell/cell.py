@@ -68,6 +68,14 @@ ILLEGAL_CHARACTERS_RE = re.compile(r'[\000-\010]|[\013-\014]|[\016-\037]')
 TIME_TYPES = (datetime.datetime, datetime.date, datetime.time, datetime.timedelta)
 KNOWN_TYPES = TIME_TYPES + (Number, basestring, unicode, bytes, bool, type(None))
 
+
+def get_column_interval(start, end):
+    if isinstance(start, basestring):
+        start = column_index_from_string(start)
+    if isinstance(end, basestring):
+        end = column_index_from_string(end)
+    return [get_column_letter(x) for x in range(start, end + 1)]
+
 def coordinate_from_string(coord_string):
     """Convert a coordinate string like 'B12' to a tuple ('B', 12)"""
     match = COORD_RE.match(coord_string.upper())
