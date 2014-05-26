@@ -33,11 +33,11 @@ cells using Excel's 'A1' column/row nomenclature are also provided.
 __docformat__ = "restructuredtext en"
 
 # Python stdlib imports
-from numbers import Number
 import datetime
 import re
 import warnings
 
+from openpyxl.units import NUMERIC_TYPES
 from openpyxl.compat import lru_cache, range
 from openpyxl.units import (
     DEFAULT_ROW_HEIGHT,
@@ -66,7 +66,8 @@ ABSOLUTE_RE = re.compile('^[$]?([A-Z]+)[$]?(\d+)(:[$]?([A-Z]+)[$]?(\d+))?$')
 ILLEGAL_CHARACTERS_RE = re.compile(r'[\000-\010]|[\013-\014]|[\016-\037]')
 
 TIME_TYPES = (datetime.datetime, datetime.date, datetime.time, datetime.timedelta)
-KNOWN_TYPES = TIME_TYPES + (Number, basestring, unicode, bytes, bool, type(None))
+STRING_TYPES = (basestring, unicode, bytes)
+KNOWN_TYPES = NUMERIC_TYPES + TIME_TYPES + STRING_TYPES + (bool, type(None))
 
 def coordinate_from_string(coord_string):
     """Convert a coordinate string like 'B12' to a tuple ('B', 12)"""
@@ -237,7 +238,7 @@ class Cell(object):
         """Coerce values according to their explicit type"""
         if data_type not in self.VALID_TYPES:
             raise ValueError('Invalid data type: %s' % data_type)
-        if isinstance(value, (str, unicode, bytes)):
+        if isinstance(value, STRING_TYPES):
             value = self.check_string(value)
         self._value = value
         self.data_type = data_type
@@ -251,7 +252,7 @@ class Cell(object):
             data_type = self.TYPE_NULL
         elif isinstance(value, bool):
             data_type = self.TYPE_BOOL
-        elif isinstance(value, Number):
+        elif isinstance(value, NUMERIC_TYPES):
             data_type = self.TYPE_NUMERIC
         elif isinstance(value, TIME_TYPES):
             data_type = self.TYPE_NUMERIC

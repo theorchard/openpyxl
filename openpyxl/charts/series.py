@@ -23,7 +23,7 @@ from __future__ import absolute_import
 # @author: see AUTHORS file
 from numbers import Number
 
-from openpyxl.units import short_color
+from openpyxl.units import short_color, NUMERIC_TYPES
 
 from .reference import Reference
 
@@ -133,7 +133,7 @@ class Series(object):
         values = getattr(self, attr)
         if self.error_bar:
             values = self._error_bar_values
-        cleaned = [v for v in values if isinstance(v, Number)]
+        cleaned = [v for v in values if isinstance(v, NUMERIC_TYPES)]
         if cleaned:
             return max(cleaned)
 
@@ -145,7 +145,7 @@ class Series(object):
         values = getattr(self, attr)
         if self.error_bar:
             values = self._error_bar_values
-        cleaned = [v for v in values if isinstance(v, Number)]
+        cleaned = [v for v in values if isinstance(v, NUMERIC_TYPES)]
         if cleaned:
             return min(cleaned)
 
