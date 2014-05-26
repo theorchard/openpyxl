@@ -30,7 +30,6 @@ import re
 
 # compatibility imports
 from openpyxl.compat import (
-    OrderedDict,
     unicode,
     range,
     basestring,
@@ -64,7 +63,7 @@ from openpyxl.workbook.named_range import NamedRangeContainingValue
 from .header_footer import HeaderFooter
 from .relationship import Relationship
 from .page import PageSetup, PageMargins
-from .dimensions import ColumnDimension, RowDimension
+from .dimensions import ColumnDimension, RowDimension, DimensionHolder
 from .protection import SheetProtection
 from .filters import AutoFilter
 
@@ -124,7 +123,7 @@ class Worksheet(object):
         else:
             self.title = title
         self.row_dimensions = {}
-        self.column_dimensions = OrderedDict([])
+        self.column_dimensions = DimensionHolder([])
         self.page_breaks = []
         self._cells = {}
         self._styles = {}

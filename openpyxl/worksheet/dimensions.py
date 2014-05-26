@@ -2,8 +2,9 @@ from __future__ import absolute_import
 # Copyright (c) 2010-2014 openpyxl
 
 from openpyxl.compat import safe_string
-from openpyxl.cell import get_column_letter, column_index_from_string
+from openpyxl.cell import get_column_interval, column_index_from_string
 from openpyxl.descriptors import Integer, Float, Bool, Strict, String, Alias
+from openpyxl.compat.odict import OrderedDict
 
 
 class Base(Strict):
@@ -129,8 +130,30 @@ class ColumnDimension(Dimension):
             if value:
                 yield key, safe_string(value)
 
-    #@property
-    #def col_label(self):
-        #return get_column_letter(self.index)
+    # @property
+    # def col_label(self):
+        # return get_column_letter(self.index)
 
 del Base
+
+
+class DimensionHolder(OrderedDict):
+    "hold (row|column)dimensions and allow operations over them"
+    def __init__(self, direction, *args, **kwargs):
+        self.direction = direction
+        super(DimensionHolder, self).__init__(*args, **kwargs)
+
+    def group(self, start, end=None, outline_level=1):
+        if end is None:
+            end = start
+        work_sequence = get_column_interval(start, end)
+        if start in self:
+            new_dim = self.pop(start)
+        else:
+            new_dim = ColumnDimension(index=start)
+        for column_letter in work_sequence:
+            if column_letter in self:
+                del self[column_letter]
+        new_dim.min, new_dim.max = map(column_index_from_string, (start, end))
+        new_dim.outline_level = outline_level
+        self[start] = new_dim
