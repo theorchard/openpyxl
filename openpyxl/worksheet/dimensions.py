@@ -86,11 +86,12 @@ class ColumnDimension(Dimension):
     auto_size = Alias('bestFit')
     index = String()
     style = Integer(allow_none=True)
-    min = Integer()
-    max = Integer()
+    min = Integer(allow_none=True)
+    max = Integer(allow_none=True)
     customWidth = Bool()
 
-    __fields__ = Dimension.__fields__ + ('width', 'bestFit', 'customWidth')
+    __fields__ = Dimension.__fields__ + ('width', 'bestFit', 'customWidth',
+                                         'min', 'max', 'outlineLevel')
 
     def __init__(self,
                  index='A',
@@ -101,8 +102,8 @@ class ColumnDimension(Dimension):
                  outline_level=None,
                  collapsed=False,
                  style=None,
-                 min=1,
-                 max=1,
+                 min=None,
+                 max=None,
                  customWidth=False,
                  visible=None,
                  auto_size=None):
@@ -146,11 +147,12 @@ class DimensionHolder(OrderedDict):
     def group(self, start, end=None, outline_level=1):
         if end is None:
             end = start
-        work_sequence = get_column_interval(start, end)
         if start in self:
             new_dim = self.pop(start)
         else:
             new_dim = ColumnDimension(index=start)
+
+        work_sequence = get_column_interval(start, end)
         for column_letter in work_sequence:
             if column_letter in self:
                 del self[column_letter]

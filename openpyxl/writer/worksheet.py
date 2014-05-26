@@ -226,7 +226,9 @@ def write_worksheet_cols(doc, worksheet, style_table=None):
     start_tag(doc, 'cols')
     for idx, col_def in sorted(cols):
         v = "%d" % idx
-        col_def.update({'min':v, 'max':v})
+        cmin = col_def.get('min') or v
+        cmax = col_def.get('max') or v
+        col_def.update({'min': cmin, 'max': cmax})
         tag(doc, 'col', col_def)
     end_tag(doc, 'cols')
 

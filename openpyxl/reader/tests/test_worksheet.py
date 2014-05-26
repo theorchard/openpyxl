@@ -33,4 +33,6 @@ def test_parse_col_dimensions(datadir):
             for col in cols:
                 parser.parse_column_dimensions(col)
     assert set(ws.column_dimensions.keys()) == set(['A', 'C', 'E', 'I', 'G'])
-    assert dict(ws.column_dimensions['A']) == {'customWidth': '1', 'width': '31.1640625'}
+    assert dict(ws.column_dimensions['A']) == {'max': '1', 'min': '1',
+                                               'customWidth': '1',
+                                               'width': '31.1640625'}
