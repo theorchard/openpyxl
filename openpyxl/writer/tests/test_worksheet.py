@@ -138,3 +138,12 @@ def test_write_lots_cols(out, doc, write_cols, ColumnDimension):
 """
     diff = compare_xml(xml, expected)
     assert diff is None, diff
+
+
+def test_write_sheet_format(out, doc, write_sheet_format, ColumnDimension):
+    worksheet = DummyWorksheet()
+    write_sheet_format(doc, worksheet)
+    xml = out.getvalue()
+    expected = """<sheetFormatPr defaultRowHeight="15" baseColWidth="10"/>"""
+    diff = compare_xml(expected, xml)
+    assert diff is None, diff
