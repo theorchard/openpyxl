@@ -200,7 +200,7 @@ def write_worksheet_format(doc, worksheet):
     if dimensions_outline:
         outline_level = max(dimensions_outline)
         if outline_level:
-            attrs['outlineLevelCol'] = outline_level
+            attrs['outlineLevelCol'] = str(outline_level)
     tag(doc, 'sheetFormatPr', attrs)
 
 

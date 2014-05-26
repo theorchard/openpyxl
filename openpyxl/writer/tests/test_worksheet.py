@@ -147,3 +147,24 @@ def test_write_sheet_format(out, doc, write_sheet_format, ColumnDimension):
     expected = """<sheetFormatPr defaultRowHeight="15" baseColWidth="10"/>"""
     diff = compare_xml(expected, xml)
     assert diff is None, diff
+
+
+def test_outline_format(out, doc, write_sheet_format, ColumnDimension):
+    worksheet = DummyWorksheet()
+    worksheet.column_dimensions['A'] = ColumnDimension(outline_level=1)
+    write_sheet_format(doc, worksheet)
+    xml = out.getvalue()
+    expected = """<sheetFormatPr defaultRowHeight="15" baseColWidth="10" outlineLevelCol="1" />"""
+    diff = compare_xml(expected, xml)
+    assert diff is None, diff
+
+
+def test_outline_cols(out, doc, write_cols, ColumnDimension):
+    worksheet = DummyWorksheet()
+    worksheet.column_dimensions['A'] = ColumnDimension(outline_level=1)
+    write_cols(doc, worksheet)
+    xml = out.getvalue()
+    expected = """<cols><col max="1" min="1" outlineLevel="1"/></cols>"""
+    diff = compare_xml(expected, xml)
+    assert diff is None, diff
+
