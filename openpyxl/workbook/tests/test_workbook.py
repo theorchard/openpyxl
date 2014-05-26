@@ -195,7 +195,7 @@ def test_write_regular_date(tmpdir):
 
     assert test_sheet.cell("A1").value == today
 
-def test_write_regular_float():
+def test_write_regular_float(tmpdir):
     float_value = 1.0 / 3.0
     book = Workbook()
     sheet = book.get_active_sheet()
