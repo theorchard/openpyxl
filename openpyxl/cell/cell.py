@@ -37,7 +37,7 @@ import datetime
 import re
 import warnings
 
-from openpyxl.units import NUMERIC_TYPES
+from openpyxl.compat import NUMERIC_TYPES
 from openpyxl.compat import lru_cache, range
 from openpyxl.units import (
     DEFAULT_ROW_HEIGHT,

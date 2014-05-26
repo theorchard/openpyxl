@@ -31,7 +31,7 @@ from .strings import (
     tempfile,
     safe_string
     )
-from .numbers import long
+from .numbers import long, NUMERIC_TYPES
 from .itertools import (
     range,
     ifilter,

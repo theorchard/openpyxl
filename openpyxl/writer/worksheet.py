@@ -30,7 +30,7 @@ from io import BytesIO
 
 # compatibility imports
 
-from openpyxl.compat import long
+from openpyxl.compat import long, safe_string
 
 # package imports
 from openpyxl.cell import (
@@ -312,11 +312,7 @@ def write_worksheet_data(doc, worksheet, string_table, style_table):
                         tag(doc, 'f', body='%s' % value[1:])
                     tag(doc, 'v')
                 elif cell.data_type == cell.TYPE_NUMERIC:
-                    if isinstance(value, (long, decimal.Decimal)):
-                        func = str
-                    else:
-                        func = repr
-                    tag(doc, 'v', body=func(value))
+                    tag(doc, 'v', body=safe_string(value))
                 elif cell.data_type == cell.TYPE_BOOL:
                     tag(doc, 'v', body='%d' % value)
                 else:

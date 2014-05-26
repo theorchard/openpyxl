@@ -21,9 +21,9 @@ from __future__ import absolute_import
 #
 # @license: http://www.opensource.org/licenses/mit-license.php
 # @author: see AUTHORS file
-from numbers import Number
 
-from openpyxl.units import short_color, NUMERIC_TYPES
+from openpyxl.compat import NUMERIC_TYPES
+from openpyxl.units import short_color
 
 from .reference import Reference
 

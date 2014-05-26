@@ -52,7 +52,7 @@ from openpyxl.date_time import (
     time_to_days
 )
 from openpyxl.xml.constants import MAX_COLUMN, MAX_ROW, PACKAGE_XL
-from openpyxl.units import NUMERIC_TYPES
+from openpyxl.compat.numbers import NUMERIC_TYPES
 from openpyxl.exceptions import WorkbookAlreadySaved
 from openpyxl.writer.excel import ExcelWriter
 from openpyxl.writer.strings import write_string_table
