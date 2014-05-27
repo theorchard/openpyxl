@@ -341,6 +341,7 @@ def test_freeze_panes_both(datadir):
                              (1234567890, """<c t="n" r="A1"><v>1234567890</v></c>"""),
                              ("=sum(1+1)", """<c r="A1"><f>sum(1+1)</f><v></v></c>"""),
                              (True, """<c t="b" r="A1"><v>1</v></c>"""),
+                             ("Hello", """<c t="s" r="A1"><v>0</v></c>"""),
                          ])
 def test_write_cell(out, doc, value, expected):
     from .. worksheet import write_cell
@@ -348,7 +349,7 @@ def test_write_cell(out, doc, value, expected):
     wb = Workbook()
     ws = wb.active
     ws['A1'] = value
-    write_cell(doc, ws, ws['A1'], [])
+    write_cell(doc, ws, ws['A1'], ['Hello'])
     doc.endDocument()
     xml = out.getvalue()
     diff = compare_xml(xml, expected)
