@@ -27,6 +27,7 @@ from __future__ import absolute_import
 # Python stdlib imports
 import decimal
 from io import BytesIO
+from operator import attrgetter
 
 # compatibility imports
 

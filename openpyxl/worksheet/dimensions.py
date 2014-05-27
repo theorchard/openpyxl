@@ -33,7 +33,7 @@ class Dimension(Base):
         self.collapsed = collapsed
 
     def __iter__(self):
-        for key in self.__fields__:
+        for key in self.__fields__[1:]:
             value = getattr(self, key)
             if value:
                 yield key, safe_string(value)
@@ -46,7 +46,7 @@ class Dimension(Base):
 class RowDimension(Dimension):
     """Information about the display properties of a row."""
 
-    __fields__ = Dimension.__fields__ + ('ht',)
+    __fields__ = Dimension.__fields__ + ('ht', 'customFormat', 'customHeight', 's')
     ht = Float(allow_none=True)
     height = Alias('ht')
     s = Integer(allow_none=True)
@@ -55,7 +55,9 @@ class RowDimension(Dimension):
     def __init__(self,
                  index=0,
                  ht=None,
+                 customHeight=None, # do not write
                  s=None,
+                 customFormat=None, # do not write
                  hidden=False,
                  outlineLevel=0,
                  outline_level=None,
@@ -76,6 +78,16 @@ class RowDimension(Dimension):
         super(RowDimension, self).__init__(index, hidden, outlineLevel,
                                            collapsed)
 
+    @property
+    def customFormat(self):
+        """Always true if there is a style for the row"""
+        return self.style is not None
+
+    @property
+    def customHeight(self):
+        """Always true if there is a height for the row"""
+        return self.ht is not None
+
 
 class ColumnDimension(Dimension):
     """Information about the display properties of a column."""
@@ -87,9 +99,8 @@ class ColumnDimension(Dimension):
     style = Integer(allow_none=True)
     min = Integer()
     max = Integer()
-    customWidth = Bool()
 
-    __fields__ = Dimension.__fields__ + ('width', 'bestFit', 'customWidth')
+    __fields__ = Dimension.__fields__ + ('width', 'bestFit', 'customWidth', 'style')
 
     def __init__(self,
                  index='A',
@@ -102,13 +113,10 @@ class ColumnDimension(Dimension):
                  style=None,
                  min=1,
                  max=1,
-                 customWidth=False,
+                 customWidth=False, # do not write
                  visible=None,
                  auto_size=None):
         self.width = width
-        if width is not None:
-            customWidth = True
-        self.customWidth = customWidth
         self.style = style
         self.min = min
         self.max = max
@@ -123,13 +131,12 @@ class ColumnDimension(Dimension):
         super(ColumnDimension, self).__init__(index, hidden, outlineLevel,
                                               collapsed)
 
-    def __iter__(self):
-        for key in self.__fields__[1:]:
-            value = getattr(self, key)
-            if value:
-                yield key, safe_string(value)
+    @property
+    def customWidth(self):
+        """Always true if there is a width for the column"""
+        return self.width is not None
 
-    #@property
+   #@property
     #def col_label(self):
         #return get_column_letter(self.index)
 
