@@ -333,18 +333,21 @@ def test_freeze_panes_both(datadir):
         assert diff is None, diff
 
 
-@pytest.mark.parametrize("value, filename",
+
+@pytest.mark.parametrize("value, expected",
                          [
-                             (9781231231230, 'long_number.xml'),
-                             (decimal.Decimal('3.14'), 'decimal.xml'),
-                             (1234567890, 'short_number.xml')
+                             (9781231231230, """<c t="n" r="A1"><v>9781231231230</v></c>"""),
+                             (decimal.Decimal('3.14'), """<c t="n" r="A1"><v>3.14</v></c>"""),
+                             (1234567890, """<c t="n" r="A1"><v>1234567890</v></c>""")
                          ])
-def test_numbers(datadir, value, filename):
-    datadir.chdir()
+def test_write_cell(out, doc, value, expected):
+    from .. worksheet import write_cell
+
     wb = Workbook()
-    ws = wb.create_sheet()
-    ws.cell('A1').value = value
-    content = write_worksheet(ws, {}, {})
-    with open(filename) as expected:
-        diff = compare_xml(content, expected.read())
-        assert diff is None, diff
+    ws = wb.active
+    ws['A1'] = value
+    write_cell(doc, ws, ws['A1'], [])
+    doc.endDocument()
+    xml = out.getvalue()
+    diff = compare_xml(xml, expected)
+    assert diff is None, diff
