@@ -319,7 +319,7 @@ def write_cell(doc, worksheet, cell, string_table):
         elif cell.data_type in (cell.TYPE_NUMERIC, cell.TYPE_BOOL):
             tag(doc, 'v', body=safe_string(value))
         else:
-            tag(doc, 'v', body='%s' % value)
+            tag(doc, 'v', body=value)
         end_tag(doc, 'c')
 
 
