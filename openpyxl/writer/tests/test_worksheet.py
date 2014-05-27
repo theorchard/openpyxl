@@ -107,18 +107,6 @@ def test_write_lots_cols(out, doc, write_cols, ColumnDimension):
 
 
 
-def test_write_string(datadir):
-    datadir.chdir()
-    wb = Workbook()
-    ws = wb.create_sheet()
-    ws.cell('F42').value = 'hello'
-    strings = create_string_table(wb)
-    content = write_worksheet(ws, strings, {})
-    with open('sheet1.xml') as expected:
-        diff = compare_xml(content, expected.read())
-        assert diff is None, diff
-
-
 def test_write_hidden_worksheet(datadir):
     datadir.chdir()
     wb = Workbook()
