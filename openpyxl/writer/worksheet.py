@@ -31,7 +31,7 @@ from operator import attrgetter
 
 # compatibility imports
 
-from openpyxl.compat import long, safe_string
+from openpyxl.compat import long, safe_string, itervalues
 
 # package imports
 from openpyxl.cell import (
@@ -267,7 +267,7 @@ def write_worksheet_data(doc, worksheet, string_table, style_table):
         # Ensure a blank cell exists if it has a style
         if isinstance(styleCoord, str) and COORD_RE.search(styleCoord):
             worksheet.cell(styleCoord)
-    for cell in worksheet.get_cell_collection():
+    for cell in itervalues(worksheet._cells):
         # create rows of cells
         cells_by_row.setdefault(cell.row, []).append(cell)
 
