@@ -260,17 +260,19 @@ def write_worksheet_conditional_formatting(doc, worksheet):
 
 def write_worksheet_data(doc, worksheet, string_table, style_table):
     """Write worksheet data to xml."""
-    start_tag(doc, 'sheetData')
     max_column = worksheet.get_highest_column()
-    shared_styles = worksheet.parent.shared_styles
     cells_by_row = {}
     for styleCoord in iterkeys(worksheet._styles):
         # Ensure a blank cell exists if it has a style
         if isinstance(styleCoord, str) and COORD_RE.search(styleCoord):
             worksheet.cell(styleCoord)
     for cell in worksheet.get_cell_collection():
+        # create rows of cells
         cells_by_row.setdefault(cell.row, []).append(cell)
+
+    start_tag(doc, 'sheetData')
     for row_idx in sorted(cells_by_row):
+        # row meta data
         row_dimension = worksheet.row_dimensions[row_idx]
         attrs = {'r': '%d' % row_idx,
                  'spans': '1:%d' % max_column}
@@ -283,43 +285,49 @@ def write_worksheet_data(doc, worksheet, string_table, style_table):
             attrs['s'] = '%d' % worksheet._styles[row_idx]
             attrs['customFormat'] = '1'
         start_tag(doc, 'row', attrs)
-        row_cells = cells_by_row[row_idx]
-        sorted_cells = sorted(row_cells, key=row_sort)
-        for cell in sorted_cells:
-            value = cell.internal_value
-            coordinate = cell.coordinate
-            attributes = {'r': coordinate}
-            if cell.data_type != cell.TYPE_FORMULA:
-                attributes['t'] = cell.data_type
-            if coordinate in worksheet._styles:
-                attributes['s'] = '%d' % worksheet._styles[coordinate]
 
-            if value in ('', None):
-                tag(doc, 'c', attributes)
-            else:
-                start_tag(doc, 'c', attributes)
-                if cell.data_type == cell.TYPE_STRING:
-                    tag(doc, 'v', body='%s' % string_table.index(value))
-                elif cell.data_type == cell.TYPE_FORMULA:
-                    if coordinate in worksheet.formula_attributes:
-                        attr = worksheet.formula_attributes[coordinate]
-                        if 't' in attr and attr['t'] == 'shared' and 'ref' not in attr:
-                            # Don't write body for shared formula
-                            tag(doc, 'f', attr=attr)
-                        else:
-                            tag(doc, 'f', attr=attr, body='%s' % value[1:])
-                    else:
-                        tag(doc, 'f', body='%s' % value[1:])
-                    tag(doc, 'v')
-                elif cell.data_type == cell.TYPE_NUMERIC:
-                    tag(doc, 'v', body=safe_string(value))
-                elif cell.data_type == cell.TYPE_BOOL:
-                    tag(doc, 'v', body='%d' % value)
-                else:
-                    tag(doc, 'v', body='%s' % value)
-                end_tag(doc, 'c')
+        row_cells = cells_by_row[row_idx]
+        for cell in sorted(row_cells, key=row_sort):
+            write_cell(doc, worksheet, cell, string_table)
+
         end_tag(doc, 'row')
     end_tag(doc, 'sheetData')
+
+
+def write_cell(doc, worksheet, cell, string_table):
+    value = cell.internal_value
+    coordinate = cell.coordinate
+    attributes = {'r': coordinate}
+    if cell.data_type != cell.TYPE_FORMULA:
+        attributes['t'] = cell.data_type
+    if coordinate in worksheet._styles:
+        attributes['s'] = '%d' % worksheet._styles[coordinate]
+
+    if value in ('', None):
+        tag(doc, 'c', attributes)
+    else:
+        start_tag(doc, 'c', attributes)
+        if cell.data_type == cell.TYPE_STRING:
+            tag(doc, 'v', body='%s' % string_table.index(value))
+        elif cell.data_type == cell.TYPE_FORMULA:
+            if coordinate in worksheet.formula_attributes:
+                attr = worksheet.formula_attributes[coordinate]
+                if 't' in attr and attr['t'] == 'shared' and 'ref' not in attr:
+                    # Don't write body for shared formula
+                    tag(doc, 'f', attr=attr)
+                else:
+                    tag(doc, 'f', attr=attr, body='%s' % value[1:])
+            else:
+                tag(doc, 'f', body='%s' % value[1:])
+            tag(doc, 'v')
+        elif cell.data_type == cell.TYPE_NUMERIC:
+            tag(doc, 'v', body=safe_string(value))
+        elif cell.data_type == cell.TYPE_BOOL:
+            tag(doc, 'v', body='%d' % value)
+        else:
+            tag(doc, 'v', body='%s' % value)
+        end_tag(doc, 'c')
+
 
 def write_worksheet_autofilter(doc, worksheet):
     auto_filter = worksheet.auto_filter
