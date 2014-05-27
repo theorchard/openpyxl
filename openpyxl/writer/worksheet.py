@@ -261,32 +261,27 @@ def write_worksheet_conditional_formatting(doc, worksheet):
 
 def write_worksheet_data(doc, worksheet, string_table, style_table):
     """Write worksheet data to xml."""
-    max_column = worksheet.get_highest_column()
-    cells_by_row = {}
+
+    # Ensure a blank cell exists if it has a style
     for styleCoord in iterkeys(worksheet._styles):
-        # Ensure a blank cell exists if it has a style
         if isinstance(styleCoord, str) and COORD_RE.search(styleCoord):
             worksheet.cell(styleCoord)
+
+    # create rows of cells
+    cells_by_row = {}
     for cell in itervalues(worksheet._cells):
-        # create rows of cells
         cells_by_row.setdefault(cell.row, []).append(cell)
 
     start_tag(doc, 'sheetData')
     for row_idx in sorted(cells_by_row):
         # row meta data
         row_dimension = worksheet.row_dimensions[row_idx]
+        row_dimension.style = worksheet._styles.get(row_idx)
         attrs = {'r': '%d' % row_idx,
-                 'spans': '1:%d' % max_column}
-        if not row_dimension.visible:
-            attrs['hidden'] = '1'
-        if row_dimension.height is not None:
-            attrs['ht'] = str(row_dimension.ht)
-            attrs['customHeight'] = '1'
-        if row_idx in worksheet._styles:
-            attrs['s'] = '%d' % worksheet._styles[row_idx]
-            attrs['customFormat'] = '1'
-        start_tag(doc, 'row', attrs)
+                 'spans': '1:%d' % worksheet.max_column}
+        attrs.update(dict(row_dimension))
 
+        start_tag(doc, 'row', attrs)
         row_cells = cells_by_row[row_idx]
         for cell in sorted(row_cells, key=row_sort):
             write_cell(doc, worksheet, cell, string_table)
@@ -321,10 +316,8 @@ def write_cell(doc, worksheet, cell, string_table):
             else:
                 tag(doc, 'f', body='%s' % value[1:])
             tag(doc, 'v')
-        elif cell.data_type == cell.TYPE_NUMERIC:
+        elif cell.data_type in (cell.TYPE_NUMERIC, cell.TYPE_BOOL):
             tag(doc, 'v', body=safe_string(value))
-        elif cell.data_type == cell.TYPE_BOOL:
-            tag(doc, 'v', body='%d' % value)
         else:
             tag(doc, 'v', body='%s' % value)
         end_tag(doc, 'c')
