@@ -23,7 +23,9 @@ def out():
                          [
                              (9781231231230, """<c t="n" r="A1"><v>9781231231230</v></c>"""),
                              (decimal.Decimal('3.14'), """<c t="n" r="A1"><v>3.14</v></c>"""),
-                             (1234567890, """<c t="n" r="A1"><v>1234567890</v></c>""")
+                             (1234567890, """<c t="n" r="A1"><v>1234567890</v></c>"""),
+                             ("=sum(1+1)", """<c r="A1"><f>sum(1+1)</f><v></v></c>"""),
+                             (True, """<c t="b" r="A1"><v>1</v></c>"""),
                          ])
 def test_write_cell(out, value, expected):
     from .. lxml_worksheet import write_cell

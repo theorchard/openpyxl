@@ -38,9 +38,6 @@ def write_worksheet_data(doc, worksheet, string_table, style_table):
                     for cell in sorted(row_cells, key=row_sort):
                         write_cell(xf, worksheet, cell, string_table)
 
-                #end_tag(doc, 'row')
-            #end_tag(doc, 'sheetData')
-
 
 def write_cell(xf, worksheet, cell, string_table):
     coordinate = cell.coordinate
@@ -58,7 +55,6 @@ def write_cell(xf, worksheet, cell, string_table):
     else:
         with xf.element('c', attributes):
             if cell.data_type == cell.TYPE_STRING:
-                #tag(doc, 'v', body='%s' % string_table.index(value))
                 el = Element('v', attributes)
                 el.text = '%d' % string_table.index(value)
                 xf.write(el)
@@ -78,13 +74,8 @@ def write_cell(xf, worksheet, cell, string_table):
                     el.text = value[1:]
                     xf.write(el)
                     el = None
-                #tag(doc, 'v')
-                xf.element("v")
+                xf.write(Element("v"))
             else:
-                #tag(doc, 'v', body=safe_string(value))
                 el = Element('v')
                 el.text = safe_string(value)
                 xf.write(el)
-            #else:
-                #tag(doc, 'v', body=value)
-            #end_tag(doc, 'c')
