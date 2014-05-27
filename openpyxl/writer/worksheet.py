@@ -202,12 +202,10 @@ def write_worksheet_cols(doc, worksheet, style_table=None):
     """
     cols = []
     for label, dimension in iteritems(worksheet.column_dimensions):
+        dimension.style = worksheet._styles.get(label)
         col_def = dict(dimension)
-        style = worksheet._styles.get(label)
-        if col_def == {} and style is None:
+        if col_def == {}:
             continue
-        elif style is not None:
-            col_def['style'] = '%d' % style
         idx = column_index_from_string(label)
         cols.append((idx, col_def))
     if cols == []:
