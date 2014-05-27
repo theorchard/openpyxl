@@ -37,6 +37,7 @@ from .itertools import (
     ifilter,
     iteritems,
     iterkeys,
+    itervalues,
     izip
 )
 try:
