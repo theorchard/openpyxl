@@ -26,6 +26,7 @@ from __future__ import absolute_import
 from io import BytesIO
 
 # package imports
+from openpyxl.compat import itervalues
 from openpyxl.xml.functions import start_tag, end_tag, tag, XMLGenerator
 from openpyxl.collections import IndexedList
 
@@ -35,7 +36,7 @@ def create_string_table(workbook):
 
     strings = set()
     for sheet in workbook.worksheets:
-        for cell in sheet.get_cell_collection():
+        for cell in itervalues(sheet._cells):
             if cell.data_type == cell.TYPE_STRING and cell._value is not None:
                 strings.add(cell.value)
     return IndexedList(sorted(strings))
