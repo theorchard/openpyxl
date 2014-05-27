@@ -132,7 +132,8 @@ def test_write_bool(datadir):
         assert diff is None, diff
 
 
-def test_write_formula(datadir):
+def test_write_formula(out, doc, datadir):
+    from .. worksheet import write_worksheet_data
     datadir.chdir()
     wb = Workbook()
     ws = wb.create_sheet()
@@ -145,10 +146,46 @@ def test_write_formula(datadir):
     ws.formula_attributes['B4'] = {'t': 'shared', 'si': '0'}
     ws.cell('C4').value = '='
     ws.formula_attributes['C4'] = {'t': 'shared', 'si': '0'}
-    content = write_worksheet(ws, {}, {})
-    with open('sheet1_formula.xml') as expected:
-        diff = compare_xml(content, expected.read())
-        assert diff is None, diff
+
+    write_worksheet_data(doc, ws, [], None)
+    doc.endDocument()
+    xml = out.getvalue()
+    expected = """
+    <sheetData>
+      <row r="1" spans="1:6">
+        <c r="F1" t="n">
+          <v>10</v>
+        </c>
+      </row>
+      <row r="2" spans="1:6">
+        <c r="F2" t="n">
+          <v>32</v>
+        </c>
+      </row>
+      <row r="3" spans="1:6">
+        <c r="F3">
+          <f>F1+F2</f>
+          <v></v>
+        </c>
+      </row>
+      <row r="4" spans="1:6">
+        <c r="A4">
+          <f ref="A4:C4" si="0" t="shared">A1+A2+A3</f>
+          <v></v>
+        </c>
+        <c r="B4">
+          <f si="0" t="shared"></f>
+          <v></v>
+        </c>
+        <c r="C4">
+          <f si="0" t="shared"></f>
+          <v></v>
+        </c>
+      </row>
+    </sheetData>
+    """
+    diff = compare_xml(xml, expected)
+    assert diff is None, diff
 
 
 # check style tests
