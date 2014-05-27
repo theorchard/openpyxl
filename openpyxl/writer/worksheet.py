@@ -300,7 +300,6 @@ def write_cell(doc, worksheet, cell, string_table):
     if cell.data_type != cell.TYPE_FORMULA:
         attributes['t'] = cell.data_type
 
-
     value = cell.internal_value
     if value in ('', None):
         tag(doc, 'c', attributes)
