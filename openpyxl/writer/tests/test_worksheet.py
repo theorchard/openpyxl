@@ -71,7 +71,7 @@ def test_write_cols_style(out, doc, write_cols, ColumnDimension):
 def test_write_lots_cols(out, doc, write_cols, ColumnDimension):
     worksheet = DummyWorksheet()
     from openpyxl.cell import get_column_letter
-    for i in range(1, 50):
+    for i in range(1, 15):
         label = get_column_letter(i)
         worksheet._styles[label] = i
         worksheet.column_dimensions[label] = ColumnDimension()
@@ -93,41 +93,6 @@ def test_write_lots_cols(out, doc, write_cols, ColumnDimension):
    <col max="12" min="12" style="12"></col>
    <col max="13" min="13" style="13"></col>
    <col max="14" min="14" style="14"></col>
-   <col max="15" min="15" style="15"></col>
-   <col max="16" min="16" style="16"></col>
-   <col max="17" min="17" style="17"></col>
-   <col max="18" min="18" style="18"></col>
-   <col max="19" min="19" style="19"></col>
-   <col max="20" min="20" style="20"></col>
-   <col max="21" min="21" style="21"></col>
-   <col max="22" min="22" style="22"></col>
-   <col max="23" min="23" style="23"></col>
-   <col max="24" min="24" style="24"></col>
-   <col max="25" min="25" style="25"></col>
-   <col max="26" min="26" style="26"></col>
-   <col max="27" min="27" style="27"></col>
-   <col max="28" min="28" style="28"></col>
-   <col max="29" min="29" style="29"></col>
-   <col max="30" min="30" style="30"></col>
-   <col max="31" min="31" style="31"></col>
-   <col max="32" min="32" style="32"></col>
-   <col max="33" min="33" style="33"></col>
-   <col max="34" min="34" style="34"></col>
-   <col max="35" min="35" style="35"></col>
-   <col max="36" min="36" style="36"></col>
-   <col max="37" min="37" style="37"></col>
-   <col max="38" min="38" style="38"></col>
-   <col max="39" min="39" style="39"></col>
-   <col max="40" min="40" style="40"></col>
-   <col max="41" min="41" style="41"></col>
-   <col max="42" min="42" style="42"></col>
-   <col max="43" min="43" style="43"></col>
-   <col max="44" min="44" style="44"></col>
-   <col max="45" min="45" style="45"></col>
-   <col max="46" min="46" style="46"></col>
-   <col max="47" min="47" style="47"></col>
-   <col max="48" min="48" style="48"></col>
-   <col max="49" min="49" style="49"></col>
  </cols>
 """
     diff = compare_xml(xml, expected)
