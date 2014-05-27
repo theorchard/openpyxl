@@ -351,3 +351,17 @@ def test_write_cell(out, doc, value, expected):
     xml = out.getvalue()
     diff = compare_xml(xml, expected)
     assert diff is None, diff
+
+
+def test_write_sheetdata(out, doc):
+    from .. worksheet import write_worksheet_data
+
+    wb = Workbook()
+    ws = wb.active
+    ws['A1'] = 10
+    write_worksheet_data(doc, ws, [], None)
+    doc.endDocument()
+    xml = out.getvalue()
+    expected = """<sheetData><row r="1" spans="1:1"><c t="n" r="A1"><v>10</v></c></row></sheetData>"""
+    diff = compare_xml(xml, expected)
+    assert diff is None, diff
