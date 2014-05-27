@@ -60,20 +60,16 @@ def write_cell(xf, worksheet, cell, string_table):
                 xf.write(el)
                 el = None
             elif cell.data_type == cell.TYPE_FORMULA:
-                shared_formula = worksheet.formula_attributes.get(coordinate)
-                attr = {}
+                shared_formula = worksheet.formula_attributes.get(coordinate, {})
                 if shared_formula is not None:
-                    attr = shared_formula
-                    if ('t' in attr
-                        and attr['t'] == 'shared'
-                        and 'ref' not in attr):
-                        # Don't write body for shared formula
+                    if (shared_formula.get('t') == 'shared'
+                        and 'ref' not in shared_formula):
                         value = None
-                el = Element('f', attr)
+                el = Element('f', shared_formula)
                 if value is not None:
                     el.text = value[1:]
-                    xf.write(el)
-                    el = None
+                xf.write(el)
+                el = None
                 xf.write(Element("v"))
             else:
                 el = Element('v')

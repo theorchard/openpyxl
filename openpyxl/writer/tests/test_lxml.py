@@ -52,3 +52,60 @@ def test_write_sheetdata(out):
     expected = """<sheetData><row r="1" spans="1:1"><c t="n" r="A1"><v>10</v></c></row></sheetData>"""
     diff = compare_xml(xml, expected)
     assert diff is None, diff
+
+
+def test_write_formula(out):
+    from .. lxml_worksheet import write_worksheet_data
+
+    wb = Workbook()
+    ws = wb.active
+
+    ws.cell('F1').value = 10
+    ws.cell('F2').value = 32
+    ws.cell('F3').value = '=F1+F2'
+    ws.cell('A4').value = '=A1+A2+A3'
+    ws.formula_attributes['A4'] = {'t': 'shared', 'ref': 'A4:C4', 'si': '0'}
+    ws.cell('B4').value = '='
+    ws.formula_attributes['B4'] = {'t': 'shared', 'si': '0'}
+    ws.cell('C4').value = '='
+    ws.formula_attributes['C4'] = {'t': 'shared', 'si': '0'}
+
+    write_worksheet_data(out, ws, [], None)
+
+    xml = out.getvalue()
+    expected = """
+    <sheetData>
+      <row r="1" spans="1:6">
+        <c r="F1" t="n">
+          <v>10</v>
+        </c>
+      </row>
+      <row r="2" spans="1:6">
+        <c r="F2" t="n">
+          <v>32</v>
+        </c>
+      </row>
+      <row r="3" spans="1:6">
+        <c r="F3">
+          <f>F1+F2</f>
+          <v></v>
+        </c>
+      </row>
+      <row r="4" spans="1:6">
+        <c r="A4">
+          <f ref="A4:C4" si="0" t="shared">A1+A2+A3</f>
+          <v></v>
+        </c>
+        <c r="B4">
+          <f si="0" t="shared"></f>
+          <v></v>
+        </c>
+        <c r="C4">
+          <f si="0" t="shared"></f>
+          <v></v>
+        </c>
+      </row>
+    </sheetData>
+    """
+    diff = compare_xml(xml, expected)
+    assert diff is None, diff
