@@ -291,14 +291,17 @@ def write_worksheet_data(doc, worksheet, string_table, style_table):
 
 
 def write_cell(doc, worksheet, cell, string_table):
-    value = cell.internal_value
     coordinate = cell.coordinate
     attributes = {'r': coordinate}
+    cell_style = worksheet._styles.get(coordinate)
+    if cell_style is not None:
+        attributes['s'] = '%d' % cell_style
+
     if cell.data_type != cell.TYPE_FORMULA:
         attributes['t'] = cell.data_type
-    if coordinate in worksheet._styles:
-        attributes['s'] = '%d' % worksheet._styles[coordinate]
 
+
+    value = cell.internal_value
     if value in ('', None):
         tag(doc, 'c', attributes)
     else:
@@ -306,15 +309,16 @@ def write_cell(doc, worksheet, cell, string_table):
         if cell.data_type == cell.TYPE_STRING:
             tag(doc, 'v', body='%s' % string_table.index(value))
         elif cell.data_type == cell.TYPE_FORMULA:
-            if coordinate in worksheet.formula_attributes:
-                attr = worksheet.formula_attributes[coordinate]
+            shared_formula = worksheet.formula_attributes.get(coordinate)
+            if shared_formula is not None:
+                attr = shared_formula
                 if 't' in attr and attr['t'] == 'shared' and 'ref' not in attr:
                     # Don't write body for shared formula
                     tag(doc, 'f', attr=attr)
                 else:
-                    tag(doc, 'f', attr=attr, body='%s' % value[1:])
+                    tag(doc, 'f', attr=attr, body=value[1:])
             else:
-                tag(doc, 'f', body='%s' % value[1:])
+                tag(doc, 'f', body=value[1:])
             tag(doc, 'v')
         elif cell.data_type in (cell.TYPE_NUMERIC, cell.TYPE_BOOL):
             tag(doc, 'v', body=safe_string(value))
