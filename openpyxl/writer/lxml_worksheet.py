@@ -55,7 +55,7 @@ def write_cell(xf, worksheet, cell, string_table):
     else:
         with xf.element('c', attributes):
             if cell.data_type == cell.TYPE_STRING:
-                el = Element('v', attributes)
+                el = Element('v')
                 el.text = '%d' % string_table.index(value)
                 xf.write(el)
                 el = None
@@ -79,3 +79,4 @@ def write_cell(xf, worksheet, cell, string_table):
                 el = Element('v')
                 el.text = safe_string(value)
                 xf.write(el)
+                el = None
