@@ -4,7 +4,7 @@ from __future__ import absolute_import
 from openpyxl.compat import safe_string
 from openpyxl.cell import get_column_interval, column_index_from_string
 from openpyxl.descriptors import Integer, Float, Bool, Strict, String, Alias
-from openpyxl.compat.odict import OrderedDict
+from openpyxl.compat import OrderedDict
 
 
 class Base(Strict):
@@ -102,7 +102,7 @@ class ColumnDimension(Dimension):
     max = Integer(allow_none=True)
     collapsed = Bool()
 
-    __fields__ = Dimension.__fields__ + ('width', 'bestFit', 'customWidth', 'style', 
+    __fields__ = Dimension.__fields__ + ('width', 'bestFit', 'customWidth', 'style',
                                          'min', 'max')
 
     def __init__(self,
@@ -138,7 +138,7 @@ class ColumnDimension(Dimension):
     def customWidth(self):
         """Always true if there is a width for the column"""
         return self.width is not None
-        
+
     def __iter__(self):
         for key in self.__fields__[1:]:
             value = getattr(self, key)

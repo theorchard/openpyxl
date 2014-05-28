@@ -57,7 +57,7 @@ def test_group_columns_simple():
     dims = ws.column_dimensions
     dims.group('A', 'C', 1)
     assert len(dims) == 1
-    group = dims.values()[0]
+    group = list(dims.values())[0]
     assert group.outline_level == 1
     assert group.min == 1
     assert group.max == 3
@@ -69,5 +69,5 @@ def test_group_columns_collapse():
     ws = Worksheet(parent_workbook=DummyWorkbook())
     dims = ws.column_dimensions
     dims.group('A', 'C', 1, hidden=True)
-    group = dims.values()[0]
+    group = list(dims.values())[0]
     assert group.hidden
