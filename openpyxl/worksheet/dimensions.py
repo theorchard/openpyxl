@@ -89,9 +89,11 @@ class ColumnDimension(Dimension):
     min = Integer(allow_none=True)
     max = Integer(allow_none=True)
     customWidth = Bool()
+    collapsed = Bool()
 
     __fields__ = Dimension.__fields__ + ('width', 'bestFit', 'customWidth',
-                                         'min', 'max', 'outlineLevel')
+                                         'min', 'max', 'outlineLevel',
+                                         'collapsed')
 
     def __init__(self,
                  index='A',
@@ -144,7 +146,7 @@ class DimensionHolder(OrderedDict):
         self.direction = direction
         super(DimensionHolder, self).__init__(*args, **kwargs)
 
-    def group(self, start, end=None, outline_level=1):
+    def group(self, start, end=None, outline_level=1, collapsed=False):
         if end is None:
             end = start
         if start in self:
@@ -158,4 +160,5 @@ class DimensionHolder(OrderedDict):
                 del self[column_letter]
         new_dim.min, new_dim.max = map(column_index_from_string, (start, end))
         new_dim.outline_level = outline_level
+        new_dim.collapsed = collapsed
         self[start] = new_dim

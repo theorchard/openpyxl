@@ -36,3 +36,16 @@ def test_group_columns_simple():
     assert group.outline_level == 1
     assert group.min == 1
     assert group.max == 3
+
+
+def test_group_columns_collapse():
+    from ..worksheet import Worksheet
+    from ..dimensions import ColumnDimension
+    class DummyWorkbook:
+        def get_sheet_names(self):
+            return []
+    ws = Worksheet(parent_workbook=DummyWorkbook())
+    dims = ws.column_dimensions
+    dims.group('A', 'C', 1, collapsed=True)
+    group = dims.values()[0]
+    assert group.collapsed is True
