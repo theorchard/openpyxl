@@ -3,7 +3,6 @@ from io import BytesIO
 from openpyxl import Workbook
 from openpyxl.xml.functions import XMLGenerator
 
-
 def make_worksheet():
     wb = Workbook()
     ws = wb.active
@@ -32,3 +31,16 @@ def lxml_writer(ws=None):
     write_worksheet_data(out, ws, [], [])
     #with open("lxl_writer.xml", "wb") as dump:
         #dump.write(out.getvalue())
+
+"""
+Sample use
+import cProfile
+ws = make_worksheet()
+cProfile.run("profiling.lxml_writer(ws)", sort="tottime")
+"""
+
+if __name__ == '__main__':
+    import cProfile
+    ws = make_worksheet()
+    cProfile.run("sax_writer(ws)", sort="tottime")
+    cProfile.run("lxml_writer(ws)", sort="tottime")
