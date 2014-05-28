@@ -240,3 +240,15 @@ Custom rule:
 .. note::
     See http://www.contextures.com/xlDataVal07.html for custom rules
 
+
+Fold columns (outline)
+----------------------
+::
+
+    import openpyxl
+    wb = openpyxl.Workbook(True)
+    ws = wb.create_sheet()
+    ws.column_dimensions.group('A','D', hidden=True)
+    wb.save('group.xlsx')
+
+
