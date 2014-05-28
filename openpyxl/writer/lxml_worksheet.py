@@ -3,7 +3,7 @@ from __future__ import absolute_import
 
 # Experimental writer of worksheet data using lxml incremental API
 
-from lxml.etree import xmlfile, Element
+from lxml.etree import xmlfile, Element, SubElement
 
 from openpyxl.compat import iterkeys, itervalues, safe_string
 from .worksheet import row_sort
@@ -46,33 +46,29 @@ def write_cell(xf, worksheet, cell, string_table):
     if cell_style is not None:
         attributes['s'] = '%d' % cell_style
 
-    if cell.data_type != cell.TYPE_FORMULA:
+    if cell.data_type != 'f':
         attributes['t'] = cell.data_type
 
     value = cell.internal_value
+
     if value in ('', None):
-        xf.element("c", attributes)
-    else:
-        with xf.element('c', attributes):
-            if cell.data_type == cell.TYPE_STRING:
-                el = Element('v')
-                el.text = '%d' % string_table.index(value)
-                xf.write(el)
-                el = None
-            elif cell.data_type == cell.TYPE_FORMULA:
-                shared_formula = worksheet.formula_attributes.get(coordinate, {})
-                if shared_formula is not None:
-                    if (shared_formula.get('t') == 'shared'
-                        and 'ref' not in shared_formula):
-                        value = None
-                el = Element('f', shared_formula)
+        with xf.element("c", attributes):
+            return
+
+    with xf.element('c', attributes):
+        if cell.data_type == 'f':
+            shared_formula = worksheet.formula_attributes.get(coordinate, {})
+            if shared_formula is not None:
+                if (shared_formula.get('t') == 'shared'
+                    and 'ref' not in shared_formula):
+                    value = None
+            with xf.element('f', shared_formula):
                 if value is not None:
-                    el.text = value[1:]
-                xf.write(el)
-                el = None
-                xf.write(Element("v"))
-            else:
-                el = Element('v')
-                el.text = safe_string(value)
-                xf.write(el)
-                el = None
+                    xf.write(value[1:])
+                    value = None
+
+        if cell.data_type == 's':
+            value = string_table.index(value)
+        with xf.element("v") as v:
+            if value is not None:
+                xf.write(safe_string(value))

@@ -27,6 +27,8 @@ def out():
                              ("=sum(1+1)", """<c r="A1"><f>sum(1+1)</f><v></v></c>"""),
                              (True, """<c t="b" r="A1"><v>1</v></c>"""),
                              ("Hello", """<c t="s" r="A1"><v>0</v></c>"""),
+                             ("", """<c r="A1" t="s"></c>"""),
+                             (None, """<c r="A1" t="s"></c>"""),
                          ])
 def test_write_cell(out, value, expected):
     from .. lxml_worksheet import write_cell
