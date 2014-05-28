@@ -4,6 +4,10 @@ from __future__ import absolute_import
 import pytest
 
 
+class DummyWorkbook:
+    def get_sheet_names(self):
+        return []
+
 def test_dimension():
     from .. dimensions import Dimension
     with pytest.raises(TypeError):
@@ -25,9 +29,6 @@ def test_col_dimensions():
 def test_group_columns_simple():
     from ..worksheet import Worksheet
     from ..dimensions import ColumnDimension
-    class DummyWorkbook:
-        def get_sheet_names(self):
-            return []
     ws = Worksheet(parent_workbook=DummyWorkbook())
     dims = ws.column_dimensions
     dims.group('A', 'C', 1)
@@ -41,9 +42,6 @@ def test_group_columns_simple():
 def test_group_columns_collapse():
     from ..worksheet import Worksheet
     from ..dimensions import ColumnDimension
-    class DummyWorkbook:
-        def get_sheet_names(self):
-            return []
     ws = Worksheet(parent_workbook=DummyWorkbook())
     dims = ws.column_dimensions
     dims.group('A', 'C', 1, hidden=True)
