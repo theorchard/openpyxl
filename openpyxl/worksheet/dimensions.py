@@ -146,6 +146,13 @@ class DimensionHolder(OrderedDict):
         super(DimensionHolder, self).__init__(*args, **kwargs)
 
     def group(self, start, end=None, outline_level=1, hidden=False):
+        """allow grouping a range of consecutive columns together
+
+        :param start: first column to be grouped (mandatory)
+        :param end: last column to be grouped (optional, default to start)
+        :param outline_level: outline level
+        :param hidden: should the group be hidden on workbook open or not
+        """
         if end is None:
             end = start
         if start in self:
