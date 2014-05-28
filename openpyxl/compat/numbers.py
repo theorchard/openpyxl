@@ -28,3 +28,8 @@ try:
 except NameError:
     # Python 3
     long = int
+
+from decimal import Decimal
+
+NUMERIC_TYPES = (int, float, long, Decimal)
+

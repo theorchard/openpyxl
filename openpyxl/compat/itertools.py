@@ -28,3 +28,12 @@ def iterkeys(iterable):
     else:
         for item in iterable.keys():
             yield item
+
+
+def itervalues(iterable):
+    if hasattr(iterable, 'itervalues'):
+        for item in iterable.itervalues():
+            yield item
+    else:
+        for item in iterable.values():
+            yield item

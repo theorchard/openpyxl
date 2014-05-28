@@ -27,10 +27,11 @@ from __future__ import absolute_import
 # Python stdlib imports
 import decimal
 from io import BytesIO
+from operator import attrgetter
 
 # compatibility imports
 
-from openpyxl.compat import long
+from openpyxl.compat import long, safe_string, itervalues
 
 # package imports
 from openpyxl.cell import (
@@ -213,12 +214,10 @@ def write_worksheet_cols(doc, worksheet, style_table=None):
     """
     cols = []
     for label, dimension in iteritems(worksheet.column_dimensions):
+        dimension.style = worksheet._styles.get(label)
         col_def = dict(dimension)
-        style = worksheet._styles.get(label)
-        if col_def == {} and style is None:
+        if col_def == {}:
             continue
-        elif style is not None:
-            col_def['style'] = '%d' % style
         idx = column_index_from_string(label)
         cols.append((idx, col_def))
     if cols == []:
@@ -274,70 +273,70 @@ def write_worksheet_conditional_formatting(doc, worksheet):
 
 def write_worksheet_data(doc, worksheet, string_table, style_table):
     """Write worksheet data to xml."""
-    start_tag(doc, 'sheetData')
-    max_column = worksheet.get_highest_column()
-    shared_styles = worksheet.parent.shared_styles
-    cells_by_row = {}
+
+    # Ensure a blank cell exists if it has a style
     for styleCoord in iterkeys(worksheet._styles):
-        # Ensure a blank cell exists if it has a style
         if isinstance(styleCoord, str) and COORD_RE.search(styleCoord):
             worksheet.cell(styleCoord)
-    for cell in worksheet.get_cell_collection():
+
+    # create rows of cells
+    cells_by_row = {}
+    for cell in itervalues(worksheet._cells):
         cells_by_row.setdefault(cell.row, []).append(cell)
+
+    start_tag(doc, 'sheetData')
     for row_idx in sorted(cells_by_row):
+        # row meta data
         row_dimension = worksheet.row_dimensions[row_idx]
+        row_dimension.style = worksheet._styles.get(row_idx)
         attrs = {'r': '%d' % row_idx,
-                 'spans': '1:%d' % max_column}
-        if not row_dimension.visible:
-            attrs['hidden'] = '1'
-        if row_dimension.height is not None:
-            attrs['ht'] = str(row_dimension.ht)
-            attrs['customHeight'] = '1'
-        if row_idx in worksheet._styles:
-            attrs['s'] = '%d' % worksheet._styles[row_idx]
-            attrs['customFormat'] = '1'
+                 'spans': '1:%d' % worksheet.max_column}
+        attrs.update(dict(row_dimension))
+
         start_tag(doc, 'row', attrs)
         row_cells = cells_by_row[row_idx]
-        sorted_cells = sorted(row_cells, key=row_sort)
-        for cell in sorted_cells:
-            value = cell.internal_value
-            coordinate = cell.coordinate
-            attributes = {'r': coordinate}
-            if cell.data_type != cell.TYPE_FORMULA:
-                attributes['t'] = cell.data_type
-            if coordinate in worksheet._styles:
-                attributes['s'] = '%d' % worksheet._styles[coordinate]
+        for cell in sorted(row_cells, key=row_sort):
+            write_cell(doc, worksheet, cell, string_table)
 
-            if value in ('', None):
-                tag(doc, 'c', attributes)
-            else:
-                start_tag(doc, 'c', attributes)
-                if cell.data_type == cell.TYPE_STRING:
-                    tag(doc, 'v', body='%s' % string_table.index(value))
-                elif cell.data_type == cell.TYPE_FORMULA:
-                    if coordinate in worksheet.formula_attributes:
-                        attr = worksheet.formula_attributes[coordinate]
-                        if 't' in attr and attr['t'] == 'shared' and 'ref' not in attr:
-                            # Don't write body for shared formula
-                            tag(doc, 'f', attr=attr)
-                        else:
-                            tag(doc, 'f', attr=attr, body='%s' % value[1:])
-                    else:
-                        tag(doc, 'f', body='%s' % value[1:])
-                    tag(doc, 'v')
-                elif cell.data_type == cell.TYPE_NUMERIC:
-                    if isinstance(value, (long, decimal.Decimal)):
-                        func = str
-                    else:
-                        func = repr
-                    tag(doc, 'v', body=func(value))
-                elif cell.data_type == cell.TYPE_BOOL:
-                    tag(doc, 'v', body='%d' % value)
-                else:
-                    tag(doc, 'v', body='%s' % value)
-                end_tag(doc, 'c')
         end_tag(doc, 'row')
     end_tag(doc, 'sheetData')
+
+
+def write_cell(doc, worksheet, cell, string_table):
+    coordinate = cell.coordinate
+    attributes = {'r': coordinate}
+    cell_style = worksheet._styles.get(coordinate)
+    if cell_style is not None:
+        attributes['s'] = '%d' % cell_style
+
+    if cell.data_type != cell.TYPE_FORMULA:
+        attributes['t'] = cell.data_type
+
+    value = cell.internal_value
+    if value in ('', None):
+        tag(doc, 'c', attributes)
+    else:
+        start_tag(doc, 'c', attributes)
+        if cell.data_type == cell.TYPE_STRING:
+            tag(doc, 'v', body='%s' % string_table.index(value))
+        elif cell.data_type == cell.TYPE_FORMULA:
+            shared_formula = worksheet.formula_attributes.get(coordinate)
+            if shared_formula is not None:
+                attr = shared_formula
+                if 't' in attr and attr['t'] == 'shared' and 'ref' not in attr:
+                    # Don't write body for shared formula
+                    tag(doc, 'f', attr=attr)
+                else:
+                    tag(doc, 'f', attr=attr, body=value[1:])
+            else:
+                tag(doc, 'f', body=value[1:])
+            tag(doc, 'v')
+        elif cell.data_type in (cell.TYPE_NUMERIC, cell.TYPE_BOOL):
+            tag(doc, 'v', body=safe_string(value))
+        else:
+            tag(doc, 'v', body=value)
+        end_tag(doc, 'c')
+
 
 def write_worksheet_autofilter(doc, worksheet):
     auto_filter = worksheet.auto_filter

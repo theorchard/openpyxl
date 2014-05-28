@@ -1,11 +1,18 @@
 from __future__ import absolute_import
 # Copyright (c) 2010-2014 openpyxl
 
-
+import decimal
 from io import BytesIO
+
 import pytest
 
 from openpyxl.xml.functions import XMLGenerator
+from openpyxl import Workbook
+
+from .. strings import create_string_table
+from .. styles import StyleWriter
+from .. workbook import write_workbook
+from .. worksheet import write_worksheet, write_worksheet_rels
 
 from openpyxl.tests.helper import compare_xml
 
@@ -78,7 +85,7 @@ def test_write_cols_style(out, doc, write_cols, ColumnDimension):
 def test_write_lots_cols(out, doc, write_cols, ColumnDimension):
     worksheet = DummyWorksheet()
     from openpyxl.cell import get_column_letter
-    for i in range(1, 50):
+    for i in range(1, 15):
         label = get_column_letter(i)
         worksheet._styles[label] = i
         worksheet.column_dimensions[label] = ColumnDimension()
@@ -100,43 +107,299 @@ def test_write_lots_cols(out, doc, write_cols, ColumnDimension):
    <col max="12" min="12" style="12"></col>
    <col max="13" min="13" style="13"></col>
    <col max="14" min="14" style="14"></col>
-   <col max="15" min="15" style="15"></col>
-   <col max="16" min="16" style="16"></col>
-   <col max="17" min="17" style="17"></col>
-   <col max="18" min="18" style="18"></col>
-   <col max="19" min="19" style="19"></col>
-   <col max="20" min="20" style="20"></col>
-   <col max="21" min="21" style="21"></col>
-   <col max="22" min="22" style="22"></col>
-   <col max="23" min="23" style="23"></col>
-   <col max="24" min="24" style="24"></col>
-   <col max="25" min="25" style="25"></col>
-   <col max="26" min="26" style="26"></col>
-   <col max="27" min="27" style="27"></col>
-   <col max="28" min="28" style="28"></col>
-   <col max="29" min="29" style="29"></col>
-   <col max="30" min="30" style="30"></col>
-   <col max="31" min="31" style="31"></col>
-   <col max="32" min="32" style="32"></col>
-   <col max="33" min="33" style="33"></col>
-   <col max="34" min="34" style="34"></col>
-   <col max="35" min="35" style="35"></col>
-   <col max="36" min="36" style="36"></col>
-   <col max="37" min="37" style="37"></col>
-   <col max="38" min="38" style="38"></col>
-   <col max="39" min="39" style="39"></col>
-   <col max="40" min="40" style="40"></col>
-   <col max="41" min="41" style="41"></col>
-   <col max="42" min="42" style="42"></col>
-   <col max="43" min="43" style="43"></col>
-   <col max="44" min="44" style="44"></col>
-   <col max="45" min="45" style="45"></col>
-   <col max="46" min="46" style="46"></col>
-   <col max="47" min="47" style="47"></col>
-   <col max="48" min="48" style="48"></col>
-   <col max="49" min="49" style="49"></col>
  </cols>
 """
+    diff = compare_xml(xml, expected)
+    assert diff is None, diff
+
+
+
+def test_write_hidden_worksheet(datadir):
+    datadir.chdir()
+    wb = Workbook()
+    ws = wb.create_sheet()
+    ws.sheet_state = ws.SHEETSTATE_HIDDEN
+    ws.cell('F42').value = 'hello'
+    strings = create_string_table(wb)
+    content = write_worksheet(ws, strings, {})
+    with open('sheet1.xml') as expected:
+        diff = compare_xml(content, expected.read())
+        assert diff is None, diff
+
+
+def test_write_bool(datadir):
+    datadir.chdir()
+    wb = Workbook()
+    ws = wb.create_sheet()
+    ws.cell('F42').value = False
+    ws.cell('F43').value = True
+    content = write_worksheet(ws, {}, {})
+    with open('sheet1_bool.xml') as expected:
+        diff = compare_xml(content, expected.read())
+        assert diff is None, diff
+
+
+def test_write_formula(out, doc, datadir):
+    from .. worksheet import write_worksheet_data
+    datadir.chdir()
+    wb = Workbook()
+    ws = wb.create_sheet()
+    ws.cell('F1').value = 10
+    ws.cell('F2').value = 32
+    ws.cell('F3').value = '=F1+F2'
+    ws.cell('A4').value = '=A1+A2+A3'
+    ws.formula_attributes['A4'] = {'t': 'shared', 'ref': 'A4:C4', 'si': '0'}
+    ws.cell('B4').value = '='
+    ws.formula_attributes['B4'] = {'t': 'shared', 'si': '0'}
+    ws.cell('C4').value = '='
+    ws.formula_attributes['C4'] = {'t': 'shared', 'si': '0'}
+
+    write_worksheet_data(doc, ws, [], None)
+    doc.endDocument()
+    xml = out.getvalue()
+    expected = """
+    <sheetData>
+      <row r="1" spans="1:6">
+        <c r="F1" t="n">
+          <v>10</v>
+        </c>
+      </row>
+      <row r="2" spans="1:6">
+        <c r="F2" t="n">
+          <v>32</v>
+        </c>
+      </row>
+      <row r="3" spans="1:6">
+        <c r="F3">
+          <f>F1+F2</f>
+          <v></v>
+        </c>
+      </row>
+      <row r="4" spans="1:6">
+        <c r="A4">
+          <f ref="A4:C4" si="0" t="shared">A1+A2+A3</f>
+          <v></v>
+        </c>
+        <c r="B4">
+          <f si="0" t="shared"></f>
+          <v></v>
+        </c>
+        <c r="C4">
+          <f si="0" t="shared"></f>
+          <v></v>
+        </c>
+      </row>
+    </sheetData>
+    """
+    diff = compare_xml(xml, expected)
+    assert diff is None, diff
+
+
+# check style tests
+def test_write_style(datadir):
+    datadir.chdir()
+    wb = Workbook(guess_types=True)
+    ws = wb.create_sheet()
+    ws.cell('F1').value = '13%'
+    ws._styles['F'] = ws._styles['F1']
+    styles = StyleWriter(wb).styles
+    content = write_worksheet(ws, {}, styles)
+    with open('sheet1_style.xml') as expected:
+        diff = compare_xml(content, expected.read())
+        assert diff is None, diff
+
+
+def test_write_height(datadir):
+    datadir.chdir()
+    wb = Workbook()
+    ws = wb.create_sheet()
+    ws.cell('F1').value = 10
+    ws.row_dimensions[ws.cell('F1').row].height = 30
+    content = write_worksheet(ws, {}, {})
+    with open('sheet1_height.xml') as expected:
+        diff = compare_xml(content, expected.read())
+        assert diff is None, diff
+
+
+def test_write_hyperlink(datadir):
+    datadir.chdir()
+    wb = Workbook()
+    ws = wb.create_sheet()
+    ws.cell('A1').value = "test"
+    ws.cell('A1').hyperlink = "http://test.com"
+    strings = create_string_table(wb)
+    content = write_worksheet(ws, strings, {})
+    with open('sheet1_hyperlink.xml') as expected:
+        diff = compare_xml(content, expected.read())
+        assert diff is None, diff
+
+
+def test_write_hyperlink_rels(datadir):
+    datadir.chdir()
+    wb = Workbook()
+    ws = wb.create_sheet()
+    assert 0 == len(ws.relationships)
+    ws.cell('A1').value = "test"
+    ws.cell('A1').hyperlink = "http://test.com/"
+    assert 1 == len(ws.relationships)
+    ws.cell('A2').value = "test"
+    ws.cell('A2').hyperlink = "http://test2.com/"
+    assert 2 == len(ws.relationships)
+    content = write_worksheet_rels(ws, 1, 1)
+    with open('sheet1_hyperlink.xml.rels') as expected:
+        diff = compare_xml(content, expected.read())
+        assert diff is None, diff
+
+
+@pytest.mark.xfail
+@pytest.mark.pil_required
+def test_write_hyperlink_image_rels(Workbook, Image, datadir):
+    datadir.chdir()
+    wb = Workbook()
+    ws = wb.create_sheet()
+    ws.cell('A1').value = "test"
+    ws.cell('A1').hyperlink = "http://test.com/"
+    i = Image( "plain.png")
+    ws.add_image(i)
+    raise ValueError("Resulting file is invalid")
+    # TODO write integration test with duplicate relation ids then fix
+
+
+def test_hyperlink_value():
+    wb = Workbook()
+    ws = wb.create_sheet()
+    ws.cell('A1').hyperlink = "http://test.com"
+    assert "http://test.com" == ws.cell('A1').value
+    ws.cell('A1').value = "test"
+    assert "test" == ws.cell('A1').value
+
+
+def test_write_auto_filter(datadir):
+    datadir.chdir()
+    wb = Workbook()
+    ws = wb.worksheets[0]
+    ws.cell('F42').value = 'hello'
+    ws.auto_filter.ref = 'A1:F1'
+    strings = create_string_table(wb)
+    content = write_worksheet(ws, strings, {})
+    with open('sheet1_auto_filter.xml') as expected:
+        diff = compare_xml(content, expected.read())
+        assert diff is None
+
+    content = write_workbook(wb)
+    with open('workbook_auto_filter.xml') as expected:
+        diff = compare_xml(content, expected.read())
+        assert diff is None, diff
+
+def test_write_auto_filter_filter_column(datadir):
+    datadir.chdir()
+    wb = Workbook()
+    ws = wb.worksheets[0]
+    ws.cell('F42').value = 'hello'
+    ws.auto_filter.ref = 'A1:F1'
+    ws.auto_filter.add_filter_column(0, ["0"], blank=True)
+    strings = create_string_table(wb)
+    content = write_worksheet(ws, strings, {})
+    with open('sheet1_auto_filter_filter_column.xml') as expected:
+        diff = compare_xml(content, expected.read())
+        assert diff is None
+
+    content = write_workbook(wb)
+    with open('workbook_auto_filter.xml') as expected:
+        diff = compare_xml(content, expected.read())
+        assert diff is None, diff
+
+def test_write_auto_filter_sort_condition(datadir):
+    datadir.chdir()
+    wb = Workbook()
+    ws = wb.worksheets[0]
+    ws.cell('A1').value = 'header'
+    ws.cell('A2').value = 1
+    ws.cell('A3').value = 0
+    ws.auto_filter.ref = 'A2:A3'
+    ws.auto_filter.add_sort_condition('A2:A3', descending=True)
+    strings = create_string_table(wb)
+    content = write_worksheet(ws, strings, {})
+    with open('sheet1_auto_filter_sort_condition.xml') as expected:
+        diff = compare_xml(content, expected.read())
+        assert diff is None
+
+    content = write_workbook(wb)
+    with open('workbook_auto_filter.xml') as expected:
+        diff = compare_xml(content, expected.read())
+
+def test_freeze_panes_horiz(datadir):
+    datadir.chdir()
+    wb = Workbook()
+    ws = wb.create_sheet()
+    ws.cell('F42').value = 'hello'
+    ws.freeze_panes = 'A4'
+    strings = create_string_table(wb)
+    content = write_worksheet(ws, strings, {})
+    with open('sheet1_freeze_panes_horiz.xml') as expected:
+        diff = compare_xml(content, expected.read())
+        assert diff is None, diff
+
+def test_freeze_panes_vert(datadir):
+    datadir.chdir()
+    wb = Workbook()
+    ws = wb.create_sheet()
+    ws.cell('F42').value = 'hello'
+    ws.freeze_panes = 'D1'
+    strings = create_string_table(wb)
+    content = write_worksheet(ws, strings, {})
+    with open('sheet1_freeze_panes_vert.xml') as expected:
+        diff = compare_xml(content, expected.read())
+        assert diff is None, diff
+
+def test_freeze_panes_both(datadir):
+    datadir.chdir()
+    wb = Workbook()
+    ws = wb.create_sheet()
+    ws.cell('F42').value = 'hello'
+    ws.freeze_panes = 'D4'
+    strings = create_string_table(wb)
+    content = write_worksheet(ws, strings, {})
+    with open('sheet1_freeze_panes_both.xml') as expected:
+        diff = compare_xml(content, expected.read())
+        assert diff is None, diff
+
+
+
+@pytest.mark.parametrize("value, expected",
+                         [
+                             (9781231231230, """<c t="n" r="A1"><v>9781231231230</v></c>"""),
+                             (decimal.Decimal('3.14'), """<c t="n" r="A1"><v>3.14</v></c>"""),
+                             (1234567890, """<c t="n" r="A1"><v>1234567890</v></c>"""),
+                             ("=sum(1+1)", """<c r="A1"><f>sum(1+1)</f><v></v></c>"""),
+                             (True, """<c t="b" r="A1"><v>1</v></c>"""),
+                             ("Hello", """<c t="s" r="A1"><v>0</v></c>"""),
+                             ("", """<c r="A1" t="s"></c>"""),
+                             (None, """<c r="A1" t="s"></c>"""),
+                         ])
+def test_write_cell(out, doc, value, expected):
+    from .. worksheet import write_cell
+
+    wb = Workbook()
+    ws = wb.active
+    ws['A1'] = value
+    write_cell(doc, ws, ws['A1'], ['Hello'])
+    doc.endDocument()
+    xml = out.getvalue()
+    diff = compare_xml(xml, expected)
+    assert diff is None, diff
+
+
+def test_write_sheetdata(out, doc):
+    from .. worksheet import write_worksheet_data
+
+    wb = Workbook()
+    ws = wb.active
+    ws['A1'] = 10
+    write_worksheet_data(doc, ws, [], None)
+    doc.endDocument()
+    xml = out.getvalue()
+    expected = """<sheetData><row r="1" spans="1:1"><c t="n" r="A1"><v>10</v></c></row></sheetData>"""
     diff = compare_xml(xml, expected)
     assert diff is None, diff
 

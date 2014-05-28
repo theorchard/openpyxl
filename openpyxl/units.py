@@ -23,13 +23,10 @@ from __future__ import division
 # @license: http://www.opensource.org/licenses/mit-license.php
 # @author: see AUTHORS file
 
-import decimal
 import math
 
-from openpyxl.compat import long
 
 #constants
-NUMERIC_TYPES = (int, float, long, decimal.Decimal)
 
 DEFAULT_ROW_HEIGHT = 15.  # Default row height measured in point size.
 BASE_COL_WIDTH = 13 # in characters
