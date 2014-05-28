@@ -46,6 +46,6 @@ def test_group_columns_collapse():
             return []
     ws = Worksheet(parent_workbook=DummyWorkbook())
     dims = ws.column_dimensions
-    dims.group('A', 'C', 1, collapsed=True)
+    dims.group('A', 'C', 1, hidden=True)
     group = dims.values()[0]
-    assert group.collapsed is True
+    assert group.hidden
