@@ -127,18 +127,6 @@ def test_write_hidden_worksheet(datadir):
         assert diff is None, diff
 
 
-def test_write_bool(datadir):
-    datadir.chdir()
-    wb = Workbook()
-    ws = wb.create_sheet()
-    ws.cell('F42').value = False
-    ws.cell('F43').value = True
-    content = write_worksheet(ws, {}, {})
-    with open('sheet1_bool.xml') as expected:
-        diff = compare_xml(content, expected.read())
-        assert diff is None, diff
-
-
 def test_write_formula(out, doc, datadir):
     from .. worksheet import write_worksheet_data
     datadir.chdir()
@@ -274,7 +262,7 @@ def test_hyperlink_value():
     assert "test" == ws.cell('A1').value
 
 
-def test_write_auto_filter(datadir):
+def test_write_auto_filter(datadir, out, doc):
     datadir.chdir()
     wb = Workbook()
     ws = wb.worksheets[0]
