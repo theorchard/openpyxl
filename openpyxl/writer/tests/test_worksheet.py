@@ -11,7 +11,6 @@ from openpyxl import Workbook
 
 from .. strings import create_string_table
 from .. styles import StyleWriter
-from .. workbook import write_workbook
 from .. worksheet import write_worksheet, write_worksheet_rels
 
 from openpyxl.tests.helper import compare_xml
@@ -111,7 +110,6 @@ def test_write_lots_cols(out, doc, write_cols, ColumnDimension):
 """
     diff = compare_xml(xml, expected)
     assert diff is None, diff
-
 
 
 def test_write_hidden_worksheet(datadir):
@@ -262,11 +260,13 @@ def test_hyperlink_value():
     assert "test" == ws.cell('A1').value
 
 
-from .. worksheet import write_worksheet_autofilter
+@pytest.fixture
+def write_worksheet_autofilter():
+    from .. worksheet import write_worksheet_autofilter
+    return write_worksheet_autofilter
 
 
-def test_write_auto_filter(datadir, out, doc):
-    datadir.chdir()
+def test_write_auto_filter(out, doc, write_worksheet_autofilter):
     wb = Workbook()
     ws = wb.worksheets[0]
     ws.cell('F42').value = 'hello'
@@ -278,14 +278,8 @@ def test_write_auto_filter(datadir, out, doc):
     diff = compare_xml(xml, expected)
     assert diff is None, diff
 
-    content = write_workbook(wb)
-    with open('workbook_auto_filter.xml') as expected:
-        diff = compare_xml(content, expected.read())
-        assert diff is None, diff
 
-
-def test_write_auto_filter_filter_column(datadir, out, doc):
-    datadir.chdir()
+def test_write_auto_filter_filter_column(out, doc, write_worksheet_autofilter):
     wb = Workbook()
     ws = wb.worksheets[0]
     ws.cell('F42').value = 'hello'
@@ -307,8 +301,7 @@ def test_write_auto_filter_filter_column(datadir, out, doc):
     assert diff is None, diff
 
 
-def test_write_auto_filter_sort_condition(datadir, out, doc):
-    datadir.chdir()
+def test_write_auto_filter_sort_condition(out, doc, write_worksheet_autofilter):
     wb = Workbook()
     ws = wb.worksheets[0]
     ws.cell('A1').value = 'header'
@@ -330,41 +323,72 @@ def test_write_auto_filter_sort_condition(datadir, out, doc):
     assert diff is None, diff
 
 
-def test_freeze_panes_horiz(datadir):
-    datadir.chdir()
+@pytest.fixture
+def write_worksheet_sheetviews():
+    from .. worksheet import write_worksheet_sheetviews
+    return write_worksheet_sheetviews
+
+
+def test_freeze_panes_horiz(out, doc, write_worksheet_sheetviews):
     wb = Workbook()
     ws = wb.create_sheet()
     ws.cell('F42').value = 'hello'
     ws.freeze_panes = 'A4'
-    strings = create_string_table(wb)
-    content = write_worksheet(ws, strings, {})
-    with open('sheet1_freeze_panes_horiz.xml') as expected:
-        diff = compare_xml(content, expected.read())
-        assert diff is None, diff
 
-def test_freeze_panes_vert(datadir):
-    datadir.chdir()
+    write_worksheet_sheetviews(doc, ws)
+    xml = out.getvalue()
+    expected = """
+    <sheetViews>
+    <sheetView workbookViewId="0">
+      <pane topLeftCell="A4" ySplit="3" state="frozen" activePane="bottomLeft"/>
+      <selection activeCell="A1" pane="bottomLeft" sqref="A1"/>
+    </sheetView>
+    </sheetViews>
+    """
+    diff = compare_xml(xml, expected)
+    assert diff is None, diff
+
+
+def test_freeze_panes_vert(out, doc, write_worksheet_sheetviews):
     wb = Workbook()
     ws = wb.create_sheet()
     ws.cell('F42').value = 'hello'
     ws.freeze_panes = 'D1'
-    strings = create_string_table(wb)
-    content = write_worksheet(ws, strings, {})
-    with open('sheet1_freeze_panes_vert.xml') as expected:
-        diff = compare_xml(content, expected.read())
-        assert diff is None, diff
 
-def test_freeze_panes_both(datadir):
-    datadir.chdir()
+    write_worksheet_sheetviews(doc, ws)
+    xml = out.getvalue()
+    expected = """
+    <sheetViews>
+      <sheetView workbookViewId="0">
+        <pane xSplit="3" topLeftCell="D1" activePane="topRight" state="frozen"/>
+        <selection pane="topRight" activeCell="A1" sqref="A1"/>
+      </sheetView>
+    </sheetViews>
+    """
+    diff = compare_xml(xml, expected)
+    assert diff is None, diff
+
+
+def test_freeze_panes_both(out, doc, write_worksheet_sheetviews):
     wb = Workbook()
     ws = wb.create_sheet()
     ws.cell('F42').value = 'hello'
     ws.freeze_panes = 'D4'
-    strings = create_string_table(wb)
-    content = write_worksheet(ws, strings, {})
-    with open('sheet1_freeze_panes_both.xml') as expected:
-        diff = compare_xml(content, expected.read())
-        assert diff is None, diff
+
+    write_worksheet_sheetviews(doc, ws)
+    xml = out.getvalue()
+    expected = """
+    <sheetViews>
+      <sheetView workbookViewId="0">
+        <pane xSplit="3" ySplit="3" topLeftCell="D4" activePane="bottomRight" state="frozen"/>
+        <selection pane="topRight"/>
+        <selection pane="bottomLeft"/>
+        <selection pane="bottomRight" activeCell="A1" sqref="A1"/>
+      </sheetView>
+    </sheetViews>
+    """
+    diff = compare_xml(xml, expected)
+    assert diff is None, diff
 
 
 
