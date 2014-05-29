@@ -24,6 +24,13 @@ class DummyWorksheet:
 
 
 @pytest.fixture
+def worksheet():
+    from openpyxl import Workbook
+    wb = Workbook()
+    return wb.active
+
+
+@pytest.fixture
 def out():
     return BytesIO()
 
@@ -266,9 +273,8 @@ def write_worksheet_autofilter():
     return write_worksheet_autofilter
 
 
-def test_write_auto_filter(out, doc, write_worksheet_autofilter):
-    wb = Workbook()
-    ws = wb.worksheets[0]
+def test_write_auto_filter(out, doc, worksheet, write_worksheet_autofilter):
+    ws = worksheet
     ws.auto_filter.ref = 'A1:F1'
 
     write_worksheet_autofilter(doc, ws)
@@ -278,9 +284,8 @@ def test_write_auto_filter(out, doc, write_worksheet_autofilter):
     assert diff is None, diff
 
 
-def test_write_auto_filter_filter_column(out, doc, write_worksheet_autofilter):
-    wb = Workbook()
-    ws = wb.worksheets[0]
+def test_write_auto_filter_filter_column(out, doc, worksheet, write_worksheet_autofilter):
+    ws = worksheet
     ws.auto_filter.ref = 'A1:F1'
     ws.auto_filter.add_filter_column(0, ["0"], blank=True)
 
@@ -299,9 +304,8 @@ def test_write_auto_filter_filter_column(out, doc, write_worksheet_autofilter):
     assert diff is None, diff
 
 
-def test_write_auto_filter_sort_condition(out, doc, write_worksheet_autofilter):
-    wb = Workbook()
-    ws = wb.worksheets[0]
+def test_write_auto_filter_sort_condition(out, doc, worksheet, write_worksheet_autofilter):
+    ws = worksheet
     ws.cell('A1').value = 'header'
     ws.cell('A2').value = 1
     ws.cell('A3').value = 0
@@ -327,9 +331,8 @@ def write_worksheet_sheetviews():
     return write_worksheet_sheetviews
 
 
-def test_freeze_panes_horiz(out, doc, write_worksheet_sheetviews):
-    wb = Workbook()
-    ws = wb.create_sheet()
+def test_freeze_panes_horiz(out, doc, worksheet, write_worksheet_sheetviews):
+    ws = worksheet
     ws.freeze_panes = 'A4'
 
     write_worksheet_sheetviews(doc, ws)
@@ -346,9 +349,8 @@ def test_freeze_panes_horiz(out, doc, write_worksheet_sheetviews):
     assert diff is None, diff
 
 
-def test_freeze_panes_vert(out, doc, write_worksheet_sheetviews):
-    wb = Workbook()
-    ws = wb.create_sheet()
+def test_freeze_panes_vert(out, doc, worksheet, write_worksheet_sheetviews):
+    ws = worksheet
     ws.freeze_panes = 'D1'
 
     write_worksheet_sheetviews(doc, ws)
@@ -365,9 +367,8 @@ def test_freeze_panes_vert(out, doc, write_worksheet_sheetviews):
     assert diff is None, diff
 
 
-def test_freeze_panes_both(out, doc, write_worksheet_sheetviews):
-    wb = Workbook()
-    ws = wb.create_sheet()
+def test_freeze_panes_both(out, doc, worksheet, write_worksheet_sheetviews):
+    ws = worksheet
     ws.freeze_panes = 'D4'
 
     write_worksheet_sheetviews(doc, ws)
@@ -398,11 +399,10 @@ def test_freeze_panes_both(out, doc, write_worksheet_sheetviews):
                              ("", """<c r="A1" t="s"></c>"""),
                              (None, """<c r="A1" t="s"></c>"""),
                          ])
-def test_write_cell(out, doc, value, expected):
+def test_write_cell(out, doc, worksheet, value, expected):
     from .. worksheet import write_cell
 
-    wb = Workbook()
-    ws = wb.active
+    ws = worksheet
     ws['A1'] = value
     write_cell(doc, ws, ws['A1'], ['Hello'])
     doc.endDocument()
@@ -411,11 +411,10 @@ def test_write_cell(out, doc, value, expected):
     assert diff is None, diff
 
 
-def test_write_sheetdata(out, doc):
+def test_write_sheetdata(out, doc, worksheet):
     from .. worksheet import write_worksheet_data
 
-    wb = Workbook()
-    ws = wb.active
+    ws = worksheet
     ws['A1'] = 10
     write_worksheet_data(doc, ws, [], None)
     doc.endDocument()
