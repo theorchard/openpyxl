@@ -262,42 +262,52 @@ def test_hyperlink_value():
     assert "test" == ws.cell('A1').value
 
 
+from .. worksheet import write_worksheet_autofilter
+
+
 def test_write_auto_filter(datadir, out, doc):
     datadir.chdir()
     wb = Workbook()
     ws = wb.worksheets[0]
     ws.cell('F42').value = 'hello'
     ws.auto_filter.ref = 'A1:F1'
-    strings = create_string_table(wb)
-    content = write_worksheet(ws, strings, {})
-    with open('sheet1_auto_filter.xml') as expected:
-        diff = compare_xml(content, expected.read())
-        assert diff is None
+
+    write_worksheet_autofilter(doc, ws)
+    xml = out.getvalue()
+    expected = """<autoFilter ref="A1:F1"></autoFilter>"""
+    diff = compare_xml(xml, expected)
+    assert diff is None, diff
 
     content = write_workbook(wb)
     with open('workbook_auto_filter.xml') as expected:
         diff = compare_xml(content, expected.read())
         assert diff is None, diff
 
-def test_write_auto_filter_filter_column(datadir):
+
+def test_write_auto_filter_filter_column(datadir, out, doc):
     datadir.chdir()
     wb = Workbook()
     ws = wb.worksheets[0]
     ws.cell('F42').value = 'hello'
     ws.auto_filter.ref = 'A1:F1'
     ws.auto_filter.add_filter_column(0, ["0"], blank=True)
-    strings = create_string_table(wb)
-    content = write_worksheet(ws, strings, {})
-    with open('sheet1_auto_filter_filter_column.xml') as expected:
-        diff = compare_xml(content, expected.read())
-        assert diff is None
 
-    content = write_workbook(wb)
-    with open('workbook_auto_filter.xml') as expected:
-        diff = compare_xml(content, expected.read())
-        assert diff is None, diff
+    write_worksheet_autofilter(doc, ws)
+    xml = out.getvalue()
+    expected = """
+    <autoFilter ref="A1:F1">
+      <filterColumn colId="0">
+        <filters blank="1">
+          <filter val="0"></filter>
+        </filters>
+      </filterColumn>
+    </autoFilter>
+    """
+    diff = compare_xml(xml, expected)
+    assert diff is None, diff
 
-def test_write_auto_filter_sort_condition(datadir):
+
+def test_write_auto_filter_sort_condition(datadir, out, doc):
     datadir.chdir()
     wb = Workbook()
     ws = wb.worksheets[0]
@@ -306,15 +316,19 @@ def test_write_auto_filter_sort_condition(datadir):
     ws.cell('A3').value = 0
     ws.auto_filter.ref = 'A2:A3'
     ws.auto_filter.add_sort_condition('A2:A3', descending=True)
-    strings = create_string_table(wb)
-    content = write_worksheet(ws, strings, {})
-    with open('sheet1_auto_filter_sort_condition.xml') as expected:
-        diff = compare_xml(content, expected.read())
-        assert diff is None
 
-    content = write_workbook(wb)
-    with open('workbook_auto_filter.xml') as expected:
-        diff = compare_xml(content, expected.read())
+    write_worksheet_autofilter(doc, ws)
+    xml = out.getvalue()
+    expected = """
+    <autoFilter ref="A2:A3">
+    <sortState ref="A2:A3">
+      <sortCondtion descending="1" ref="A2:A3"></sortCondtion>
+    </sortState>
+    </autoFilter>
+    """
+    diff = compare_xml(xml, expected)
+    assert diff is None, diff
+
 
 def test_freeze_panes_horiz(datadir):
     datadir.chdir()
