@@ -269,7 +269,6 @@ def write_worksheet_autofilter():
 def test_write_auto_filter(out, doc, write_worksheet_autofilter):
     wb = Workbook()
     ws = wb.worksheets[0]
-    ws.cell('F42').value = 'hello'
     ws.auto_filter.ref = 'A1:F1'
 
     write_worksheet_autofilter(doc, ws)
@@ -282,7 +281,6 @@ def test_write_auto_filter(out, doc, write_worksheet_autofilter):
 def test_write_auto_filter_filter_column(out, doc, write_worksheet_autofilter):
     wb = Workbook()
     ws = wb.worksheets[0]
-    ws.cell('F42').value = 'hello'
     ws.auto_filter.ref = 'A1:F1'
     ws.auto_filter.add_filter_column(0, ["0"], blank=True)
 
@@ -332,7 +330,6 @@ def write_worksheet_sheetviews():
 def test_freeze_panes_horiz(out, doc, write_worksheet_sheetviews):
     wb = Workbook()
     ws = wb.create_sheet()
-    ws.cell('F42').value = 'hello'
     ws.freeze_panes = 'A4'
 
     write_worksheet_sheetviews(doc, ws)
@@ -352,7 +349,6 @@ def test_freeze_panes_horiz(out, doc, write_worksheet_sheetviews):
 def test_freeze_panes_vert(out, doc, write_worksheet_sheetviews):
     wb = Workbook()
     ws = wb.create_sheet()
-    ws.cell('F42').value = 'hello'
     ws.freeze_panes = 'D1'
 
     write_worksheet_sheetviews(doc, ws)
@@ -372,7 +368,6 @@ def test_freeze_panes_vert(out, doc, write_worksheet_sheetviews):
 def test_freeze_panes_both(out, doc, write_worksheet_sheetviews):
     wb = Workbook()
     ws = wb.create_sheet()
-    ws.cell('F42').value = 'hello'
     ws.freeze_panes = 'D4'
 
     write_worksheet_sheetviews(doc, ws)
