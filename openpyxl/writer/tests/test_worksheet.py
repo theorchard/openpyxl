@@ -201,23 +201,27 @@ def test_write_height(datadir):
         assert diff is None, diff
 
 
-def test_write_hyperlink(datadir):
-    datadir.chdir()
-    wb = Workbook()
-    ws = wb.create_sheet()
+def test_write_hyperlink(out, doc, worksheet):
+    from .. worksheet import write_worksheet_hyperlinks
+
+    ws = worksheet
     ws.cell('A1').value = "test"
     ws.cell('A1').hyperlink = "http://test.com"
-    strings = create_string_table(wb)
-    content = write_worksheet(ws, strings, {})
-    with open('sheet1_hyperlink.xml') as expected:
-        diff = compare_xml(content, expected.read())
-        assert diff is None, diff
+
+    write_worksheet_hyperlinks(doc, ws)
+    xml = out.getvalue()
+    expected = """
+    <hyperlinks xmlns:r="http://schemas.openxmlformats.org/officeDocument/2006/relationships">
+      <hyperlink display="http://test.com" r:id="rId1" ref="A1"/>
+    </hyperlinks>
+    """
+    diff = compare_xml(xml, expected)
+    assert diff is None, diff
 
 
-def test_write_hyperlink_rels(datadir):
+def test_write_hyperlink_rels(datadir, worksheet):
     datadir.chdir()
-    wb = Workbook()
-    ws = wb.create_sheet()
+    ws = worksheet
     assert 0 == len(ws.relationships)
     ws.cell('A1').value = "test"
     ws.cell('A1').hyperlink = "http://test.com/"
@@ -225,6 +229,7 @@ def test_write_hyperlink_rels(datadir):
     ws.cell('A2').value = "test"
     ws.cell('A2').hyperlink = "http://test2.com/"
     assert 2 == len(ws.relationships)
+
     content = write_worksheet_rels(ws, 1, 1)
     with open('sheet1_hyperlink.xml.rels') as expected:
         diff = compare_xml(content, expected.read())
@@ -243,15 +248,6 @@ def test_write_hyperlink_image_rels(Workbook, Image, datadir):
     ws.add_image(i)
     raise ValueError("Resulting file is invalid")
     # TODO write integration test with duplicate relation ids then fix
-
-
-def test_hyperlink_value():
-    wb = Workbook()
-    ws = wb.create_sheet()
-    ws.cell('A1').hyperlink = "http://test.com"
-    assert "http://test.com" == ws.cell('A1').value
-    ws.cell('A1').value = "test"
-    assert "test" == ws.cell('A1').value
 
 
 @pytest.fixture

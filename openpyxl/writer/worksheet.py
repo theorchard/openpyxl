@@ -400,7 +400,7 @@ def write_worksheet_hyperlinks(doc, worksheet):
             write_hyperlinks = True
             break
     if write_hyperlinks:
-        start_tag(doc, 'hyperlinks')
+        start_tag(doc, 'hyperlinks', {'xmlns:r':"http://schemas.openxmlformats.org/officeDocument/2006/relationships"})
         for cell in worksheet.get_cell_collection():
             if cell.hyperlink_rel_id is not None:
                 attrs = {'display': cell.hyperlink,

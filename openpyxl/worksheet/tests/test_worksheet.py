@@ -128,6 +128,15 @@ class TestWorksheet(object):
         ws._garbage_collect()
         assert set(ws.get_cell_collection()), set([ws.cell('B2'), ws.cell('C4') == ws.cell('D1')])
 
+
+    def test_hyperlink_value(self):
+        ws = Worksheet(self.wb)
+        ws.cell('A1').hyperlink = "http://test.com"
+        assert "http://test.com" == ws.cell('A1').value
+        ws.cell('A1').value = "test"
+        assert "test" == ws.cell('A1').value
+
+
     def test_hyperlink_relationships(self):
         ws = Worksheet(self.wb)
         assert len(ws.relationships) == 0
