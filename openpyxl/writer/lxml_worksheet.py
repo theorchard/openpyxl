@@ -9,7 +9,7 @@ from openpyxl.compat import iterkeys, itervalues, safe_string
 from .worksheet import row_sort
 
 
-def write_worksheet_data(doc, worksheet, string_table, style_table=None):
+def write_worksheet_data(xf, worksheet, string_table, style_table=None):
     """Write worksheet data to xml."""
 
     # Ensure a blank cell exists if it has a style
@@ -22,21 +22,20 @@ def write_worksheet_data(doc, worksheet, string_table, style_table=None):
     for cell in itervalues(worksheet._cells):
         cells_by_row.setdefault(cell.row, []).append(cell)
 
-    with xmlfile(doc) as xf:
-        with xf.element("sheetData"):
-            for row_idx in sorted(cells_by_row):
-                # row meta data
-                row_dimension = worksheet.row_dimensions[row_idx]
-                row_dimension.style = worksheet._styles.get(row_idx)
-                attrs = {'r': '%d' % row_idx,
-                         'spans': '1:%d' % worksheet.max_column}
-                attrs.update(dict(row_dimension))
+    with xf.element("sheetData"):
+        for row_idx in sorted(cells_by_row):
+            # row meta data
+            row_dimension = worksheet.row_dimensions[row_idx]
+            row_dimension.style = worksheet._styles.get(row_idx)
+            attrs = {'r': '%d' % row_idx,
+                     'spans': '1:%d' % worksheet.max_column}
+            attrs.update(dict(row_dimension))
 
-                with xf.element("row", attrs):
+            with xf.element("row", attrs):
 
-                    row_cells = cells_by_row[row_idx]
-                    for cell in sorted(row_cells, key=row_sort):
-                        write_cell(xf, worksheet, cell, string_table)
+                row_cells = cells_by_row[row_idx]
+                for cell in sorted(row_cells, key=row_sort):
+                    write_cell(xf, worksheet, cell, string_table)
 
 
 def write_cell(xf, worksheet, cell, string_table):

@@ -28,7 +28,8 @@ def lxml_writer(ws=None):
         ws = make_worksheet()
 
     out = BytesIO()
-    write_worksheet_data(out, ws, [], [])
+    with xmlfile(out) as xf:
+        write_worksheet_data(out, ws, [], [])
     #with open("lxl_writer.xml", "wb") as dump:
         #dump.write(out.getvalue())
 
