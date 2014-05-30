@@ -92,6 +92,7 @@ def write_worksheet(worksheet, shared_strings):
     if worksheet.page_setup.fitToPage:
         tag(doc, 'pageSetUpPr', {'fitToPage': '1'})
     end_tag(doc, 'sheetPr')
+
     tag(doc, 'dimension', {'ref': '%s' % worksheet.calculate_dimension()})
     write_worksheet_sheetviews(doc, worksheet)
     write_worksheet_format(doc, worksheet)
@@ -116,13 +117,7 @@ def write_worksheet(worksheet, shared_strings):
     if setup:
         tag(doc, 'pageSetup', setup)
 
-    if worksheet.header_footer.hasHeader() or worksheet.header_footer.hasFooter():
-        start_tag(doc, 'headerFooter')
-        if worksheet.header_footer.hasHeader():
-            tag(doc, 'oddHeader', None, worksheet.header_footer.getHeader())
-        if worksheet.header_footer.hasFooter():
-            tag(doc, 'oddFooter', None, worksheet.header_footer.getFooter())
-        end_tag(doc, 'headerFooter')
+    write_header_footer(doc, worksheet)
 
     if worksheet._charts or worksheet._images:
         tag(doc, 'drawing', {'r:id': 'rId1'})
@@ -135,12 +130,8 @@ def write_worksheet(worksheet, shared_strings):
             rId = el.get('{%s}id' % REL_NS)
             tag(doc, 'legacyDrawing', {'r:id': rId})
 
-    breaks = worksheet.page_breaks
-    if breaks:
-        start_tag(doc, 'rowBreaks', {'count': str(len(breaks)), 'manualBreakCount': str(len(breaks))})
-        for b in breaks:
-            tag(doc, 'brk', {'id': str(b), 'man': 'true', 'max': '16383', 'min': '0'})
-        end_tag(doc, 'rowBreaks')
+    write_pagebreaks(doc, worksheet)
+
 
     # add a legacyDrawing so that excel can draw comments
     if worksheet._comment_count > 0:
@@ -429,3 +420,24 @@ def write_worksheet_rels(worksheet, drawing_id, comments_id):
                  'Target': '../drawings/commentsDrawing%s.vml' % comments_id}
         SubElement(root, '{%s}Relationship' % PKG_REL_NS, attrs)
     return get_document_content(root)
+
+
+def write_header_footer(doc, worksheet):
+    if worksheet.header_footer.hasHeader() or worksheet.header_footer.hasFooter():
+        start_tag(doc, 'headerFooter')
+        if worksheet.header_footer.hasHeader():
+            tag(doc, 'oddHeader', None, worksheet.header_footer.getHeader())
+        if worksheet.header_footer.hasFooter():
+            tag(doc, 'oddFooter', None, worksheet.header_footer.getFooter())
+        end_tag(doc, 'headerFooter')
+
+
+def write_pagebreaks(doc, worksheet):
+    breaks = worksheet.page_breaks
+    if breaks:
+        start_tag(doc, 'rowBreaks', {'count': str(len(breaks)),
+                                     'manualBreakCount': str(len(breaks))})
+        for b in breaks:
+            tag(doc, 'brk', {'id': str(b), 'man': 'true', 'max': '16383',
+                             'min': '0'})
+        end_tag(doc, 'rowBreaks')
