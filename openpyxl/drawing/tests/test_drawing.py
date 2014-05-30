@@ -1,26 +1,6 @@
 from __future__ import absolute_import
 # Copyright (c) 2010-2014 openpyxl
-#
-# Permission is hereby granted, free of charge, to any person obtaining a copy
-# of this software and associated documentation files (the "Software"), to deal
-# in the Software without restriction, including without limitation the rights
-# to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-# copies of the Software, and to permit persons to whom the Software is
-# furnished to do so, subject to the following conditions:
-#
-# The above copyright notice and this permission notice shall be included in
-# all copies or substantial portions of the Software.
-#
-# THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-# IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-# FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-# AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-# LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-# OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
-# THE SOFTWARE.
-#
-# @license: http://www.opensource.org/licenses/mit-license.php
-# @author: see AUTHORS file
+
 import os
 
 import pytest
@@ -28,8 +8,8 @@ import pytest
 from openpyxl.xml.constants import CHART_DRAWING_NS, SHEET_DRAWING_NS
 from openpyxl.xml.functions import Element, fromstring
 
-from .helper import compare_xml, get_xml, DATADIR
-from .schema import drawing_schema, chart_schema
+from openpyxl.tests.helper import compare_xml, get_xml
+from openpyxl.tests.schema import drawing_schema, chart_schema
 
 def test_bounding_box():
     from openpyxl.drawing import bounding_box
@@ -216,25 +196,29 @@ class DummyCell(object):
         self.parent = DummySheet()
 
 
+@pytest.fixture
+def Image():
+    from openpyxl.drawing import Image
+    return Image
+
+@pytest.fixture()
+def ImageFile(datadir, Image):
+    datadir.chdir()
+    return Image("plain.png")
+
+
 class TestImage(object):
 
-    def setup(self):
-        self.img = os.path.join(DATADIR, "plain.png")
-
-    def make_one(self):
-        from openpyxl.drawing import Image
-        return Image
-
     @pytest.mark.pil_not_installed
-    def test_import(self):
-        Image = self.make_one()
+    def test_import(self, Image, datadir):
+        datadir.chdir()
         with pytest.raises(ImportError):
-            Image._import_image(self.img)
+            Image._import_image("plain.png")
 
     @pytest.mark.pil_required
-    def test_ctor(self):
-        Image = self.make_one()
-        i = Image(img=self.img)
+    def test_ctor(self, Image, datadir):
+        datadir.chdir()
+        i = Image(img="plain.png")
         assert i.nochangearrowheads == True
         assert i.nochangeaspect == True
         d = i.drawing
@@ -243,17 +227,17 @@ class TestImage(object):
         assert d.height == 118
 
     @pytest.mark.pil_required
-    def test_anchor(self):
-        Image = self.make_one()
-        i = Image(self.img)
+    def test_anchor(self, Image, datadir):
+        datadir.chdir()
+        i = Image("plain.png")
         c = DummyCell()
         vals = i.anchor(c)
         assert vals == (('A', 1), (118, 118))
 
     @pytest.mark.pil_required
-    def test_anchor_onecell(self):
-        Image = self.make_one()
-        i = Image(self.img)
+    def test_anchor_onecell(self, Image, datadir):
+        datadir.chdir()
+        i = Image("plain.png")
         c = DummyCell()
         vals = i.anchor(c, anchortype="oneCell")
         assert vals == ((0, 0), None)
@@ -313,12 +297,10 @@ class TestDrawingWriter(object):
 
     @pytest.mark.lxml_required
     @pytest.mark.pil_required
-    def test_write_images(self):
-        from openpyxl.drawing import Image
-        path = os.path.join(DATADIR, "plain.png")
-        img = Image(path)
+    def test_write_images(self, ImageFile):
+
         root = Element("{%s}wsDr" % SHEET_DRAWING_NS)
-        self.dw._write_image(root, img, 1)
+        self.dw._write_image(root, ImageFile, 1)
         drawing_schema.assertValid(root)
         xml = get_xml(root)
         expected = """<xdr:wsDr xmlns:a="http://schemas.openxmlformats.org/drawingml/2006/main" xmlns:xdr="http://schemas.openxmlformats.org/drawingml/2006/spreadsheetDrawing">
@@ -364,11 +346,10 @@ class TestDrawingWriter(object):
         diff = compare_xml(xml, expected)
         assert diff is None, diff
 
+
     @pytest.mark.pil_required
-    def test_write_anchor(self):
-        from openpyxl.drawing import Image
-        path = os.path.join(DATADIR, "plain.png")
-        drawing = Image(path).drawing
+    def test_write_anchor(self, ImageFile):
+        drawing = ImageFile.drawing
         root = Element("test")
         self.dw._write_anchor(root, drawing)
         xml = get_xml(root)
@@ -376,11 +357,10 @@ class TestDrawingWriter(object):
         diff = compare_xml(xml, expected)
         assert diff is None, diff
 
+
     @pytest.mark.pil_required
-    def test_write_anchor_onecell(self):
-        from openpyxl.drawing import Image
-        path = os.path.join(DATADIR, "plain.png")
-        drawing = Image(path).drawing
+    def test_write_anchor_onecell(self, ImageFile):
+        drawing =ImageFile.drawing
         drawing.anchortype =  "oneCell"
         drawing.anchorcol = 0
         drawing.anchorrow = 0
