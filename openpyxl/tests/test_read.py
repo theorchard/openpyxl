@@ -428,11 +428,15 @@ def test_get_xml_iter():
     z.writestr("test", "whatever")
     stream = FUT(z.open("test"))
     assert hasattr(stream, "read")
+    # z.close()
     try:
         z.close()
     except IOError:
         # you can't just close zipfiles in Windows
-        z.fp.close()
+        if z.fp is not None:
+            z.fp.close() # python 2.6
+        else:
+            z.close() # python 2.7
 
 
 def test_read_autofilter(datadir):
