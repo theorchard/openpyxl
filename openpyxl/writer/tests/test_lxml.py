@@ -51,25 +51,25 @@ def test_write_cell(out, value, expected):
     assert diff is None, diff
 
 
-def test_write_sheetdata(out):
+@pytest.fixture
+def write_rows():
     from .. lxml_worksheet import write_worksheet_data
+    return write_worksheet_data
 
-    wb = Workbook()
-    ws = wb.active
+
+def test_write_sheetdata(out, worksheet, write_rows):
+    ws = worksheet
     ws['A1'] = 10
     with xmlfile(out) as xf:
-        write_worksheet_data(xf, ws, [])
+        write_rows(xf, ws, [])
     xml = out.getvalue()
     expected = """<sheetData><row r="1" spans="1:1"><c t="n" r="A1"><v>10</v></c></row></sheetData>"""
     diff = compare_xml(xml, expected)
     assert diff is None, diff
 
 
-def test_write_formula(out):
-    from .. lxml_worksheet import write_worksheet_data
-
-    wb = Workbook()
-    ws = wb.active
+def test_write_formula(out, worksheet, write_rows):
+    ws = worksheet
 
     ws.cell('F1').value = 10
     ws.cell('F2').value = 32
@@ -82,7 +82,7 @@ def test_write_formula(out):
     ws.formula_attributes['C4'] = {'t': 'shared', 'si': '0'}
 
     with xmlfile(out) as xf:
-        write_worksheet_data(xf, ws, [])
+        write_rows(xf, ws, [])
 
     xml = out.getvalue()
     expected = """
@@ -118,6 +118,27 @@ def test_write_formula(out):
         </c>
       </row>
     </sheetData>
+    """
+    diff = compare_xml(xml, expected)
+    assert diff is None, diff
+
+
+def test_row_height(out, worksheet, write_rows):
+    ws = worksheet
+    ws.cell('F1').value = 10
+    ws.row_dimensions[ws.cell('F1').row].height = 30
+
+    with xmlfile(out) as xf:
+        write_rows(xf, ws, {})
+    xml = out.getvalue()
+    expected = """
+     <sheetData>
+     <row customHeight="1" ht="30" r="1" spans="1:6">
+     <c r="F1" t="n">
+       <v>10</v>
+     </c>
+   </row>
+   </sheetData>
     """
     diff = compare_xml(xml, expected)
     assert diff is None, diff

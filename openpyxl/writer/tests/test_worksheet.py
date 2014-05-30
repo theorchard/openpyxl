@@ -176,10 +176,9 @@ def test_write_formula(out, doc, datadir):
     assert diff is None, diff
 
 
-def test_write_height(out, doc, worksheet, datadir):
+def test_write_height(out, doc, worksheet):
     from .. worksheet import write_worksheet_data
 
-    datadir.chdir()
     ws = worksheet
     ws.cell('F1').value = 10
     ws.row_dimensions[ws.cell('F1').row].height = 30
