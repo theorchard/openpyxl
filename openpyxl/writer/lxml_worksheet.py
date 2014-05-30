@@ -166,3 +166,15 @@ def write_sheetviews(xf, worksheet):
 
     SubElement(view, 'selection', selectionAttrs)
     xf.write(views)
+
+
+def write_format(xf, worksheet):
+    attrs = {'defaultRowHeight': '15', 'baseColWidth': '10'}
+    dimensions_outline = [dim.outline_level
+                          for dim in itervalues(worksheet.column_dimensions)]
+    if dimensions_outline:
+        outline_level = max(dimensions_outline)
+        if outline_level:
+            attrs['outlineLevelCol'] = str(outline_level)
+    with xf.element('sheetFormatPr', attrs):
+        pass

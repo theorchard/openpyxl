@@ -228,9 +228,29 @@ def test_write_lots_cols(out, write_cols, ColumnDimension, DummyWorksheet):
 
 
 @pytest.fixture
-def write_sheet_format():
-    from .. worksheet import write_format
+def write_format():
+    from .. lxml_worksheet import write_format
     return write_format
+
+
+def test_write_sheet_format(out, write_format, ColumnDimension, DummyWorksheet):
+    with xmlfile(out) as xf:
+        write_format(xf, DummyWorksheet)
+    xml = out.getvalue()
+    expected = """<sheetFormatPr defaultRowHeight="15" baseColWidth="10"/>"""
+    diff = compare_xml(expected, xml)
+    assert diff is None, diff
+
+
+def test_outline_format(out, write_format, ColumnDimension, DummyWorksheet):
+    worksheet = DummyWorksheet
+    worksheet.column_dimensions['A'] = ColumnDimension(outline_level=1)
+    with xmlfile(out) as xf:
+        write_format(xf, worksheet)
+    xml = out.getvalue()
+    expected = """<sheetFormatPr defaultRowHeight="15" baseColWidth="10" outlineLevelCol="1" />"""
+    diff = compare_xml(expected, xml)
+    assert diff is None, diff
 
 
 @pytest.fixture
