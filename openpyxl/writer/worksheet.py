@@ -77,15 +77,13 @@ def write_worksheet(worksheet, shared_strings):
     start_tag(doc, 'worksheet',
               {'xmlns': SHEET_MAIN_NS,
                'xmlns:r': REL_NS})
+    vba_attrs = {}
     if vba_root is not None:
         el = vba_root.find('{%s}sheetPr' % SHEET_MAIN_NS)
         if el is not None:
-            codename = el.get('codeName', worksheet.title)
-            start_tag(doc, 'sheetPr', {"codeName": codename})
-        else:
-            start_tag(doc, 'sheetPr')
-    else:
-        start_tag(doc, 'sheetPr')
+            vba_attrs['codeName'] = el.get('codeName', worksheet.title)
+    start_tag(doc, 'sheetPr', vba_attrs)
+
     tag(doc, 'outlinePr',
         {'summaryBelow': '%d' % (worksheet.show_summary_below),
          'summaryRight': '%d' % (worksheet.show_summary_right)})
