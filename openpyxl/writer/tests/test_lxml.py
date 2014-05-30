@@ -453,3 +453,84 @@ def test_merge(out, worksheet):
     expected = """<mergeCells/>"""
     diff = compare_xml(xml, expected)
     assert diff is None, diff
+
+
+def test_header_footer(out, worksheet):
+    ws = worksheet
+    ws.header_footer.left_header.text = "Left Header Text"
+    ws.header_footer.center_header.text = "Center Header Text"
+    ws.header_footer.center_header.font_name = "Arial,Regular"
+    ws.header_footer.center_header.font_size = 6
+    ws.header_footer.center_header.font_color = "445566"
+    ws.header_footer.right_header.text = "Right Header Text"
+    ws.header_footer.right_header.font_name = "Arial,Bold"
+    ws.header_footer.right_header.font_size = 8
+    ws.header_footer.right_header.font_color = "112233"
+    ws.header_footer.left_footer.text = "Left Footer Text\nAnd &[Date] and &[Time]"
+    ws.header_footer.left_footer.font_name = "Times New Roman,Regular"
+    ws.header_footer.left_footer.font_size = 10
+    ws.header_footer.left_footer.font_color = "445566"
+    ws.header_footer.center_footer.text = "Center Footer Text &[Path]&[File] on &[Tab]"
+    ws.header_footer.center_footer.font_name = "Times New Roman,Bold"
+    ws.header_footer.center_footer.font_size = 12
+    ws.header_footer.center_footer.font_color = "778899"
+    ws.header_footer.right_footer.text = "Right Footer Text &[Page] of &[Pages]"
+    ws.header_footer.right_footer.font_name = "Times New Roman,Italic"
+    ws.header_footer.right_footer.font_size = 14
+    ws.header_footer.right_footer.font_color = "AABBCC"
+
+    from .. lxml_worksheet import write_header_footer
+    with xmlfile(out) as xf:
+        write_header_footer(xf, ws)
+    xml = out.getvalue()
+    expected = """
+    <headerFooter>
+      <oddHeader>&amp;L&amp;"Calibri,Regular"&amp;K000000Left Header Text&amp;C&amp;"Arial,Regular"&amp;6&amp;K445566Center Header Text&amp;R&amp;"Arial,Bold"&amp;8&amp;K112233Right Header Text</oddHeader>
+      <oddFooter>&amp;L&amp;"Times New Roman,Regular"&amp;10&amp;K445566Left Footer Text_x000D_And &amp;D and &amp;T&amp;C&amp;"Times New Roman,Bold"&amp;12&amp;K778899Center Footer Text &amp;Z&amp;F on &amp;A&amp;R&amp;"Times New Roman,Italic"&amp;14&amp;KAABBCCRight Footer Text &amp;P of &amp;N</oddFooter>
+    </headerFooter>
+    """
+    diff = compare_xml(xml, expected)
+    assert diff is None, diff
+
+
+@pytest.mark.xfail
+def test_write_no_header(out, worksheet):
+    from .. lxml_worksheet import write_header_footer
+    ws = worksheet
+
+    with xmlfile(out) as xf:
+        write_header_footer(xf, ws)
+    assert out.getvalue() == b""
+
+
+@pytest.mark.xfail
+def test_write_pagebreaks(out, worksheet):
+    from .. lxml_worksheet import write_pagebreaks
+
+    with xmlfile(out) as xf:
+        write_pagebreaks(xf, worksheet)
+    assert out.getvalue() == b""
+
+
+def test_data_validation(out, worksheet):
+    from .. lxml_worksheet import write_datavalidation
+    from openpyxl.datavalidation import DataValidation, ValidationType
+
+    ws = worksheet
+    dv = DataValidation(ValidationType.LIST, formula1='"Dog,Cat,Fish"')
+    dv.add_cell(ws['A1'])
+    ws.add_data_validation(dv)
+
+    with xmlfile(out) as xf:
+        write_datavalidation(xf, worksheet)
+    xml = out.getvalue()
+    expected = """
+    <dataValidations count="1">
+    <dataValidation allowBlank="0" showErrorMessage="1" showInputMessage="1" sqref="A1" type="list">
+      <formula1>&quot;Dog,Cat,Fish&quot;</formula1>
+      <formula2>None</formula2>
+    </dataValidation>
+    </dataValidations>
+    """
+    diff = compare_xml(xml, expected)
+    assert diff is None, diff

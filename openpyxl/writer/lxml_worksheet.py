@@ -189,3 +189,44 @@ def write_mergecells(xf, worksheet):
         attrs = {'ref': range_string}
         SubElement(merge, 'mergeCell', attrs)
     xf.write(merge)
+
+
+def write_datavalidation(xf, worksheet):
+    """ Write data validation(s) to xml."""
+    # Filter out "empty" data-validation objects (i.e. with 0 cells)
+    required_dvs = [x for x in worksheet._data_validations
+                    if len(x.cells) or len(x.ranges)]
+    if not required_dvs:
+        return
+
+    dvs = Element('dataValidations', {'count': str(len(required_dvs))})
+    for data_validation in required_dvs:
+        dv = SubElement(dvs, 'dataValidation',
+                        data_validation.generate_attributes_map())
+        if data_validation.formula1:
+            SubElement(dv, 'formula1').text = data_validation.formula1
+        if data_validation.formula2:
+            SubElement(dv, 'formula2').text = data_validation.formula2
+    xf.write(dvs)
+
+
+def write_header_footer(xf, worksheet):
+    header = worksheet.header_footer.getHeader()
+    footer = worksheet.header_footer.getFooter()
+    if header or footer:
+        tag = Element('headerFooter')
+        if header:
+            SubElement(tag, 'oddHeader').text = header
+        if worksheet.header_footer.hasFooter():
+            SubElement(tag, 'oddFooter').text = footer
+        xf.write(tag)
+
+
+def write_pagebreaks(xf, worksheet):
+    breaks = worksheet.page_breaks
+    if breaks:
+        tag = Element( 'rowBreaks', {'count': str(len(breaks)),
+                                     'manualBreakCount': str(len(breaks))})
+        for b in breaks:
+            SubElement(tag, 'brk', {'id': str(b), 'man': 'true', 'max': '16383',
+                             'min': '0'})
