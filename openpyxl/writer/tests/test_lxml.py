@@ -53,8 +53,8 @@ def test_write_cell(out, value, expected):
 
 @pytest.fixture
 def write_rows():
-    from .. lxml_worksheet import write_worksheet_data
-    return write_worksheet_data
+    from .. lxml_worksheet import write_rows
+    return write_rows
 
 
 def test_write_sheetdata(out, worksheet, write_rows):
@@ -571,6 +571,39 @@ def test_write_hyperlink(out, worksheet):
     <hyperlinks xmlns:r="http://schemas.openxmlformats.org/officeDocument/2006/relationships">
       <hyperlink display="http://test.com" r:id="rId1" ref="A1"/>
     </hyperlinks>
+    """
+    diff = compare_xml(xml, expected)
+    assert diff is None, diff
+
+
+def test_printer_settings(worksheet, write_worksheet):
+    ws = worksheet
+    ws.page_setup.orientation = ws.ORIENTATION_LANDSCAPE
+    ws.page_setup.paperSize = ws.PAPERSIZE_TABLOID
+    ws.page_setup.fitToPage = True
+    ws.page_setup.fitToHeight = 0
+    ws.page_setup.fitToWidth = 1
+    ws.page_setup.horizontalCentered = True
+    ws.page_setup.verticalCentered = True
+    xml = write_worksheet(ws, None)
+    expected = """
+    <worksheet xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main" xmlns:r="http://schemas.openxmlformats.org/officeDocument/2006/relationships">
+      <sheetPr>
+        <outlinePr summaryRight="1" summaryBelow="1"/>
+        <pageSetUpPr fitToPage="1"/>
+      </sheetPr>
+      <dimension ref="A1:A1"/>
+      <sheetViews>
+        <sheetView workbookViewId="0">
+          <selection sqref="A1" activeCell="A1"/>
+        </sheetView>
+      </sheetViews>
+      <sheetFormatPr baseColWidth="10" defaultRowHeight="15"/>
+      <sheetData/>
+      <printOptions horizontalCentered="1" verticalCentered="1"/>
+      <pageMargins left="0.75" right="0.75" top="1" bottom="1" header="0.5" footer="0.5"/>
+      <pageSetup orientation="landscape" paperSize="3" fitToHeight="0" fitToWidth="1"/>
+    </worksheet>
     """
     diff = compare_xml(xml, expected)
     assert diff is None, diff

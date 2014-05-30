@@ -3,7 +3,8 @@ from __future__ import absolute_import
 
 # Experimental writer of worksheet data using lxml incremental API
 
-from lxml.etree import xmlfile, Element, SubElement
+from io import BytesIO
+from lxml.etree import xmlfile, Element, SubElement, fromstring
 
 from openpyxl.compat import (
     iterkeys,
@@ -15,9 +16,102 @@ from openpyxl.cell import (
     column_index_from_string,
     coordinate_from_string
 )
-from openpyxl.xml.constants import PKG_REL_NS, REL_NS
+from openpyxl.xml.constants import (
+    PKG_REL_NS,
+    REL_NS,
+    SHEET_MAIN_NS
+)
 
 from .worksheet import row_sort
+
+
+def write_worksheet(worksheet, shared_strings):
+    """Write a worksheet to an xml file."""
+    vba_attrs = {}
+    vba_root = None
+    if worksheet.xml_source:
+        vba_root = fromstring(worksheet.xml_source)
+        el = vba_root.find('{%s}sheetPr' % SHEET_MAIN_NS)
+        if el is not None:
+            vba_attrs['codeName'] = el.get('codeName', worksheet.title)
+
+    out = BytesIO()
+    with xmlfile(out) as xf:
+        with xf.element('{%s}worksheet' % SHEET_MAIN_NS):
+
+            pr = Element('sheetPr', vba_attrs)
+            SubElement(pr, 'outlinePr',
+                       {'summaryBelow':
+                        '%d' %  (worksheet.show_summary_below),
+                        'summaryRight': '%d' %     (worksheet.show_summary_right)})
+            if worksheet.page_setup.fitToPage:
+                SubElement(pr, 'pageSetUpPr', {'fitToPage': '1'})
+            xf.write(pr)
+            del pr
+
+            dim = Element('dimension', {'ref': '%s' % worksheet.calculate_dimension()})
+            xf.write(dim)
+            del dim
+
+            write_sheetviews(xf, worksheet)
+            write_format(xf, worksheet)
+            write_cols(xf, worksheet)
+            write_rows(xf, worksheet, shared_strings)
+
+            if worksheet.protection.enabled:
+                prot = Element('sheetProtection',
+                               {'objects': '1','scenarios': '1', 'sheet': '1'})
+                xf.write(prot)
+                del prot
+
+            write_autofilter(xf, worksheet)
+            write_mergecells(xf, worksheet)
+            #write_conditional_formatting(xf, worksheet)
+            write_datavalidation(xf, worksheet)
+            write_hyperlinks(xf, worksheet)
+
+            options = worksheet.page_setup.options
+            if options:
+                print_options = Element('printOptions', options)
+                xf.write(print_options)
+                del print_options
+
+            margins = Element('pageMargins', dict(worksheet.page_margins))
+            xf.write(margins)
+            del margins
+
+            setup = worksheet.page_setup.setup
+            if setup:
+                page_setup = Element('pageSetup', setup)
+                xf.write(page_setup)
+                del page_setup
+
+            write_header_footer(xf, worksheet)
+
+            if worksheet._charts or worksheet._images:
+                drawing = Element('drawing', {'r:id': 'rId1'})
+                xf.write(drawing)
+                del drawing
+
+            # If vba is being preserved then add a legacyDrawing element so
+            # that any controls can be drawn.
+            if vba_root is not None:
+                el = vba_root.find('{%s}legacyDrawing' % SHEET_MAIN_NS)
+                if el is not None:
+                    rId = el.get('{%s}id' % REL_NS)
+                    legacy = Element('legacyDrawing', {'r:id': rId})
+                    xf.write(legacy)
+
+            write_pagebreaks(xf, worksheet)
+
+            # add a legacyDrawing so that excel can draw comments
+            if worksheet._comment_count > 0:
+                comments = Element('legacyDrawing', {'r:id': 'commentsvml'})
+                xf.write(comments)
+
+    xml = out.getvalue()
+    out.close()
+    return xml
 
 
 def write_cols(xf, worksheet, style_table=None):
@@ -49,7 +143,7 @@ def write_cols(xf, worksheet, style_table=None):
             xf.write(c)
 
 
-def write_worksheet_data(xf, worksheet, string_table, style_table=None):
+def write_rows(xf, worksheet, string_table, style_table=None):
     """Write worksheet data to xml."""
 
     # Ensure a blank cell exists if it has a style
@@ -115,6 +209,9 @@ def write_cell(xf, worksheet, cell, string_table):
 
 def write_autofilter(xf, worksheet):
     auto_filter = worksheet.auto_filter
+    if auto_filter.ref is None:
+        return
+
     el = Element('autoFilter', {'ref': auto_filter.ref})
     if (auto_filter.filter_columns
         or auto_filter.sort_conditions):
