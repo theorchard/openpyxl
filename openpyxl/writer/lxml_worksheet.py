@@ -9,7 +9,7 @@ from openpyxl.compat import iterkeys, itervalues, safe_string
 from .worksheet import row_sort
 
 
-def write_worksheet_data(doc, worksheet, string_table, style_table):
+def write_worksheet_data(doc, worksheet, string_table, style_table=None):
     """Write worksheet data to xml."""
 
     # Ensure a blank cell exists if it has a style

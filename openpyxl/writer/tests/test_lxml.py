@@ -49,7 +49,7 @@ def test_write_sheetdata(out):
     wb = Workbook()
     ws = wb.active
     ws['A1'] = 10
-    write_worksheet_data(out, ws, [], None)
+    write_worksheet_data(out, ws, [])
     xml = out.getvalue()
     expected = """<sheetData><row r="1" spans="1:1"><c t="n" r="A1"><v>10</v></c></row></sheetData>"""
     diff = compare_xml(xml, expected)
@@ -72,7 +72,7 @@ def test_write_formula(out):
     ws.cell('C4').value = '='
     ws.formula_attributes['C4'] = {'t': 'shared', 'si': '0'}
 
-    write_worksheet_data(out, ws, [], None)
+    write_worksheet_data(out, ws, [])
 
     xml = out.getvalue()
     expected = """

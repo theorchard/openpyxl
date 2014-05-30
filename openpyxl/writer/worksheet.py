@@ -66,7 +66,7 @@ def row_sort(cell):
 
 
 
-def write_worksheet(worksheet, shared_strings, style_table):
+def write_worksheet(worksheet, shared_strings):
     """Write a worksheet to an xml file."""
     if worksheet.xml_source:
         vba_root = fromstring(worksheet.xml_source)
@@ -95,8 +95,8 @@ def write_worksheet(worksheet, shared_strings, style_table):
     tag(doc, 'dimension', {'ref': '%s' % worksheet.calculate_dimension()})
     write_worksheet_sheetviews(doc, worksheet)
     write_worksheet_format(doc, worksheet)
-    write_worksheet_cols(doc, worksheet, style_table)
-    write_worksheet_data(doc, worksheet, shared_strings, style_table)
+    write_worksheet_cols(doc, worksheet)
+    write_worksheet_data(doc, worksheet, shared_strings)
     if worksheet.protection.enabled:
         tag(doc, 'sheetProtection',
             {'objects': '1', 'scenarios': '1', 'sheet': '1'})
@@ -265,7 +265,7 @@ def write_worksheet_conditional_formatting(doc, worksheet):
         end_tag(doc, 'conditionalFormatting')
 
 
-def write_worksheet_data(doc, worksheet, string_table, style_table):
+def write_worksheet_data(doc, worksheet, string_table, style_table=None):
     """Write worksheet data to xml."""
 
     # Ensure a blank cell exists if it has a style

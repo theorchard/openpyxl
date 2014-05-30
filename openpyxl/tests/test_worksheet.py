@@ -24,7 +24,7 @@ class TestWorkSheetWriter(object):
 
     def test_write_empty(self):
         ws = Worksheet(self.wb)
-        xml = write_worksheet(ws, None, None)
+        xml = write_worksheet(ws, None)
         expected = """
         <worksheet xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main" xmlns:r="http://schemas.openxmlformats.org/officeDocument/2006/relationships">
           <sheetPr>
@@ -53,7 +53,7 @@ class TestWorkSheetWriter(object):
         ws.page_margins.bottom = 2.0
         ws.page_margins.header = 1.5
         ws.page_margins.footer = 1.5
-        xml = write_worksheet(ws, None, None)
+        xml = write_worksheet(ws, None)
         expected = """
         <worksheet xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main" xmlns:r="http://schemas.openxmlformats.org/officeDocument/2006/relationships">
           <sheetPr>
@@ -105,12 +105,12 @@ class TestWorkSheetWriter(object):
 
         ws.cell('A1').value = 'Cell A1'
         ws.cell('B1').value = 'Cell B1'
-        xml = write_worksheet(ws, string_table, None)
+        xml = write_worksheet(ws, string_table)
         diff = compare_xml(xml, expected)
         assert diff is None, diff
 
         ws.merge_cells('A1:B1')
-        xml = write_worksheet(ws, string_table, None)
+        xml = write_worksheet(ws, string_table)
         expected = """
         <worksheet xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main" xmlns:r="http://schemas.openxmlformats.org/officeDocument/2006/relationships">
           <sheetPr>
@@ -141,7 +141,7 @@ class TestWorkSheetWriter(object):
         assert diff is None, diff
 
         ws.unmerge_cells('A1:B1')
-        xml = write_worksheet(ws, string_table, None)
+        xml = write_worksheet(ws, string_table)
         expected = """
         <worksheet xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main" xmlns:r="http://schemas.openxmlformats.org/officeDocument/2006/relationships">
           <sheetPr>
@@ -177,7 +177,7 @@ class TestWorkSheetWriter(object):
         ws.page_setup.fitToWidth = 1
         ws.page_setup.horizontalCentered = True
         ws.page_setup.verticalCentered = True
-        xml = write_worksheet(ws, None, None)
+        xml = write_worksheet(ws, None)
         expected = """
         <worksheet xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main" xmlns:r="http://schemas.openxmlformats.org/officeDocument/2006/relationships">
           <sheetPr>
@@ -224,7 +224,7 @@ class TestWorkSheetWriter(object):
         ws.header_footer.right_footer.font_name = "Times New Roman,Italic"
         ws.header_footer.right_footer.font_size = 14
         ws.header_footer.right_footer.font_color = "AABBCC"
-        xml_string = write_worksheet(ws, None, None)
+        xml_string = write_worksheet(ws, None)
         diff = compare_xml(xml_string, """
         <worksheet xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main" xmlns:r="http://schemas.openxmlformats.org/officeDocument/2006/relationships">
           <sheetPr>
@@ -248,7 +248,7 @@ class TestWorkSheetWriter(object):
         assert diff is None, diff
 
         ws = Worksheet(self.wb)
-        xml_string = write_worksheet(ws, None, None)
+        xml_string = write_worksheet(ws, None)
         diff = compare_xml(xml_string, """
         <worksheet xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main" xmlns:r="http://schemas.openxmlformats.org/officeDocument/2006/relationships">
           <sheetPr>

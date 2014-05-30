@@ -134,7 +134,7 @@ def test_write_formula(out, doc, datadir):
     ws.cell('C4').value = '='
     ws.formula_attributes['C4'] = {'t': 'shared', 'si': '0'}
 
-    write_worksheet_data(doc, ws, [], None)
+    write_worksheet_data(doc, ws, [])
     doc.endDocument()
     xml = out.getvalue()
     expected = """
@@ -182,8 +182,7 @@ def test_write_style(datadir):
     ws = wb.create_sheet()
     ws.cell('F1').value = '13%'
     ws._styles['F'] = ws._styles['F1']
-    styles = StyleWriter(wb).styles
-    content = write_worksheet(ws, {}, styles)
+    content = write_worksheet(ws, {})
     with open('sheet1_style.xml') as expected:
         diff = compare_xml(content, expected.read())
         assert diff is None, diff
@@ -195,7 +194,7 @@ def test_write_height(datadir):
     ws = wb.create_sheet()
     ws.cell('F1').value = 10
     ws.row_dimensions[ws.cell('F1').row].height = 30
-    content = write_worksheet(ws, {}, {})
+    content = write_worksheet(ws, {})
     with open('sheet1_height.xml') as expected:
         diff = compare_xml(content, expected.read())
         assert diff is None, diff
@@ -399,7 +398,7 @@ def test_write_sheetdata(out, doc, worksheet):
 
     ws = worksheet
     ws['A1'] = 10
-    write_worksheet_data(doc, ws, [], None)
+    write_worksheet_data(doc, ws, [])
     doc.endDocument()
     xml = out.getvalue()
     expected = """<sheetData><row r="1" spans="1:1"><c t="n" r="A1"><v>10</v></c></row></sheetData>"""
