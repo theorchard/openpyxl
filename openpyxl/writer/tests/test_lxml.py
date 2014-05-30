@@ -253,6 +253,17 @@ def test_outline_format(out, write_format, ColumnDimension, DummyWorksheet):
     assert diff is None, diff
 
 
+def test_outline_cols(out, write_cols, ColumnDimension, DummyWorksheet):
+    worksheet = DummyWorksheet
+    worksheet.column_dimensions['A'] = ColumnDimension(outline_level=1)
+    with xmlfile(out) as xf:
+        write_cols(xf, worksheet)
+    xml = out.getvalue()
+    expected = """<cols><col max="1" min="1" outlineLevel="1"/></cols>"""
+    diff = compare_xml(expected, xml)
+    assert diff is None, diff
+
+
 @pytest.fixture
 def write_autofilter():
     from .. lxml_worksheet import write_autofilter
