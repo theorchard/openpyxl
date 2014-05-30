@@ -291,3 +291,68 @@ def test_write_auto_filter_sort_condition(out, worksheet, write_autofilter):
     """
     diff = compare_xml(xml, expected)
     assert diff is None, diff
+
+
+@pytest.fixture
+def write_sheetviews():
+    from .. lxml_worksheet import write_sheetviews
+    return write_sheetviews
+
+
+def test_freeze_panes_horiz(out, worksheet, write_sheetviews):
+    ws = worksheet
+    ws.freeze_panes = 'A4'
+
+    with xmlfile(out) as xf:
+        write_sheetviews(xf, ws)
+    xml = out.getvalue()
+    expected = """
+    <sheetViews>
+    <sheetView workbookViewId="0">
+      <pane topLeftCell="A4" ySplit="3" state="frozen" activePane="bottomLeft"/>
+      <selection activeCell="A1" pane="bottomLeft" sqref="A1"/>
+    </sheetView>
+    </sheetViews>
+    """
+    diff = compare_xml(xml, expected)
+    assert diff is None, diff
+
+
+def test_freeze_panes_vert(out, worksheet, write_sheetviews):
+    ws = worksheet
+    ws.freeze_panes = 'D1'
+
+    with xmlfile(out) as xf:
+        write_sheetviews(xf, ws)
+    xml = out.getvalue()
+    expected = """
+    <sheetViews>
+      <sheetView workbookViewId="0">
+        <pane xSplit="3" topLeftCell="D1" activePane="topRight" state="frozen"/>
+        <selection pane="topRight" activeCell="A1" sqref="A1"/>
+      </sheetView>
+    </sheetViews>
+    """
+    diff = compare_xml(xml, expected)
+    assert diff is None, diff
+
+
+def test_freeze_panes_both(out, worksheet, write_sheetviews):
+    ws = worksheet
+    ws.freeze_panes = 'D4'
+
+    with xmlfile(out) as xf:
+        write_sheetviews(xf, ws)
+    xml = out.getvalue()
+    expected = """
+    <sheetViews>
+      <sheetView workbookViewId="0">
+        <pane xSplit="3" ySplit="3" topLeftCell="D4" activePane="bottomRight" state="frozen"/>
+        <selection pane="topRight"/>
+        <selection pane="bottomLeft"/>
+        <selection pane="bottomRight" activeCell="A1" sqref="A1"/>
+      </sheetView>
+    </sheetViews>
+    """
+    diff = compare_xml(xml, expected)
+    assert diff is None, diff

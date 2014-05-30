@@ -11,7 +11,10 @@ from openpyxl.compat import (
     safe_string,
     iteritems
 )
-from openpyxl.cell import column_index_from_string
+from openpyxl.cell import (
+    column_index_from_string,
+    coordinate_from_string
+)
 
 from .worksheet import row_sort
 
@@ -130,3 +133,36 @@ def write_autofilter(xf, worksheet):
                     sort_attr['descending'] = '1'
                 SubElement(srt, 'sortCondtion', sort_attr)
     xf.write(el)
+
+
+def write_sheetviews(xf, worksheet):
+    views = Element('sheetViews')
+    view = SubElement(views, 'sheetView', {'workbookViewId': '0'})
+    selectionAttrs = {}
+    topLeftCell = worksheet.freeze_panes
+    if topLeftCell:
+        colName, row = coordinate_from_string(topLeftCell)
+        column = column_index_from_string(colName)
+        pane = 'topRight'
+        paneAttrs = {}
+        if column > 1:
+            paneAttrs['xSplit'] = str(column - 1)
+        if row > 1:
+            paneAttrs['ySplit'] = str(row - 1)
+            pane = 'bottomLeft'
+            if column > 1:
+                pane = 'bottomRight'
+        paneAttrs.update(dict(topLeftCell=topLeftCell,
+                              activePane=pane,
+                              state='frozen'))
+        SubElement(view, 'pane', paneAttrs)
+        selectionAttrs['pane'] = pane
+        if row > 1 and column > 1:
+            SubElement(view, 'selection', {'pane': 'topRight'})
+            SubElement(view, 'selection', {'pane': 'bottomLeft'})
+
+    selectionAttrs.update({'activeCell': worksheet.active_cell,
+                           'sqref': worksheet.selected_cell})
+
+    SubElement(view, 'selection', selectionAttrs)
+    xf.write(views)
