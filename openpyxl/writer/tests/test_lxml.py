@@ -376,3 +376,40 @@ def test_freeze_panes_both(out, worksheet, write_sheetviews):
     """
     diff = compare_xml(xml, expected)
     assert diff is None, diff
+
+
+@pytest.fixture
+def write_worksheet():
+    from .. lxml_worksheet import write_worksheet
+    return write_worksheet
+
+
+@pytest.mark.xfail
+def test_page_margins(worksheet, out):
+    ws = worksheet
+    ws.page_margins.left = 2.0
+    ws.page_margins.right = 2.0
+    ws.page_margins.top = 2.0
+    ws.page_margins.bottom = 2.0
+    ws.page_margins.header = 1.5
+    ws.page_margins.footer = 1.5
+    with xmlfile(out) as xf:
+        xml = write_worksheet(ws, None)
+    expected = """
+    <worksheet xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main" xmlns:r="http://schemas.openxmlformats.org/officeDocument/2006/relationships">
+      <sheetPr>
+        <outlinePr summaryRight="1" summaryBelow="1"/>
+      </sheetPr>
+      <dimension ref="A1:A1"/>
+      <sheetViews>
+        <sheetView workbookViewId="0">
+          <selection sqref="A1" activeCell="A1"/>
+        </sheetView>
+      </sheetViews>
+      <sheetFormatPr baseColWidth="10" defaultRowHeight="15"/>
+      <sheetData/>
+      <pageMargins left="2" right="2" top="2" bottom="2" header="1.5" footer="1.5"/>
+    </worksheet>
+    """
+    diff = compare_xml(xml, expected)
+    assert diff is None, diff

@@ -82,8 +82,8 @@ def write_worksheet(worksheet, shared_strings):
         el = vba_root.find('{%s}sheetPr' % SHEET_MAIN_NS)
         if el is not None:
             vba_attrs['codeName'] = el.get('codeName', worksheet.title)
-    start_tag(doc, 'sheetPr', vba_attrs)
 
+    start_tag(doc, 'sheetPr', vba_attrs)
     tag(doc, 'outlinePr',
         {'summaryBelow': '%d' % (worksheet.show_summary_below),
          'summaryRight': '%d' % (worksheet.show_summary_right)})
