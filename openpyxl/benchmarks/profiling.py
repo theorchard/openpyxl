@@ -1,4 +1,5 @@
 from io import BytesIO
+from lxml.etree import xmlfile
 
 from openpyxl import Workbook
 from openpyxl.xml.functions import XMLGenerator
@@ -29,7 +30,7 @@ def lxml_writer(ws=None):
 
     out = BytesIO()
     with xmlfile(out) as xf:
-        write_worksheet_data(out, ws, [], [])
+        write_worksheet_data(xf, ws, [], [])
     #with open("lxl_writer.xml", "wb") as dump:
         #dump.write(out.getvalue())
 
