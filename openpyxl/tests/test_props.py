@@ -1,39 +1,14 @@
 # Copyright (c) 2010-2014 openpyxl
-#
-# Permission is hereby granted, free of charge, to any person obtaining a copy
-# of this software and associated documentation files (the "Software"), to deal
-# in the Software without restriction, including without limitation the rights
-# to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-# copies of the Software, and to permit persons to whom the Software is
-# furnished to do so, subject to the following conditions:
-#
-# The above copyright notice and this permission notice shall be included in
-# all copies or substantial portions of the Software.
-#
-# THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-# IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-# FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-# AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-# LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-# OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
-# THE SOFTWARE.
-#
-# @license: http://www.opensource.org/licenses/mit-license.php
-# @author: see AUTHORS file
 
 # Python stdlib imports
-from zipfile import ZipFile, ZIP_DEFLATED
+from zipfile import ZipFile
 from datetime import datetime
-import os.path
+
+# test imports
+import pytest
 
 # package imports
-from openpyxl.tests.helper import (
-    DATADIR,
-    TMPDIR,
-    make_tmpdir,
-    clean_tmpdir,
-    compare_xml
-    )
+from openpyxl.tests.helper import compare_xml
 from openpyxl.reader.workbook import read_properties_core
 from openpyxl.writer.workbook import (
     write_properties_core,
@@ -44,76 +19,56 @@ from openpyxl.date_time import CALENDAR_WINDOWS_1900
 from openpyxl.workbook import DocumentProperties, Workbook
 
 
-class TestReaderProps(object):
-
-    @classmethod
-    def setup_class(cls):
-        cls.genuine_filename = os.path.join(DATADIR, 'genuine', 'empty.xlsx')
-        cls.archive = ZipFile(cls.genuine_filename, 'r', ZIP_DEFLATED)
-
-    @classmethod
-    def teardown_class(cls):
-        cls.archive.close()
-
-    def test_read_properties_core(self):
-        content = self.archive.read(ARC_CORE)
-        prop = read_properties_core(content)
-        assert prop.creator == '*.*'
-        assert prop.last_modified_by == 'Charlie Clark'
-        assert prop.created == datetime(2010, 4, 9, 20, 43, 12)
-        assert prop.modified ==  datetime(2014, 1, 2, 14, 53, 6)
-
-    def test_read_sheets_titles(self):
-        from openpyxl.reader.workbook import read_sheets
-        sheet_titles = [s[1] for s in read_sheets(self.archive)]
-        assert sheet_titles == ['Sheet1 - Text', 'Sheet2 - Numbers', 'Sheet3 - Formulas', 'Sheet4 - Dates']
+def test_read_properties_core(datadir):
+    datadir.join("genuine").chdir()
+    archive = ZipFile("empty.xlsx")
+    content = archive.read(ARC_CORE)
+    prop = read_properties_core(content)
+    assert prop.creator == '*.*'
+    assert prop.excel_base_date == CALENDAR_WINDOWS_1900
+    assert prop.last_modified_by == 'Charlie Clark'
+    assert prop.created == datetime(2010, 4, 9, 20, 43, 12)
+    assert prop.modified ==  datetime(2014, 1, 2, 14, 53, 6)
 
 
-class TestLibreOfficeCompat(object):
-    """
-    Just tests that the correct date/time format is returned from LibreOffice saved version
-    """
-
-    @classmethod
-    def setup_class(cls):
-        cls.genuine_filename = os.path.join(DATADIR, 'genuine', 'empty_libre.xlsx')
-        cls.archive = ZipFile(cls.genuine_filename, 'r', ZIP_DEFLATED)
-
-    @classmethod
-    def teardown_class(cls):
-        cls.archive.close()
-
-    def test_read_properties_core(self):
-        content = self.archive.read(ARC_CORE)
-        prop = read_properties_core(content)
-        assert prop.excel_base_date == CALENDAR_WINDOWS_1900
-
-    def test_read_sheets_titles(self):
-        from openpyxl.reader.workbook import read_sheets
-        sheet_titles = [s[1] for s in read_sheets(self.archive)]
-        assert sheet_titles == ['Sheet1 - Text', 'Sheet2 - Numbers', 'Sheet3 - Formulas', 'Sheet4 - Dates']
+def test_read_properties_libreeoffice(datadir):
+    datadir.join("genuine").chdir()
+    archive = ZipFile("empty_libre.xlsx")
+    content = archive.read(ARC_CORE)
+    prop = read_properties_core(content)
+    assert prop.excel_base_date == CALENDAR_WINDOWS_1900
+    assert prop.creator == ''
+    assert prop.last_modified_by == ''
 
 
-class TestWriteProps(object):
+@pytest.mark.parametrize("filename", ['empty.xlsx', 'empty_libre.xlsx'])
+def test_read_sheets_titles(datadir, filename):
+    from openpyxl.reader.workbook import read_sheets
 
-    def test_write_properties_core(self, datadir):
-        datadir.join("writer").chdir()
-        prop = DocumentProperties()
-        prop.creator = 'TEST_USER'
-        prop.last_modified_by = 'SOMEBODY'
-        prop.created = datetime(2010, 4, 1, 20, 30, 00)
-        prop.modified = datetime(2010, 4, 5, 14, 5, 30)
-        content = write_properties_core(prop)
-        with open('core.xml') as expected:
-            diff = compare_xml(content, expected.read())
-            assert diff is None
+    datadir.join("genuine").chdir()
+    archive = ZipFile(filename)
+    sheet_titles = [s[1] for s in read_sheets(archive)]
+    assert sheet_titles == ['Sheet1 - Text', 'Sheet2 - Numbers', 'Sheet3 - Formulas', 'Sheet4 - Dates']
 
-    def test_write_properties_app(self, datadir):
-        datadir.join("writer").chdir()
-        wb = Workbook()
-        wb.create_sheet()
-        wb.create_sheet()
-        content = write_properties_app(wb)
-        with open('app.xml') as expected:
-            diff = compare_xml(content, expected.read())
-            assert diff is None
+
+def test_write_properties_core(datadir):
+    datadir.join("writer").chdir()
+    prop = DocumentProperties()
+    prop.creator = 'TEST_USER'
+    prop.last_modified_by = 'SOMEBODY'
+    prop.created = datetime(2010, 4, 1, 20, 30, 00)
+    prop.modified = datetime(2010, 4, 5, 14, 5, 30)
+    content = write_properties_core(prop)
+    with open('core.xml') as expected:
+        diff = compare_xml(content, expected.read())
+        assert diff is None
+
+def test_write_properties_app(datadir):
+    datadir.join("writer").chdir()
+    wb = Workbook()
+    wb.create_sheet()
+    wb.create_sheet()
+    content = write_properties_app(wb)
+    with open('app.xml') as expected:
+        diff = compare_xml(content, expected.read())
+        assert diff is None
