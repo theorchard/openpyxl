@@ -231,3 +231,63 @@ def test_write_lots_cols(out, write_cols, ColumnDimension, DummyWorksheet):
 def write_sheet_format():
     from .. worksheet import write_format
     return write_format
+
+
+@pytest.fixture
+def write_autofilter():
+    from .. lxml_worksheet import write_autofilter
+    return write_autofilter
+
+
+def test_write_auto_filter(out, worksheet, write_autofilter):
+    ws = worksheet
+    ws.auto_filter.ref = 'A1:F1'
+    with xmlfile(out) as xf:
+        write_autofilter(xf, ws)
+    xml = out.getvalue()
+    expected = """<autoFilter ref="A1:F1"></autoFilter>"""
+    diff = compare_xml(xml, expected)
+    assert diff is None, diff
+
+
+def test_write_auto_filter_filter_column(out, worksheet, write_autofilter):
+    ws = worksheet
+    ws.auto_filter.ref = 'A1:F1'
+    ws.auto_filter.add_filter_column(0, ["0"], blank=True)
+
+    with xmlfile(out) as xf:
+        write_autofilter(xf, ws)
+    xml = out.getvalue()
+    expected = """
+    <autoFilter ref="A1:F1">
+      <filterColumn colId="0">
+        <filters blank="1">
+          <filter val="0"></filter>
+        </filters>
+      </filterColumn>
+    </autoFilter>
+    """
+    diff = compare_xml(xml, expected)
+    assert diff is None, diff
+
+
+def test_write_auto_filter_sort_condition(out, worksheet, write_autofilter):
+    ws = worksheet
+    ws.cell('A1').value = 'header'
+    ws.cell('A2').value = 1
+    ws.cell('A3').value = 0
+    ws.auto_filter.ref = 'A2:A3'
+    ws.auto_filter.add_sort_condition('A2:A3', descending=True)
+
+    with xmlfile(out) as xf:
+        write_autofilter(xf, ws)
+    xml = out.getvalue()
+    expected = """
+    <autoFilter ref="A2:A3">
+    <sortState ref="A2:A3">
+      <sortCondtion descending="1" ref="A2:A3"></sortCondtion>
+    </sortState>
+    </autoFilter>
+    """
+    diff = compare_xml(xml, expected)
+    assert diff is None, diff

@@ -107,3 +107,26 @@ def write_cell(xf, worksheet, cell, string_table):
         with xf.element("v") as v:
             if value is not None:
                 xf.write(safe_string(value))
+
+
+def write_autofilter(xf, worksheet):
+    auto_filter = worksheet.auto_filter
+    el = Element('autoFilter', {'ref': auto_filter.ref})
+    if (auto_filter.filter_columns
+        or auto_filter.sort_conditions):
+        for col_id, filter_column in sorted(auto_filter.filter_columns.items()):
+            fc = SubElement(el, 'filterColumn', {'colId': str(col_id)})
+            attrs = {}
+            if filter_column.blank:
+                attrs = {'blank': '1'}
+            flt = SubElement(fc, 'filters', attrs)
+            for val in filter_column.vals:
+                SubElement(flt, 'filter', {'val': val})
+        if auto_filter.sort_conditions:
+            srt = SubElement(el,  'sortState', {'ref': auto_filter.ref})
+            for sort_condition in auto_filter.sort_conditions:
+                sort_attr = {'ref': sort_condition.ref}
+                if sort_condition.descending:
+                    sort_attr['descending'] = '1'
+                SubElement(srt, 'sortCondtion', sort_attr)
+    xf.write(el)
