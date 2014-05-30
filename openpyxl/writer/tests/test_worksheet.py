@@ -490,99 +490,29 @@ def test_page_margins(worksheet):
     assert diff is None, diff
 
 
-def test_merge(worksheet):
-    ws = worksheet
-    string_table = ['Cell A1', 'Cell B1']
-    expected = """
-    <worksheet xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main" xmlns:r="http://schemas.openxmlformats.org/officeDocument/2006/relationships">
-      <sheetPr>
-        <outlinePr summaryRight="1" summaryBelow="1"/>
-      </sheetPr>
-      <dimension ref="A1:B1"/>
-      <sheetViews>
-        <sheetView workbookViewId="0">
-          <selection sqref="A1" activeCell="A1"/>
-        </sheetView>
-      </sheetViews>
-      <sheetFormatPr baseColWidth="10" defaultRowHeight="15"/>
-      <sheetData>
-        <row r="1" spans="1:2">
-          <c r="A1" t="s">
-            <v>0</v>
-          </c>
-          <c r="B1" t="s">
-            <v>1</v>
-          </c>
-        </row>
-      </sheetData>
-      <pageMargins left="0.75" right="0.75" top="1" bottom="1" header="0.5" footer="0.5"/>
-    </worksheet>
-    """
+def test_merge(out, doc, worksheet):
+    from .. worksheet import write_worksheet_mergecells
 
+    ws = worksheet
     ws.cell('A1').value = 'Cell A1'
     ws.cell('B1').value = 'Cell B1'
-    xml = write_worksheet(ws, string_table)
-    diff = compare_xml(xml, expected)
-    assert diff is None, diff
 
     ws.merge_cells('A1:B1')
-    xml = write_worksheet(ws, string_table)
+    write_worksheet_mergecells(doc, ws)
+    xml = out.getvalue()
     expected = """
-    <worksheet xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main" xmlns:r="http://schemas.openxmlformats.org/officeDocument/2006/relationships">
-      <sheetPr>
-        <outlinePr summaryRight="1" summaryBelow="1"/>
-      </sheetPr>
-      <dimension ref="A1:B1"/>
-      <sheetViews>
-        <sheetView workbookViewId="0">
-          <selection sqref="A1" activeCell="A1"/>
-        </sheetView>
-      </sheetViews>
-      <sheetFormatPr baseColWidth="10" defaultRowHeight="15"/>
-      <sheetData>
-        <row r="1" spans="1:2">
-          <c r="A1" t="s">
-            <v>0</v>
-          </c>
-          <c r="B1" t="s"/>
-        </row>
-      </sheetData>
       <mergeCells count="1">
         <mergeCell ref="A1:B1"/>
       </mergeCells>
-      <pageMargins left="0.75" right="0.75" top="1" bottom="1" header="0.5" footer="0.5"/>
-    </worksheet>
     """
     diff = compare_xml(xml, expected)
     assert diff is None, diff
 
+    out.truncate(0) # reset
     ws.unmerge_cells('A1:B1')
-    xml = write_worksheet(ws, string_table)
-    expected = """
-    <worksheet xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main" xmlns:r="http://schemas.openxmlformats.org/officeDocument/2006/relationships">
-      <sheetPr>
-        <outlinePr summaryRight="1" summaryBelow="1"/>
-      </sheetPr>
-      <dimension ref="A1:B1"/>
-      <sheetViews>
-        <sheetView workbookViewId="0">
-          <selection sqref="A1" activeCell="A1"/>
-        </sheetView>
-      </sheetViews>
-      <sheetFormatPr baseColWidth="10" defaultRowHeight="15"/>
-      <sheetData>
-        <row r="1" spans="1:2">
-          <c r="A1" t="s">
-            <v>0</v>
-          </c>
-          <c r="B1" t="s"/>
-        </row>
-      </sheetData>
-      <pageMargins left="0.75" right="0.75" top="1" bottom="1" header="0.5" footer="0.5"/>
-    </worksheet>
-    """
-    diff = compare_xml(xml, expected)
-    assert diff is None, diff
+    write_worksheet_mergecells(doc, ws)
+    xml = out.getvalue()
+    assert xml == b""
 
 
 def test_printer_settings(worksheet):
