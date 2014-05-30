@@ -1,6 +1,7 @@
 from __future__ import absolute_import
 # Copyright (c) 2010-2014 openpyxl
 
+import datetime
 import decimal
 from io import BytesIO
 
@@ -173,19 +174,6 @@ def test_write_formula(out, doc, datadir):
     """
     diff = compare_xml(xml, expected)
     assert diff is None, diff
-
-
-# check style tests
-def test_write_style(datadir):
-    datadir.chdir()
-    wb = Workbook(guess_types=True)
-    ws = wb.create_sheet()
-    ws.cell('F1').value = '13%'
-    ws._styles['F'] = ws._styles['F1']
-    content = write_worksheet(ws, {})
-    with open('sheet1_style.xml') as expected:
-        diff = compare_xml(content, expected.read())
-        assert diff is None, diff
 
 
 def test_write_height(out, doc, worksheet, datadir):
@@ -391,6 +379,7 @@ def test_freeze_panes_both(out, doc, worksheet, write_worksheet_sheetviews):
                              ("Hello", """<c t="s" r="A1"><v>0</v></c>"""),
                              ("", """<c r="A1" t="s"></c>"""),
                              (None, """<c r="A1" t="s"></c>"""),
+                             (datetime.date(2011, 12, 25), """<c r="A1" t="n" s="1"><v>40902</v></c>"""),
                          ])
 def test_write_cell(out, doc, worksheet, value, expected):
     from .. worksheet import write_cell

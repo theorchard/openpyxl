@@ -2,6 +2,7 @@ from __future__ import absolute_import
 # Copyright (c) 2010-2014 openpyxl
 
 # stdlib
+import datetime
 import decimal
 from io import BytesIO
 
@@ -29,6 +30,7 @@ def out():
                              ("Hello", """<c t="s" r="A1"><v>0</v></c>"""),
                              ("", """<c r="A1" t="s"></c>"""),
                              (None, """<c r="A1" t="s"></c>"""),
+                             (datetime.date(2011, 12, 25), """<c r="A1" t="n" s="1"><v>40902</v></c>"""),
                          ])
 def test_write_cell(out, value, expected):
     from .. lxml_worksheet import write_cell
