@@ -65,12 +65,6 @@ def row_sort(cell):
     return column_index_from_string(cell.column)
 
 
-def write_etree(doc, element):
-    start_tag(doc, element.tag, element)
-    for e in element.getchildren():
-        write_etree(doc, e)
-    end_tag(doc, element.tag)
-
 
 def write_worksheet(worksheet, shared_strings, style_table):
     """Write a worksheet to an xml file."""
