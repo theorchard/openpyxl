@@ -248,7 +248,7 @@ class DumpWorksheet(Worksheet):
                  'spans': '1:%d' % span}
         start_tag(doc, 'row', attrs)
 
-        for col_idx, cell in enumerate(row):
+        for col_idx, cell in enumerate(row, 1):
             style = None
             comment = None
             if cell is None:
@@ -268,7 +268,7 @@ class DumpWorksheet(Worksheet):
                                          cls.__class__.__name__,
                                          ob.__class__.__name__))
 
-            column = get_column_letter(col_idx + 1)
+            column = get_column_letter(col_idx)
             coordinate = '%s%d' % (column, row_idx)
             attributes = {'r': coordinate}
             if comment is not None:
