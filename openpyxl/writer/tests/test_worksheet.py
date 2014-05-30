@@ -598,3 +598,26 @@ def test_write_pagebreaks(out, doc, worksheet):
 
     write_pagebreaks(doc, worksheet)
     assert out.getvalue() == b""
+
+
+def test_data_validation(out, doc, worksheet):
+    from .. worksheet import write_worksheet_datavalidations
+    from openpyxl.datavalidation import DataValidation, ValidationType
+
+    ws = worksheet
+    dv = DataValidation(ValidationType.LIST, formula1='"Dog,Cat,Fish"')
+    dv.add_cell(ws['A1'])
+    ws.add_data_validation(dv)
+
+    write_worksheet_datavalidations(doc, worksheet)
+    xml = out.getvalue()
+    expected = """
+    <dataValidations count="1">
+    <dataValidation allowBlank="0" showErrorMessage="1" showInputMessage="1" sqref="A1" type="list">
+      <formula1>&quot;Dog,Cat,Fish&quot;</formula1>
+      <formula2>None</formula2>
+    </dataValidation>
+    </dataValidations>
+    """
+    diff = compare_xml(xml, expected)
+    assert diff is None, diff
