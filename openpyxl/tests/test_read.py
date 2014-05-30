@@ -428,7 +428,11 @@ def test_get_xml_iter():
     z.writestr("test", "whatever")
     stream = FUT(z.open("test"))
     assert hasattr(stream, "read")
-    z.close()
+    try:
+        z.close()
+    except IOError:
+        # you can't just close zipfiles in Windows
+        z.fp.close()
 
 
 def test_read_autofilter(datadir):
