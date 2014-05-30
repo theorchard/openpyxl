@@ -96,33 +96,24 @@ class TestLibreOfficeCompat(object):
 
 class TestWriteProps(object):
 
-    @classmethod
-    def setup_class(cls):
-        make_tmpdir()
-        cls.tmp_filename = os.path.join(TMPDIR, 'test.xlsx')
-        cls.prop = DocumentProperties()
-
-    @classmethod
-    def teardown_class(cls):
-        clean_tmpdir()
-
-    def test_write_properties_core(self):
-        self.prop.creator = 'TEST_USER'
-        self.prop.last_modified_by = 'SOMEBODY'
-        self.prop.created = datetime(2010, 4, 1, 20, 30, 00)
-        self.prop.modified = datetime(2010, 4, 5, 14, 5, 30)
-        content = write_properties_core(self.prop)
-        reference_file = os.path.join(DATADIR, 'writer', 'expected', 'core.xml')
-        with open(reference_file) as expected:
+    def test_write_properties_core(self, datadir):
+        datadir.join("writer").chdir()
+        prop = DocumentProperties()
+        prop.creator = 'TEST_USER'
+        prop.last_modified_by = 'SOMEBODY'
+        prop.created = datetime(2010, 4, 1, 20, 30, 00)
+        prop.modified = datetime(2010, 4, 5, 14, 5, 30)
+        content = write_properties_core(prop)
+        with open('core.xml') as expected:
             diff = compare_xml(content, expected.read())
             assert diff is None
 
-    def test_write_properties_app(self):
+    def test_write_properties_app(self, datadir):
+        datadir.join("writer").chdir()
         wb = Workbook()
         wb.create_sheet()
         wb.create_sheet()
         content = write_properties_app(wb)
-        reference_file = os.path.join(DATADIR, 'writer', 'expected', 'app.xml')
-        with open(reference_file) as expected:
+        with open('app.xml') as expected:
             diff = compare_xml(content, expected.read())
             assert diff is None

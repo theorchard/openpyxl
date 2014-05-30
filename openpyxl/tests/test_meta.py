@@ -35,8 +35,7 @@ def test_write_content_types():
     wb.create_sheet()
     wb.create_sheet()
     content = write_content_types(wb)
-    reference_file = os.path.join(DATADIR, 'writer', 'expected',
-            '[Content_Types].xml')
+    reference_file = os.path.join(DATADIR, 'writer', '[Content_Types].xml')
     with open(reference_file) as expected:
         diff = compare_xml(content, expected.read())
         assert diff is None, diff
@@ -45,7 +44,7 @@ def test_write_content_types():
 def test_write_root_rels():
     wb = Workbook()
     content = write_root_rels(wb)
-    reference_file = os.path.join(DATADIR, 'writer', 'expected', '.rels')
+    reference_file = os.path.join(DATADIR, 'writer', '.rels')
     with open(reference_file) as expected:
         diff = compare_xml(content, expected.read())
         assert diff is None, diff

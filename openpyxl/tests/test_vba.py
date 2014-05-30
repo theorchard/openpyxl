@@ -36,7 +36,7 @@ def test_write_content_types(datadir):
     wb = load_workbook('vba-test.xlsm', keep_vba=True)
     content = write_content_types(wb)
     datadir.chdir()
-    datadir.join('writer').join('expected').chdir()
+    datadir.join('writer').chdir()
     with open('Content_types_vba.xml') as expected:
         diff = compare_xml(content, expected.read())
         assert diff is None, diff
