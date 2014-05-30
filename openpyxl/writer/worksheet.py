@@ -132,7 +132,6 @@ def write_worksheet(worksheet, shared_strings):
 
     write_pagebreaks(doc, worksheet)
 
-
     # add a legacyDrawing so that excel can draw comments
     if worksheet._comment_count > 0:
         tag(doc, 'legacyDrawing', {'r:id': 'commentsvml'})

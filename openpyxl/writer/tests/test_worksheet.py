@@ -661,3 +661,10 @@ def test_write_no_header(out, doc, worksheet):
 
     write_header_footer(doc, ws)
     assert out.getvalue() == b""
+
+
+def test_write_pagebreaks(out, doc, worksheet):
+    from .. worksheet import write_pagebreaks
+
+    write_pagebreaks(doc, worksheet)
+    assert out.getvalue() == b""
