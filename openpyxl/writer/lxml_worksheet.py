@@ -178,3 +178,14 @@ def write_format(xf, worksheet):
             attrs['outlineLevelCol'] = str(outline_level)
     with xf.element('sheetFormatPr', attrs):
         pass
+
+
+def write_mergecells(xf, worksheet):
+    """Write merged cells to xml."""
+    merge = Element('mergeCells')
+    if worksheet._merged_cells:
+        merge.set("count", str(len(worksheet._merged_cells)))
+    for range_string in worksheet._merged_cells:
+        attrs = {'ref': range_string}
+        SubElement(merge, 'mergeCell', attrs)
+    xf.write(merge)

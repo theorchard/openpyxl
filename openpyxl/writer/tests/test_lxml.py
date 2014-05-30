@@ -424,3 +424,32 @@ def test_page_margins(worksheet, out):
     """
     diff = compare_xml(xml, expected)
     assert diff is None, diff
+
+
+def test_merge(out, worksheet):
+    from .. lxml_worksheet import write_mergecells
+
+    ws = worksheet
+    ws.cell('A1').value = 'Cell A1'
+    ws.cell('B1').value = 'Cell B1'
+
+    ws.merge_cells('A1:B1')
+    with xmlfile(out) as xf:
+        write_mergecells(xf, ws)
+    xml = out.getvalue()
+    expected = """
+      <mergeCells count="1">
+        <mergeCell ref="A1:B1"/>
+      </mergeCells>
+    """
+    diff = compare_xml(xml, expected)
+    assert diff is None, diff
+
+    out = BytesIO()
+    ws.unmerge_cells('A1:B1')
+    with xmlfile(out) as xf:
+        write_mergecells(xf, ws)
+    xml = out.getvalue()
+    expected = """<mergeCells/>"""
+    diff = compare_xml(xml, expected)
+    assert diff is None, diff
