@@ -15,7 +15,7 @@ from openpyxl.cell import (
     column_index_from_string,
     coordinate_from_string
 )
-from openpyxl.xml.constants import PKG_REL_NS
+from openpyxl.xml.constants import PKG_REL_NS, REL_NS
 
 from .worksheet import row_sort
 
@@ -258,3 +258,15 @@ def write_rels(xf, worksheet, drawing_id, comments_id):
                  'Target': '../drawings/commentsDrawing%s.vml' % comments_id}
         SubElement(root, '{%s}Relationship' % PKG_REL_NS, attrs)
     xf.write(root)
+
+
+def write_hyperlinks(xf, worksheet):
+    """Write worksheet hyperlinks to xml."""
+    tag = Element('hyperlinks')
+    for cell in worksheet.get_cell_collection():
+        if cell.hyperlink_rel_id is not None:
+            attrs = {'display': cell.hyperlink,
+                     'ref': cell.coordinate,
+                     '{%s}id' % REL_NS: cell.hyperlink_rel_id}
+            SubElement(tag, 'hyperlink', attrs)
+    xf.write(tag)

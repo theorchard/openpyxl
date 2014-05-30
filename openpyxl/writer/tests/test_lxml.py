@@ -555,3 +555,22 @@ def test_write_hyperlink_rels(out, datadir, worksheet):
         xml = out.getvalue()
         diff = compare_xml(xml, expected.read())
         assert diff is None, diff
+
+
+def test_write_hyperlink(out, worksheet):
+    from .. lxml_worksheet import write_hyperlinks
+
+    ws = worksheet
+    ws.cell('A1').value = "test"
+    ws.cell('A1').hyperlink = "http://test.com"
+
+    with xmlfile(out) as xf:
+        write_hyperlinks(xf, ws)
+    xml = out.getvalue()
+    expected = """
+    <hyperlinks xmlns:r="http://schemas.openxmlformats.org/officeDocument/2006/relationships">
+      <hyperlink display="http://test.com" r:id="rId1" ref="A1"/>
+    </hyperlinks>
+    """
+    diff = compare_xml(xml, expected)
+    assert diff is None, diff
