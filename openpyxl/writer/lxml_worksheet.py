@@ -5,8 +5,44 @@ from __future__ import absolute_import
 
 from lxml.etree import xmlfile, Element, SubElement
 
-from openpyxl.compat import iterkeys, itervalues, safe_string
+from openpyxl.compat import (
+    iterkeys,
+    itervalues,
+    safe_string,
+    iteritems
+)
+from openpyxl.cell import column_index_from_string
+
 from .worksheet import row_sort
+
+
+def write_cols(xf, worksheet, style_table=None):
+    """Write worksheet columns to xml.
+
+    style_table is ignored but required
+    for compatibility with the dumped worksheet <cols> may never be empty -
+    spec says must contain at least one child
+    """
+    cols = []
+    for label, dimension in iteritems(worksheet.column_dimensions):
+        dimension.style = worksheet._styles.get(label)
+        col_def = dict(dimension)
+        if col_def == {}:
+            continue
+        idx = column_index_from_string(label)
+        cols.append((idx, col_def))
+
+    if not cols:
+        return
+
+    with xf.element('cols'):
+        for idx, col_def in sorted(cols):
+            v = "%d" % idx
+            cmin = col_def.get('min') or v
+            cmax = col_def.get('max') or v
+            col_def.update({'min': cmin, 'max': cmax})
+            c = Element('col', col_def)
+            xf.write(c)
 
 
 def write_worksheet_data(xf, worksheet, string_table, style_table=None):
