@@ -188,16 +188,27 @@ def test_write_style(datadir):
         assert diff is None, diff
 
 
-def test_write_height(datadir):
+def test_write_height(out, doc, worksheet, datadir):
+    from .. worksheet import write_worksheet_data
+
     datadir.chdir()
-    wb = Workbook()
-    ws = wb.create_sheet()
+    ws = worksheet
     ws.cell('F1').value = 10
     ws.row_dimensions[ws.cell('F1').row].height = 30
-    content = write_worksheet(ws, {})
-    with open('sheet1_height.xml') as expected:
-        diff = compare_xml(content, expected.read())
-        assert diff is None, diff
+
+    write_worksheet_data(doc, ws, {})
+    xml = out.getvalue()
+    expected = """
+     <sheetData>
+     <row customHeight="1" ht="30" r="1" spans="1:6">
+     <c r="F1" t="n">
+       <v>10</v>
+     </c>
+   </row>
+   </sheetData>
+    """
+    diff = compare_xml(xml, expected)
+    assert diff is None, diff
 
 
 def test_write_hyperlink(out, doc, worksheet):
