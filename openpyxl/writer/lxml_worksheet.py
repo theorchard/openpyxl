@@ -15,6 +15,7 @@ from openpyxl.cell import (
     column_index_from_string,
     coordinate_from_string
 )
+from openpyxl.xml.constants import PKG_REL_NS
 
 from .worksheet import row_sort
 
@@ -230,3 +231,30 @@ def write_pagebreaks(xf, worksheet):
         for b in breaks:
             SubElement(tag, 'brk', {'id': str(b), 'man': 'true', 'max': '16383',
                              'min': '0'})
+
+
+def write_rels(xf, worksheet, drawing_id, comments_id):
+    """Write relationships for the worksheet to xml."""
+    root = Element('{%s}Relationships' % PKG_REL_NS)
+    for rel in worksheet.relationships:
+        attrs = {'Id': rel.id, 'Type': rel.type, 'Target': rel.target}
+        if rel.target_mode:
+            attrs['TargetMode'] = rel.target_mode
+        SubElement(root, '{%s}Relationship' % PKG_REL_NS, attrs)
+    if worksheet._charts or worksheet._images:
+        attrs = {'Id': 'rId1',
+                 'Type': '%s/drawing' % REL_NS,
+                 'Target': '../drawings/drawing%s.xml' % drawing_id}
+        SubElement(root, '{%s}Relationship' % PKG_REL_NS, attrs)
+    if worksheet._comment_count > 0:
+        # there's only one comments sheet per worksheet,
+        # so there's no reason to call the Id rIdx
+        attrs = {'Id': 'comments',
+                 'Type': COMMENTS_NS,
+                 'Target': '../comments%s.xml' % comments_id}
+        SubElement(root, '{%s}Relationship' % PKG_REL_NS, attrs)
+        attrs = {'Id': 'commentsvml',
+                 'Type': VML_NS,
+                 'Target': '../drawings/commentsDrawing%s.vml' % comments_id}
+        SubElement(root, '{%s}Relationship' % PKG_REL_NS, attrs)
+    xf.write(root)
