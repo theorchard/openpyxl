@@ -42,6 +42,10 @@ from openpyxl.worksheet.page import PageMargins
 
 
 def _get_xml_iter(xml_source):
+    """
+    Possible inputs: strings, bytes, members of zipfile, temporary file
+    Always return a file like object
+    """
     if not hasattr(xml_source, 'read'):
         try:
             xml_source = xml_source.encode("utf-8")

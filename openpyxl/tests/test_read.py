@@ -419,7 +419,7 @@ def test_get_xml_iter():
 
     f = TemporaryFile(mode='rb+', prefix='openpyxl.', suffix='.unpack.temp')
     stream = FUT(f)
-    assert isinstance(stream, tempfile), type(stream)
+    assert stream == f
     f.close()
 
     from zipfile import ZipFile
