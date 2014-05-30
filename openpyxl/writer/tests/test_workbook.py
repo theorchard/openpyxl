@@ -1,15 +1,24 @@
 from __future__ import absolute_import
 # Copyright (c) 2010-2014 openpyxl
 
+#stdlib
+from io import BytesIO
+import os
+
 # package
-from openpyxl import Workbook
+from openpyxl import Workbook, load_workbook
 
 # test
 import pytest
 from openpyxl.tests.helper import compare_xml
 
+from openpyxl.writer.excel import (
+    save_workbook,
+    save_virtual_workbook,
+    )
+from openpyxl.writer.worksheet import write_worksheet, write_worksheet_rels
 
-from .. workbook import write_workbook
+from .. workbook import write_workbook, write_workbook_rels
 
 
 def test_write_auto_filter(datadir):
@@ -48,3 +57,36 @@ def test_write_hidden_worksheet():
     """
     diff = compare_xml(xml, expected)
     assert diff is None, diff
+
+
+def test_write_empty_workbook(tmpdir):
+    tmpdir.chdir()
+    wb = Workbook()
+    dest_filename = 'empty_book.xlsx'
+    save_workbook(wb, dest_filename)
+    assert os.path.isfile(dest_filename)
+
+
+def test_write_virtual_workbook():
+    old_wb = Workbook()
+    saved_wb = save_virtual_workbook(old_wb)
+    new_wb = load_workbook(BytesIO(saved_wb))
+    assert new_wb
+
+
+def test_write_workbook_rels(datadir):
+    datadir.chdir()
+    wb = Workbook()
+    content = write_workbook_rels(wb)
+    with open('workbook.xml.rels') as expected:
+        diff = compare_xml(content, expected.read())
+        assert diff is None, diff
+
+
+def test_write_workbook(datadir):
+    datadir.chdir()
+    wb = Workbook()
+    content = write_workbook(wb)
+    with open('workbook.xml') as expected:
+        diff = compare_xml(content, expected.read())
+        assert diff is None, diff
