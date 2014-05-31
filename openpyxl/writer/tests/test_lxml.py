@@ -556,6 +556,28 @@ def test_no_hyperlink(out, worksheet, root_xml):
     assert out.getvalue() == b"<test/>"
 
 
+def test_empty_worksheet(worksheet, write_worksheet):
+    xml = write_worksheet(worksheet, None)
+    expected = """
+    <s:worksheet xmlns:s="http://schemas.openxmlformats.org/spreadsheetml/2006/main">
+      <sheetPr>
+        <outlinePr summaryBelow="1" summaryRight="1"/>
+      </sheetPr>
+      <dimension ref="A1:A1"/>
+      <sheetViews>
+        <sheetView workbookViewId="0">
+          <selection activeCell="A1" sqref="A1"/>
+        </sheetView>
+      </sheetViews>
+      <sheetFormatPr baseColWidth="10" defaultRowHeight="15"/>
+      <sheetData/>
+      <pageMargins bottom="1" footer="0.5" header="0.5" left="0.75" right="0.75" top="1"/>
+    </s:worksheet>
+    """
+    diff = compare_xml(xml, expected)
+    assert diff is None, diff
+
+
 def test_printer_settings(worksheet, write_worksheet):
     ws = worksheet
     ws.page_setup.orientation = ws.ORIENTATION_LANDSCAPE
@@ -589,7 +611,6 @@ def test_printer_settings(worksheet, write_worksheet):
     assert diff is None, diff
 
 
-#@pytest.mark.xfail
 def test_page_margins(worksheet, write_worksheet):
     ws = worksheet
     ws.page_margins.left = 2.0
