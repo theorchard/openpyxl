@@ -589,7 +589,7 @@ def test_printer_settings(worksheet, write_worksheet):
     ws.page_setup.verticalCentered = True
     xml = write_worksheet(ws, None)
     expected = """
-    <s:worksheet xmlns:s="http://schemas.openxmlformats.org/spreadsheetml/2006/main" xmlns:r="http://schemas.openxmlformats.org/officeDocument/2006/relationships">
+    <s:worksheet xmlns:s="http://schemas.openxmlformats.org/spreadsheetml/2006/main">
       <sheetPr>
         <outlinePr summaryRight="1" summaryBelow="1"/>
         <pageSetUpPr fitToPage="1"/>
@@ -621,7 +621,7 @@ def test_page_margins(worksheet, write_worksheet):
     ws.page_margins.footer = 1.5
     xml = write_worksheet(ws, None)
     expected = """
-    <s:worksheet xmlns:s="http://schemas.openxmlformats.org/spreadsheetml/2006/main" xmlns:r="http://schemas.openxmlformats.org/officeDocument/2006/relationships">
+    <s:worksheet xmlns:s="http://schemas.openxmlformats.org/spreadsheetml/2006/main">
       <sheetPr>
         <outlinePr summaryRight="1" summaryBelow="1"/>
       </sheetPr>
