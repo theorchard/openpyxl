@@ -392,33 +392,6 @@ def write_worksheet_hyperlinks(doc, worksheet):
         end_tag(doc, 'hyperlinks')
 
 
-def write_worksheet_rels(worksheet, drawing_id, comments_id):
-    """Write relationships for the worksheet to xml."""
-    root = Element('{%s}Relationships' % PKG_REL_NS)
-    for rel in worksheet.relationships:
-        attrs = {'Id': rel.id, 'Type': rel.type, 'Target': rel.target}
-        if rel.target_mode:
-            attrs['TargetMode'] = rel.target_mode
-        SubElement(root, '{%s}Relationship' % PKG_REL_NS, attrs)
-    if worksheet._charts or worksheet._images:
-        attrs = {'Id': 'rId1',
-                 'Type': '%s/drawing' % REL_NS,
-                 'Target': '../drawings/drawing%s.xml' % drawing_id}
-        SubElement(root, '{%s}Relationship' % PKG_REL_NS, attrs)
-    if worksheet._comment_count > 0:
-        # there's only one comments sheet per worksheet,
-        # so there's no reason to call the Id rIdx
-        attrs = {'Id': 'comments',
-                 'Type': COMMENTS_NS,
-                 'Target': '../comments%s.xml' % comments_id}
-        SubElement(root, '{%s}Relationship' % PKG_REL_NS, attrs)
-        attrs = {'Id': 'commentsvml',
-                 'Type': VML_NS,
-                 'Target': '../drawings/commentsDrawing%s.vml' % comments_id}
-        SubElement(root, '{%s}Relationship' % PKG_REL_NS, attrs)
-    return root
-
-
 def write_header_footer(doc, worksheet):
     if worksheet.header_footer.hasHeader() or worksheet.header_footer.hasFooter():
         start_tag(doc, 'headerFooter')

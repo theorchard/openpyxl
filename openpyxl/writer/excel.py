@@ -59,10 +59,11 @@ from openpyxl.writer.theme import write_theme
 from openpyxl.writer.styles import StyleWriter
 from openpyxl.writer.drawings import DrawingWriter, ShapeWriter
 from openpyxl.writer.charts import ChartWriter
-from openpyxl.writer.worksheet import write_worksheet, write_worksheet_rels
+from .relations import write_rels
+from openpyxl.writer.worksheet import write_worksheet
 from openpyxl import LXML
 if LXML is True:
-    from . lxml_worksheet import write_worksheet, write_rels as write_worksheet_rels
+    from . lxml_worksheet import write_worksheet
 from openpyxl.writer.comments import CommentWriter
 
 
@@ -129,7 +130,7 @@ class ExcelWriter(object):
             if (sheet._charts or sheet._images
                 or sheet.relationships
                 or sheet._comment_count > 0):
-                rels = write_worksheet_rels(sheet, drawing_id, comments_id)
+                rels = write_rels(sheet, drawing_id, comments_id)
                 archive.writestr(
                     PACKAGE_WORKSHEETS + '/_rels/sheet%d.xml.rels' % (i + 1),
                     tostring(rels)

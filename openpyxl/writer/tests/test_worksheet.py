@@ -12,7 +12,7 @@ from openpyxl import Workbook
 
 from .. strings import create_string_table
 from .. styles import StyleWriter
-from .. worksheet import write_worksheet, write_worksheet_rels
+from .. worksheet import write_worksheet
 
 from openpyxl.tests.helper import compare_xml
 
@@ -214,23 +214,6 @@ def test_write_hyperlink(out, doc, worksheet):
     """
     diff = compare_xml(xml, expected)
     assert diff is None, diff
-
-
-def test_write_hyperlink_rels(datadir, worksheet):
-    datadir.chdir()
-    ws = worksheet
-    assert 0 == len(ws.relationships)
-    ws.cell('A1').value = "test"
-    ws.cell('A1').hyperlink = "http://test.com/"
-    assert 1 == len(ws.relationships)
-    ws.cell('A2').value = "test"
-    ws.cell('A2').hyperlink = "http://test2.com/"
-    assert 2 == len(ws.relationships)
-
-    content = tostring(write_worksheet_rels(ws, 1, 1))
-    with open('sheet1_hyperlink.xml.rels') as expected:
-        diff = compare_xml(content, expected.read())
-        assert diff is None, diff
 
 
 @pytest.mark.xfail

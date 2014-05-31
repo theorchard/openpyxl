@@ -507,29 +507,6 @@ def test_data_validation(out, worksheet):
     assert diff is None, diff
 
 
-def test_write_hyperlink_rels(out, datadir, worksheet):
-    from .. lxml_worksheet import write_rels
-
-    datadir.chdir()
-    ws = worksheet
-    assert 0 == len(ws.relationships)
-    ws.cell('A1').value = "test"
-    ws.cell('A1').hyperlink = "http://test.com/"
-    assert 1 == len(ws.relationships)
-    ws.cell('A2').value = "test"
-    ws.cell('A2').hyperlink = "http://test2.com/"
-    assert 2 == len(ws.relationships)
-
-    with xmlfile(out) as xf:
-        el = write_rels(ws, 1, 1)
-        xf.write(el)
-
-    with open('sheet1_hyperlink.xml.rels') as expected:
-        xml = out.getvalue()
-        diff = compare_xml(xml, expected.read())
-        assert diff is None, diff
-
-
 def test_hyperlink(out, worksheet):
     from .. lxml_worksheet import write_hyperlinks
 
