@@ -620,3 +620,32 @@ def test_data_validation(out, doc, worksheet):
     """
     diff = compare_xml(xml, expected)
     assert diff is None, diff
+
+
+def test_vba(worksheet):
+    ws = worksheet
+    ws.xml_source = """
+    <worksheet xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main">
+        <sheetPr codeName="Sheet1"/>
+    </worksheet>
+    """
+
+    xml = write_worksheet(ws, None)
+    expected = """
+    <worksheet xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main">
+      <sheetPr codeName="Sheet1">
+        <outlinePr summaryBelow="1" summaryRight="1"/>
+      </sheetPr>
+      <dimension ref="A1:A1"/>
+      <sheetViews>
+        <sheetView workbookViewId="0">
+          <selection activeCell="A1" sqref="A1"/>
+        </sheetView>
+      </sheetViews>
+      <sheetFormatPr baseColWidth="10" defaultRowHeight="15"/>
+      <sheetData/>
+      <pageMargins bottom="1" footer="0.5" header="0.5" left="0.75" right="0.75" top="1"/>
+    </worksheet>
+    """
+    diff = compare_xml(xml, expected)
+    assert diff is None, diff
