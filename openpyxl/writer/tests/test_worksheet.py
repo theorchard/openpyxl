@@ -7,7 +7,7 @@ from io import BytesIO
 
 import pytest
 
-from openpyxl.xml.functions import XMLGenerator
+from openpyxl.xml.functions import XMLGenerator, tostring
 from openpyxl import Workbook
 
 from .. strings import create_string_table
@@ -227,7 +227,7 @@ def test_write_hyperlink_rels(datadir, worksheet):
     ws.cell('A2').hyperlink = "http://test2.com/"
     assert 2 == len(ws.relationships)
 
-    content = write_worksheet_rels(ws, 1, 1)
+    content = tostring(write_worksheet_rels(ws, 1, 1))
     with open('sheet1_hyperlink.xml.rels') as expected:
         diff = compare_xml(content, expected.read())
         assert diff is None, diff

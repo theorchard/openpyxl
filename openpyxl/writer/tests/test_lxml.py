@@ -521,7 +521,8 @@ def test_write_hyperlink_rels(out, datadir, worksheet):
     assert 2 == len(ws.relationships)
 
     with xmlfile(out) as xf:
-        write_rels(xf, ws, 1, 1)
+        el = write_rels(ws, 1, 1)
+        xf.write(el)
 
     with open('sheet1_hyperlink.xml.rels') as expected:
         xml = out.getvalue()

@@ -45,6 +45,7 @@ from openpyxl.xml.constants import (
     PACKAGE_IMAGES,
     PACKAGE_XL
     )
+from openpyxl.xml.functions import tostring
 from openpyxl.writer.strings import create_string_table, write_string_table
 from openpyxl.writer.workbook import (
     write_content_types,
@@ -128,9 +129,11 @@ class ExcelWriter(object):
             if (sheet._charts or sheet._images
                 or sheet.relationships
                 or sheet._comment_count > 0):
-                archive.writestr(PACKAGE_WORKSHEETS +
-                        '/_rels/sheet%d.xml.rels' % (i + 1),
-                        write_worksheet_rels(sheet, drawing_id, comments_id))
+                rels = write_worksheet_rels(sheet, drawing_id, comments_id)
+                archive.writestr(
+                    PACKAGE_WORKSHEETS + '/_rels/sheet%d.xml.rels' % (i + 1),
+                    tostring(rels)
+                )
             if sheet._charts or sheet._images:
                 dw = DrawingWriter(sheet)
                 archive.writestr(PACKAGE_DRAWINGS + '/drawing%d.xml' % drawing_id,

@@ -336,7 +336,7 @@ def write_pagebreaks(xf, worksheet):
                              'min': '0'})
 
 
-def write_rels(xf, worksheet, drawing_id, comments_id):
+def write_rels(worksheet, drawing_id, comments_id):
     """Write relationships for the worksheet to xml."""
     root = Element('{%s}Relationships' % PKG_REL_NS)
     for rel in worksheet.relationships:
@@ -360,7 +360,7 @@ def write_rels(xf, worksheet, drawing_id, comments_id):
                  'Type': VML_NS,
                  'Target': '../drawings/commentsDrawing%s.vml' % comments_id}
         SubElement(root, '{%s}Relationship' % PKG_REL_NS, attrs)
-    xf.write(root)
+    return root
 
 
 def write_hyperlinks(xf, worksheet):

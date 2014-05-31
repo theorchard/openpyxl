@@ -416,7 +416,7 @@ def write_worksheet_rels(worksheet, drawing_id, comments_id):
                  'Type': VML_NS,
                  'Target': '../drawings/commentsDrawing%s.vml' % comments_id}
         SubElement(root, '{%s}Relationship' % PKG_REL_NS, attrs)
-    return get_document_content(root)
+    return root
 
 
 def write_header_footer(doc, worksheet):

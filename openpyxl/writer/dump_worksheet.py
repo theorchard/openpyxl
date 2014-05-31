@@ -46,6 +46,7 @@ from openpyxl.xml.functions import (
     SubElement,
     ConditionalElement,
     get_document_content,
+    tostring
 )
 from openpyxl.date_time import (
     to_excel,
@@ -354,9 +355,11 @@ class ExcelDumpWriter(ExcelWriter):
 
             # write comments
             if sheet._comments:
-                archive.writestr(PACKAGE_WORKSHEETS +
-                        '/_rels/sheet%d.xml.rels' % (i + 1),
-                        write_worksheet_rels(sheet, drawing_id, comments_id))
+                rels = write_worksheet_rels(sheet, drawing_id, comments_id)
+                archive.writestr(
+                    PACKAGE_WORKSHEETS + '/_rels/sheet%d.xml.rels' % (i + 1),
+                    tostring(rels)
+                        )
 
                 cw = DumpCommentWriter(sheet)
                 archive.writestr(PACKAGE_XL + '/comments%d.xml' % comments_id,
