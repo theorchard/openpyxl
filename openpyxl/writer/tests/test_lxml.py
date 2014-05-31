@@ -639,6 +639,39 @@ def test_page_margins(worksheet, write_worksheet):
     assert diff is None, diff
 
 
+def test_vba(worksheet, write_worksheet):
+    ws = worksheet
+    ws.xml_source = """
+    <worksheet xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main"
+    xmlns:r="http://schemas.openxmlformats.org/officeDocument/2006/relationships">
+        <sheetPr codeName="Sheet1"/>
+        <legacyDrawing r:id="rId2"/>
+    </worksheet>
+    """
+
+    xml = write_worksheet(ws, None)
+    expected = """
+    <worksheet xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main"
+    xmlns:r="http://schemas.openxmlformats.org/officeDocument/2006/relationships">
+      <sheetPr codeName="Sheet1">
+        <outlinePr summaryBelow="1" summaryRight="1"/>
+      </sheetPr>
+      <dimension ref="A1:A1"/>
+      <sheetViews>
+        <sheetView workbookViewId="0">
+          <selection activeCell="A1" sqref="A1"/>
+        </sheetView>
+      </sheetViews>
+      <sheetFormatPr baseColWidth="10" defaultRowHeight="15"/>
+      <sheetData/>
+      <pageMargins bottom="1" footer="0.5" header="0.5" left="0.75" right="0.75" top="1"/>
+      <legacyDrawing r:id="rId2"/>
+    </worksheet>
+    """
+    diff = compare_xml(xml, expected)
+    assert diff is None, diff
+
+
 @pytest.fixture
 def worksheet_with_cf(worksheet):
     from openpyxl.formatting import ConditionalFormatting

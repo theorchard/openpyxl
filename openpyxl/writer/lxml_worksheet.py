@@ -93,7 +93,7 @@ def write_worksheet(worksheet, shared_strings):
             write_header_footer(xf, worksheet)
 
             if worksheet._charts or worksheet._images:
-                drawing = Element('drawing', {'r:id': 'rId1'})
+                drawing = Element('drawing', {'{%s}id' % REL_NS: 'rId1'})
                 xf.write(drawing)
                 del drawing
 
@@ -103,7 +103,7 @@ def write_worksheet(worksheet, shared_strings):
                 el = vba_root.find('{%s}legacyDrawing' % SHEET_MAIN_NS)
                 if el is not None:
                     rId = el.get('{%s}id' % REL_NS)
-                    legacy = Element('legacyDrawing', {'r:id': rId})
+                    legacy = Element('legacyDrawing', {'{%s}id' % REL_NS: rId})
                     xf.write(legacy)
 
             write_pagebreaks(xf, worksheet)
