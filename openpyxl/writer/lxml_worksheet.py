@@ -280,10 +280,12 @@ def write_format(xf, worksheet):
 
 def write_mergecells(xf, worksheet):
     """Write merged cells to xml."""
-    merge = Element('mergeCells')
-    if worksheet._merged_cells:
-        merge.set("count", str(len(worksheet._merged_cells)))
-    for range_string in worksheet._merged_cells:
+    cells = worksheet._merged_cells
+    if not cells:
+        return
+
+    merge = Element('mergeCells', {'count':'%d' % len(cells)})
+    for range_string in cells:
         attrs = {'ref': range_string}
         SubElement(merge, 'mergeCell', attrs)
     xf.write(merge)

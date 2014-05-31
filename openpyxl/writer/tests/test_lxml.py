@@ -8,6 +8,7 @@ from io import BytesIO
 
 # package
 from openpyxl import Workbook
+from openpyxl.xml.functions import Element
 from lxml.etree import xmlfile
 
 # test imports
@@ -166,11 +167,11 @@ def ColumnDimension():
     return ColumnDimension
 
 
-@pytest.mark.xfail
 def test_write_no_cols(out, write_cols, DummyWorksheet):
     with xmlfile(out) as xf:
+        xf.write(Element('test'))
         write_cols(xf, DummyWorksheet)
-    assert out.getvalue() == b""
+    assert out.getvalue() == b"<test/>"
 
 
 def test_write_col_widths(out, write_cols, ColumnDimension, DummyWorksheet):
@@ -448,9 +449,10 @@ def test_merge(out, worksheet):
     out = BytesIO()
     ws.unmerge_cells('A1:B1')
     with xmlfile(out) as xf:
+        xf.write(Element("test"))
         write_mergecells(xf, ws)
     xml = out.getvalue()
-    expected = """<mergeCells/>"""
+    expected = """<test/>"""
     diff = compare_xml(xml, expected)
     assert diff is None, diff
 
@@ -493,23 +495,23 @@ def test_header_footer(out, worksheet):
     assert diff is None, diff
 
 
-@pytest.mark.xfail
 def test_write_no_header(out, worksheet):
     from .. lxml_worksheet import write_header_footer
     ws = worksheet
 
     with xmlfile(out) as xf:
+        xf.write(Element('test'))
         write_header_footer(xf, ws)
-    assert out.getvalue() == b""
+    assert out.getvalue() == b"<test/>"
 
 
-@pytest.mark.xfail
 def test_write_pagebreaks(out, worksheet):
     from .. lxml_worksheet import write_pagebreaks
 
     with xmlfile(out) as xf:
+        xf.write(Element('test'))
         write_pagebreaks(xf, worksheet)
-    assert out.getvalue() == b""
+    assert out.getvalue() == b"<test/>"
 
 
 def test_data_validation(out, worksheet):
