@@ -8,8 +8,7 @@ from io import BytesIO
 
 # package
 from openpyxl import Workbook
-from openpyxl.xml.functions import Element
-from lxml.etree import xmlfile
+from lxml.etree import xmlfile, Element
 
 # test imports
 import pytest
