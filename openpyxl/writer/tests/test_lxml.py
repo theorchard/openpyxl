@@ -182,7 +182,7 @@ def test_no_cols(out, write_cols, DummyWorksheet, root_xml):
     assert out.getvalue() == b"<test/>"
 
 
-def test_write_col_widths(out, write_cols, ColumnDimension, DummyWorksheet):
+def test_col_widths(out, write_cols, ColumnDimension, DummyWorksheet):
     ws = DummyWorksheet
     ws.column_dimensions['A'] = ColumnDimension(width=4)
     with xmlfile(out) as xf:
@@ -193,7 +193,7 @@ def test_write_col_widths(out, write_cols, ColumnDimension, DummyWorksheet):
     assert diff is None, diff
 
 
-def test_write_cols_style(out, write_cols, ColumnDimension, DummyWorksheet):
+def test_col_style(out, write_cols, ColumnDimension, DummyWorksheet):
     ws = DummyWorksheet
     ws.column_dimensions['A'] = ColumnDimension()
     ws._styles['A'] = 1
@@ -205,7 +205,7 @@ def test_write_cols_style(out, write_cols, ColumnDimension, DummyWorksheet):
     assert diff is None, diff
 
 
-def test_write_lots_cols(out, write_cols, ColumnDimension, DummyWorksheet):
+def test_lots_cols(out, write_cols, ColumnDimension, DummyWorksheet):
     ws = DummyWorksheet
     from openpyxl.cell import get_column_letter
     for i in range(1, 15):
@@ -242,7 +242,7 @@ def write_format():
     return write_format
 
 
-def test_write_sheet_format(out, write_format, ColumnDimension, DummyWorksheet):
+def test_sheet_format(out, write_format, ColumnDimension, DummyWorksheet):
     with xmlfile(out) as xf:
         write_format(xf, DummyWorksheet)
     xml = out.getvalue()
@@ -279,7 +279,7 @@ def write_autofilter():
     return write_autofilter
 
 
-def test_write_auto_filter(out, worksheet, write_autofilter):
+def test_auto_filter(out, worksheet, write_autofilter):
     ws = worksheet
     ws.auto_filter.ref = 'A1:F1'
     with xmlfile(out) as xf:
@@ -290,7 +290,7 @@ def test_write_auto_filter(out, worksheet, write_autofilter):
     assert diff is None, diff
 
 
-def test_write_auto_filter_filter_column(out, worksheet, write_autofilter):
+def test_auto_filter_filter_column(out, worksheet, write_autofilter):
     ws = worksheet
     ws.auto_filter.ref = 'A1:F1'
     ws.auto_filter.add_filter_column(0, ["0"], blank=True)
@@ -311,7 +311,7 @@ def test_write_auto_filter_filter_column(out, worksheet, write_autofilter):
     assert diff is None, diff
 
 
-def test_write_auto_filter_sort_condition(out, worksheet, write_autofilter):
+def test_auto_filter_sort_condition(out, worksheet, write_autofilter):
     ws = worksheet
     ws.cell('A1').value = 'header'
     ws.cell('A2').value = 1
