@@ -637,3 +637,93 @@ def test_page_margins(worksheet, write_worksheet):
     """
     diff = compare_xml(xml, expected)
     assert diff is None, diff
+
+
+@pytest.fixture
+def worksheet_with_cf(worksheet):
+    from openpyxl.formatting import ConditionalFormatting
+    worksheet.conditional_formating = ConditionalFormatting()
+    return worksheet
+
+
+@pytest.fixture
+def write_conditional_formatting():
+    from .. lxml_worksheet import write_conditional_formatting
+    return write_conditional_formatting
+
+
+def test_conditional_formatting_customRule(out, worksheet_with_cf, write_conditional_formatting):
+    from .. lxml_worksheet import write_conditional_formatting
+
+    ws = worksheet_with_cf
+
+    ws.conditional_formatting.add('C1:C10', {'type': 'expression', 'formula': ['ISBLANK(C1)'],
+                                                    'stopIfTrue': '1', 'dxf': {}})
+    with xmlfile(out) as xf:
+        write_conditional_formatting(xf, ws)
+    xml = out.getvalue()
+
+    diff = compare_xml(xml, """
+    <conditionalFormatting sqref="C1:C10">
+      <cfRule type="expression" stopIfTrue="1" priority="1">
+        <formula>ISBLANK(C1)</formula>
+      </cfRule>
+    </conditionalFormatting>
+    """)
+    assert diff is None, diff
+
+
+def test_conditional_font(out, worksheet_with_cf, write_conditional_formatting):
+    """Test to verify font style written correctly."""
+
+    # Create cf rule
+    from openpyxl.styles import PatternFill, Font, Color
+    from openpyxl.formatting import CellIsRule
+
+    redFill = PatternFill(start_color=Color('FFEE1111'),
+                   end_color=Color('FFEE1111'),
+                   patternType='solid')
+    whiteFont = Font(color=Color("FFFFFFFF"))
+
+    ws = worksheet_with_cf
+    ws.conditional_formatting.add('A1:A3',
+                                  CellIsRule(operator='equal',
+                                             formula=['"Fail"'],
+                                             stopIfTrue=False,
+                                             font=whiteFont,
+                                             fill=redFill))
+
+    with xmlfile(out) as xf:
+        write_conditional_formatting(xf, ws)
+    xml = out.getvalue()
+    diff = compare_xml(xml, """
+    <conditionalFormatting sqref="A1:A3">
+      <cfRule operator="equal" priority="1" type="cellIs">
+        <formula>"Fail"</formula>
+      </cfRule>
+    </conditionalFormatting>
+    """)
+    assert diff is None, diff
+
+
+def test_formula_rule(out, worksheet_with_cf, write_conditional_formatting):
+    from openpyxl.formatting import FormulaRule
+
+    ws = worksheet_with_cf
+    ws.conditional_formatting.add('C1:C10',
+                                  FormulaRule(
+                                      formula=['ISBLANK(C1)'],
+                                      stopIfTrue=True)
+                                  )
+    with xmlfile(out) as xf:
+        write_conditional_formatting(xf, ws)
+    xml = out.getvalue()
+
+    diff = compare_xml(xml, """
+    <conditionalFormatting sqref="C1:C10">
+      <cfRule type="expression" stopIfTrue="1" priority="1">
+        <formula>ISBLANK(C1)</formula>
+      </cfRule>
+    </conditionalFormatting>
+    """)
+    assert diff is None, diff
