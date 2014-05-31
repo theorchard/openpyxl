@@ -558,7 +558,7 @@ def test_no_hyperlink(out, worksheet, root_xml):
 def test_empty_worksheet(worksheet, write_worksheet):
     xml = write_worksheet(worksheet, None)
     expected = """
-    <s:worksheet xmlns:s="http://schemas.openxmlformats.org/spreadsheetml/2006/main">
+    <worksheet xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main">
       <sheetPr>
         <outlinePr summaryBelow="1" summaryRight="1"/>
       </sheetPr>
@@ -571,7 +571,7 @@ def test_empty_worksheet(worksheet, write_worksheet):
       <sheetFormatPr baseColWidth="10" defaultRowHeight="15"/>
       <sheetData/>
       <pageMargins bottom="1" footer="0.5" header="0.5" left="0.75" right="0.75" top="1"/>
-    </s:worksheet>
+    </worksheet>
     """
     diff = compare_xml(xml, expected)
     assert diff is None, diff
@@ -588,7 +588,7 @@ def test_printer_settings(worksheet, write_worksheet):
     ws.page_setup.verticalCentered = True
     xml = write_worksheet(ws, None)
     expected = """
-    <s:worksheet xmlns:s="http://schemas.openxmlformats.org/spreadsheetml/2006/main">
+    <worksheet xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main">
       <sheetPr>
         <outlinePr summaryRight="1" summaryBelow="1"/>
         <pageSetUpPr fitToPage="1"/>
@@ -604,7 +604,7 @@ def test_printer_settings(worksheet, write_worksheet):
       <printOptions horizontalCentered="1" verticalCentered="1"/>
       <pageMargins left="0.75" right="0.75" top="1" bottom="1" header="0.5" footer="0.5"/>
       <pageSetup orientation="landscape" paperSize="3" fitToHeight="0" fitToWidth="1"/>
-    </s:worksheet>
+    </worksheet>
     """
     diff = compare_xml(xml, expected)
     assert diff is None, diff
@@ -620,7 +620,7 @@ def test_page_margins(worksheet, write_worksheet):
     ws.page_margins.footer = 1.5
     xml = write_worksheet(ws, None)
     expected = """
-    <s:worksheet xmlns:s="http://schemas.openxmlformats.org/spreadsheetml/2006/main">
+    <worksheet xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main">
       <sheetPr>
         <outlinePr summaryRight="1" summaryBelow="1"/>
       </sheetPr>
@@ -633,7 +633,7 @@ def test_page_margins(worksheet, write_worksheet):
       <sheetFormatPr baseColWidth="10" defaultRowHeight="15"/>
       <sheetData/>
       <pageMargins left="2" right="2" top="2" bottom="2" header="1.5" footer="1.5"/>
-    </s:worksheet>
+    </worksheet>
     """
     diff = compare_xml(xml, expected)
     assert diff is None, diff

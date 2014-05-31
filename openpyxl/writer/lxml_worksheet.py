@@ -14,7 +14,8 @@ from openpyxl.compat import (
 )
 from openpyxl.cell import (
     column_index_from_string,
-    coordinate_from_string
+    coordinate_from_string,
+    COORD_RE
 )
 from openpyxl.xml.constants import (
     PKG_REL_NS,
@@ -38,8 +39,9 @@ def write_worksheet(worksheet, shared_strings):
             vba_attrs['codeName'] = el.get('codeName', worksheet.title)
 
     out = BytesIO()
+    NSMAP = {None : SHEET_MAIN_NS}
     with xmlfile(out) as xf:
-        with xf.element('{%s}worksheet' % SHEET_MAIN_NS):
+        with xf.element('worksheet', nsmap=NSMAP):
 
             pr = Element('sheetPr', vba_attrs)
             SubElement(pr, 'outlinePr',
@@ -68,7 +70,7 @@ def write_worksheet(worksheet, shared_strings):
 
             write_autofilter(xf, worksheet)
             write_mergecells(xf, worksheet)
-            #write_conditional_formatting(xf, worksheet)
+            write_conditional_formatting(xf, worksheet)
             write_datavalidation(xf, worksheet)
             write_hyperlinks(xf, worksheet)
 
