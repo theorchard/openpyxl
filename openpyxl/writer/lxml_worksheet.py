@@ -368,4 +368,5 @@ def write_hyperlinks(xf, worksheet):
                      'ref': cell.coordinate,
                      '{%s}id' % REL_NS: cell.hyperlink_rel_id}
             SubElement(tag, 'hyperlink', attrs)
-    xf.write(tag)
+    if tag.getchildren():
+        xf.write(tag)

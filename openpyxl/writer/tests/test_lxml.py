@@ -22,9 +22,18 @@ def worksheet():
     wb = Workbook()
     return wb.active
 
+
 @pytest.fixture
 def out():
     return BytesIO()
+
+
+@pytest.fixture
+def root_xml(out):
+    """Root element for use when checking that nothing is written"""
+    with xmlfile(out) as xf:
+        xf.write(Element("test"))
+        return xf
 
 
 @pytest.mark.parametrize("value, expected",
@@ -167,10 +176,9 @@ def ColumnDimension():
     return ColumnDimension
 
 
-def test_write_no_cols(out, write_cols, DummyWorksheet):
-    with xmlfile(out) as xf:
-        xf.write(Element('test'))
-        write_cols(xf, DummyWorksheet)
+def test_no_cols(out, write_cols, DummyWorksheet, root_xml):
+
+    write_cols(root_xml, DummyWorksheet)
     assert out.getvalue() == b"<test/>"
 
 
@@ -446,15 +454,13 @@ def test_merge(out, worksheet):
     diff = compare_xml(xml, expected)
     assert diff is None, diff
 
-    out = BytesIO()
-    ws.unmerge_cells('A1:B1')
-    with xmlfile(out) as xf:
-        xf.write(Element("test"))
-        write_mergecells(xf, ws)
+
+def test_no_merge(out, worksheet, root_xml):
+    from .. lxml_worksheet import write_mergecells
+
+    write_mergecells(root_xml, worksheet)
     xml = out.getvalue()
-    expected = """<test/>"""
-    diff = compare_xml(xml, expected)
-    assert diff is None, diff
+    expected = b"<test/>"
 
 
 def test_header_footer(out, worksheet):
@@ -495,22 +501,17 @@ def test_header_footer(out, worksheet):
     assert diff is None, diff
 
 
-def test_write_no_header(out, worksheet):
+def test_no_header(out, worksheet, root_xml):
     from .. lxml_worksheet import write_header_footer
-    ws = worksheet
 
-    with xmlfile(out) as xf:
-        xf.write(Element('test'))
-        write_header_footer(xf, ws)
+    write_header_footer(root_xml, worksheet)
     assert out.getvalue() == b"<test/>"
 
 
-def test_write_pagebreaks(out, worksheet):
+def test_no_pagebreaks(out, worksheet, root_xml):
     from .. lxml_worksheet import write_pagebreaks
 
-    with xmlfile(out) as xf:
-        xf.write(Element('test'))
-        write_pagebreaks(xf, worksheet)
+    write_pagebreaks(root_xml, worksheet)
     assert out.getvalue() == b"<test/>"
 
 
@@ -553,13 +554,14 @@ def test_write_hyperlink_rels(out, datadir, worksheet):
 
     with xmlfile(out) as xf:
         write_rels(xf, ws, 1, 1)
+
     with open('sheet1_hyperlink.xml.rels') as expected:
         xml = out.getvalue()
         diff = compare_xml(xml, expected.read())
         assert diff is None, diff
 
 
-def test_write_hyperlink(out, worksheet):
+def test_hyperlink(out, worksheet):
     from .. lxml_worksheet import write_hyperlinks
 
     ws = worksheet
@@ -578,7 +580,13 @@ def test_write_hyperlink(out, worksheet):
     assert diff is None, diff
 
 
-@pytest.mark.xfail
+def test_no_hyperlink(out, worksheet, root_xml):
+    from .. lxml_worksheet import write_hyperlinks
+
+    write_hyperlinks(root_xml, worksheet)
+    assert out.getvalue() == b"<test/>"
+
+
 def test_printer_settings(worksheet, write_worksheet):
     ws = worksheet
     ws.page_setup.orientation = ws.ORIENTATION_LANDSCAPE
@@ -590,7 +598,7 @@ def test_printer_settings(worksheet, write_worksheet):
     ws.page_setup.verticalCentered = True
     xml = write_worksheet(ws, None)
     expected = """
-    <worksheet xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main" xmlns:r="http://schemas.openxmlformats.org/officeDocument/2006/relationships">
+    <s:worksheet xmlns:s="http://schemas.openxmlformats.org/spreadsheetml/2006/main" xmlns:r="http://schemas.openxmlformats.org/officeDocument/2006/relationships">
       <sheetPr>
         <outlinePr summaryRight="1" summaryBelow="1"/>
         <pageSetUpPr fitToPage="1"/>
@@ -606,7 +614,7 @@ def test_printer_settings(worksheet, write_worksheet):
       <printOptions horizontalCentered="1" verticalCentered="1"/>
       <pageMargins left="0.75" right="0.75" top="1" bottom="1" header="0.5" footer="0.5"/>
       <pageSetup orientation="landscape" paperSize="3" fitToHeight="0" fitToWidth="1"/>
-    </worksheet>
+    </s:worksheet>
     """
     diff = compare_xml(xml, expected)
     assert diff is None, diff
