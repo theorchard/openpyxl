@@ -417,3 +417,14 @@ class TestEncoding:
         ws = wb.active
         cell = ws['A1']
         cell.value = self.test_string
+
+
+def test_style():
+    from openpyxl.styles import Font, Style
+    wb = Workbook()
+    ws = wb.active
+    cell = ws['A1']
+    new_style = Style(font=Font(bold=True))
+    cell.style = new_style
+    assert cell.coordinate in ws._styles
+    assert new_style in wb.shared_styles

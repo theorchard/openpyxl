@@ -197,3 +197,12 @@ def test_dump_bad_style():
     ws = wb.create_sheet()
     with pytest.raises(TypeError):
         ws.append([{'value': 'hello', 'style': 'world'}, 3.14, None])
+
+
+def test_style():
+    from openpyxl.styles import Font, Style
+    wb = Workbook(optimized_write=True)
+    ws = wb.create_sheet()
+    new_style = Style(font=Font(bold=True))
+    ws.append([{'value':'hello', 'style':new_style}])
+    assert new_style in wb.shared_styles
