@@ -79,15 +79,15 @@ class PatternFill(Fill):
 
     patternType = Set(values=fills)
     fill_type = Alias("patternType")
-    fgColor = Typed(expected_type=Color, allow_none=True)
+    fgColor = Typed(expected_type=Color)
     start_color = Alias("fgColor")
-    bgColor = Typed(expected_type=Color, allow_none=True)
+    bgColor = Typed(expected_type=Color)
     end_color = Alias("bgColor")
 
-    def __init__(self, patternType=FILL_NONE, fgColor=None, bgColor=None,
+    def __init__(self, patternType=FILL_NONE, fgColor=Color(), bgColor=Color(),
                  fill_type=None, start_color=None, end_color=None):
         if fill_type is not None:
-           patternType = fill_type
+            patternType = fill_type
         self.patternType = patternType
         if start_color is not None:
             fgColor = start_color

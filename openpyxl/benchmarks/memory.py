@@ -23,7 +23,7 @@ def test_memory_use():
             if initial_use is None:
                 initial_use = use
             assert use/initial_use < 1.2
-            print n, use
+            print(n, use)
 
 if __name__ == '__main__':
     test_memory_use()
