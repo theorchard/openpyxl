@@ -96,3 +96,18 @@ class HashableObject(Strict):
 
     def __ne__(self, other):
         return not self == other
+
+    def __add__(self, other):
+        vals = {}
+        for attr in self.__fields__:
+            vals[attr] = getattr(self, attr) or getattr(other, attr)
+        return self.__class__(**vals)
+
+    def __sub__(self, other):
+        vals = {}
+        if (self is other) or (self == other):
+            return
+        for attr in self.__fields__:
+            if not getattr(other, attr) and getattr(self, attr):
+                vals[attr] = getattr(self, attr)
+        return self.__class__(**vals)
