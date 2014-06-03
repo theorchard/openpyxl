@@ -33,6 +33,9 @@ class Typed(Descriptor):
                 raise TypeError('expected ' + str(self.expected_type))
         super(Typed, self).__set__(instance, value)
 
+    def __repr__(self):
+        return "Value must be type '{0}'".format(self.expected_type.__name__)
+
 
 class Convertible(Typed):
     """Values must be convertible to a particular type"""
