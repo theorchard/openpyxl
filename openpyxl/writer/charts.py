@@ -63,7 +63,7 @@ class BaseChartWriter(object):
         self._write_print_settings()
         self._write_shapes()
 
-        return tostringt(self.root)
+        return tostring(self.root)
 
     def _write_chart(self):
         ch = SubElement(self.root, '{%s}chart' % CHART_NS)
