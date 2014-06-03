@@ -37,7 +37,7 @@ def lxml_writer(ws=None):
 
 
 COLUMNS = 100
-ROWS = 10
+ROWS = 1000
 BOLD = 1
 ITALIC = 2
 UNDERLINE = 4
