@@ -84,10 +84,10 @@ class HashableObject(Strict):
     @property
     def __key(self):
         """Use a tuple of fields as the basis for a key"""
-        return [getattr(self, x) for x in self.__fields__]
+        return tuple(getattr(self, x) for x in self.__fields__)
 
     def __hash__(self):
-        return hash(str(self.__key))
+        return hash(self.__key)
 
     def __eq__(self, other):
         if isinstance(other, self.__class__):
