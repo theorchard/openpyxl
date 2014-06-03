@@ -24,7 +24,7 @@ from __future__ import absolute_import
 # @license: http://www.opensource.org/licenses/mit-license.php
 # @author: see AUTHORS file
 
-from openpyxl.xml.functions import Element, SubElement, get_document_content
+from openpyxl.xml.functions import Element, SubElement, tostring
 from openpyxl.xml.constants import (
     DRAWING_NS,
     SHEET_DRAWING_NS,
@@ -53,7 +53,7 @@ class DrawingWriter(object):
         for idx, img in enumerate(self._sheet._images):
             self._write_image(root, img, idx+1)
 
-        return get_document_content(root)
+        return tostring(root)
 
     def _write_chart(self, node, chart, idx):
         """Add a chart"""
@@ -176,7 +176,7 @@ class DrawingWriter(object):
                 'Type' : '%s/image' % REL_NS,
                 'Target' : '../media/image%s.png' % (image_id + j) }
             SubElement(root, '{%s}Relationship' % PKG_REL_NS, attrs)
-        return get_document_content(root)
+        return tostring(root)
 
 
 class ShapeWriter(object):
@@ -229,7 +229,7 @@ class ShapeWriter(object):
 
             shape_id += 1
 
-        return get_document_content(root)
+        return tostring(root)
 
     def _write_text(self, node, shape):
         """ write text in the shape """

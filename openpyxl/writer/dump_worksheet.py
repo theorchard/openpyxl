@@ -22,7 +22,6 @@ from openpyxl.xml.functions import (
     Element,
     SubElement,
     ConditionalElement,
-    get_document_content,
     tostring
 )
 from openpyxl.date_time import (

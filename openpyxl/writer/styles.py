@@ -11,7 +11,7 @@ from openpyxl.xml.functions import (
     Element,
     SubElement,
     ConditionalElement,
-    get_document_content,
+    tostring,
     )
 from openpyxl.xml.constants import SHEET_MAIN_NS
 
@@ -41,7 +41,7 @@ class StyleWriter(object):
         self._write_dxfs()
         self._write_table_styles()
 
-        return get_document_content(xml_node=self._root)
+        return tostring(self._root)
 
     def _write_color(self, node, color, key='color'):
         """

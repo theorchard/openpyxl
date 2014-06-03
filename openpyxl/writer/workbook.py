@@ -52,7 +52,7 @@ from openpyxl.xml.constants import (
     ARC_CONTENT_TYPES,
     ARC_ROOT_RELS
 )
-from openpyxl.xml.functions import get_document_content, fromstring
+from openpyxl.xml.functions import tostring, fromstring
 from openpyxl.date_time import datetime_to_W3CDTF
 from openpyxl.workbook.named_range import NamedRange, NamedRangeContainingValue
 
@@ -73,7 +73,7 @@ def write_properties_core(properties):
     SubElement(root, '{%s}subject' % DCORE_NS).text = properties.subject
     SubElement(root, '{%s}keywords' % COREPROPS_NS).text = properties.keywords
     SubElement(root, '{%s}category' % COREPROPS_NS).text = properties.category
-    return get_document_content(root)
+    return tostring(root)
 
 
 static_content_types_config = [
@@ -158,7 +158,7 @@ def write_content_types(workbook):
                  'ContentType': 'application/vnd.openxmlformats-officedocument.spreadsheetml.comments+xml'})
             comments_id += 1
 
-    return get_document_content(root)
+    return tostring(root)
 
 
 def write_properties_app(workbook):
@@ -189,7 +189,7 @@ def write_properties_app(workbook):
             {'size': '%d' % worksheets_count, 'baseType': 'lpstr'})
     for ws in workbook.worksheets:
         SubElement(vector, '{%s}lpstr' % VTYPES_NS).text = '%s' % ws.title
-    return get_document_content(root)
+    return tostring(root)
 
 
 def write_root_rels(workbook):
@@ -214,7 +214,7 @@ def write_root_rels(workbook):
         if rId is not None:
             SubElement(root, relation_tag, {'Id': rId, 'Target': ARC_CUSTOM_UI,
                 'Type': '%s' % CUSTOMUI_NS})
-    return get_document_content(root)
+    return tostring(root)
 
 
 def write_workbook(workbook):
@@ -281,7 +281,7 @@ def write_workbook(workbook):
 
     SubElement(root, '{%s}calcPr' % SHEET_MAIN_NS,
                {'calcId': '124519', 'calcMode': 'auto', 'fullCalcOnLoad': '1'})
-    return get_document_content(root)
+    return tostring(root)
 
 
 def write_workbook_rels(workbook):
@@ -305,4 +305,4 @@ def write_workbook_rels(workbook):
         SubElement(root, '{%s}Relationship' % PKG_REL_NS,
                    {'Id': 'rId%d' % (rid + 3), 'Target': 'vbaProject.bin',
                     'Type': 'http://schemas.microsoft.com/office/2006/relationships/vbaProject'})
-    return get_document_content(root)
+    return tostring(root)

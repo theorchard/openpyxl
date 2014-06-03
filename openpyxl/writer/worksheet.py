@@ -43,7 +43,6 @@ from openpyxl.xml.functions import (
     Element,
     SubElement,
     XMLGenerator,
-    get_document_content,
     start_tag,
     end_tag,
     tag,
