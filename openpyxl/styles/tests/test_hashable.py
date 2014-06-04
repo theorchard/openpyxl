@@ -32,7 +32,7 @@ class TestHashable:
         d = Immutable()
         d.value = 1
         with pytest.raises(TypeError):
-            del d['value']
+            delattr(d, 'value')
 
     def test_copy(self, Immutable):
         d = Immutable()
