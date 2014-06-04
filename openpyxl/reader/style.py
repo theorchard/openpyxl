@@ -132,7 +132,7 @@ class SharedStylesParser(object):
     def parse_gradient_fill(self, node):
         fill = dict(node.items())
         color_nodes = safe_iterator(node, "{%s}color" % SHEET_MAIN_NS)
-        fill['stop'] = [Color(**dict(node.items())) for node in color_nodes]
+        fill['stop'] = tuple(Color(**dict(node.items())) for node in color_nodes)
         return GradientFill(**fill)
 
     def parse_borders(self):
