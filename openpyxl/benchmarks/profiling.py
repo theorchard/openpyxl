@@ -62,24 +62,22 @@ def styled_sheet():
     empty_fill = PatternFill()
     styles = []
     # pregenerate relevant styles
-    for idx in range(16):
-        font = {}
-        fill = empty_fill
-        if idx & BOLD:
-            font['bold'] = True
-        if idx & ITALIC:
-            font['italic'] = True
-        if idx & UNDERLINE:
-            font['underline'] = 'single'
-        if idx & RED_BG:
-            fill = red_fill
-        styles.append(Style(font=Font(**font), fill=fill))
-
     for row in range(ROWS):
+        _row = []
         for col in range(COLUMNS):
             cell = ws.cell(row=row+1, column=col+1)
             cell.value = 1
-            cell.style = styles[formatData[row][col]]
+            font = {}
+            fill = PatternFill()
+            if formatData[row][col] & BOLD:
+                font['bold'] = True
+            if formatData[row][col] & ITALIC:
+                font['italic'] = True
+            if formatData[row][col] & UNDERLINE:
+                font['underline'] = 'single'
+            if formatData[row][col] & RED_BG:
+                fill = red_fill
+            cell.style = Style(font=Font(**font), fill=fill)
 
     #wb.save(get_output_path('test_openpyxl_style_std_pregen.xlsx'))
 
