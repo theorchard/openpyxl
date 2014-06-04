@@ -32,7 +32,7 @@ BASE_TYPES = (str, unicode, float, int)
 class HashableObject(Strict):
     """Define how to hash property classes."""
     __fields__ = ()
-    __slots__ = __fields__
+    __slots__ = ('_key',) + __fields__
     __base__ = False
 
     @property
@@ -81,18 +81,23 @@ class HashableObject(Strict):
     def __str__(self):
         return self.__print__(defaults=True)
 
-    @property
-    def __key(self):
+    def _make_key(self):
         """Use a tuple of fields as the basis for a key"""
-        return tuple(getattr(self, x) for x in self.__fields__)
+        self._key = hash(tuple(getattr(self, x) for x in self.__fields__))
 
     def __hash__(self):
-        return hash(self.__key)
+        if not hasattr(self, '_key'):
+            self._make_key()
+        return self._key
 
     def __eq__(self, other):
         if isinstance(other, self.__class__):
-            return self.__key == other.__key
-        return self.__key == other
+            if not hasattr(self, '_key'):
+                self._make_key()
+            if not hasattr(other, '_key'):
+                other._make_key()
+            return self._key == other._key
+        return self._key == other
 
     def __ne__(self, other):
         return not self == other
