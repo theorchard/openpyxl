@@ -433,10 +433,13 @@ class Worksheet(object):
                 return tuple(result)
 
     def get_style(self, coordinate):
-        """Return the style object for the specified cell."""
-        if not coordinate in self._styles:
-            self._styles[coordinate] = self.parent.shared_styles.add(Style())
-        return self.parent.shared_styles[self._styles[coordinate]]
+        """Return a copy of the style object for the specified cell."""
+        style_id = self._styles.get(coordinate)
+        if style_id is None:
+            style = Style()
+        else:
+            style = self.parent.shared_styles[style_id].copy()
+        return style
 
     def set_style(self, coordinate, style):
         self._styles[coordinate] = self.parent.shared_styles.add(style)
