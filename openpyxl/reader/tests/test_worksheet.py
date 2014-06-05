@@ -36,3 +36,27 @@ def test_parse_col_dimensions(datadir):
     assert dict(ws.column_dimensions['A']) == {'max': '1', 'min': '1',
                                                'customWidth': '1',
                                                'width': '31.1640625'}
+
+
+def test_sheet_protection(datadir):
+    from .. worksheet import WorkSheetParser
+
+    datadir.chdir()
+    ws = DummyWorksheet()
+
+    with open("protected_sheet.xml") as src:
+        parser = WorkSheetParser(ws, src, {}, {})
+        tree = iterparse(parser.source)
+        for _, tag in tree:
+            prot = safe_iterator(tag, '{%s}sheetProtection' % SHEET_MAIN_NS)
+            for el in prot:
+                parser.parse_sheet_protection(el)
+    assert dict(ws.protection) == {
+        'autoFilter': '1', 'deleteColumns': '1',
+        'deleteRows': '1', 'formatCells': '1', 'formatColumns': '1', 'formatRows':
+        '1', 'insertColumns': '1', 'insertHyperlinks': '1', 'insertRows': '1',
+        'objects': '0', 'password': 'DAA7', 'pivotTables': '1', 'scenarios': '0',
+        'selectLockedCells': '0', 'selectUnlockedCells': '0', 'sheet': '1', 'sort':
+        '1'
+    }
+

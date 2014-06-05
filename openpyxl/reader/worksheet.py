@@ -33,12 +33,13 @@ from openpyxl.cell import get_column_letter
 from openpyxl.cell import Cell
 from openpyxl.worksheet import Worksheet, ColumnDimension, RowDimension
 from openpyxl.worksheet.iter_worksheet import IterableWorksheet
+from openpyxl.worksheet.page import PageMargins
+from openpyxl.worksheet.protection import SheetProtection
 from openpyxl.xml.constants import SHEET_MAIN_NS
 from openpyxl.xml.functions import safe_iterator
 from openpyxl.styles import Color
 from openpyxl.styles import colors
 from openpyxl.formatting import ConditionalFormatting
-from openpyxl.worksheet.page import PageMargins
 
 
 def _get_xml_iter(xml_source):
@@ -88,7 +89,8 @@ class WorkSheetParser(object):
             '{%s}pageSetup' % SHEET_MAIN_NS: self.parse_page_setup,
             '{%s}headerFooter' % SHEET_MAIN_NS: self.parse_header_footer,
             '{%s}conditionalFormatting' % SHEET_MAIN_NS: self.parser_conditional_formatting,
-            '{%s}autoFilter' % SHEET_MAIN_NS: self.parse_auto_filter
+            '{%s}autoFilter' % SHEET_MAIN_NS: self.parse_auto_filter,
+            '{%s}sheetProtection' % SHEET_MAIN_NS: self.parse_sheet_protection,
                       }
         tags = dispatcher.keys()
         stream = _get_xml_iter(self.source)
@@ -272,6 +274,10 @@ class WorkSheetParser(object):
             self.ws.auto_filter.add_filter_column(fc.get("colId"), vals, blank=blank)
         for sc in safe_iterator(element, '{%s}sortCondition' % SHEET_MAIN_NS):
             self.ws.auto_filter.add_sort_condition(sc.get("ref"), sc.get("descending"))
+
+    def parse_sheet_protection(self, element):
+        values = element.attrib
+        self.ws.protection = SheetProtection(**values)
 
 
 def fast_parse(ws, xml_source, shared_strings, style_table, color_index=None):

@@ -62,9 +62,8 @@ def write_worksheet(worksheet, shared_strings):
             write_cols(xf, worksheet)
             write_rows(xf, worksheet, shared_strings)
 
-            if worksheet.protection.enabled:
-                prot = Element('sheetProtection',
-                               {'objects': '1','scenarios': '1', 'sheet': '1'})
+            if worksheet.protection.sheet:
+                prot = Element('sheetProtection', dict(worksheet.protection))
                 xf.write(prot)
                 del prot
 

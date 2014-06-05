@@ -95,9 +95,8 @@ def write_worksheet(worksheet, shared_strings):
     write_worksheet_format(doc, worksheet)
     write_worksheet_cols(doc, worksheet)
     write_worksheet_data(doc, worksheet, shared_strings)
-    if worksheet.protection.enabled:
-        tag(doc, 'sheetProtection',
-            {'objects': '1', 'scenarios': '1', 'sheet': '1'})
+    if worksheet.protection.sheet:
+        tag(doc, 'sheetProtection', dict(worksheet.protection))
     write_worksheet_autofilter(doc, worksheet)
     write_worksheet_mergecells(doc, worksheet)
     write_worksheet_conditional_formatting(doc, worksheet)
