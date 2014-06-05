@@ -183,10 +183,6 @@ class WorkSheetParser(object):
     def parse_margins(self, element):
         margins = dict(element.items())
         self.page_margins = PageMargins(**margins)
-        #for key in ("left", "right", "top", "bottom", "header", "footer"):
-            #value = element.get(key)
-            #if value is not None:
-                #setattr(self.ws.page_margins, key, float(value))
 
     def parse_page_setup(self, element):
         for key in ("orientation", "paperSize", "scale", "fitToPage",
