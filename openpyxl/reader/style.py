@@ -184,15 +184,10 @@ class SharedStylesParser(object):
                 alignment = {}
                 al = cell_xfs_node.find('{%s}alignment' % SHEET_MAIN_NS)
                 if al is not None:
-                    for key in ('horizontal', 'vertical', 'indent'):
-                        _value = al.get(key)
-                        if _value is not None:
-                            alignment[key] = _value
-                    alignment['wrap_text'] = bool(al.get('wrapText'))
-                    alignment['shrink_to_fit'] = bool(al.get('shrinkToFit'))
-                    text_rotation = al.get('textRotation')
-                    if text_rotation is not None:
-                        alignment['text_rotation'] = int(text_rotation)
+                    alignment.update(al.attrib)
+                    alignment['wrap_text'] = al.get('wrapText')
+                    alignment['shrink_to_fit'] = al.get('shrinkToFit')
+                    alignment['text_rotation'] = al.get('textRotation')
                     # ignore justifyLastLine option when horizontal = distributed
                 _style['alignment'] = Alignment(**alignment)
 
