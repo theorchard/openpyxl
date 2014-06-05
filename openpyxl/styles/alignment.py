@@ -42,7 +42,7 @@ class Alignment(HashableObject):
     def __init__(self, horizontal='general', vertical='bottom',
                  textRotation=0, wrapText=False, shrinkToFit=False, indent=0, relativeIndent=0,
                  justifyLastLine=False, readingOrder=0, text_rotation=None,
-                 wrap_text=False, shrink_to_fit=False) :
+                 wrap_text=None, shrink_to_fit=None) :
         self.horizontal = horizontal
         self.vertical = vertical
         self.indent = indent

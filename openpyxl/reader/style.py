@@ -184,11 +184,7 @@ class SharedStylesParser(object):
                 alignment = {}
                 al = cell_xfs_node.find('{%s}alignment' % SHEET_MAIN_NS)
                 if al is not None:
-                    alignment.update(al.attrib)
-                    alignment['wrap_text'] = al.get('wrapText')
-                    alignment['shrink_to_fit'] = al.get('shrinkToFit')
-                    alignment['text_rotation'] = al.get('textRotation')
-                    # ignore justifyLastLine option when horizontal = distributed
+                    alignment = al.attrib
                 _style['alignment'] = Alignment(**alignment)
 
             if bool(cell_xfs_node.get('applyFont')):
