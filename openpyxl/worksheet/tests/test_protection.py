@@ -31,3 +31,4 @@ def test_explicit_password(password, already_hashed, value):
     prot = SheetProtection()
     prot.set_password(password, already_hashed)
     assert prot.password == value
+    assert prot.sheet == True

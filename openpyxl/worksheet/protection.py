@@ -73,25 +73,26 @@ class SheetProtection(Strict):
         if not already_hashed:
             value = hash_password(value)
         self._password = value
-        self.sheet = True
+        self.enable()
 
+    @property
+    def password(self):
+        """Return the password value, regardless of hash."""
+        return self._password
+
+    @password.setter
     def _set_raw_password(self, value):
         """Set a password directly, forcing a hash step."""
         self.set_password(value, already_hashed=False)
 
-    def _get_raw_password(self):
-        """Return the password value, regardless of hash."""
-        return self._password
 
     def enable(self):
         self.sheet = True
 
+
     def disable(self):
         self.sheet = False
 
-    password = property(_get_raw_password, _set_raw_password,
-            'get/set the password (if already hashed, '
-            'use set_password() instead)')
 
     def __iter__(self):
         for key in ('sheet', 'objects', 'scenarios', 'formatCells',
