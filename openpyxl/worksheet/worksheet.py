@@ -434,11 +434,8 @@ class Worksheet(object):
 
     def get_style(self, coordinate):
         """Return a copy of the style object for the specified cell."""
-        style_id = self._styles.get(coordinate)
-        if style_id is None:
-            style = Style()
-        else:
-            style = self.parent.shared_styles[style_id].copy()
+        style_id = self._styles.get(coordinate, 0)
+        style = self.parent.shared_styles[style_id].copy()
         return style
 
     def set_style(self, coordinate, style):
