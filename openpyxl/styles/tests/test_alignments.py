@@ -8,6 +8,20 @@ def Alignment():
     return Alignment
 
 
-def test_ctor(Alignment):
+def test_default(Alignment):
     al = Alignment()
-    assert dict(al) ==  {'horizontal': 'general', 'vertical': 'bottom'}
+    assert dict(al) == {'horizontal':'general', 'vertical':'bottom'}
+
+
+def test_round_trip(Alignment):
+    args = {'horizontal':'center', 'vertical':'top', 'textRotation':'45', 'indent':'4'}
+    al = Alignment(**args)
+    assert dict(al) == args
+
+
+def test_alias(Alignment):
+    al = Alignment(text_rotation=90, shrink_to_fit=True, wrap_text=True)
+    assert dict(al) == {'horizontal':'general', 'vertical':'bottom',
+                        'textRotation':'90',
+                        'shrinkToFit':'1',
+                        'wrapText':'1'}

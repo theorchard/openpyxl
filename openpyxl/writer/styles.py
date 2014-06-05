@@ -231,27 +231,12 @@ class StyleWriter(object):
 
 
     def _write_alignment(self, node, alignment):
-        alignments = {}
-
-        for align_attr in ['horizontal', 'vertical']:
-            if getattr(alignment, align_attr) != getattr(DEFAULTS.alignment, align_attr):
-                alignments[align_attr] = getattr(alignment, align_attr)
-
-            if alignment.wrap_text != DEFAULTS.alignment.wrap_text:
-                alignments['wrapText'] = '1'
-
-            if alignment.shrink_to_fit != DEFAULTS.alignment.shrink_to_fit:
-                alignments['shrinkToFit'] = '1'
-
-            if alignment.indent > 0:
-                alignments['indent'] = '%s' % alignment.indent
-
-            if alignment.text_rotation > 0:
-                alignments['textRotation'] = '%s' % alignment.text_rotation
-            elif alignment.text_rotation < 0:
-                alignments['textRotation'] = '%s' % (90 - alignment.text_rotation)
-
-        SubElement(node, 'alignment', alignments)
+        values = dict(alignment)
+        if values.get('horizontal', 'general') == 'general':
+            del values['horizontal']
+        if values.get('vertical', 'bottom') == 'bottom':
+            del values['vertical']
+        SubElement(node, 'alignment', values)
 
 
     def _write_protection(self, node, protection):

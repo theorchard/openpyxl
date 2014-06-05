@@ -302,43 +302,32 @@ class TestStyleWriter(object):
 
 
     def test_alignment(self):
-        st = Style(alignment=Alignment(horizontal='center', vertical='center'))
-        self.worksheet.cell('A1').style = st
         w = StyleWriter(self.workbook)
-        nft = fonts = borders = fills = Element('empty')
-        w._write_cell_xfs(nft, fonts, fills, borders)
+        al = Alignment(horizontal='center', vertical='center')
+        w._write_alignment(w._root, al)
         xml = get_xml(w._root)
-        assert 'applyAlignment="1"' in xml
-        assert 'horizontal="center"' in xml
-        assert 'vertical="center"' in xml
+        expected = """
+        <styleSheet xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main">
+        <alignment horizontal="center" vertical="center"/>
+        </styleSheet>
+        """
+        diff = compare_xml(xml, expected)
+        assert diff is None, diff
 
 
-    def test_alignment_rotation(self):
-        self.worksheet.cell('A1').style = Style(alignment=Alignment(vertical='center', text_rotation=90))
-        self.worksheet.cell('A2').style = Style(alignment=Alignment(vertical='center', text_rotation=135))
-        self.worksheet.cell('A3').style = Style(alignment=Alignment(text_rotation=-34))
+    def test_alignment_default(self):
         w = StyleWriter(self.workbook)
-        nft = fonts = borders = fills = Element('empty')
-        w._write_cell_xfs(nft,fonts, fills, borders)
+        al = Alignment()
+        w._write_alignment(w._root, al)
         xml = get_xml(w._root)
-        assert 'textRotation="90"' in xml
-        assert 'textRotation="135"' in xml
-        assert 'textRotation="124"' in xml
+        expected = """
+        <styleSheet xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main">
+        <alignment/>
+        </styleSheet>
+        """
+        diff = compare_xml(xml, expected)
+        assert diff is None, diff
 
-    def test_alignment_indent(self):
-        self.worksheet.cell('A1').style = Style(alignment=Alignment(indent=1))
-        self.worksheet.cell('A2').style = Style(alignment=Alignment(indent=4))
-        self.worksheet.cell('A3').style = Style(alignment=Alignment(indent=0))
-        self.worksheet.cell('A3').style = Style(alignment=Alignment(indent=-1))
-        w = StyleWriter(self.workbook)
-        nft = fonts = borders = fills = Element('empty')
-        w._write_cell_xfs(nft, fonts, fills, borders)
-        xml = get_xml(w._root)
-        assert 'indent="1"' in xml
-        assert 'indent="4"' in xml
-        #Indents not greater than zero are ignored when writing
-        assert 'indent="0"' not in xml
-        assert 'indent="-1"' not in xml
 
     def test_rewrite_styles(self):
         """Test to verify Bugfix # 46"""
