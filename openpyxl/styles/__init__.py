@@ -32,9 +32,14 @@ class Style(HashableObject):
     number_format = Typed(expected_type=NumberFormat)
     protection = Typed(expected_type=Protection)
 
-    def __init__(self, font=Font(), fill=PatternFill(), border=Border(),
-                 alignment=Alignment(), number_format=NumberFormat(),
-                 protection=Protection()):
+    def __init__(self,
+                 font=Font(),
+                 fill=PatternFill(),
+                 border=Border(),
+                 alignment=Alignment(),
+                 number_format=NumberFormat(),
+                 protection=Protection()
+                 ):
         self.font = font
         self.fill = fill
         self.border = border
