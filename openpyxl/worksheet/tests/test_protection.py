@@ -1,6 +1,6 @@
 # Copyright (c) 2010-2014 openpyxl
 
-import py.test
+import pytest
 
 
 from .. protection import SheetProtection
@@ -16,3 +16,18 @@ def test_ctor():
         '0', 'selectUnlockedCells': '0', 'sheet': '0', 'sort': '1'
     }
 
+
+def test_ctor_with_password():
+    prot = SheetProtection(password="secret")
+    assert prot.password == "DAA7"
+
+
+@pytest.mark.parametrize("password, already_hashed, value",
+                         [
+                             ('secret', False, 'DAA7'),
+                             ('secret', True, 'secret'),
+                         ])
+def test_explicit_password(password, already_hashed, value):
+    prot = SheetProtection()
+    prot.set_password(password, already_hashed)
+    assert prot.password == value

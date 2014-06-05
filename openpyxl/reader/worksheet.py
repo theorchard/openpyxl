@@ -278,6 +278,9 @@ class WorkSheetParser(object):
     def parse_sheet_protection(self, element):
         values = element.attrib
         self.ws.protection = SheetProtection(**values)
+        password = values.get("password")
+        if password is not None:
+            self.ws.protection.set_password(password, True)
 
 
 def fast_parse(ws, xml_source, shared_strings, style_table, color_index=None):
