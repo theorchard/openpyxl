@@ -240,20 +240,7 @@ class StyleWriter(object):
 
 
     def _write_protection(self, node, protection):
-        protections = {}
-
-        if protection.locked == Protection.PROTECTION_PROTECTED:
-            protections['locked'] = '1'
-        elif protection.locked == Protection.PROTECTION_UNPROTECTED:
-            protections['locked'] = '0'
-
-        if protection.hidden == Protection.PROTECTION_PROTECTED:
-            protections['hidden'] = '1'
-        elif protection.hidden == Protection.PROTECTION_UNPROTECTED:
-            protections['hidden'] = '0'
-
-        SubElement(node, 'protection', protections)
-
+        SubElement(node, 'protection', dict(protection))
 
 
     def _write_cell_style(self):

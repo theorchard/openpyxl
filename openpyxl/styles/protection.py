@@ -1,20 +1,19 @@
 from __future__ import absolute_import
 # Copyright (c) 2010-2014 openpyxl
 
+from openpyxl.descriptors import Bool
 
 from .hashable import HashableObject
 
 
 class Protection(HashableObject):
     """Protection options for use in styles."""
-    PROTECTION_INHERIT = 'inherit'
-    PROTECTION_PROTECTED = True
-    PROTECTION_UNPROTECTED = False
 
     __fields__ = ('locked',
                   'hidden')
-    __slots__ = __fields__
+    locked = Bool()
+    hidden = Bool()
 
-    def __init__(self, locked=PROTECTION_INHERIT, hidden=PROTECTION_INHERIT):
+    def __init__(self, locked=False, hidden=False):
         self.locked = locked
         self.hidden = hidden

@@ -405,15 +405,15 @@ class TestStyleWriter(object):
         assert diff is None, diff
 
     def test_protection(self):
-        prot = Protection(locked=Protection.PROTECTION_UNPROTECTED,
-                          hidden=Protection.PROTECTION_UNPROTECTED)
+        prot = Protection(locked=True,
+                          hidden=True)
         self.worksheet.cell('A1').style = Style(protection=prot)
         w = StyleWriter(self.workbook)
         w._write_protection(w._root, prot)
         xml = get_xml(w._root)
         expected = """
         <styleSheet xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main">
-          <protection hidden="0" locked="0"/>
+          <protection hidden="1" locked="1"/>
         </styleSheet>
                 """
         diff = compare_xml(xml, expected)
@@ -424,11 +424,11 @@ class TestStyleWriter(object):
         xml = get_xml(w._root)
         expected = """
         <styleSheet xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main">
-          <protection hidden="0" locked="0"/>
+          <protection hidden="1" locked="1"/>
           <cellXfs count="2">
             <xf borderId="0" fillId="0" fontId="0" numFmtId="0" xfId="0"/>
             <xf applyProtection="1" borderId="0" fillId="0" fontId="0" numFmtId="0" xfId="0">
-              <protection hidden="0" locked="0"/>
+              <protection hidden="1" locked="1"/>
             </xf>
           </cellXfs>
         </styleSheet>
@@ -450,9 +450,9 @@ class TestCreateStyle(object):
         cls.worksheet.cell(coordinate='C14').value = 'This is a test'  # 1
         cls.worksheet.cell(coordinate='D9').value = '31.31415'  # 3
         st = Style(number_format=NumberFormat(NumberFormat.FORMAT_NUMBER_00),
-                   protection=Protection(locked=Protection.PROTECTION_UNPROTECTED))  # 4
+                   protection=Protection(locked=True))  # 4
         cls.worksheet.cell(coordinate='D9').style = st
-        st2 = Style(protection=Protection(hidden=Protection.PROTECTION_UNPROTECTED))  # 5
+        st2 = Style(protection=Protection(hidden=True))  # 5
         cls.worksheet.cell(coordinate='E1').style = st2
         cls.writer = StyleWriter(cls.workbook)
 

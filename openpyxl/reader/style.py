@@ -199,10 +199,8 @@ class SharedStylesParser(object):
             if bool(cell_xfs_node.get('applyProtection')):
                 protection = {}
                 prot = cell_xfs_node.find('{%s}protection' % SHEET_MAIN_NS)
-                # Ignore if there are no protection sub-nodes
                 if prot is not None:
-                    protection['locked'] = bool(prot.get('locked'))
-                    protection['hidden'] = bool(prot.get('hidden'))
+                    protection.update(prot.attrib)
                 _style['protection'] = Protection(**protection)
 
             self.style_prop['table'][index] = styles_list.add(Style(**_style))
