@@ -23,7 +23,7 @@ from __future__ import absolute_import
 # @author: see AUTHORS file
 
 import inspect
-from openpyxl.compat import unicode, basestring
+from openpyxl.compat import unicode, basestring, safe_string
 from openpyxl.descriptors import Descriptor, Strict
 
 BASE_TYPES = (str, unicode, float, int)
@@ -116,3 +116,14 @@ class HashableObject(Strict):
             if not getattr(other, attr) and getattr(self, attr):
                 vals[attr] = getattr(self, attr)
         return self.__class__(**vals)
+
+
+    def __iter__(self):
+        """
+        Dictionary interface for easier serialising.
+        All values converted to strings
+        """
+        for key in self.__fields__:
+            value = getattr(self, key)
+            if bool(value):
+                yield key, safe_string(value)
