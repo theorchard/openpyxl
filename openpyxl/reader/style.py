@@ -102,7 +102,7 @@ class SharedStylesParser(object):
             font['u'] = underline.get('val', 'single')
         color = font_node.find('{%s}color' % SHEET_MAIN_NS)
         if color is not None:
-            font['color'] = Color(**dict(color.items()))
+            font['color'] = Color(**dict(color.attrib))
         return Font(**font)
 
     def parse_fills(self):
@@ -122,17 +122,17 @@ class SharedStylesParser(object):
             return self.parse_gradient_fill(gradient)
 
     def parse_pattern_fill(self, node):
-        fill = dict(node.items())
+        fill = dict(node.attrib)
         for child in safe_iterator(node):
             if child is not node:
                 tag = localname(child)
-                fill[tag] = Color(**dict(child.items()))
+                fill[tag] = Color(**dict(child.attrib))
         return PatternFill(**fill)
 
     def parse_gradient_fill(self, node):
-        fill = dict(node.items())
+        fill = dict(node.attrib)
         color_nodes = safe_iterator(node, "{%s}color" % SHEET_MAIN_NS)
-        fill['stop'] = tuple(Color(**dict(node.items())) for node in color_nodes)
+        fill['stop'] = tuple(Color(**dict(node.attrib)) for node in color_nodes)
         return GradientFill(**fill)
 
     def parse_borders(self):
@@ -144,15 +144,15 @@ class SharedStylesParser(object):
 
     def parse_border(self, border_node):
         """Read individual border"""
-        border = dict(border_node.items())
+        border = dict(border_node.attrib)
 
         for side in ('left', 'right', 'top', 'bottom', 'diagonal'):
             node = border_node.find('{%s}%s' % (SHEET_MAIN_NS, side))
             if node is not None:
-                bside = dict(node.items())
+                bside = dict(node.attrib)
                 color = node.find('{%s}color' % SHEET_MAIN_NS)
                 if color is not None:
-                    bside['color'] = Color(**dict(color.items()))
+                    bside['color'] = Color(**dict(color.attrib))
                 border[side] = Side(**bside)
         return Border(**border)
 
