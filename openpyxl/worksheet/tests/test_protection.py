@@ -3,7 +3,12 @@
 import pytest
 
 
-from .. protection import SheetProtection
+from .. protection import SheetProtection, hash_password
+
+
+def test_password():
+    enc = hash_password('secret')
+    assert enc == 'DAA7'
 
 
 def test_ctor():
