@@ -29,7 +29,7 @@ def WorkSheetParser(Worksheet):
     return WorkSheetParser(Worksheet, None, {}, {})
 
 
-def test_parse_col_dimensions(datadir, Worksheet, WorkSheetParser):
+def test_col_width(datadir, Worksheet, WorkSheetParser):
     datadir.chdir()
     ws = Worksheet
     parser = WorkSheetParser
