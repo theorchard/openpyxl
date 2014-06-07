@@ -1,6 +1,6 @@
 # Copyright (c) 2010-2014 openpyxl
 
-import py.test
+import pytest
 
 from openpyxl.xml.constants import SHEET_MAIN_NS
 from openpyxl.xml.functions import safe_iterator, fromstring, iterparse
@@ -19,9 +19,13 @@ class DummyWorksheet:
         self._styles = {}
 
 
-def test_parse_col_dimensions(datadir):
-    from openpyxl.reader.worksheet import WorkSheetParser
+@pytest.fixture
+def WorkSheetParser():
+    from .. worksheet import WorkSheetParser
+    return WorkSheetParser
 
+
+def test_parse_col_dimensions(datadir, WorkSheetParser):
     datadir.chdir()
     ws = DummyWorksheet()
 
@@ -38,9 +42,7 @@ def test_parse_col_dimensions(datadir):
                                                'width': '31.1640625'}
 
 
-def test_sheet_protection(datadir):
-    from .. worksheet import WorkSheetParser
-
+def test_sheet_protection(datadir, WorkSheetParser):
     datadir.chdir()
     ws = DummyWorksheet()
 
