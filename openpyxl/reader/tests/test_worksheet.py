@@ -5,33 +5,37 @@ import pytest
 from openpyxl.xml.constants import SHEET_MAIN_NS
 from openpyxl.xml.functions import safe_iterator, fromstring, iterparse
 
-class DummyWorkbook:
 
-    _guess_types = False
-    data_only = False
+@pytest.fixture
+def Worksheet(Workbook):
+    class DummyWorkbook:
 
+        _guess_types = False
+        data_only = False
 
-class DummyWorksheet:
+    class DummyWorksheet:
 
-    def __init__(self):
-        self.parent = DummyWorkbook()
-        self.column_dimensions = {}
-        self._styles = {}
+        def __init__(self):
+            self.parent = DummyWorkbook()
+            self.column_dimensions = {}
+            self._styles = {}
+    return DummyWorksheet()
 
 
 @pytest.fixture
-def WorkSheetParser():
+def WorkSheetParser(Worksheet):
+    """Setup a parser instance with an empty source"""
     from .. worksheet import WorkSheetParser
-    return WorkSheetParser
+    return WorkSheetParser(Worksheet, None, {}, {})
 
 
-def test_parse_col_dimensions(datadir, WorkSheetParser):
+def test_parse_col_dimensions(datadir, Worksheet, WorkSheetParser):
     datadir.chdir()
-    ws = DummyWorksheet()
+    ws = Worksheet
+    parser = WorkSheetParser
 
     with open("complex-styles-worksheet.xml") as src:
-        parser = WorkSheetParser(ws, src, {}, {})
-        tree = iterparse(parser.source)
+        tree = iterparse(src)
         for _, tag in tree:
             cols = safe_iterator(tag, '{%s}col' % SHEET_MAIN_NS)
             for col in cols:
@@ -42,13 +46,13 @@ def test_parse_col_dimensions(datadir, WorkSheetParser):
                                                'width': '31.1640625'}
 
 
-def test_sheet_protection(datadir, WorkSheetParser):
+def test_sheet_protection(datadir, Worksheet, WorkSheetParser):
     datadir.chdir()
-    ws = DummyWorksheet()
+    ws = Worksheet
+    parser = WorkSheetParser
 
     with open("protected_sheet.xml") as src:
-        parser = WorkSheetParser(ws, src, {}, {})
-        tree = iterparse(parser.source)
+        tree = iterparse(src)
         for _, tag in tree:
             prot = safe_iterator(tag, '{%s}sheetProtection' % SHEET_MAIN_NS)
             for el in prot:
