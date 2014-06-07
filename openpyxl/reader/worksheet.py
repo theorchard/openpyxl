@@ -155,7 +155,7 @@ class WorkSheetParser(object):
         if max != 16384:
             for colId in range(min, max + 1):
                 column = get_column_letter(colId)
-                attrs = dict(col.items())
+                attrs = dict(col.attrib)
                 attrs['index'] = column
                 if column not in self.ws.column_dimensions:
                     dim = ColumnDimension(**attrs)
