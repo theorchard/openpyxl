@@ -2,8 +2,10 @@
 
 import pytest
 
-from openpyxl.xml.constants import SHEET_MAIN_NS
 from lxml.etree import iterparse
+
+from openpyxl.xml.constants import SHEET_MAIN_NS
+from openpyxl.cell import Cell
 
 
 @pytest.fixture
@@ -18,7 +20,12 @@ def Worksheet(Workbook):
         def __init__(self):
             self.parent = DummyWorkbook()
             self.column_dimensions = {}
+            self.row_dimensions = {}
             self._styles = {}
+
+        def __getitem__(self, value):
+            return Cell(self, 'A', 1)
+
     return DummyWorksheet()
 
 
@@ -26,7 +33,7 @@ def Worksheet(Workbook):
 def WorkSheetParser(Worksheet):
     """Setup a parser instance with an empty source"""
     from .. worksheet import WorkSheetParser
-    return WorkSheetParser(Worksheet, None, {}, {})
+    return WorkSheetParser(Worksheet, None, {0:'a'}, {})
 
 
 def test_col_width(datadir, Worksheet, WorkSheetParser):
@@ -57,6 +64,19 @@ def test_hidden_col(datadir, Worksheet, WorkSheetParser):
     assert dict(ws.column_dimensions['D']) == {'customWidth': '1', 'hidden': '1', 'max': '4', 'min': '4'}
 
 
+def test_hidden_col(datadir, Worksheet, WorkSheetParser):
+    datadir.chdir()
+    ws = Worksheet
+    parser = WorkSheetParser
+
+    with open("hidden_rows_cols.xml", "rb") as src:
+        rows = iterparse(src, tag='{%s}row' % SHEET_MAIN_NS)
+        for _, row in rows:
+            parser.parse_row_dimensions(row)
+    assert 2 in ws.row_dimensions
+    #assert dict(ws.row_dimensions[2]) == {'hidden': '1'}
+
+
 def test_sheet_protection(datadir, Worksheet, WorkSheetParser):
     datadir.chdir()
     ws = Worksheet
@@ -74,4 +94,3 @@ def test_sheet_protection(datadir, Worksheet, WorkSheetParser):
         'selectLockedCells': '0', 'selectUnlockedCells': '0', 'sheet': '1', 'sort':
         '1'
     }
-
