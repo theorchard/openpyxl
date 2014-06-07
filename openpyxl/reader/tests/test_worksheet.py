@@ -64,7 +64,7 @@ def test_hidden_col(datadir, Worksheet, WorkSheetParser):
     assert dict(ws.column_dimensions['D']) == {'customWidth': '1', 'hidden': '1', 'max': '4', 'min': '4'}
 
 
-def test_hidden_col(datadir, Worksheet, WorkSheetParser):
+def test_hidden_row(datadir, Worksheet, WorkSheetParser):
     datadir.chdir()
     ws = Worksheet
     parser = WorkSheetParser
@@ -74,7 +74,7 @@ def test_hidden_col(datadir, Worksheet, WorkSheetParser):
         for _, row in rows:
             parser.parse_row_dimensions(row)
     assert 2 in ws.row_dimensions
-    #assert dict(ws.row_dimensions[2]) == {'hidden': '1'}
+    assert dict(ws.row_dimensions[2]) == {'hidden': '1'}
 
 
 def test_sheet_protection(datadir, Worksheet, WorkSheetParser):

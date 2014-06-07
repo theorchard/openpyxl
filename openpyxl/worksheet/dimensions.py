@@ -48,10 +48,13 @@ class RowDimension(Dimension):
     """Information about the display properties of a row."""
 
     __fields__ = Dimension.__fields__ + ('ht', 'customFormat', 'customHeight', 's')
+    r = Alias('index')
     ht = Float(allow_none=True)
     height = Alias('ht')
     s = Integer(allow_none=True)
     style = Alias('s')
+    thickBot = Bool()
+    thickTop = Bool()
 
     def __init__(self,
                  index=0,
@@ -65,7 +68,13 @@ class RowDimension(Dimension):
                  collapsed=False,
                  style=None,
                  visible=None,
-                 height=None):
+                 height=None,
+                 r=None,
+                 spans=None,
+                 thickBot=None,
+                 thickTop=None):
+        if r is not None:
+            index = r
         if height is not None:
             ht = height
         self.ht = ht

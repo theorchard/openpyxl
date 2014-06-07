@@ -164,13 +164,15 @@ class WorkSheetParser(object):
                         self.ws._styles[column] = self.style_table.get(dim.style)
 
     def parse_row_dimensions(self, row):
-        rowId = int(row.get('r'))
-        ht = row.get('ht')
-        if rowId not in self.ws.row_dimensions:
-            self.ws.row_dimensions[rowId] = RowDimension(rowId, height=ht)
-        style_index = row.get('s')
-        if row.get('customFormat') and style_index:
-            self.ws._styles[rowId] = self.style_table.get(int(style_index))
+        attrs = dict(row.attrib)
+        for key in set(attrs):
+            if key.startswith('{'): #ignore custom namespaces
+                del attrs[key]
+        dim = RowDimension(**attrs)
+        if dim.index not in self.ws.row_dimensions:
+            self.ws.row_dimensions[dim.index] = dim
+        if row.get('customFormat') and dim.style:
+            self.ws._styles[rowId] = self.style_table.get(dim.style)
         for cell in safe_iterator(row, self.CELL_TAG):
             self.parse_cell(cell)
 
