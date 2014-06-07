@@ -15,7 +15,10 @@ def Worksheet(Workbook):
         _guess_types = False
         data_only = False
 
+
     class DummyWorksheet:
+
+        encoding = "utf-8"
 
         def __init__(self):
             self.parent = DummyWorkbook()
