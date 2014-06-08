@@ -20,6 +20,8 @@ Create all style tags in a single pass
 
 Bug fixes
 ---------
+#153 Cannot read visibility of sheets and rows
+#181 No content type for worksheets
 #319 Cannot load Workbooks with vertAlign styling for fonts
 
 

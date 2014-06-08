@@ -139,7 +139,8 @@ def detect_worksheets(archive):
         rel['title'] = title
         if state is not None:
             rel['state'] = state
-        if "/" + rel['path'] in valid_sheets:
+        if ("/" + rel['path'] in valid_sheets
+            or "worksheets" in rel['path']): # fallback in case content type is missing
             yield rel
 
 
