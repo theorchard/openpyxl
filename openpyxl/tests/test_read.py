@@ -380,17 +380,24 @@ def test_read_content_types(datadir):
 
 @pytest.mark.parametrize("excel_file, expected", [
     ("bug137.xlsx",
-     {"rId1":"Chart1", "rId2":"Sheet1"}
+     [
+         ("rId1", "Chart1", None),
+         ("rId2", "Sheet1", None),
+     ]
      ),
     ("bug304.xlsx",
-     {'rId1': 'Sheet1', 'rId2': 'Sheet2', 'rId3': 'Sheet3'}
+     [
+         ('rId1', 'Sheet1', None),
+         ('rId2', 'Sheet2', None),
+         ('rId3', 'Sheet3', None),
+     ]
      )
 ])
 def test_read_sheets(datadir, excel_file, expected):
     from openpyxl.reader.workbook import read_sheets
     datadir.join("reader")
     archive = zipfile.ZipFile(excel_file)
-    assert dict(read_sheets(archive)) == expected
+    assert list(read_sheets(archive)) == expected
 
 
 def test_guess_types(datadir):

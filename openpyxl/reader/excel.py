@@ -237,6 +237,8 @@ def _load_workbook(wb, archive, filename, read_only, keep_vba):
                                     style_table,
                                     color_index=style_properties['color_index'],
                                     worksheet_path=worksheet_path)
+
+        new_ws.sheet_state = sheet.get('state') or 'visible'
         wb._add_sheet(new_ws)
 
         if not read_only:
