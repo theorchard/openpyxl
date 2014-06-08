@@ -77,7 +77,6 @@ def test_detect_worksheets(datadir, excel_file, expected):
 def test_read_rels(datadir, excel_file, expected):
     from openpyxl.reader.workbook import read_rels
 
-
     datadir.chdir()
     archive = ZipFile(excel_file)
     assert dict(read_rels(archive)) == expected
