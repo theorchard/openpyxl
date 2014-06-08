@@ -5,7 +5,11 @@ from zipfile import ZipFile
 
 import pytest
 
-from openpyxl.xml.constants import ARC_WORKBOOK, ARC_CONTENT_TYPES
+from openpyxl.xml.constants import (
+    ARC_WORKBOOK,
+    ARC_CONTENT_TYPES,
+    ARC_WORKBOOK_RELS
+)
 
 
 @pytest.fixture()
@@ -20,7 +24,7 @@ def test_hidden_sheets(datadir, DummyArchive):
 
     datadir.chdir()
     archive = DummyArchive
-    with open("hidden_sheets.xml", encoding="utf-8") as src:
+    with open("hidden_sheets.xml") as src:
         archive.writestr(ARC_WORKBOOK, src.read())
     sheets = read_sheets(archive)
     assert list(sheets) == [
@@ -103,7 +107,7 @@ def test_read_sheets(datadir, DummyArchive, workbook_file, expected):
     datadir.chdir()
     archive = DummyArchive
 
-    with open(workbook_file, encoding="utf-8") as src:
+    with open(workbook_file) as src:
         archive.writestr(ARC_WORKBOOK, src.read())
     assert list(read_sheets(archive)) == expected
 
@@ -113,7 +117,7 @@ def test_read_content_types(datadir, DummyArchive):
 
     archive = DummyArchive
     datadir.chdir()
-    with open("content_types.xml", encoding="utf-8") as src:
+    with open("content_types.xml") as src:
         archive.writestr(ARC_CONTENT_TYPES, src.read())
 
     assert list(read_content_types(archive)) == [
@@ -132,3 +136,18 @@ def test_read_content_types(datadir, DummyArchive):
     ('/docProps/core.xml', 'application/vnd.openxmlformats-package.core-properties+xml'),
     ('/docProps/app.xml', 'application/vnd.openxmlformats-officedocument.extended-properties+xml')
     ]
+
+
+def test_missing_content_type(datadir, DummyArchive):
+    from .. workbook import detect_worksheets
+
+    archive = DummyArchive
+    datadir.chdir()
+    with open("bug181_content_types.xml") as src:
+        archive.writestr(ARC_CONTENT_TYPES, src.read())
+    with open("bug181_workbook.xml") as src:
+        archive.writestr(ARC_WORKBOOK, src.read())
+    with open("bug181_workbook.xml.rels") as src:
+        archive.writestr(ARC_WORKBOOK_RELS, src.read())
+    sheets = list(detect_worksheets(archive))
+    assert sheets == [{'path': 'xl/worksheets/sheet1.xml', 'title': 'Sheet 1'}]
