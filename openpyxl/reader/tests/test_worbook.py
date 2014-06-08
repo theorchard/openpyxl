@@ -20,7 +20,7 @@ def test_hidden_sheets(datadir, DummyArchive):
 
     datadir.chdir()
     archive = DummyArchive
-    with open("hidden_sheets.xml") as src:
+    with open("hidden_sheets.xml", encoding="utf-8") as src:
         archive.writestr(ARC_WORKBOOK, src.read())
     sheets = read_sheets(archive)
     assert list(sheets) == [
@@ -103,7 +103,7 @@ def test_read_sheets(datadir, DummyArchive, workbook_file, expected):
     datadir.chdir()
     archive = DummyArchive
 
-    with open(workbook_file) as src:
+    with open(workbook_file, encoding="utf-8") as src:
         archive.writestr(ARC_WORKBOOK, src.read())
     assert list(read_sheets(archive)) == expected
 
@@ -113,7 +113,7 @@ def test_read_content_types(datadir, DummyArchive):
 
     archive = DummyArchive
     datadir.chdir()
-    with open("content_types.xml") as src:
+    with open("content_types.xml", encoding="utf-8") as src:
         archive.writestr(ARC_CONTENT_TYPES, src.read())
 
     assert list(read_content_types(archive)) == [
