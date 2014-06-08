@@ -5,7 +5,7 @@ from zipfile import ZipFile
 
 import pytest
 
-from openpyxl.xml.constants import ARC_WORKBOOK
+from openpyxl.xml.constants import ARC_WORKBOOK, ARC_CONTENT_TYPES
 
 
 @pytest.fixture()
@@ -22,7 +22,7 @@ def test_hidden_sheets(datadir, DummyArchive):
     archive = DummyArchive
     with open("hidden_sheets.xml") as src:
         archive.writestr(ARC_WORKBOOK, src.read())
-        sheets = read_sheets(archive)
+    sheets = read_sheets(archive)
     assert list(sheets) == [
         ('rId1', 'Blatt1', None),
         ('rId2', 'Blatt2', 'hidden'),
@@ -82,14 +82,14 @@ def test_read_rels(datadir, excel_file, expected):
     assert dict(read_rels(archive)) == expected
 
 
-@pytest.mark.parametrize("excel_file, expected", [
-    ("bug137.xlsx",
+@pytest.mark.parametrize("workbook_file, expected", [
+    ("bug137_workbook.xml",
      [
          ("rId1", "Chart1", None),
          ("rId2", "Sheet1", None),
      ]
      ),
-    ("bug304.xlsx",
+    ("bug304_workbook.xml",
      [
          ('rId1', 'Sheet1', None),
          ('rId2', 'Sheet2', None),
@@ -97,19 +97,25 @@ def test_read_rels(datadir, excel_file, expected):
      ]
      )
 ])
-def test_read_sheets(datadir, excel_file, expected):
+def test_read_sheets(datadir, DummyArchive, workbook_file, expected):
     from openpyxl.reader.workbook import read_sheets
 
     datadir.chdir()
-    archive = ZipFile(excel_file)
+    archive = DummyArchive
+
+    with open(workbook_file) as src:
+        archive.writestr(ARC_WORKBOOK, src.read())
     assert list(read_sheets(archive)) == expected
 
 
-def test_read_content_types(datadir):
+def test_read_content_types(datadir, DummyArchive):
     from openpyxl.reader.workbook import read_content_types
 
+    archive = DummyArchive
     datadir.chdir()
-    archive = ZipFile("contains_chartsheets.xlsx")
+    with open("content_types.xml") as src:
+        archive.writestr(ARC_CONTENT_TYPES, src.read())
+
     assert list(read_content_types(archive)) == [
     ('/xl/workbook.xml', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet.main+xml'),
     ('/xl/worksheets/sheet1.xml', 'application/vnd.openxmlformats-officedocument.spreadsheetml.worksheet+xml'),
