@@ -196,7 +196,7 @@ class Cell(object):
         self._hyperlink_rel = None
         self.data_type = self.TYPE_NULL
         self.parent = worksheet
-        if value:
+        if value is not None:
             self.value = value
         self.xf_index = 0
         self.merged = False
