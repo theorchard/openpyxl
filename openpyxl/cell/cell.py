@@ -256,65 +256,64 @@ class Cell(object):
         if not isinstance(value, KNOWN_TYPES):
             raise ValueError("Cannot convert {0} to Excel".format(value))
 
-        data_type = self.TYPE_STRING
+        self.data_type = self.TYPE_STRING
         if value is None:
             value = ''
         elif isinstance(value, bool):
-            data_type = self.TYPE_BOOL
+            self.data_type = self.TYPE_BOOL
         elif isinstance(value, NUMERIC_TYPES):
-            data_type = self.TYPE_NUMERIC
+            self.data_type = self.TYPE_NUMERIC
 
         elif isinstance(value, TIME_TYPES):
-            data_type = self.TYPE_NUMERIC
+            self.data_type = self.TYPE_NUMERIC
             value = self._cast_datetime(value)
 
         elif isinstance(value, basestring):
             if value.startswith("="):
-                data_type = self.TYPE_FORMULA
+                self.data_type = self.TYPE_FORMULA
             elif value in self.ERROR_CODES:
-                data_type = self.TYPE_ERROR
+                self.data_type = self.TYPE_ERROR
             elif self.guess_types:
-                self.infer_value(value)
-                return
-        self.set_explicit_value(value, data_type)
+                value = self.infer_value(value)
+        self.set_explicit_value(value, self.data_type)
 
 
     def infer_value(self, value):
-        """Given a value, infer type and display options."""
-
+        """Given a string, infer type and formatting options."""
         if not isinstance(value, unicode):
             value = str(value)
-        # number detection
-        if self._cast_numeric(value):
-            return
-        # percentage detection
-        elif self._cast_percentage(value):
-            return
-        # time detection
-        elif self._cast_time(value):
-            return
 
-        self.set_explicit_value(value)
+        # number detection
+        v = self._cast_numeric(value)
+        if v is None:
+            # percentage detection
+            v = self._cast_percentage(value)
+        if v is None:
+            # time detection
+            v = self._cast_time(value)
+        if v is not None:
+            self.data_type = self.TYPE_NUMERIC
+            return v
+
+        return value
+
 
     def _cast_numeric(self, value):
         """Explicity convert a string to a numeric value"""
         if NUMBER_REGEX.match(value):
             try:
-                value = int(value)
+                return int(value)
             except ValueError:
-                value = float(value)
-            self.set_explicit_value(value, self.TYPE_NUMERIC)
-            return True
+                return float(value)
 
     def _cast_percentage(self, value):
         """Explicitly convert a string to numeric value and format as a
         percentage"""
         match = PERCENT_REGEX.match(value)
         if match:
-            value = float(match.group('number')) / 100
-            self.set_explicit_value(value, self.TYPE_NUMERIC)
             self.number_format = NumberFormat.FORMAT_PERCENTAGE
-            return True
+            return float(match.group('number')) / 100
+
 
     def _cast_time(self, value):
         """Explicitly convert a string to a number and format as datetime or
@@ -332,10 +331,9 @@ class Cell(object):
                 pattern = "%H:%M:%S"
                 fmt = NumberFormat.FORMAT_DATE_TIME6
             value = datetime.datetime.strptime(value, pattern)
-            value = time_to_days(value)
-            self.set_explicit_value(value, self.TYPE_NUMERIC)
             self.number_format = fmt
-            return True
+            return time_to_days(value)
+
 
     def _cast_datetime(self, value):
         if isinstance(value, datetime.date):
