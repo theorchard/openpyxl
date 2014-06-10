@@ -584,8 +584,8 @@ class Worksheet(object):
                 col = get_column_letter(col_idx)
                 if col not in self.column_dimensions:
                     self.column_dimensions[col] = ColumnDimension(col)
-                    if row_idx not in self.row_dimensions:
-                        self.row_dimensions[row_idx] = RowDimension(row_idx)
+                if row_idx not in self.row_dimensions:
+                    self.row_dimensions[row_idx] = RowDimension(row_idx)
                 cell = Cell(self, col, row_idx, content)
                 self._cells[cell.coordinate] = cell
 
