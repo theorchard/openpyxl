@@ -578,14 +578,12 @@ class Worksheet(object):
 
         """
         row_idx = self.max_row + 1
-        sequences = (list, tuple)
-        if isinstance(list_or_dict, sequences):
+        self.row_dimensions[row_idx] = RowDimension(row_idx)
+        if isinstance(list_or_dict, (list, tuple)):
             for col_idx, content in enumerate(list_or_dict, 1):
                 col = get_column_letter(col_idx)
                 if col not in self.column_dimensions:
                     self.column_dimensions[col] = ColumnDimension(col)
-                if row_idx not in self.row_dimensions:
-                    self.row_dimensions[row_idx] = RowDimension(row_idx)
                 cell = Cell(self, col, row_idx, content)
                 self._cells[cell.coordinate] = cell
 
