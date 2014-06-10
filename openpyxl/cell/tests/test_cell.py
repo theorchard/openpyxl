@@ -200,13 +200,15 @@ class TestCellValueTypes(object):
         self.cell.value = '3.14%'
         assert expected == safe_string(self.cell.internal_value)
 
-    def test_insert_datetime(self):
+    def test_insert_date(self):
         self.cell.value = date.today()
         assert Cell.TYPE_NUMERIC == self.cell.data_type
+        assert self.cell.number_format == "yyyy-mm-dd"
 
-    def test_insert_date(self):
+    def test_insert_datetime(self):
         self.cell.value = datetime.now()
         assert Cell.TYPE_NUMERIC == self.cell.data_type
+        assert self.cell.number_format == "yyyy-mm-dd"
 
     def test_internal_date(self):
         dt = datetime(2010, 7, 13, 6, 37, 41)
