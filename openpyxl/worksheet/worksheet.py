@@ -33,9 +33,9 @@ from openpyxl.compat import (
     unicode,
     range,
     basestring,
-    iteritems
-    , deprecated)
-
+    iteritems,
+    deprecated
+)
 
 # package imports
 import openpyxl.cell
@@ -43,7 +43,8 @@ from openpyxl.cell import (
     coordinate_from_string,
     COORD_RE,
     column_index_from_string,
-    get_column_letter
+    get_column_letter,
+    Cell
 )
 from openpyxl.exceptions import (
     SheetTitleException,
@@ -577,9 +578,16 @@ class Worksheet(object):
 
         """
         row_idx = self.max_row + 1
-        if isinstance(list_or_dict, (list, tuple)):
+        sequences = (list, tuple)
+        if isinstance(list_or_dict, sequences):
             for col_idx, content in enumerate(list_or_dict, 1):
-                self.cell(row=row_idx, column=col_idx).value = content
+                col = get_column_letter(col_idx)
+                if col not in self.column_dimensions:
+                    self.column_dimensions[col] = ColumnDimension(col)
+                    if row_idx not in self.row_dimensions:
+                        self.row_dimensions[row_idx] = RowDimension(row_idx)
+                cell = Cell(self, col, row_idx, content)
+                self._cells[cell.coordinate] = cell
 
         elif isinstance(list_or_dict, dict):
             for col_idx, content in iteritems(list_or_dict):
