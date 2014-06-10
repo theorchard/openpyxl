@@ -251,48 +251,50 @@ class Cell(object):
         self._value = value
         self.data_type = data_type
 
-    def data_type_for_value(self, value):
+    def bind_value(self, value):
         """Given a value, infer the correct data type"""
         if not isinstance(value, KNOWN_TYPES):
             raise ValueError("Cannot convert {0} to Excel".format(value))
+
         data_type = self.TYPE_STRING
         if value is None:
-            data_type = self.TYPE_NULL
+            value = ''
         elif isinstance(value, bool):
             data_type = self.TYPE_BOOL
         elif isinstance(value, NUMERIC_TYPES):
             data_type = self.TYPE_NUMERIC
+
         elif isinstance(value, TIME_TYPES):
             data_type = self.TYPE_NUMERIC
+            value = self._cast_datetime(value)
+
         elif isinstance(value, basestring):
             if value.startswith("="):
                 data_type = self.TYPE_FORMULA
             elif value in self.ERROR_CODES:
                 data_type = self.TYPE_ERROR
-        return data_type
+            elif self.guess_types:
+                self.infer_value(value)
+                return
+        self.set_explicit_value(value, data_type)
 
-    def bind_value(self, value):
+
+    def infer_value(self, value):
         """Given a value, infer type and display options."""
-        self.data_type = self.data_type_for_value(value)
-        if value is None:
-            value = ''
-        elif isinstance(value, TIME_TYPES):
-            value = self._cast_datetime(value)
 
-        elif self.guess_types and self.data_type == self.TYPE_STRING:
-            if not isinstance(value, unicode):
-                value = str(value)
-            # number detection
-            if self._cast_numeric(value):
-                return
-            # percentage detection
-            if self._cast_percentage(value):
-                return
-            # time detection
-            if self._cast_time(value):
-                return
+        if not isinstance(value, unicode):
+            value = str(value)
+        # number detection
+        if self._cast_numeric(value):
+            return
+        # percentage detection
+        elif self._cast_percentage(value):
+            return
+        # time detection
+        elif self._cast_time(value):
+            return
 
-        self.set_explicit_value(value, self.data_type)
+        self.set_explicit_value(value)
 
     def _cast_numeric(self, value):
         """Explicity convert a string to a numeric value"""
