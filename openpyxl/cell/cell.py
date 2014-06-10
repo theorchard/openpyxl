@@ -275,8 +275,10 @@ class Cell(object):
         """Given a value, infer type and display options."""
         self.data_type = self.data_type_for_value(value)
         if value is None:
-            self.set_explicit_value('', self.TYPE_NULL)
-            return
+            value = ''
+        elif isinstance(value, TIME_TYPES):
+            value = self._cast_datetime(value)
+
         elif self.guess_types and self.data_type == self.TYPE_STRING:
             if not isinstance(value, unicode):
                 value = str(value)
@@ -289,9 +291,7 @@ class Cell(object):
             # time detection
             if self._cast_time(value):
                 return
-        if self.data_type == self.TYPE_NUMERIC:
-            if self._cast_datetime(value):
-                return
+
         self.set_explicit_value(value, self.data_type)
 
     def _cast_numeric(self, value):
@@ -345,8 +345,7 @@ class Cell(object):
         elif isinstance(value, datetime.timedelta):
             value = timedelta_to_days(value)
             self.number_format = NumberFormat.FORMAT_DATE_TIMEDELTA
-        self.set_explicit_value(value, self.TYPE_NUMERIC)
-        return True
+        return value
 
     @property
     def value(self):
