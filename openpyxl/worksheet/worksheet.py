@@ -585,7 +585,7 @@ class Worksheet(object):
                 if col not in self.column_dimensions:
                     self.column_dimensions[col] = ColumnDimension(col)
                 cell = Cell(self, col, row_idx, content)
-                self._cells[cell.coordinate] = cell
+                self._cells['%s%d' % (col, row_idx)] = cell
 
         elif isinstance(list_or_dict, dict):
             for col_idx, content in iteritems(list_or_dict):
