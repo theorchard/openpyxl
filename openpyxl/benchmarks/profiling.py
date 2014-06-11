@@ -25,15 +25,16 @@ def sax_writer(ws=None):
 
 
 def lxml_writer(ws=None):
-    from openpyxl.writer.lxml_worksheet import write_worksheet_data
+    from openpyxl.writer.lxml_worksheet import write_rows
     if ws is None:
         ws = make_worksheet()
 
     out = BytesIO()
     with xmlfile(out) as xf:
-        write_worksheet_data(xf, ws, [], [])
-    #with open("lxl_writer.xml", "wb") as dump:
+        write_rows(xf, ws, [], [])
+    #with open("lxml_writer.xml", "wb") as dump:
         #dump.write(out.getvalue())
+    #ws.parent.save("lxml_writer.xlsx")
 
 
 COLUMNS = 100
@@ -91,8 +92,9 @@ cProfile.run("profiling.lxml_writer(ws)", sort="tottime")
 
 if __name__ == '__main__':
     import cProfile
-    #ws = make_worksheet()
+    ws = make_worksheet()
+    cProfile.run("make_worksheet()", sort="tottime")
     #cProfile.run("sax_writer(ws)", sort="tottime")
     #cProfile.run("lxml_writer(ws)", sort="tottime")
-    generate_format_data()
-    cProfile.run("styled_sheet()", sort="tottime")
+    #generate_format_data()
+    #cProfile.run("styled_sheet()", sort="tottime")
