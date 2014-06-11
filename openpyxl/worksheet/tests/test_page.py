@@ -23,3 +23,24 @@ def test_dict_interface(PageMargins):
     assert dict(pm) == {'bottom': '1', 'footer': '0.5', 'header': '0.5',
                         'left': '0.75', 'right': '0.75', 'top': '1'}
 
+
+@pytest.fixture
+def PageSetup():
+    from openpyxl.worksheet import PageSetup
+    return PageSetup
+
+
+@pytest.mark.xfail
+def test_page_setup(PageSetup):
+    p = PageSetup()
+    assert p.setup == {}
+    p.scale = 1
+    assert p.setup['scale'] == 1
+
+
+def test_page_options(PageSetup):
+    p = PageSetup()
+    assert p.options == {}
+    p.horizontalCentered = True
+    p.verticalCentered = True
+    assert p.options == {'verticalCentered': '1', 'horizontalCentered': '1'}

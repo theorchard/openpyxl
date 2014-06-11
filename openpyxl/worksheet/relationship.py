@@ -23,7 +23,7 @@ from __future__ import absolute_import
 # @author: see AUTHORS file
 
 from openpyxl.xml.constants import REL_NS, PKG_REL_NS
-from openpyxl.xml.functions import Element, SubElement, get_document_content
+from openpyxl.xml.functions import Element, SubElement, tostring
 
 class Relationship(object):
     """Represents many kinds of relationships."""
@@ -43,5 +43,5 @@ class Relationship(object):
     def __repr__(self):
         root = Element("{%s}Relationships" % PKG_REL_NS)
         body = SubElement(root, "{%s}Relationship" % PKG_REL_NS, self.__dict__)
-        return get_document_content(root)
+        return tostring(root)
 

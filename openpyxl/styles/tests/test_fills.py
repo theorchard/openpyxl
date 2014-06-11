@@ -36,7 +36,7 @@ class TestGradientFill:
     def test_sequence(self, GradientFill):
         colors = [Color(BLACK), Color(WHITE)]
         gf = GradientFill(stop=colors)
-        assert gf.stop == colors
+        assert gf.stop == tuple(colors)
 
 
     def test_invalid_sequence(self, GradientFill):
@@ -49,4 +49,3 @@ class TestGradientFill:
         gf = GradientFill(degree=90, left=1, right=2, top=3, bottom=4)
         assert dict(gf) == {'bottom': "4", 'degree': "90", 'left':"1",
                             'right': "2", 'top': "3", 'type': 'linear'}
-

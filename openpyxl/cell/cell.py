@@ -33,11 +33,11 @@ cells using Excel's 'A1' column/row nomenclature are also provided.
 __docformat__ = "restructuredtext en"
 
 # Python stdlib imports
-from numbers import Number
 import datetime
 import re
 import warnings
 
+from openpyxl.compat import NUMERIC_TYPES
 from openpyxl.compat import lru_cache, range
 from openpyxl.units import (
     DEFAULT_ROW_HEIGHT,
@@ -66,7 +66,16 @@ ABSOLUTE_RE = re.compile('^[$]?([A-Z]+)[$]?(\d+)(:[$]?([A-Z]+)[$]?(\d+))?$')
 ILLEGAL_CHARACTERS_RE = re.compile(r'[\000-\010]|[\013-\014]|[\016-\037]')
 
 TIME_TYPES = (datetime.datetime, datetime.date, datetime.time, datetime.timedelta)
-KNOWN_TYPES = TIME_TYPES + (Number, basestring, unicode, bytes, bool, type(None))
+STRING_TYPES = (basestring, unicode, bytes)
+KNOWN_TYPES = NUMERIC_TYPES + TIME_TYPES + STRING_TYPES + (bool, type(None))
+
+
+def get_column_interval(start, end):
+    if isinstance(start, basestring):
+        start = column_index_from_string(start)
+    if isinstance(end, basestring):
+        end = column_index_from_string(end)
+    return [get_column_letter(x) for x in range(start, end + 1)]
 
 def coordinate_from_string(coord_string):
     """Convert a coordinate string like 'B12' to a tuple ('B', 12)"""
@@ -187,7 +196,7 @@ class Cell(object):
         self._hyperlink_rel = None
         self.data_type = self.TYPE_NULL
         self.parent = worksheet
-        if value:
+        if value is not None:
             self.value = value
         self.xf_index = 0
         self.merged = False
@@ -237,73 +246,74 @@ class Cell(object):
         """Coerce values according to their explicit type"""
         if data_type not in self.VALID_TYPES:
             raise ValueError('Invalid data type: %s' % data_type)
-        if isinstance(value, (str, unicode, bytes)):
+        if isinstance(value, STRING_TYPES):
             value = self.check_string(value)
         self._value = value
         self.data_type = data_type
 
-    def data_type_for_value(self, value):
+    def bind_value(self, value):
         """Given a value, infer the correct data type"""
         if not isinstance(value, KNOWN_TYPES):
             raise ValueError("Cannot convert {0} to Excel".format(value))
-        data_type = self.TYPE_STRING
+
+        self.data_type = self.TYPE_STRING
         if value is None:
-            data_type = self.TYPE_NULL
+            value = ''
         elif isinstance(value, bool):
-            data_type = self.TYPE_BOOL
-        elif isinstance(value, Number):
-            data_type = self.TYPE_NUMERIC
+            self.data_type = self.TYPE_BOOL
+        elif isinstance(value, NUMERIC_TYPES):
+            self.data_type = self.TYPE_NUMERIC
+
         elif isinstance(value, TIME_TYPES):
-            data_type = self.TYPE_NUMERIC
+            self.data_type = self.TYPE_NUMERIC
+            value = self._cast_datetime(value)
+
         elif isinstance(value, basestring):
             if value.startswith("="):
-                data_type = self.TYPE_FORMULA
+                self.data_type = self.TYPE_FORMULA
             elif value in self.ERROR_CODES:
-                data_type = self.TYPE_ERROR
-        return data_type
-
-    def bind_value(self, value):
-        """Given a value, infer type and display options."""
-        self.data_type = self.data_type_for_value(value)
-        if value is None:
-            self.set_explicit_value('', self.TYPE_NULL)
-            return
-        elif self.guess_types and self.data_type == self.TYPE_STRING:
-            if not isinstance(value, unicode):
-                value = str(value)
-            # number detection
-            if self._cast_numeric(value):
-                return
-            # percentage detection
-            if self._cast_percentage(value):
-                return
-            # time detection
-            if self._cast_time(value):
-                return
-        if self.data_type == self.TYPE_NUMERIC:
-            if self._cast_datetime(value):
-                return
+                self.data_type = self.TYPE_ERROR
+            elif self.guess_types:
+                value = self.infer_value(value)
         self.set_explicit_value(value, self.data_type)
+
+
+    def infer_value(self, value):
+        """Given a string, infer type and formatting options."""
+        if not isinstance(value, unicode):
+            value = str(value)
+
+        # number detection
+        v = self._cast_numeric(value)
+        if v is None:
+            # percentage detection
+            v = self._cast_percentage(value)
+        if v is None:
+            # time detection
+            v = self._cast_time(value)
+        if v is not None:
+            self.data_type = self.TYPE_NUMERIC
+            return v
+
+        return value
+
 
     def _cast_numeric(self, value):
         """Explicity convert a string to a numeric value"""
         if NUMBER_REGEX.match(value):
             try:
-                value = int(value)
+                return int(value)
             except ValueError:
-                value = float(value)
-            self.set_explicit_value(value, self.TYPE_NUMERIC)
-            return True
+                return float(value)
 
     def _cast_percentage(self, value):
         """Explicitly convert a string to numeric value and format as a
         percentage"""
         match = PERCENT_REGEX.match(value)
         if match:
-            value = float(match.group('number')) / 100
-            self.set_explicit_value(value, self.TYPE_NUMERIC)
             self.number_format = NumberFormat.FORMAT_PERCENTAGE
-            return True
+            return float(match.group('number')) / 100
+
 
     def _cast_time(self, value):
         """Explicitly convert a string to a number and format as datetime or
@@ -321,12 +331,12 @@ class Cell(object):
                 pattern = "%H:%M:%S"
                 fmt = NumberFormat.FORMAT_DATE_TIME6
             value = datetime.datetime.strptime(value, pattern)
-            value = time_to_days(value)
-            self.set_explicit_value(value, self.TYPE_NUMERIC)
             self.number_format = fmt
-            return True
+            return time_to_days(value)
+
 
     def _cast_datetime(self, value):
+        """Convert Python datetime to Excel and set formatting"""
         if isinstance(value, datetime.date):
             value = to_excel(value, self.base_date)
             self.number_format = NumberFormat.FORMAT_DATE_YYYYMMDD2
@@ -336,8 +346,7 @@ class Cell(object):
         elif isinstance(value, datetime.timedelta):
             value = timedelta_to_days(value)
             self.number_format = NumberFormat.FORMAT_DATE_TIMEDELTA
-        self.set_explicit_value(value, self.TYPE_NUMERIC)
-        return True
+        return value
 
     @property
     def value(self):
@@ -372,7 +381,7 @@ class Cell(object):
         but you can modify it afterwards by setting the `value`
         property, and the hyperlink will remain.\n\n' ':rtype: string"""
         if self._hyperlink_rel is None:
-            self._hyperlink_rel = self.parent.create_relationship("hyperlink")
+            self._hyperlink_rel = self.parent._create_relationship("hyperlink")
         self._hyperlink_rel.target = val
         self._hyperlink_rel.target_mode = "External"
         if self._value is None:

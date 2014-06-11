@@ -29,7 +29,13 @@ from __future__ import absolute_import
 import re
 
 # compatibility imports
-from openpyxl.compat import range
+from openpyxl.compat import (
+    unicode,
+    range,
+    basestring,
+    iteritems,
+    deprecated
+)
 
 # package imports
 import openpyxl.cell
@@ -37,7 +43,8 @@ from openpyxl.cell import (
     coordinate_from_string,
     COORD_RE,
     column_index_from_string,
-    get_column_letter
+    get_column_letter,
+    Cell
 )
 from openpyxl.exceptions import (
     SheetTitleException,
@@ -52,14 +59,12 @@ from openpyxl.units import (
 )
 from openpyxl.styles import Style, DEFAULTS as DEFAULTS_STYLE
 from openpyxl.formatting import ConditionalFormatting
-from openpyxl.namedrange import NamedRangeContainingValue
-from openpyxl.compat import OrderedDict, unicode, range, basestring
-from openpyxl.compat.itertools import iteritems
+from openpyxl.workbook.named_range import NamedRangeContainingValue
 
 from .header_footer import HeaderFooter
 from .relationship import Relationship
 from .page import PageSetup, PageMargins
-from .dimensions import ColumnDimension, RowDimension
+from .dimensions import ColumnDimension, RowDimension, DimensionHolder
 from .protection import SheetProtection
 from .filters import AutoFilter
 
@@ -119,7 +124,7 @@ class Worksheet(object):
         else:
             self.title = title
         self.row_dimensions = {}
-        self.column_dimensions = OrderedDict([])
+        self.column_dimensions = DimensionHolder([])
         self.page_breaks = []
         self._cells = {}
         self._styles = {}
@@ -162,7 +167,11 @@ class Worksheet(object):
     def encoding(self):
         return self._parent.encoding
 
+    @deprecated('this method is private and should not be called directly')
     def garbage_collect(self):
+        self._garbage_collect()
+
+    def _garbage_collect(self):
         """Delete cells that are not storing a value."""
         delete_list = []
         for coordinate, cell in iteritems(self._cells):
@@ -189,13 +198,17 @@ class Worksheet(object):
         if self.bad_title_char_re.search(value):
             msg = 'Invalid character found in sheet title'
             raise SheetTitleException(msg)
-        value = self.unique_sheet_name(value)
+        value = self._unique_sheet_name(value)
         if len(value) > 31:
             msg = 'Maximum 31 characters allowed in sheet title'
             raise SheetTitleException(msg)
         self._title = value
 
+    @deprecated('this method is private and should not be called directly')
     def unique_sheet_name(self, value):
+        return self._unique_sheet_name(value)
+
+    def _unique_sheet_name(self, value):
         # check if sheet_name already exists
         # do this *before* length check
         sheets = self._parent.get_sheet_names()
@@ -421,10 +434,10 @@ class Worksheet(object):
                 return tuple(result)
 
     def get_style(self, coordinate):
-        """Return the style object for the specified cell."""
-        if not coordinate in self._styles:
-            self._styles[coordinate] = self.parent.shared_styles.add(Style())
-        return self.parent.shared_styles[self._styles[coordinate]]
+        """Return a copy of the style object for the specified cell."""
+        style_id = self._styles.get(coordinate, 0)
+        style = self.parent.shared_styles[style_id].copy()
+        return style
 
     def set_style(self, coordinate, style):
         self._styles[coordinate] = self.parent.shared_styles.add(style)
@@ -437,7 +450,11 @@ class Worksheet(object):
             raise ValueError("Values should be %s or %s" % (self.ORIENTATION_PORTRAIT, self.ORIENTATION_LANDSCAPE))
         self.page_setup.orientation = orientation
 
+    @deprecated('this method is private and should not be called directly')
     def create_relationship(self, rel_type):
+        return self._create_relationship(rel_type)
+
+    def _create_relationship(self, rel_type):
         """Add a relationship for this sheet."""
         rel = Relationship(rel_type)
         self.relationships.append(rel)
@@ -561,9 +578,14 @@ class Worksheet(object):
 
         """
         row_idx = self.max_row + 1
+        self.row_dimensions[row_idx] = RowDimension(row_idx)
         if isinstance(list_or_dict, (list, tuple)):
             for col_idx, content in enumerate(list_or_dict, 1):
-                self.cell(row=row_idx, column=col_idx).value = content
+                col = get_column_letter(col_idx)
+                if col not in self.column_dimensions:
+                    self.column_dimensions[col] = ColumnDimension(col)
+                cell = Cell(self, col, row_idx, content)
+                self._cells['%s%d' % (col, row_idx)] = cell
 
         elif isinstance(list_or_dict, dict):
             for col_idx, content in iteritems(list_or_dict):

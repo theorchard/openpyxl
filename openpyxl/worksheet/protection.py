@@ -1,75 +1,123 @@
 from __future__ import absolute_import
 # Copyright (c) 2010-2014 openpyxl
-#
-# Permission is hereby granted, free of charge, to any person obtaining a copy
-# of this software and associated documentation files (the "Software"), to deal
-# in the Software without restriction, including without limitation the rights
-# to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-# copies of the Software, and to permit persons to whom the Software is
-# furnished to do so, subject to the following conditions:
-#
-# The above copyright notice and this permission notice shall be included in
-# all copies or substantial portions of the Software.
-#
-# THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-# IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-# FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-# AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-# LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-# OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
-# THE SOFTWARE.
-#
-# @license: http://www.opensource.org/licenses/mit-license.php
-# @author: see AUTHORS file
+
+from openpyxl.descriptors import Strict, Bool, String, Alias, Integer
+from openpyxl.compat import safe_string
 
 
-from .password_hasher import hash_password
+def hash_password(plaintext_password=''):
+    """
+    Create a password hash from a given string for protecting a worksheet
+    only. This will not work for encrypting a workbook.
 
-class SheetProtection(object):
-    """Information about protection of various aspects of a sheet."""
+    This method is based on the algorithm provided by
+    Daniel Rentz of OpenOffice and the PEAR package
+    Spreadsheet_Excel_Writer by Xavier Noguer <xnoguer@rezebra.com>.
+    See also http://blogs.msdn.com/b/ericwhite/archive/2008/02/23/the-legacy-hashing-algorithm-in-open-xml.aspx
+    """
+    password = 0x0000
+    for idx, char in enumerate(plaintext_password, 1):
+        value = ord(char) << idx
+        rotated_bits = value >> 15
+        value &= 0x7fff
+        password ^= (value | rotated_bits)
+    password ^= len(plaintext_password)
+    password ^= 0xCE4B
+    return str(hex(password)).upper()[2:]
 
-    def __init__(self):
-        self.sheet = False
-        self.objects = False
-        self.scenarios = False
-        self.format_cells = False
-        self.format_columns = False
-        self.format_rows = False
-        self.insert_columns = False
-        self.insert_rows = False
-        self.insert_hyperlinks = False
-        self.delete_columns = False
-        self.delete_rows = False
-        self.select_locked_cells = False
-        self.sort = False
-        self.auto_filter = False
-        self.pivot_tables = False
-        self.select_unlocked_cells = False
-        self._password = ''
-        self.enabled = False
+
+class SheetProtection(Strict):
+    """
+    Information about protection of various aspects of a sheet. True values
+    mean that protection for the object or action is active This is the
+    **default** when protection is active, ie. users cannot do something
+    """
+
+    sheet = Bool()
+    enabled = Alias('sheet')
+    objects = Bool()
+    scenarios = Bool()
+    formatCells = Bool()
+    formatColumns = Bool()
+    formatRows = Bool()
+    insertColumns = Bool()
+    insertRows = Bool()
+    insertHyperlinks = Bool()
+    deleteColumns = Bool()
+    deleteRows = Bool()
+    selectLockedCells = Bool()
+    selectUnlockedCells = Bool()
+    sort = Bool()
+    autoFilter = Bool()
+    pivotTables = Bool()
+    saltValue = String(allow_none=True)
+    spinCount = Integer(allow_none=True)
+    algorithmName = String(allow_none=True)
+
+    _password = None
+
+
+    def __init__(self, sheet=False, objects=False, scenarios=False,
+                 formatCells=True, formatRows=True, formatColumns=True,
+                 insertColumns=True, insertRows=True, insertHyperlinks=True,
+                 deleteColumns=True, deleteRows=True, selectLockedCells=False,
+                 selectUnlockedCells=False, sort=True, autoFilter=True, pivotTables=True,
+                 password=None, algorithmName=None, saltValue=None, spinCount=None):
+        self.sheet = sheet
+        self.objects = objects
+        self.scenarios = scenarios
+        self.formatCells = formatCells
+        self.formatColumns = formatColumns
+        self.formatRows = formatRows
+        self.insertColumns = insertColumns
+        self.insertRows = insertRows
+        self.insertHyperlinks = insertHyperlinks
+        self.deleteColumns = deleteColumns
+        self.deleteRows = deleteRows
+        self.selectLockedCells = selectLockedCells
+        self.selectUnlockedCells = selectUnlockedCells
+        self.sort = sort
+        self.autoFilter = autoFilter
+        self.pivotTables = pivotTables
+        if password is not None:
+            self.set_password(password)
+        self.algorithmName = algorithmName
+        self.saltValue = saltValue
+        self.spinCount = spinCount
+
 
     def set_password(self, value='', already_hashed=False):
         """Set a password on this sheet."""
         if not already_hashed:
             value = hash_password(value)
         self._password = value
-        self.enabled = True
+        self.enable()
 
-    def _set_raw_password(self, value):
-        """Set a password directly, forcing a hash step."""
-        self.set_password(value, already_hashed=False)
-
-    def _get_raw_password(self):
+    @property
+    def password(self):
         """Return the password value, regardless of hash."""
         return self._password
 
+    @password.setter
+    def password(self, value):
+        """Set a password directly, forcing a hash step."""
+        self.set_password(value, already_hashed=False)
+
+
     def enable(self):
-        self.enabled = True
+        self.sheet = True
+
 
     def disable(self):
-        self.enabled = False
+        self.sheet = False
 
-    password = property(_get_raw_password, _set_raw_password,
-            'get/set the password (if already hashed, '
-            'use set_password() instead)')
 
+    def __iter__(self):
+        for key in ('sheet', 'objects', 'scenarios', 'formatCells',
+                  'formatRows', 'formatColumns', 'insertColumns', 'insertRows',
+                  'insertHyperlinks', 'deleteColumns', 'deleteRows',
+                  'selectLockedCells', 'selectUnlockedCells', 'sort', 'autoFilter',
+                  'pivotTables', 'password', 'algorithmName', 'saltValue', 'spinCount'):
+            value = getattr(self, key)
+            if value is not None:
+                yield key, safe_string(value)

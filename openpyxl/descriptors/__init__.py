@@ -33,6 +33,9 @@ class Typed(Descriptor):
                 raise TypeError('expected ' + str(self.expected_type))
         super(Typed, self).__set__(instance, value)
 
+    def __repr__(self):
+        return "Value must be type '{0}'".format(self.expected_type.__name__)
+
 
 class Convertible(Typed):
     """Values must be convertible to a particular type"""
@@ -143,10 +146,13 @@ class Sequence(Descriptor):
     """
 
     expected_type = type(None)
+    seq_types = (list, tuple)
 
     def __set__(self, instance, seq):
-        if not isinstance(seq, (list, tuple)):
+        if not isinstance(seq, self.seq_types):
             raise TypeError("Value must be a sequence")
+        elif isinstance(seq, list):
+            seq = tuple(seq)
         for idx, value in enumerate(seq):
             if not isinstance(value, self.expected_type):
                 raise TypeError(

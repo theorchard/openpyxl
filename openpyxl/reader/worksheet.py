@@ -33,15 +33,20 @@ from openpyxl.cell import get_column_letter
 from openpyxl.cell import Cell
 from openpyxl.worksheet import Worksheet, ColumnDimension, RowDimension
 from openpyxl.worksheet.iter_worksheet import IterableWorksheet
+from openpyxl.worksheet.page import PageMargins
+from openpyxl.worksheet.protection import SheetProtection
 from openpyxl.xml.constants import SHEET_MAIN_NS
 from openpyxl.xml.functions import safe_iterator
 from openpyxl.styles import Color
 from openpyxl.styles import colors
 from openpyxl.formatting import ConditionalFormatting
-from openpyxl.worksheet.page import PageMargins
 
 
 def _get_xml_iter(xml_source):
+    """
+    Possible inputs: strings, bytes, members of zipfile, temporary file
+    Always return a file like object
+    """
     if not hasattr(xml_source, 'read'):
         try:
             xml_source = xml_source.encode("utf-8")
@@ -84,7 +89,8 @@ class WorkSheetParser(object):
             '{%s}pageSetup' % SHEET_MAIN_NS: self.parse_page_setup,
             '{%s}headerFooter' % SHEET_MAIN_NS: self.parse_header_footer,
             '{%s}conditionalFormatting' % SHEET_MAIN_NS: self.parser_conditional_formatting,
-            '{%s}autoFilter' % SHEET_MAIN_NS: self.parse_auto_filter
+            '{%s}autoFilter' % SHEET_MAIN_NS: self.parse_auto_filter,
+            '{%s}sheetProtection' % SHEET_MAIN_NS: self.parse_sheet_protection,
                       }
         tags = dispatcher.keys()
         stream = _get_xml_iter(self.source)
@@ -117,7 +123,7 @@ class WorkSheetParser(object):
             elif data_type == Cell.TYPE_BOOL:
                 value = bool(int(value))
             elif data_type == 'n':
-                cell._cast_numeric(value)
+                cell.value = cell._cast_numeric(value)
                 if self.data_only or formula is None:
                     return
             if formula is not None and not self.data_only:
@@ -149,7 +155,7 @@ class WorkSheetParser(object):
         if max != 16384:
             for colId in range(min, max + 1):
                 column = get_column_letter(colId)
-                attrs = dict(col.items())
+                attrs = dict(col.attrib)
                 attrs['index'] = column
                 if column not in self.ws.column_dimensions:
                     dim = ColumnDimension(**attrs)
@@ -158,13 +164,15 @@ class WorkSheetParser(object):
                         self.ws._styles[column] = self.style_table.get(dim.style)
 
     def parse_row_dimensions(self, row):
-        rowId = int(row.get('r'))
-        ht = row.get('ht')
-        if rowId not in self.ws.row_dimensions:
-            self.ws.row_dimensions[rowId] = RowDimension(rowId, height=ht)
-        style_index = row.get('s')
-        if row.get('customFormat') and style_index:
-            self.ws._styles[rowId] = self.style_table.get(int(style_index))
+        attrs = dict(row.attrib)
+        for key in set(attrs):
+            if key.startswith('{'): #ignore custom namespaces
+                del attrs[key]
+        dim = RowDimension(**attrs)
+        if dim.index not in self.ws.row_dimensions:
+            self.ws.row_dimensions[dim.index] = dim
+        if row.get('customFormat') and dim.style:
+            self.ws._styles[rowId] = self.style_table.get(dim.style)
         for cell in safe_iterator(row, self.CELL_TAG):
             self.parse_cell(cell)
 
@@ -179,10 +187,6 @@ class WorkSheetParser(object):
     def parse_margins(self, element):
         margins = dict(element.items())
         self.page_margins = PageMargins(**margins)
-        #for key in ("left", "right", "top", "bottom", "header", "footer"):
-            #value = element.get(key)
-            #if value is not None:
-                #setattr(self.ws.page_margins, key, float(value))
 
     def parse_page_setup(self, element):
         for key in ("orientation", "paperSize", "scale", "fitToPage",
@@ -272,6 +276,13 @@ class WorkSheetParser(object):
             self.ws.auto_filter.add_filter_column(fc.get("colId"), vals, blank=blank)
         for sc in safe_iterator(element, '{%s}sortCondition' % SHEET_MAIN_NS):
             self.ws.auto_filter.add_sort_condition(sc.get("ref"), sc.get("descending"))
+
+    def parse_sheet_protection(self, element):
+        values = element.attrib
+        self.ws.protection = SheetProtection(**values)
+        password = values.get("password")
+        if password is not None:
+            self.ws.protection.set_password(password, True)
 
 
 def fast_parse(ws, xml_source, shared_strings, style_table, color_index=None):

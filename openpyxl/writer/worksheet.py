@@ -27,10 +27,11 @@ from __future__ import absolute_import
 # Python stdlib imports
 import decimal
 from io import BytesIO
+from operator import attrgetter
 
 # compatibility imports
 
-from openpyxl.compat import long
+from openpyxl.compat import long, safe_string, itervalues
 
 # package imports
 from openpyxl.cell import (
@@ -42,7 +43,6 @@ from openpyxl.xml.functions import (
     Element,
     SubElement,
     XMLGenerator,
-    get_document_content,
     start_tag,
     end_tag,
     tag,
@@ -64,14 +64,8 @@ def row_sort(cell):
     return column_index_from_string(cell.column)
 
 
-def write_etree(doc, element):
-    start_tag(doc, element.tag, element)
-    for e in element.getchildren():
-        write_etree(doc, e)
-    end_tag(doc, element.tag)
 
-
-def write_worksheet(worksheet, shared_strings, style_table):
+def write_worksheet(worksheet, shared_strings):
     """Write a worksheet to an xml file."""
     if worksheet.xml_source:
         vba_root = fromstring(worksheet.xml_source)
@@ -82,29 +76,27 @@ def write_worksheet(worksheet, shared_strings, style_table):
     start_tag(doc, 'worksheet',
               {'xmlns': SHEET_MAIN_NS,
                'xmlns:r': REL_NS})
+    vba_attrs = {}
     if vba_root is not None:
         el = vba_root.find('{%s}sheetPr' % SHEET_MAIN_NS)
         if el is not None:
-            codename = el.get('codeName', worksheet.title)
-            start_tag(doc, 'sheetPr', {"codeName": codename})
-        else:
-            start_tag(doc, 'sheetPr')
-    else:
-        start_tag(doc, 'sheetPr')
+            vba_attrs['codeName'] = el.get('codeName', worksheet.title)
+
+    start_tag(doc, 'sheetPr', vba_attrs)
     tag(doc, 'outlinePr',
         {'summaryBelow': '%d' % (worksheet.show_summary_below),
          'summaryRight': '%d' % (worksheet.show_summary_right)})
     if worksheet.page_setup.fitToPage:
         tag(doc, 'pageSetUpPr', {'fitToPage': '1'})
     end_tag(doc, 'sheetPr')
+
     tag(doc, 'dimension', {'ref': '%s' % worksheet.calculate_dimension()})
     write_worksheet_sheetviews(doc, worksheet)
-    tag(doc, 'sheetFormatPr', {'defaultRowHeight': '15', 'baseColWidth':'10'})
-    write_worksheet_cols(doc, worksheet, style_table)
-    write_worksheet_data(doc, worksheet, shared_strings, style_table)
-    if worksheet.protection.enabled:
-        tag(doc, 'sheetProtection',
-            {'objects': '1', 'scenarios': '1', 'sheet': '1'})
+    write_worksheet_format(doc, worksheet)
+    write_worksheet_cols(doc, worksheet)
+    write_worksheet_data(doc, worksheet, shared_strings)
+    if worksheet.protection.sheet:
+        tag(doc, 'sheetProtection', dict(worksheet.protection))
     write_worksheet_autofilter(doc, worksheet)
     write_worksheet_mergecells(doc, worksheet)
     write_worksheet_conditional_formatting(doc, worksheet)
@@ -121,13 +113,7 @@ def write_worksheet(worksheet, shared_strings, style_table):
     if setup:
         tag(doc, 'pageSetup', setup)
 
-    if worksheet.header_footer.hasHeader() or worksheet.header_footer.hasFooter():
-        start_tag(doc, 'headerFooter')
-        if worksheet.header_footer.hasHeader():
-            tag(doc, 'oddHeader', None, worksheet.header_footer.getHeader())
-        if worksheet.header_footer.hasFooter():
-            tag(doc, 'oddFooter', None, worksheet.header_footer.getFooter())
-        end_tag(doc, 'headerFooter')
+    write_header_footer(doc, worksheet)
 
     if worksheet._charts or worksheet._images:
         tag(doc, 'drawing', {'r:id': 'rId1'})
@@ -140,12 +126,7 @@ def write_worksheet(worksheet, shared_strings, style_table):
             rId = el.get('{%s}id' % REL_NS)
             tag(doc, 'legacyDrawing', {'r:id': rId})
 
-    breaks = worksheet.page_breaks
-    if breaks:
-        start_tag(doc, 'rowBreaks', {'count': str(len(breaks)), 'manualBreakCount': str(len(breaks))})
-        for b in breaks:
-            tag(doc, 'brk', {'id': str(b), 'man': 'true', 'max': '16383', 'min': '0'})
-        end_tag(doc, 'rowBreaks')
+    write_pagebreaks(doc, worksheet)
 
     # add a legacyDrawing so that excel can draw comments
     if worksheet._comment_count > 0:
@@ -192,6 +173,18 @@ def write_worksheet_sheetviews(doc, worksheet):
     end_tag(doc, 'sheetViews')
 
 
+def write_worksheet_format(doc, worksheet):
+    attrs = {'defaultRowHeight': '15',
+             'baseColWidth': '10'}
+    dimensions_outline = [dim.outline_level
+                          for _, dim in iteritems(worksheet.column_dimensions)]
+    if dimensions_outline:
+        outline_level = max(dimensions_outline)
+        if outline_level:
+            attrs['outlineLevelCol'] = str(outline_level)
+    tag(doc, 'sheetFormatPr', attrs)
+
+
 def write_worksheet_cols(doc, worksheet, style_table=None):
     """Write worksheet columns to xml.
 
@@ -201,12 +194,10 @@ def write_worksheet_cols(doc, worksheet, style_table=None):
     """
     cols = []
     for label, dimension in iteritems(worksheet.column_dimensions):
+        dimension.style = worksheet._styles.get(label)
         col_def = dict(dimension)
-        style = worksheet._styles.get(label)
-        if col_def == {} and style is None:
+        if col_def == {}:
             continue
-        elif style is not None:
-            col_def['style'] = '%d' % style
         idx = column_index_from_string(label)
         cols.append((idx, col_def))
     if cols == []:
@@ -214,7 +205,9 @@ def write_worksheet_cols(doc, worksheet, style_table=None):
     start_tag(doc, 'cols')
     for idx, col_def in sorted(cols):
         v = "%d" % idx
-        col_def.update({'min':v, 'max':v})
+        cmin = col_def.get('min') or v
+        cmax = col_def.get('max') or v
+        col_def.update({'min': cmin, 'max': cmax})
         tag(doc, 'col', col_def)
     end_tag(doc, 'cols')
 
@@ -258,72 +251,72 @@ def write_worksheet_conditional_formatting(doc, worksheet):
         end_tag(doc, 'conditionalFormatting')
 
 
-def write_worksheet_data(doc, worksheet, string_table, style_table):
+def write_worksheet_data(doc, worksheet, string_table, style_table=None):
     """Write worksheet data to xml."""
-    start_tag(doc, 'sheetData')
-    max_column = worksheet.get_highest_column()
-    shared_styles = worksheet.parent.shared_styles
-    cells_by_row = {}
+
+    # Ensure a blank cell exists if it has a style
     for styleCoord in iterkeys(worksheet._styles):
-        # Ensure a blank cell exists if it has a style
         if isinstance(styleCoord, str) and COORD_RE.search(styleCoord):
             worksheet.cell(styleCoord)
-    for cell in worksheet.get_cell_collection():
+
+    # create rows of cells
+    cells_by_row = {}
+    for cell in itervalues(worksheet._cells):
         cells_by_row.setdefault(cell.row, []).append(cell)
+
+    start_tag(doc, 'sheetData')
     for row_idx in sorted(cells_by_row):
+        # row meta data
         row_dimension = worksheet.row_dimensions[row_idx]
+        row_dimension.style = worksheet._styles.get(row_idx)
         attrs = {'r': '%d' % row_idx,
-                 'spans': '1:%d' % max_column}
-        if not row_dimension.visible:
-            attrs['hidden'] = '1'
-        if row_dimension.height is not None:
-            attrs['ht'] = str(row_dimension.ht)
-            attrs['customHeight'] = '1'
-        if row_idx in worksheet._styles:
-            attrs['s'] = '%d' % worksheet._styles[row_idx]
-            attrs['customFormat'] = '1'
+                 'spans': '1:%d' % worksheet.max_column}
+        attrs.update(dict(row_dimension))
+
         start_tag(doc, 'row', attrs)
         row_cells = cells_by_row[row_idx]
-        sorted_cells = sorted(row_cells, key=row_sort)
-        for cell in sorted_cells:
-            value = cell.internal_value
-            coordinate = cell.coordinate
-            attributes = {'r': coordinate}
-            if cell.data_type != cell.TYPE_FORMULA:
-                attributes['t'] = cell.data_type
-            if coordinate in worksheet._styles:
-                attributes['s'] = '%d' % worksheet._styles[coordinate]
+        for cell in sorted(row_cells, key=row_sort):
+            write_cell(doc, worksheet, cell, string_table)
 
-            if value in ('', None):
-                tag(doc, 'c', attributes)
-            else:
-                start_tag(doc, 'c', attributes)
-                if cell.data_type == cell.TYPE_STRING:
-                    tag(doc, 'v', body='%s' % string_table.index(value))
-                elif cell.data_type == cell.TYPE_FORMULA:
-                    if coordinate in worksheet.formula_attributes:
-                        attr = worksheet.formula_attributes[coordinate]
-                        if 't' in attr and attr['t'] == 'shared' and 'ref' not in attr:
-                            # Don't write body for shared formula
-                            tag(doc, 'f', attr=attr)
-                        else:
-                            tag(doc, 'f', attr=attr, body='%s' % value[1:])
-                    else:
-                        tag(doc, 'f', body='%s' % value[1:])
-                    tag(doc, 'v')
-                elif cell.data_type == cell.TYPE_NUMERIC:
-                    if isinstance(value, (long, decimal.Decimal)):
-                        func = str
-                    else:
-                        func = repr
-                    tag(doc, 'v', body=func(value))
-                elif cell.data_type == cell.TYPE_BOOL:
-                    tag(doc, 'v', body='%d' % value)
-                else:
-                    tag(doc, 'v', body='%s' % value)
-                end_tag(doc, 'c')
         end_tag(doc, 'row')
     end_tag(doc, 'sheetData')
+
+
+def write_cell(doc, worksheet, cell, string_table):
+    coordinate = cell.coordinate
+    attributes = {'r': coordinate}
+    cell_style = worksheet._styles.get(coordinate)
+    if cell_style is not None:
+        attributes['s'] = '%d' % cell_style
+
+    if cell.data_type != cell.TYPE_FORMULA:
+        attributes['t'] = cell.data_type
+
+    value = cell.internal_value
+    if value in ('', None):
+        tag(doc, 'c', attributes)
+    else:
+        start_tag(doc, 'c', attributes)
+        if cell.data_type == cell.TYPE_STRING:
+            tag(doc, 'v', body='%s' % string_table.index(value))
+        elif cell.data_type == cell.TYPE_FORMULA:
+            shared_formula = worksheet.formula_attributes.get(coordinate)
+            if shared_formula is not None:
+                attr = shared_formula
+                if 't' in attr and attr['t'] == 'shared' and 'ref' not in attr:
+                    # Don't write body for shared formula
+                    tag(doc, 'f', attr=attr)
+                else:
+                    tag(doc, 'f', attr=attr, body=value[1:])
+            else:
+                tag(doc, 'f', body=value[1:])
+            tag(doc, 'v')
+        elif cell.data_type in (cell.TYPE_NUMERIC, cell.TYPE_BOOL):
+            tag(doc, 'v', body=safe_string(value))
+        else:
+            tag(doc, 'v', body=value)
+        end_tag(doc, 'c')
+
 
 def write_worksheet_autofilter(doc, worksheet):
     auto_filter = worksheet.auto_filter
@@ -387,7 +380,7 @@ def write_worksheet_hyperlinks(doc, worksheet):
             write_hyperlinks = True
             break
     if write_hyperlinks:
-        start_tag(doc, 'hyperlinks')
+        start_tag(doc, 'hyperlinks', {'xmlns:r':"http://schemas.openxmlformats.org/officeDocument/2006/relationships"})
         for cell in worksheet.get_cell_collection():
             if cell.hyperlink_rel_id is not None:
                 attrs = {'display': cell.hyperlink,
@@ -397,28 +390,22 @@ def write_worksheet_hyperlinks(doc, worksheet):
         end_tag(doc, 'hyperlinks')
 
 
-def write_worksheet_rels(worksheet, drawing_id, comments_id):
-    """Write relationships for the worksheet to xml."""
-    root = Element('{%s}Relationships' % PKG_REL_NS)
-    for rel in worksheet.relationships:
-        attrs = {'Id': rel.id, 'Type': rel.type, 'Target': rel.target}
-        if rel.target_mode:
-            attrs['TargetMode'] = rel.target_mode
-        SubElement(root, '{%s}Relationship' % PKG_REL_NS, attrs)
-    if worksheet._charts or worksheet._images:
-        attrs = {'Id': 'rId1',
-                 'Type': '%s/drawing' % REL_NS,
-                 'Target': '../drawings/drawing%s.xml' % drawing_id}
-        SubElement(root, '{%s}Relationship' % PKG_REL_NS, attrs)
-    if worksheet._comment_count > 0:
-        # there's only one comments sheet per worksheet,
-        # so there's no reason to call the Id rIdx
-        attrs = {'Id': 'comments',
-                 'Type': COMMENTS_NS,
-                 'Target': '../comments%s.xml' % comments_id}
-        SubElement(root, '{%s}Relationship' % PKG_REL_NS, attrs)
-        attrs = {'Id': 'commentsvml',
-                 'Type': VML_NS,
-                 'Target': '../drawings/commentsDrawing%s.vml' % comments_id}
-        SubElement(root, '{%s}Relationship' % PKG_REL_NS, attrs)
-    return get_document_content(root)
+def write_header_footer(doc, worksheet):
+    if worksheet.header_footer.hasHeader() or worksheet.header_footer.hasFooter():
+        start_tag(doc, 'headerFooter')
+        if worksheet.header_footer.hasHeader():
+            tag(doc, 'oddHeader', None, worksheet.header_footer.getHeader())
+        if worksheet.header_footer.hasFooter():
+            tag(doc, 'oddFooter', None, worksheet.header_footer.getFooter())
+        end_tag(doc, 'headerFooter')
+
+
+def write_pagebreaks(doc, worksheet):
+    breaks = worksheet.page_breaks
+    if breaks:
+        start_tag(doc, 'rowBreaks', {'count': str(len(breaks)),
+                                     'manualBreakCount': str(len(breaks))})
+        for b in breaks:
+            tag(doc, 'brk', {'id': str(b), 'man': 'true', 'max': '16383',
+                             'min': '0'})
+        end_tag(doc, 'rowBreaks')

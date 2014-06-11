@@ -1,29 +1,6 @@
 from __future__ import absolute_import
-from openpyxl.comments.comments import Comment
-from openpyxl.writer.comments import CommentWriter
-from openpyxl.writer.worksheet import write_worksheet_rels
 # Copyright (c) 2010-2014 openpyxl
-#
-# Permission is hereby granted, free of charge, to any person obtaining a copy
-# of this software and associated documentation files (the "Software"), to deal
-# in the Software without restriction, including without limitation the rights
-# to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-# copies of the Software, and to permit persons to whom the Software is
-# furnished to do so, subject to the following conditions:
-#
-# The above copyright notice and this permission notice shall be included in
-# all copies or substantial portions of the Software.
-#
-# THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-# IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-# FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-# AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-# LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-# OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
-# THE SOFTWARE.
-#
-# @license: http://www.opensource.org/licenses/mit-license.php
-# @author: see AUTHORS file
+
 
 """Write worksheets to xml representations in an optimized way"""
 
@@ -32,13 +9,20 @@ import os
 from tempfile import NamedTemporaryFile
 
 from openpyxl.compat import OrderedDict, unicode
-
+from openpyxl.comments.comments import Comment
 from openpyxl.cell import  get_column_letter, Cell, TIME_TYPES
+from openpyxl.styles import Style, NumberFormat, DEFAULTS
 from openpyxl.worksheet import Worksheet
+from openpyxl.xml.constants import SHEET_MAIN_NS
 from openpyxl.xml.functions import (
     XMLGenerator,
     start_tag,
-    end_tag, tag
+    end_tag,
+    tag,
+    Element,
+    SubElement,
+    ConditionalElement,
+    tostring
 )
 from openpyxl.date_time import (
     to_excel,
@@ -46,12 +30,14 @@ from openpyxl.date_time import (
     time_to_days
 )
 from openpyxl.xml.constants import MAX_COLUMN, MAX_ROW, PACKAGE_XL
-from openpyxl.units import NUMERIC_TYPES
+from openpyxl.compat.numbers import NUMERIC_TYPES
 from openpyxl.exceptions import WorkbookAlreadySaved
 from openpyxl.writer.excel import ExcelWriter
 from openpyxl.writer.strings import write_string_table
 from openpyxl.writer.styles import StyleWriter
-from openpyxl.styles import Style, NumberFormat, DEFAULTS
+from openpyxl.writer.comments import CommentWriter
+from .relations import write_rels
+from .worksheet import write_worksheet_cols, write_worksheet_format
 
 from openpyxl.xml.constants import (ARC_SHARED_STRINGS, PACKAGE_WORKSHEETS)
 
@@ -177,7 +163,8 @@ class DumpWorksheet(Worksheet):
                 'sqref': 'A1'})
         end_tag(doc, 'sheetView')
         end_tag(doc, 'sheetViews')
-        tag(doc, 'sheetFormatPr', {'defaultRowHeight': '15'})
+        write_worksheet_format(doc, self)
+        write_worksheet_cols(doc, self)
         start_tag(doc, 'sheetData')
 
     def close(self):
@@ -240,7 +227,7 @@ class DumpWorksheet(Worksheet):
                  'spans': '1:%d' % span}
         start_tag(doc, 'row', attrs)
 
-        for col_idx, cell in enumerate(row):
+        for col_idx, cell in enumerate(row, 1):
             style = None
             comment = None
             if cell is None:
@@ -260,7 +247,7 @@ class DumpWorksheet(Worksheet):
                                          cls.__class__.__name__,
                                          ob.__class__.__name__))
 
-            column = get_column_letter(col_idx + 1)
+            column = get_column_letter(col_idx)
             coordinate = '%s%d' % (column, row_idx)
             attributes = {'r': coordinate}
             if comment is not None:
@@ -321,6 +308,7 @@ class DumpCommentWriter(CommentWriter):
 
 
 class ExcelDumpWriter(ExcelWriter):
+
     def __init__(self, workbook):
         self.workbook = workbook
         self.style_writer = StyleWriter(workbook)
@@ -345,9 +333,11 @@ class ExcelDumpWriter(ExcelWriter):
 
             # write comments
             if sheet._comments:
-                archive.writestr(PACKAGE_WORKSHEETS +
-                        '/_rels/sheet%d.xml.rels' % (i + 1),
-                        write_worksheet_rels(sheet, drawing_id, comments_id))
+                rels = write_rels(sheet, drawing_id, comments_id)
+                archive.writestr(
+                    PACKAGE_WORKSHEETS + '/_rels/sheet%d.xml.rels' % (i + 1),
+                    tostring(rels)
+                        )
 
                 cw = DumpCommentWriter(sheet)
                 archive.writestr(PACKAGE_XL + '/comments%d.xml' % comments_id,

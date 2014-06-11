@@ -26,6 +26,8 @@ import sys
 
 VER = sys.version_info
 
+from .numbers import NUMERIC_TYPES
+
 if VER[0] == 3:
     basestring = str
     unicode = str
@@ -43,10 +45,9 @@ else:
 
 
 def safe_string(value):
-    from numbers import Number
     """Safely and consistently format numeric values"""
-    if isinstance(value, Number):
-        value = "%.15g" % value
+    if isinstance(value, NUMERIC_TYPES):
+        value = "%.16g" % value
     elif not isinstance(value, basestring):
         value = str(value)
     return value

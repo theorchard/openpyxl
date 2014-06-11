@@ -1,3 +1,26 @@
+2.1.0 (unreleased)
+==================
+
+Major changes
+-------------
+"read_only" and "write_only" new flags for workbooks
+Support for reading and writing worksheet protection
+Support for reading hidden rows
+
+
+Minor changes
+-------------
+Create all style tags in a single pass
+Performance improvement when appending rows
+Cleaner conversion of Python to Excel values
+
+
+Bug fixes
+---------
+#153 Cannot read visibility of sheets and rows
+#181 No content type for worksheets
+
+
 2.0.4 (unreleased)
 ==================
 
@@ -24,7 +47,6 @@ Updated docs
 
 Bug fixes
 ---------
-
 #319 Cannot load Workbooks with vertAlign styling for fonts
 
 

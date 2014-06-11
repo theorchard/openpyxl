@@ -102,7 +102,7 @@ class SharedStylesParser(object):
             font['u'] = underline.get('val', 'single')
         color = font_node.find('{%s}color' % SHEET_MAIN_NS)
         if color is not None:
-            font['color'] = Color(**dict(color.items()))
+            font['color'] = Color(**dict(color.attrib))
         return Font(**font)
 
     def parse_fills(self):
@@ -122,17 +122,17 @@ class SharedStylesParser(object):
             return self.parse_gradient_fill(gradient)
 
     def parse_pattern_fill(self, node):
-        fill = dict(node.items())
+        fill = dict(node.attrib)
         for child in safe_iterator(node):
             if child is not node:
                 tag = localname(child)
-                fill[tag] = Color(**dict(child.items()))
+                fill[tag] = Color(**dict(child.attrib))
         return PatternFill(**fill)
 
     def parse_gradient_fill(self, node):
-        fill = dict(node.items())
+        fill = dict(node.attrib)
         color_nodes = safe_iterator(node, "{%s}color" % SHEET_MAIN_NS)
-        fill['stop'] = [Color(**dict(node.items())) for node in color_nodes]
+        fill['stop'] = tuple(Color(**dict(node.attrib)) for node in color_nodes)
         return GradientFill(**fill)
 
     def parse_borders(self):
@@ -144,15 +144,15 @@ class SharedStylesParser(object):
 
     def parse_border(self, border_node):
         """Read individual border"""
-        border = dict(border_node.items())
+        border = dict(border_node.attrib)
 
         for side in ('left', 'right', 'top', 'bottom', 'diagonal'):
             node = border_node.find('{%s}%s' % (SHEET_MAIN_NS, side))
             if node is not None:
-                bside = dict(node.items())
+                bside = dict(node.attrib)
                 color = node.find('{%s}color' % SHEET_MAIN_NS)
                 if color is not None:
-                    bside['color'] = Color(**dict(color.items()))
+                    bside['color'] = Color(**dict(color.attrib))
                 border[side] = Side(**bside)
         return Border(**border)
 
@@ -184,16 +184,7 @@ class SharedStylesParser(object):
                 alignment = {}
                 al = cell_xfs_node.find('{%s}alignment' % SHEET_MAIN_NS)
                 if al is not None:
-                    for key in ('horizontal', 'vertical', 'indent'):
-                        _value = al.get(key)
-                        if _value is not None:
-                            alignment[key] = _value
-                    alignment['wrap_text'] = bool(al.get('wrapText'))
-                    alignment['shrink_to_fit'] = bool(al.get('shrinkToFit'))
-                    text_rotation = al.get('textRotation')
-                    if text_rotation is not None:
-                        alignment['text_rotation'] = int(text_rotation)
-                    # ignore justifyLastLine option when horizontal = distributed
+                    alignment = al.attrib
                 _style['alignment'] = Alignment(**alignment)
 
             if bool(cell_xfs_node.get('applyFont')):
@@ -208,10 +199,8 @@ class SharedStylesParser(object):
             if bool(cell_xfs_node.get('applyProtection')):
                 protection = {}
                 prot = cell_xfs_node.find('{%s}protection' % SHEET_MAIN_NS)
-                # Ignore if there are no protection sub-nodes
                 if prot is not None:
-                    protection['locked'] = bool(prot.get('locked'))
-                    protection['hidden'] = bool(prot.get('hidden'))
+                    protection.update(prot.attrib)
                 _style['protection'] = Protection(**protection)
 
             self.style_prop['table'][index] = styles_list.add(Style(**_style))

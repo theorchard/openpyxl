@@ -45,7 +45,7 @@ from openpyxl.date_time import (
     CALENDAR_WINDOWS_1900,
     CALENDAR_MAC_1904
     )
-from openpyxl.namedrange import (
+from openpyxl.workbook.named_range import (
     NamedRange,
     NamedRangeContainingValue,
     split_named_range,
@@ -122,7 +122,7 @@ def read_sheets(archive):
     tree = fromstring(xml_source)
     for element in safe_iterator(tree, '{%s}sheet' % SHEET_MAIN_NS):
         rId = element.get("{%s}id" % REL_NS)
-        yield rId, element.get('name')
+        yield rId, element.get('name'), element.get('state')
 
 
 def detect_worksheets(archive):
@@ -131,52 +131,47 @@ def detect_worksheets(archive):
     # workbook has a list of titles and relIds but no paths
     # workbook_rels has a list of relIds and paths but no titles
     # rels = {'id':{'title':'', 'path':''} }
-    from openpyxl.reader.workbook import read_rels, read_sheets
     content_types = read_content_types(archive)
     valid_sheets = dict((path, ct) for path, ct in content_types if ct == VALID_WORKSHEET)
     rels = dict(read_rels(archive))
-    for rId, title in read_sheets(archive):
+    for rId, title, state in read_sheets(archive):
         rel = rels[rId]
         rel['title'] = title
-        if "/" + rel['path'] in valid_sheets:
+        if state is not None:
+            rel['state'] = state
+        if ("/" + rel['path'] in valid_sheets
+            or "worksheets" in rel['path']): # fallback in case content type is missing
             yield rel
 
 
 def read_named_ranges(xml_source, workbook):
     """Read named ranges, excluding poorly defined ranges."""
+    sheetnames = set(sheet.title for sheet in workbook.worksheets)
     root = fromstring(xml_source)
-    names_root = root.find('{%s}definedNames' %SHEET_MAIN_NS)
-    existing_sheets = workbook.get_sheet_names()
-    if names_root is not None:
-        for name_node in names_root:
-            range_name = name_node.get('name')
-            node_text = name_node.text or ''
-            if bool(name_node.get("hidden", False)):
+    for name_node in safe_iterator(root, '{%s}definedName' %SHEET_MAIN_NS):
+
+        range_name = name_node.get('name')
+        if DISCARDED_RANGES.search(range_name) or BUGGY_NAMED_RANGES.search(range_name):
+            continue
+
+        node_text = name_node.text
+
+        if node_text is None:
+            named_range = NamedRangeContainingValue(range_name, node_text)
+
+        elif refers_to_range(node_text):
+            destinations = split_named_range(node_text)
+            # it can happen that a valid named range references
+            # a missing worksheet, when Excel didn't properly maintain
+            # the named range list
+            destinations = [(workbook[sheet], cells) for sheet, cells in destinations
+                            if sheet in sheetnames]
+            if not destinations:
                 continue
+            named_range = NamedRange(range_name, destinations)
 
-            if DISCARDED_RANGES.search(range_name) or BUGGY_NAMED_RANGES.search(range_name):
-                continue
+        location_id = name_node.get("localSheetId")
+        if location_id is not None:
+            named_range.scope = workbook.worksheets[int(location_id)]
 
-            if refers_to_range(node_text):
-                destinations = split_named_range(node_text)
-
-                new_destinations = []
-                for worksheet_name, cells_range in destinations:
-                    # it can happen that a valid named range references
-                    # a missing worksheet, when Excel didn't properly maintain
-                    # the named range list
-                    #
-                    # we just ignore them here
-                    if worksheet_name in existing_sheets:
-                        worksheet = workbook[worksheet_name]
-                        new_destinations.append((worksheet, cells_range))
-                if not new_destinations:
-                    continue
-                named_range = NamedRange(range_name, new_destinations)
-            else:
-                named_range = NamedRangeContainingValue(range_name, node_text)
-
-            location_id = name_node.get("localSheetId")
-            if location_id:
-                named_range.scope = workbook.worksheets[int(location_id)]
-            yield named_range
+        yield named_range

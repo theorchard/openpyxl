@@ -382,7 +382,7 @@ class TestSequence:
     @pytest.mark.parametrize("value", [list(), tuple()])
     def test_valid_ctor(self, Sequence, value):
         Sequence.value = value
-        assert Sequence.value == value
+        assert Sequence.value == tuple(value)
 
     @pytest.mark.parametrize("value", ["", b"", dict(), 1, None])
     def test_invalid_container(self, Sequence, value):

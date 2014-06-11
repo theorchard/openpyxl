@@ -24,7 +24,7 @@ from __future__ import absolute_import
 
 from openpyxl.compat import iteritems
 from openpyxl.xml.constants import SHEET_MAIN_NS
-from openpyxl.xml.functions import Element, SubElement, get_document_content
+from openpyxl.xml.functions import Element, SubElement, tostring
 from openpyxl.cell import column_index_from_string
 
 vmlns = "urn:schemas-microsoft-com:vml"
@@ -77,7 +77,7 @@ class CommentWriter(object):
             t_tag = SubElement(run_tag, "{%s}t" % SHEET_MAIN_NS)
             t_tag.text = comment.text
 
-        return get_document_content(root)
+        return tostring(root)
 
     def write_comments_vml(self):
         root = Element("xml")
@@ -101,7 +101,7 @@ class CommentWriter(object):
         for i, comment in enumerate(self.comments):
             self._write_comment_shape(root, comment, i)
 
-        return get_document_content(root)
+        return tostring(root)
 
     def _write_comment_shape(self, root, comment, idx):
         # get zero-indexed coordinates of the comment

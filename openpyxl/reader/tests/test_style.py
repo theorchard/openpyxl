@@ -84,7 +84,7 @@ def test_read_pattern_fill(StyleReader, datadir):
 def test_read_gradient_fill(StyleReader, datadir):
     datadir.chdir()
     expected = [
-        GradientFill(degree=90, stop=[Color(theme=0), Color(theme=4)])
+        GradientFill(degree=90, stop=(Color(theme=0), Color(theme=4)))
     ]
     with open("bug284-styles.xml") as src:
         reader = StyleReader(src.read())
