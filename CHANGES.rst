@@ -12,6 +12,8 @@ Support for reading hidden rows
 Minor changes
 -------------
 Create all style tags in a single pass
+Performance improvement when appending rows
+Cleaner conversion of Python to Excel values
 
 
 2.0.3 (unreleased)
