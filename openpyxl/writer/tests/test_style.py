@@ -76,7 +76,7 @@ def test_write_pattern_fill():
     expected = """<?xml version="1.0" ?>
 <styleSheet xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main">
   <patternFill patternType="solid">
-     <fgColor rgb="0000FF00" />
+     <fgColor rgb="00808000" />
   </patternFill>
 </styleSheet>
     """
@@ -238,7 +238,7 @@ class TestStyleWriter(object):
         expected = """<fills count="3">
             <fill>
               <patternFill patternType="solid">
-                <fgColor rgb="0000FF00"></fgColor>
+                <fgColor rgb="00808000"></fgColor>
                </patternFill>
             </fill>
           </fills>
@@ -276,7 +276,7 @@ class TestStyleWriter(object):
               <left />
               <right />
               <top style="thin">
-                <color rgb="0000FF00"></color>
+                <color rgb="00808000"></color>
               </top>
               <bottom />
               <diagonal />
