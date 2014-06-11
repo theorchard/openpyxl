@@ -20,7 +20,7 @@ def reader(optimised):
     for r, row in enumerate(rows):
         for c, col in enumerate(row):
             pass
-    print (r+1)* (c+1), "cells"
+    print((r+1)* (c+1), "cells")
 
 def timer(fn):
     """
@@ -28,19 +28,19 @@ def timer(fn):
     The function is called twice, once using the standard workbook, then with the optimised one.
     Time from the best of three is taken.
     """
-    print "lxml", openpyxl.LXML
+    print("lxml", openpyxl.LXML)
     result = []
     for opt in (False, True,):
-        print "Workbook is {0}".format(opt and "optimised" or "not optimised")
-        times = timeit.repeat("{0}({1})".format(fn.func_name, opt),
-                              setup="from __main__ import {0}".format(fn.func_name),
+        print("Workbook is {0}".format(opt and "optimised" or "not optimised"))
+        times = timeit.repeat("{0}({1})".format(fn.__name__, opt),
+                              setup="from __main__ import {0}".format(fn.__name__),
                               number = 1,
                               repeat = 3
         )
-        print "{0:.2f}s".format(min(times))
+        print("{0:.2f}s".format(min(times)))
         result.append(min(times))
     std, opt = result
-    print "Optimised takes {0:.2%} time\n".format(opt/std)
+    print("Optimised takes {0:.2%} time\n".format(opt/std))
     return std, opt
 
 
