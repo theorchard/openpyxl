@@ -118,14 +118,16 @@ class WorkSheetParser(object):
         if value is not None and value is not '':
             cell = self.ws[coordinate]
             data_type = element.get('t', 'n')
-            if data_type == Cell.TYPE_STRING:
-                value = self.shared_strings[int(value)]
-            elif data_type == Cell.TYPE_BOOL:
-                value = bool(int(value))
-            elif data_type == 'n':
+            if data_type == 'n':
                 cell.value = cell._cast_numeric(value)
                 if self.data_only or formula is None:
+                    # either number or the value only of a formula
                     return
+            if data_type == Cell.TYPE_BOOL:
+                    value = bool(int(value))
+            elif data_type == Cell.TYPE_STRING:
+                value = self.shared_strings[int(value)]
+
             if formula is not None and not self.data_only:
                 if formula.text:
                     value = "=" + formula.text
