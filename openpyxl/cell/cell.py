@@ -336,6 +336,7 @@ class Cell(object):
 
 
     def _cast_datetime(self, value):
+        """Convert Python datetime to Excel and set formatting"""
         if isinstance(value, datetime.date):
             value = to_excel(value, self.base_date)
             self.number_format = NumberFormat.FORMAT_DATE_YYYYMMDD2
