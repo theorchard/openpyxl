@@ -1,3 +1,18 @@
+2.0.4 (unreleased)
+==================
+
+Minor changes
+-------------
+Add a sample file illustrating colours
+
+
+Bug fixes
+---------
+
+#331 DARKYELLOW was incorrect
+Correctly handle extend attribute for fonts
+
+
 2.0.3 (2014-05-22)
 ==================
 
