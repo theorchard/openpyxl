@@ -48,8 +48,5 @@ class TestReference:
         assert missing_values.data_type == 'n'
 
     def test_number_format(self, cell):
-        with pytest.raises(ValueError):
-            cell.number_format = 'YYYY'
         cell.number_format = 'd-mmm'
         assert cell.number_format == 'd-mmm'
-

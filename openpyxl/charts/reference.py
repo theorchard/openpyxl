@@ -66,9 +66,6 @@ class Reference(Strict):
 
     @number_format.setter
     def number_format(self, value):
-        if value is not None:
-            if not is_builtin(value):
-                raise ValueError("Invalid number format")
         self._number_format = value
 
     @property
