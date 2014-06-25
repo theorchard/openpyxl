@@ -5,8 +5,8 @@
 .. moduleauthor:: Eric Gazoni
 
 :Author: Eric Gazoni
-:Source code: http://bitbucket.org/ericgazoni/openpyxl/src
-:Issues: http://bitbucket.org/ericgazoni/openpyxl/issues
+:Source code: http://bitbucket.org/openpyxl/openpyxl/src
+:Issues: http://bitbucket.org/openpyxl/openpyxl/issues
 :Generated: |today|
 :License: MIT/Expat
 :Version: |release|
@@ -32,7 +32,7 @@ How to Contribute Code
 Any help will be greatly appreciated, just follow those steps:
 
     1. Please start a new fork
-    (https://bitbucket.org/ericgazoni/openpyxl/fork) for each independent
+    (https://bitbucket.org/openpyxl/openpyxl/fork) for each independent
     feature, don't try to fix all problems at the same time, it's easier for
     those who will review and merge your changes ;-)
 
@@ -105,7 +105,7 @@ or ::
 
     $ python setup.py install
 
-.. _bitbucket: https://bitbucket.org/ericgazoni/openpyxl/downloads
+.. _bitbucket: https://bitbucket.org/openpyxl/openpyxl/downloads
 .. _lxml: http://lxml.de
 
 .. warning::
@@ -124,11 +124,11 @@ Getting the source
 
 Source code is hosted on bitbucket.org. You can get it using a Mercurial client and the following URLs:
 
-    * $ hg clone \https://bitbucket.org/ericgazoni/openpyxl -r |release|
+    * $ hg clone \https://bitbucket.org/openpyxl/openpyxl -r |release|
 
 or to get the latest development version:
 
-    * $ hg clone \https://bitbucket.org/ericgazoni/openpyxl
+    * $ hg clone \https://bitbucket.org/openpyxl/openpyxl
 
 
 Usage examples
