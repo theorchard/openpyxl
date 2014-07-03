@@ -165,7 +165,8 @@ class DumpWorksheet(Worksheet):
         end_tag(doc, 'sheetViews')
         write_worksheet_format(doc, self)
         write_worksheet_cols(doc, self)
-        start_tag(doc, 'sheetData')
+
+        return doc
 
     def close(self):
         self._close_content()
@@ -323,7 +324,10 @@ class ExcelDumpWriter(ExcelWriter):
         comments_id = 1
 
         for i, sheet in enumerate(self.workbook.worksheets):
-            sheet.write_header()
+            header_doc = sheet.write_header()
+
+            start_tag(header_doc, 'sheetData')
+
             sheet.close()
             archive.write(sheet.filename, PACKAGE_WORKSHEETS + '/sheet%d.xml' % (i + 1))
             for filename in sheet._temp_files:
