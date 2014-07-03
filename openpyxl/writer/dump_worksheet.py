@@ -44,17 +44,21 @@ from openpyxl.xml.constants import (ARC_SHARED_STRINGS, PACKAGE_WORKSHEETS)
 ITERABLES = (list, tuple)
 
 
+DTYPE_DATETIME, DTYPE_STRING, DTYPE_NUMERIC, DTYPE_FORMULA, DTYPE_BOOLEAN \
+    = range(1, 6)
+
 DATETIME_STYLE = Style(number_format=NumberFormat(format_code=NumberFormat.FORMAT_DATE_YYYYMMDD2))
-STYLES = {'datetime': {'type': Cell.TYPE_NUMERIC,
+
+STYLES = {DTYPE_DATETIME: {'type': Cell.TYPE_NUMERIC,
                        'style': DATETIME_STYLE},
-          'string': {'type': Cell.TYPE_STRING,
+          DTYPE_STRING: {'type': Cell.TYPE_STRING,
                      'style': DEFAULTS},
-          'numeric': {'type': Cell.TYPE_NUMERIC,
+          DTYPE_NUMERIC: {'type': Cell.TYPE_NUMERIC,
                       'style': DEFAULTS},
-          'formula': {'type': Cell.TYPE_FORMULA,
+          DTYPE_FORMULA: {'type': Cell.TYPE_FORMULA,
                       'style': DEFAULTS},
-          'boolean': {'type': Cell.TYPE_BOOL,
-                    'style': DEFAULTS},
+          DTYPE_BOOLEAN: {'type': Cell.TYPE_BOOL,
+                      'style': DEFAULTS},
         }
 
 DESCRIPTORS_CACHE_SIZE = 50
@@ -259,11 +263,11 @@ class DumpWorksheet(Worksheet):
                 self._comment_count += 1
 
             if isinstance(cell, bool):
-                dtype = 'boolean'
+                dtype = DTYPE_BOOLEAN
             elif isinstance(cell, NUMERIC_TYPES):
-                dtype = 'numeric'
+                dtype = DTYPE_NUMERIC
             elif isinstance(cell, TIME_TYPES):
-                dtype = 'datetime'
+                dtype = DTYPE_DATETIME
                 if isinstance(cell, datetime.date):
                     cell = to_excel(cell)
                 elif isinstance(cell, datetime.time):
@@ -273,27 +277,30 @@ class DumpWorksheet(Worksheet):
                 if style is None:
                     # allow user-defined style if needed
                     style = STYLES[dtype]['style']
-            elif cell and cell[0] == '=':
-                dtype = 'formula'
+            elif cell.startswith('='):
+                dtype = DTYPE_FORMULA
             else:
-                dtype = 'string'
+                dtype = DTYPE_STRING
                 cell = self._strings.add(unicode(cell))
 
             if style is not None:
                 attributes['s'] = '%d' % self._styles.add(style)
 
-            if dtype != 'formula':
+            if dtype != DTYPE_FORMULA:
                 attributes['t'] = STYLES[dtype]['type']
+
             start_tag(doc, 'c', attributes)
 
-            if dtype == 'formula':
+            if dtype == DTYPE_FORMULA:
                 tag(doc, 'f', body='%s' % cell[1:])
                 tag(doc, 'v')
-            elif dtype == 'boolean':
+            elif dtype == DTYPE_BOOLEAN:
                 tag(doc, 'v', body='%d' % cell)
             else:
                 tag(doc, 'v', body='%s' % cell)
+
             end_tag(doc, 'c')
+
         end_tag(doc, 'row')
 
 
