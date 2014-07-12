@@ -109,41 +109,44 @@ class WorkSheetParser(object):
     def parse_cell(self, element):
         value = element.findtext(self.VALUE_TAG)
         formula = element.find(self.FORMULA_TAG)
+        data_type = element.get('t', 'n')
 
         coordinate = element.get('r')
         style_id = element.get('s')
         if style_id is not None:
             self.ws._styles[coordinate] = self.style_table.get(int(style_id))
 
-        if value is not None or formula is not None:
+        # assign formula to cell value unless only the data is desired
+        if formula is not None and not self.data_only:
+            data_type = 'f'
+            if formula.text:
+                value = "=" + formula.text
+            else:
+                value = "="
+            formula_type = formula.get('t')
+            if formula_type:
+                self.ws.formula_attributes[coordinate] = {'t': formula_type}
+                si = formula.get('si') # Shared group index for shared formulas
+                if si:
+                    self.ws.formula_attributes[coordinate]['si'] = si
+                ref = formula.get('ref') # Range for shared formulas
+                if ref:
+                    self.ws.formula_attributes[coordinate]['ref'] = ref
+
+        if value is not None:
             cell = self.ws[coordinate]
-            data_type = element.get('t', 'n')
             if data_type == 'n':
-                cell.value = cell._cast_numeric(value)
-                if self.data_only or formula is None:
-                    # either number or the value only of a formula
-                    return
-            if data_type == Cell.TYPE_BOOL:
+                value = cell._cast_numeric(value)
+            elif data_type == 'b':
                 value = bool(int(value))
-            elif data_type == Cell.TYPE_STRING and value is not None:
+            elif data_type == 's':
                 value = self.shared_strings[int(value)]
 
-            if formula is not None and not self.data_only:
-                if formula.text:
-                    value = "=" + formula.text
-                else:
-                    value = "="
-                formula_type = formula.get('t')
-                if formula_type:
-                    self.ws.formula_attributes[coordinate] = {'t': formula_type}
-                    if formula.get('si'):  # Shared group index for shared formulas
-                        self.ws.formula_attributes[coordinate]['si'] = formula.get('si')
-                    if formula.get('ref'):  # Range for shared formulas
-                        self.ws.formula_attributes[coordinate]['ref'] = formula.get('ref')
-            if not self.guess_types and formula is None:
-                cell.set_explicit_value(value=value, data_type=data_type)
-            else:
+            if self.guess_types:
                 cell.value = value
+            else:
+                cell.set_explicit_value(value=value, data_type=data_type)
+
 
     def parse_merge(self, element):
         for mergeCell in safe_iterator(element, ('{%s}mergeCell' % SHEET_MAIN_NS)):
