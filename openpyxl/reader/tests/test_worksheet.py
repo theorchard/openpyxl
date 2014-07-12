@@ -19,6 +19,7 @@ def Worksheet(Workbook):
     class DummyWorksheet:
 
         encoding = "utf-8"
+        title = "Dummy"
 
         def __init__(self):
             self.parent = DummyWorkbook()
@@ -117,3 +118,104 @@ def test_formula_without_value(Worksheet, WorkSheetParser):
     parser.parse_cell(element)
     assert ws['A1'].data_type == 'f'
     assert ws['A1'].value == '=IF(TRUE, "y", "n")'
+
+
+def test_formula(Worksheet, WorkSheetParser):
+    ws = Worksheet
+    parser = WorkSheetParser
+
+    src = """
+    <x:c r="A1" t="str" xmlns:x="http://schemas.openxmlformats.org/spreadsheetml/2006/main">
+        <x:f>IF(TRUE, "y", "n")</x:f>
+        <x:v>y</x:v>
+    </x:c>
+    """
+    element = fromstring(src)
+
+    parser.parse_cell(element)
+    assert ws['A1'].data_type == 'f'
+    assert ws['A1'].value == '=IF(TRUE, "y", "n")'
+
+
+def test_formula_data_only(Worksheet, WorkSheetParser):
+    ws = Worksheet
+    parser = WorkSheetParser
+    parser.data_only = True
+
+    src = """
+    <x:c r="A1" xmlns:x="http://schemas.openxmlformats.org/spreadsheetml/2006/main">
+        <x:f>1+2</x:f>
+        <x:v>3</x:v>
+    </x:c>
+    """
+    element = fromstring(src)
+
+    parser.parse_cell(element)
+    assert ws['A1'].data_type == 'n'
+    assert ws['A1'].value == 3
+
+
+def test_string_formula_data_only(Worksheet, WorkSheetParser):
+    ws = Worksheet
+    parser = WorkSheetParser
+    parser.data_only = True
+
+    src = """
+    <x:c r="A1" t="str" xmlns:x="http://schemas.openxmlformats.org/spreadsheetml/2006/main">
+        <x:f>IF(TRUE, "y", "n")</x:f>
+        <x:v>y</x:v>
+    </x:c>
+    """
+    element = fromstring(src)
+
+    parser.parse_cell(element)
+    assert ws['A1'].data_type == 's'
+    assert ws['A1'].value == 'y'
+
+
+def test_number(Worksheet, WorkSheetParser):
+    ws = Worksheet
+    parser = WorkSheetParser
+
+    src = """
+    <x:c r="A1" xmlns:x="http://schemas.openxmlformats.org/spreadsheetml/2006/main">
+        <x:v>1</x:v>
+    </x:c>
+    """
+    element = fromstring(src)
+
+    parser.parse_cell(element)
+    assert ws['A1'].data_type == 'n'
+    assert ws['A1'].value == 1
+
+
+def test_string(Worksheet, WorkSheetParser):
+    ws = Worksheet
+    parser = WorkSheetParser
+
+    src = """
+    <x:c r="A1" t="s" xmlns:x="http://schemas.openxmlformats.org/spreadsheetml/2006/main">
+        <x:v>0</x:v>
+    </x:c>
+    """
+    element = fromstring(src)
+
+    parser.parse_cell(element)
+    assert ws['A1'].data_type == 's'
+    assert ws['A1'].value == "a"
+
+
+def test_boolean(Worksheet, WorkSheetParser):
+    ws = Worksheet
+    parser = WorkSheetParser
+
+    src = """
+    <x:c r="A1" t="b" xmlns:x="http://schemas.openxmlformats.org/spreadsheetml/2006/main">
+        <x:v>1</x:v>
+    </x:c>
+    """
+    element = fromstring(src)
+
+    parser.parse_cell(element)
+    assert ws['A1'].data_type == 'b'
+    assert ws['A1'].value is True
