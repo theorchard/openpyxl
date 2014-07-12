@@ -141,6 +141,8 @@ class WorkSheetParser(object):
                 value = bool(int(value))
             elif data_type == 's':
                 value = self.shared_strings[int(value)]
+            elif data_type in ('str', 'inlineStr'):
+                data_type = 's'
 
             if self.guess_types:
                 cell.value = value
