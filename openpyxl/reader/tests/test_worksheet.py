@@ -111,7 +111,6 @@ def test_formula_without_value(Worksheet, WorkSheetParser):
         <x:f>IF(TRUE, "y", "n")</x:f>
         <x:v />
       </x:c>
-
     """
     element = fromstring(src)
 
