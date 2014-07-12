@@ -218,3 +218,48 @@ class TestBoolean(TestWorksheet):
         assert row[0][0].coordinate == cell
         assert row[0][0].data_type == 'b'
         assert row[0][0].value == expected
+
+
+class TestStyleIter(object):
+
+    def test_read_style_iter(self):
+        '''
+        Test if cell styles are read properly in iter mode.
+        '''
+        import tempfile
+        from openpyxl import Workbook
+        from openpyxl.styles import Style, Font
+
+        FONT_NAME = "Times New Roman"
+        FONT_SIZE = 15
+
+        wb = Workbook()
+        ws = wb.worksheets[0]
+        cell = ws.cell('A1')
+        cell.style = Style(font=Font(name=FONT_NAME, size=FONT_SIZE))
+        #cell.style.font.name = FONT_NAME
+        #cell.style.font.size = FONT_SIZE
+
+        xlsx_file = tempfile.NamedTemporaryFile()
+        wb.save(xlsx_file)
+
+        # Passes as of 1.6.1
+        wb_regular = load_workbook(xlsx_file)
+        ws_regular = wb.worksheets[0]
+        cell_style_regular = ws_regular.cell('A1').style
+        assert cell_style_regular.font.name == FONT_NAME
+        assert cell_style_regular.font.size == FONT_SIZE
+
+        # Fails as of 1.6.1
+        # perhaps not correct
+        # but would work if style_table was not ignored and styles
+        # would still be present in ws_iter._styles
+        wb_iter = load_workbook(xlsx_file, use_iterators=True)
+        ws_iter = wb_iter.worksheets[0]
+
+        style_id = ws_iter['A1'].style_id
+        style = ws_iter.parent.shared_styles[style_id]
+
+
+        assert style.font.name == FONT_NAME
+        assert style.font.size == FONT_SIZE
