@@ -19,6 +19,7 @@ Bug fixes
 ---------
 #153 Cannot read visibility of sheets and rows
 #181 No content type for worksheets
+#341 Cells with formulae do not round-trip
 
 
 2.0.4 (unreleased)
