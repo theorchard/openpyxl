@@ -2,7 +2,7 @@
 
 import pytest
 
-from lxml.etree import iterparse
+from lxml.etree import iterparse, fromstring
 
 from openpyxl.xml.constants import SHEET_MAIN_NS
 from openpyxl.cell import Cell
@@ -25,9 +25,12 @@ def Worksheet(Workbook):
             self.column_dimensions = {}
             self.row_dimensions = {}
             self._styles = {}
+            self.cell = None
 
         def __getitem__(self, value):
-            return Cell(self, 'A', 1)
+            if self.cell is None:
+                self.cell = Cell(self, 'A', 1)
+            return self.cell
 
     return DummyWorksheet()
 
@@ -97,3 +100,21 @@ def test_sheet_protection(datadir, Worksheet, WorkSheetParser):
         'selectLockedCells': '0', 'selectUnlockedCells': '0', 'sheet': '1', 'sort':
         '1'
     }
+
+
+def test_formula_without_value(Worksheet, WorkSheetParser):
+    ws = Worksheet
+    parser = WorkSheetParser
+
+    src = """
+      <x:c r="A1" xmlns:x="http://schemas.openxmlformats.org/spreadsheetml/2006/main">
+        <x:f>IF(TRUE, "y", "n")</x:f>
+        <x:v />
+      </x:c>
+
+    """
+    element = fromstring(src)
+
+    parser.parse_cell(element)
+    assert ws['A1'].data_type == 'f'
+    assert ws['A1'].value == '=IF(TRUE, "y", "n")'

@@ -115,7 +115,7 @@ class WorkSheetParser(object):
         if style_id is not None:
             self.ws._styles[coordinate] = self.style_table.get(int(style_id))
 
-        if value is not None and value is not '':
+        if value is not None or formula is not None:
             cell = self.ws[coordinate]
             data_type = element.get('t', 'n')
             if data_type == 'n':
@@ -124,8 +124,8 @@ class WorkSheetParser(object):
                     # either number or the value only of a formula
                     return
             if data_type == Cell.TYPE_BOOL:
-                    value = bool(int(value))
-            elif data_type == Cell.TYPE_STRING:
+                value = bool(int(value))
+            elif data_type == Cell.TYPE_STRING and value is not None:
                 value = self.shared_strings[int(value)]
 
             if formula is not None and not self.data_only:
