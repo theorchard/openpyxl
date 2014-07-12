@@ -110,7 +110,6 @@ class WorkSheetParser(object):
         value = element.findtext(self.VALUE_TAG)
         formula = element.find(self.FORMULA_TAG)
         data_type = element.get('t', 'n')
-
         coordinate = element.get('r')
         style_id = element.get('s')
         if style_id is not None:
@@ -133,21 +132,27 @@ class WorkSheetParser(object):
                 if ref:
                     self.ws.formula_attributes[coordinate]['ref'] = ref
 
+        cell = self.ws[coordinate]
+
         if value is not None:
-            cell = self.ws[coordinate]
             if data_type == 'n':
                 value = cell._cast_numeric(value)
             elif data_type == 'b':
                 value = bool(int(value))
             elif data_type == 's':
                 value = self.shared_strings[int(value)]
-            elif data_type in ('str', 'inlineStr'):
+            elif data_type == 'str':
                 data_type = 's'
 
-            if self.guess_types:
-                cell.value = value
-            else:
-                cell.set_explicit_value(value=value, data_type=data_type)
+        else:
+            if data_type == 'inlineStr':
+                data_type = 's'
+                value = element.findtext("{%s}is/{%s}t" % (SHEET_MAIN_NS, SHEET_MAIN_NS))
+
+        if self.guess_types:
+            cell.value = value
+        else:
+            cell.set_explicit_value(value=value, data_type=data_type)
 
 
     def parse_merge(self, element):

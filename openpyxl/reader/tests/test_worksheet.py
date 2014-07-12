@@ -16,6 +16,12 @@ def Worksheet(Workbook):
         data_only = False
 
 
+    from openpyxl.styles import NumberFormat
+
+    class DummyStyle:
+        number_format = NumberFormat()
+
+
     class DummyWorksheet:
 
         encoding = "utf-8"
@@ -32,6 +38,9 @@ def Worksheet(Workbook):
             if self.cell is None:
                 self.cell = Cell(self, 'A', 1)
             return self.cell
+
+        def get_style(self, coordinate):
+            return DummyStyle()
 
     return DummyWorksheet()
 
@@ -219,3 +228,17 @@ def test_boolean(Worksheet, WorkSheetParser):
     parser.parse_cell(element)
     assert ws['A1'].data_type == 'b'
     assert ws['A1'].value is True
+
+
+def test_inline_string(Worksheet, WorkSheetParser, datadir):
+    ws = Worksheet
+    parser = WorkSheetParser
+    datadir.chdir()
+
+    with open("Table1-XmlFromAccess.xml") as src:
+        sheet = fromstring(src.read())
+
+    element = sheet.find("{%s}sheetData/{%s}row/{%s}c" % (SHEET_MAIN_NS, SHEET_MAIN_NS, SHEET_MAIN_NS))
+    parser.parse_cell(element)
+    assert ws['A1'].data_type == 's'
+    assert ws['A1'].value == "ID"
