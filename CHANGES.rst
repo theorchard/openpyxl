@@ -19,6 +19,7 @@ Bug fixes
 ---------
 #153 Cannot read visibility of sheets and rows
 #181 No content type for worksheets
+#241 Cannot read sheets with inline strings
 #341 Cells with formulae do not round-trip
 
 
