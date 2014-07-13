@@ -104,7 +104,6 @@ class IterableWorksheet(Worksheet):
         Worksheet.__init__(self, parent_workbook, title)
         self.worksheet_path = worksheet_path
         self.shared_strings = shared_strings
-        self.style_table = style_table
         self.base_date = parent_workbook.excel_base_date
         dimensions = read_dimension(self.xml_source)
         if dimensions is not None:

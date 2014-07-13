@@ -34,10 +34,6 @@ class ReadOnlyCell(object):
         return self.sheet.shared_strings
 
     @property
-    def style_table(self):
-        return self.sheet.style_table
-
-    @property
     def base_date(self):
         return self.sheet.base_date
 
@@ -95,8 +91,7 @@ class ReadOnlyCell(object):
     def style(self):
         if self.style_id is None:
             return Style()
-        idx = self.style_table[self.style_id]
-        return self.sheet.parent.shared_styles[idx]
+        return self.sheet.parent.shared_styles[self.style_id]
 
 
 EMPTY_CELL = ReadOnlyCell(None, None, None, None)
