@@ -237,8 +237,6 @@ class TestStyleIter(object):
         ws = wb.worksheets[0]
         cell = ws.cell('A1')
         cell.style = Style(font=Font(name=FONT_NAME, size=FONT_SIZE))
-        #cell.style.font.name = FONT_NAME
-        #cell.style.font.size = FONT_SIZE
 
         xlsx_file = tempfile.NamedTemporaryFile()
         wb.save(xlsx_file)
@@ -256,10 +254,7 @@ class TestStyleIter(object):
         # would still be present in ws_iter._styles
         wb_iter = load_workbook(xlsx_file, use_iterators=True)
         ws_iter = wb_iter.worksheets[0]
+        cell = ws_iter['A1']
 
-        style_id = ws_iter['A1'].style_id
-        style = ws_iter.parent.shared_styles[style_id]
-
-
-        assert style.font.name == FONT_NAME
-        assert style.font.size == FONT_SIZE
+        assert cell.style.font.name == FONT_NAME
+        assert cell.style.font.size == FONT_SIZE

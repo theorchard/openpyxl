@@ -250,3 +250,6 @@ class IterableWorksheet(Worksheet):
 
     def get_highest_row(self):
         return self.max_row
+
+    def get_style(self, coordinate):
+        raise NotImplementedError("use `cell.style` instead")

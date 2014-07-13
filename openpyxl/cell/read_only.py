@@ -4,7 +4,7 @@ from __future__ import absolute_import
 
 from openpyxl.compat import unicode
 from openpyxl.date_time import from_excel
-from openpyxl.styles import is_date_format
+from openpyxl.styles import is_date_format, Style
 from .cell import Cell, get_column_letter
 
 
@@ -55,8 +55,7 @@ class ReadOnlyCell(object):
     def number_format(self):
         if self.style_id is None:
             return
-        style = self.sheet.parent.shared_styles[self.style_table[self._style_id]]
-        return style.number_format.format_code
+        return self.style.number_format.format_code
 
     @property
     def style_id(self):
@@ -91,5 +90,13 @@ class ReadOnlyCell(object):
         elif self.data_type == Cell.TYPE_NUMERIC:
             value = float(value)
         self._value = value
+
+    @property
+    def style(self):
+        if self.style_id is None:
+            return Style()
+        idx = self.style_table[self.style_id]
+        return self.sheet.parent.shared_styles[idx]
+
 
 EMPTY_CELL = ReadOnlyCell(None, None, None, None)
