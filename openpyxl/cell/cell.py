@@ -202,9 +202,6 @@ class Cell(object):
         self.merged = False
         self._comment = None
 
-    def bool(self, value):
-        return bool(value)
-
     @property
     def encoding(self):
         return self.parent.encoding
