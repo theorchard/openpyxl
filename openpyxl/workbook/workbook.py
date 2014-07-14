@@ -148,6 +148,7 @@ class Workbook(object):
         if self.write_only :
             new_ws = self._optimized_worksheet_class(parent_workbook=self,
                                                       title=title)
+            self._worksheet_class = self._optimized_worksheet_class
         else:
             if title is not None:
                 new_ws = self._worksheet_class(
