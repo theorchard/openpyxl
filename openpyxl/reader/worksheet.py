@@ -113,7 +113,7 @@ class WorkSheetParser(object):
         coordinate = element.get('r')
         style_id = element.get('s')
         if style_id is not None:
-            self.ws._styles[coordinate] = self.style_table.get(int(style_id))
+            self.ws._styles[coordinate] = int(style_id)
 
         # assign formula to cell value unless only the data is desired
         if formula is not None and not self.data_only:
@@ -173,7 +173,7 @@ class WorkSheetParser(object):
                     dim = ColumnDimension(**attrs)
                     self.ws.column_dimensions[column] = dim
                     if dim.style is not None:
-                        self.ws._styles[column] = self.style_table.get(dim.style)
+                        self.ws._styles[column] = dim.style
 
     def parse_row_dimensions(self, row):
         attrs = dict(row.attrib)
@@ -184,7 +184,7 @@ class WorkSheetParser(object):
         if dim.index not in self.ws.row_dimensions:
             self.ws.row_dimensions[dim.index] = dim
         if row.get('customFormat') and dim.style:
-            self.ws._styles[rowId] = self.style_table.get(dim.style)
+            self.ws._styles[rowId] = dim.style
         for cell in safe_iterator(row, self.CELL_TAG):
             self.parse_cell(cell)
 

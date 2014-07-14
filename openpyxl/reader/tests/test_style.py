@@ -95,31 +95,32 @@ def test_read_cell_style(datadir):
     datadir.chdir()
     with open("empty-workbook-styles.xml") as content:
         style_properties = read_style_table(content.read())
-        style_table = style_properties['table']
-        assert len(style_table) == 2
+        #style_table = style_properties['table']
+        assert len(style_properties) == 3
 
 
 def test_read_simple_style_mappings(datadir):
     datadir.chdir()
     with open("simple-styles.xml") as content:
-        style_properties = read_style_table(content.read())
-        style_table = style_properties['table']
-        style_list = style_properties['list']
-        assert len(style_table) == 4
-        assert NumberFormat._BUILTIN_FORMATS[9] == style_list[style_table[1]].number_format
-        assert 'yyyy-mm-dd' == style_list[style_table[2]].number_format
+        style_properties = read_style_table(content.read())[0]
+        #style_table = style_properties['table']
+        #style_list = style_properties['list']
+        assert len(style_properties) == 4
+        assert NumberFormat._BUILTIN_FORMATS[9] == style_properties[1].number_format
+        assert 'yyyy-mm-dd' == style_properties[2].number_format
 
 
 def test_read_complex_style_mappings(datadir):
     datadir.chdir()
     with open("complex-styles.xml") as content:
-        style_properties = read_style_table(content.read())
-        assert style_properties['table'] == {0:0, 1:1, 2:2, 3:3, 4:4, 5:5,
-                                             6:6, 7:7, 8:8, 9:9, 10:10, 11:11,
-                                             12:12, 13:0, 14:13, 15:14, 16:15,
-                                             17:10, 18:16, 19:17, 20:18, 21:19,
-                                             22:0, 23:10, 24:20, 25:21, 26:22,
-                                             27: 23, 28: 24}
+        style_properties = read_style_table(content.read())[0]
+        assert len(style_properties) == 29
+        #assert style_properties['table'] == {0:0, 1:1, 2:2, 3:3, 4:4, 5:5,
+                                             #6:6, 7:7, 8:8, 9:9, 10:10, 11:11,
+                                             #12:12, 13:0, 14:13, 15:14, 16:15,
+                                             #17:10, 18:16, 19:17, 20:18, 21:19,
+                                             #22:0, 23:10, 24:20, 25:21, 26:22,
+                                             #27: 23, 28: 24}
 
 
 def test_read_complex_style(datadir):

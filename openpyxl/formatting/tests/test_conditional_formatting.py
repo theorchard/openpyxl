@@ -770,6 +770,6 @@ def test_parse_dxfs(datadir):
     w._write_dxfs()
     write_xml = get_xml(w._root)
     read_style_prop = read_style_table(write_xml)
-    assert len(read_style_prop['dxf_list']) == len(wb.style_properties['dxf_list'])
-    for i, dxf in enumerate(read_style_prop['dxf_list']):
+    assert len(read_style_prop[2]) == len(wb.style_properties['dxf_list'])
+    for i, dxf in enumerate(read_style_prop[2]):
         assert repr(wb.style_properties['dxf_list'][i] == dxf)
