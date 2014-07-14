@@ -166,7 +166,8 @@ class Cell(object):
                  'xf_index',
                  '_hyperlink_rel',
                  'merged',
-                 '_comment')
+                 '_comment',
+                 '_style_id',)
 
     ERROR_CODES = ('#NULL!',
                    '#DIV/0!',
@@ -201,6 +202,7 @@ class Cell(object):
         self.xf_index = 0
         self.merged = False
         self._comment = None
+        self._style_id = 0
 
     @property
     def encoding(self):
