@@ -428,10 +428,6 @@ class Cell(object):
     def style(self, new_style):
         return self.parent.set_style(self.coordinate, new_style)
 
-    def get_coordinate(self):
-        warnings.warn("cell.get_coordinate() is deprecated use cell.coordinate instead")
-        return self.coordinate
-
     @property
     def coordinate(self):
         """Return the coordinate string for this cell (e.g. 'B12')
@@ -439,11 +435,6 @@ class Cell(object):
         :rtype: string
         """
         return '{1}{0}'.format(self.row, self.column)
-
-    @property
-    def address(self):
-        warnings.warn("cell.address is deprecated, use cell.coordinate instead")
-        return self.coordinate
 
     def offset(self, row=0, column=0):
         """Returns a cell location relative to this cell.
