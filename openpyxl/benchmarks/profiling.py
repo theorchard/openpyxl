@@ -37,6 +37,18 @@ def lxml_writer(ws=None):
     #ws.parent.save("lxml_writer.xlsx")
 
 
+def make_dump_worksheet():
+    wb = Workbook(write_only=True)
+    ws = wb.create_sheet()
+    return ws
+
+def dump_writer(ws=None):
+    if ws is None:
+        ws = make_dump_worksheet()
+    for i in range(1000):
+        ws.append(list(range(100)))
+
+
 COLUMNS = 100
 ROWS = 1000
 BOLD = 1
@@ -93,8 +105,10 @@ cProfile.run("profiling.lxml_writer(ws)", sort="tottime")
 if __name__ == '__main__':
     import cProfile
     ws = make_worksheet()
-    cProfile.run("make_worksheet()", sort="tottime")
-    #cProfile.run("sax_writer(ws)", sort="tottime")
+    #cProfile.run("make_worksheet()", sort="tottime")
+    cProfile.run("sax_writer(ws)", sort="tottime")
     #cProfile.run("lxml_writer(ws)", sort="tottime")
     #generate_format_data()
     #cProfile.run("styled_sheet()", sort="tottime")
+    #ws = make_dump_worksheet()
+    #cProfile.run("dump_writer(ws)", sort="tottime")
