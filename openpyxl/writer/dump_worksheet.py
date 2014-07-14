@@ -100,7 +100,7 @@ class DumpWorksheet(Worksheet):
         self._fileobj_name = create_temporary_file()
 
         self._strings = self._parent.shared_strings
-        self._styles = self.parent.shared_styles
+        self._styles = self._parent.shared_styles
         self._comments = []
 
     def get_temporary_file(self, filename):
