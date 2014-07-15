@@ -190,6 +190,7 @@ class Cell(object):
                    TYPE_NULL, TYPE_INLINE, TYPE_ERROR, TYPE_FORMULA_CACHE_STRING)
 
     def __init__(self, worksheet, column, row, value=None):
+        self._style_id = 0
         self.column = column.upper()
         self.row = row
         # _value is the stored value, while value is the displayed value
@@ -202,7 +203,6 @@ class Cell(object):
         self.xf_index = 0
         self.merged = False
         self._comment = None
-        self._style_id = 0
 
     @property
     def encoding(self):
