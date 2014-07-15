@@ -22,6 +22,7 @@ from __future__ import absolute_import
 # @license: http://www.opensource.org/licenses/mit-license.php
 # @author: see AUTHORS file
 
+from openpyxl.collections import IndexedList
 from openpyxl.compat import iteritems
 from openpyxl.xml.constants import SHEET_MAIN_NS
 from openpyxl.xml.functions import Element, SubElement, tostring
@@ -34,24 +35,22 @@ excelns = "urn:schemas-microsoft-com:office:excel"
 
 class CommentWriter(object):
 
-    def sheet_comments(self, sheet):
-        for _coord, cell in iteritems(sheet._cells):
+    def extract_comments(self):
+        """
+         extract list of comments and authors
+         """
+        for _coord, cell in iteritems(self.sheet._cells):
             if cell.comment is not None:
-                yield cell.comment
+                self.authors.add(cell.comment.author)
+                self.comments.append(cell.comment)
 
     def __init__(self, sheet):
         self.sheet = sheet
+        self.authors = IndexedList()
+        self.comments = []
 
-        # get list of comments
-        self.comments = list(self.sheet_comments(sheet))
+        self.extract_comments()
 
-        # get list of authors
-        self.authors = []
-        self.author_to_id = {}
-        for comment in self.comments:
-            if comment.author not in self.author_to_id:
-                self.author_to_id[comment.author] = str(len(self.authors))
-                self.authors.append(comment.author)
 
     def write_comments(self):
         # produce xml
@@ -64,7 +63,7 @@ class CommentWriter(object):
         commentlist_tag = SubElement(root, "{%s}commentList" % SHEET_MAIN_NS)
         for comment in self.comments:
             attrs = {'ref': comment._parent.coordinate,
-                     'authorId': self.author_to_id[comment.author],
+                     'authorId': '%d' % self.authors.index(comment.author),
                      'shapeId': '0'}
             comment_tag = SubElement(commentlist_tag,
                                      "{%s}comment" % SHEET_MAIN_NS, attrs)

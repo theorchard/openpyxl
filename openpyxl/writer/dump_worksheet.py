@@ -293,8 +293,11 @@ def save_dump(workbook, filename):
 
 
 class DumpCommentWriter(CommentWriter):
-    def sheet_comments(self, sheet):
-        return sheet._comments
+    def extract_comments(self):
+        for comment in self.sheet._comments:
+            if comment is not None:
+                self.authors.add(comment.author)
+                self.comments.append(comment)
 
 
 class ExcelDumpWriter(ExcelWriter):

@@ -45,9 +45,6 @@ def test_comment_writer_init():
     ws, comment1, comment2, comment3 = _create_ws()
     cw = CommentWriter(ws)
     assert set(cw.authors) == set(["author", "author2", "author3"])
-    assert cw.author_to_id[cw.authors[0]] == "0"
-    assert cw.author_to_id[cw.authors[1]] == "1"
-    assert cw.author_to_id[cw.authors[2]] == "2"
     assert set(cw.comments) == set([comment1, comment2, comment3])
 
 def test_write_comments(datadir):
