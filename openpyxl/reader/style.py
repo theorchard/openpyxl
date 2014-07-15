@@ -160,7 +160,6 @@ class SharedStylesParser(object):
     def parse_cell_xfs(self):
         """Read styles from the shared style table"""
         cell_xfs = self.root.find('{%s}cellXfs' % SHEET_MAIN_NS)
-        #styles_list = self.style_prop['list']
         _styles  = []
 
         if cell_xfs is None:  # can happen on bad OOXML writers (e.g. Gnumeric)
@@ -206,9 +205,7 @@ class SharedStylesParser(object):
                 _style['protection'] = Protection(**protection)
             _styles.append(Style(**_style))
 
-
         self.shared_styles = IndexedList(_styles)
-            #self.style_prop['table'][index] = styles_list.add(Style(**_style))
 
 
 def read_style_table(xml_source):
