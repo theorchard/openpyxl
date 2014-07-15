@@ -274,6 +274,16 @@ class DumpWorksheet(Worksheet):
             end_tag(doc, 'c')
 
 
+def removed_method(*args, **kw):
+    raise NotImplementedError
+
+setattr(DumpWorksheet, '__getitem__', removed_method)
+setattr(DumpWorksheet, '__setitem__', removed_method)
+setattr(DumpWorksheet, 'cell', removed_method)
+setattr(DumpWorksheet, 'range', removed_method)
+setattr(DumpWorksheet, 'merge_cells', removed_method)
+
+
 def save_dump(workbook, filename):
     writer = ExcelDumpWriter(workbook)
     writer.save(filename)

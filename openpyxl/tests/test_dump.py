@@ -195,3 +195,13 @@ def test_dump_with_comment():
     wb2 = load_workbook(test_filename)
     ws2 = wb2[ws.title]
     assert ws2['A1'].comment.text == 'hello world'
+
+@pytest.mark.parametrize("method", [
+    '__getitem__', '__setitem__', 'cell', 'range', 'merge_cells']
+                         )
+def test_illegal_method(method):
+    wb = Workbook(write_only=True)
+    ws = wb.create_sheet()
+    fn = getattr(ws, method)
+    with pytest.raises(NotImplementedError):
+        fn()
