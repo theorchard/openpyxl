@@ -35,17 +35,15 @@ excelns = "urn:schemas-microsoft-com:office:excel"
 class CommentWriter(object):
 
     def sheet_comments(self, sheet):
-        comments = []
         for _coord, cell in iteritems(sheet._cells):
             if cell.comment is not None:
-                comments.append(cell.comment)
-        return comments
+                yield cell.comment
 
     def __init__(self, sheet):
         self.sheet = sheet
 
         # get list of comments
-        self.comments = self.sheet_comments(sheet)
+        self.comments = list(self.sheet_comments(sheet))
 
         # get list of authors
         self.authors = []
