@@ -194,7 +194,7 @@ class Cell(object):
         self._style_id = 0
         self.column = column.upper()
         self.row = row
-        self.coordinate = '{1}{0}'.format(self.row, self.column)
+        self.coordinate = '%s%d' % (self.column, self.row)
         # _value is the stored value, while value is the displayed value
         self._value = None
         self._hyperlink_rel = None
@@ -493,16 +493,18 @@ class Cell(object):
 
     @comment.setter
     def comment(self, value):
-        if value is not None and value._parent is not None and value is not self.comment:
+        if value is None:
+            return
+        if value._parent is not None and value is not self.comment:
             raise AttributeError(
                 "Comment already assigned to %s in worksheet %s. Cannot assign a comment to more than one cell" %
                 (value._parent.coordinate, value._parent.parent.title)
                 )
 
         # Ensure the number of comments for the parent worksheet is up-to-date
-        if value is None and self._comment is not None:
+        if self._comment is not None:
             self.parent._comment_count -= 1
-        if value is not None and self._comment is None:
+        if self._comment is None:
             self.parent._comment_count += 1
 
         # orphan the old comment
