@@ -160,14 +160,17 @@ def test_datetime(value):
 
 
 def test_dump_with_font():
+    from openpyxl.cell.write_only import WriteOnlyCell
     test_filename = _get_test_filename()
 
     wb = Workbook(optimized_write=True)
     ws = wb.create_sheet()
     user_style = Style(font=Font(name='Courrier', size=36))
-    complex_cell = {'value': 'hello',
-                    'style': user_style}
-    ws.append([complex_cell, 3.14, None])
+    cell = WriteOnlyCell(ws, value='hello')
+    cell.style = Style(font=Font(name='Courrier', size=36))
+
+    ws.append([cell, 3.14, None])
+    assert user_style in wb.shared_styles
     wb.save(test_filename)
 
     wb2 = load_workbook(test_filename)
@@ -176,33 +179,19 @@ def test_dump_with_font():
 
 
 def test_dump_with_comment():
+    from openpyxl.cell.write_only import WriteOnlyCell
     test_filename = _get_test_filename()
 
     wb = Workbook(optimized_write=True)
     ws = wb.create_sheet()
-    user_comment = Comment(text='hello world',
-                           author='me')
-    complex_cell = {'value': 'hello',
-                    'comment': user_comment}
-    ws.append([complex_cell, 3.14, None])
+    user_comment = Comment(text='hello world', author='me')
+    cell = WriteOnlyCell(ws, value="hello")
+    cell.comment = user_comment
+
+    ws.append([cell, 3.14, None])
+    assert user_comment in ws._comments
     wb.save(test_filename)
 
     wb2 = load_workbook(test_filename)
     ws2 = wb2[ws.title]
     assert ws2['A1'].comment.text == 'hello world'
-
-
-def test_dump_bad_style():
-    wb = Workbook(optimized_write=True)
-    ws = wb.create_sheet()
-    with pytest.raises(TypeError):
-        ws.append([{'value': 'hello', 'style': 'world'}, 3.14, None])
-
-
-def test_style():
-    from openpyxl.styles import Font, Style
-    wb = Workbook(optimized_write=True)
-    ws = wb.create_sheet()
-    new_style = Style(font=Font(bold=True))
-    ws.append([{'value':'hello', 'style':new_style}])
-    assert new_style in wb.shared_styles

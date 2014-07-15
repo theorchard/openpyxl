@@ -206,7 +206,7 @@ class DumpWorksheet(Worksheet):
         :type row: iterable
         """
         doc = self._get_content_generator()
-        cell = WriteOnlyCell(self, 'A', 1) # singleton
+        cell = WriteOnlyCell(self) # singleton
 
         self._max_row += 1
         span = len(row)
@@ -217,38 +217,26 @@ class DumpWorksheet(Worksheet):
         start_tag(doc, 'row', attrs)
 
         for col_idx, value in enumerate(row, 1):
-            style = None
-            comment = None
             if value is None:
                 continue
-            elif isinstance(value, dict):
-                dct = value
-                value = dct.get('value')
-                if value is None:
-                    continue
-                style = dct.get('style')
-                comment = dct.get('comment')
-                for ob, attr, cls in ((style, 'style', Style),
-                                      (comment, 'comment', Comment)):
-                    if ob is not None and not isinstance(ob, cls):
-                        raise TypeError('%s should be a %s not a %s' %
-                                        (attr,
-                                         cls.__class__.__name__,
-                                         ob.__class__.__name__))
-
+            dirty_cell = False
             column = get_column_letter(col_idx)
 
-            cell.style_id = 0
-            cell.value = value
+            if isinstance(value, WriteOnlyCell):
+                cell = value
+                dirty_cell = True # cell may have other properties than a value
+            else:
+                cell.value = value
+
             cell.coordinate = '%s%d' % (column, row_idx)
-            if comment is not None:
+            if cell.comment is not None:
+                comment = cell.comment
                 comment._parent = CommentParentCell(cell)
                 self._comments.append(comment)
-                self._comment_count += 1
-            if style is not None:
-                cell.style = style
 
             self.write_cell(doc, cell)
+            if dirty_cell:
+                cell = WriteOnlyCell()
         end_tag(doc, 'row')
 
     def write_cell(self, doc, cell):
