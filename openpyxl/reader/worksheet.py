@@ -149,7 +149,7 @@ class WorkSheetParser(object):
                 data_type = 's'
                 value = element.findtext("{%s}is/{%s}t" % (SHEET_MAIN_NS, SHEET_MAIN_NS))
 
-        if self.guess_types:
+        if self.guess_types or value is None:
             cell.value = value
         else:
             cell.set_explicit_value(value=value, data_type=data_type)
