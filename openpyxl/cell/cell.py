@@ -160,6 +160,7 @@ class Cell(object):
     """
     __slots__ = ('column',
                  'row',
+                 'coordinate',
                  '_value',
                  'data_type',
                  'parent',
@@ -193,6 +194,7 @@ class Cell(object):
         self._style_id = 0
         self.column = column.upper()
         self.row = row
+        self.coordinate = '{1}{0}'.format(self.row, self.column)
         # _value is the stored value, while value is the displayed value
         self._value = None
         self._hyperlink_rel = None
@@ -429,14 +431,6 @@ class Cell(object):
     @style.setter
     def style(self, new_style):
         return self.parent.set_style(self.coordinate, new_style)
-
-    @property
-    def coordinate(self):
-        """Return the coordinate string for this cell (e.g. 'B12')
-
-        :rtype: string
-        """
-        return '{1}{0}'.format(self.row, self.column)
 
     def offset(self, row=0, column=0):
         """Returns a cell location relative to this cell.
