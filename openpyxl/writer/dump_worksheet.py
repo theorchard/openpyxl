@@ -10,7 +10,8 @@ from tempfile import NamedTemporaryFile
 
 from openpyxl.compat import OrderedDict, unicode
 from openpyxl.comments.comments import Comment
-from openpyxl.cell import  get_column_letter, Cell, TIME_TYPES
+from openpyxl.cell import get_column_letter, Cell, TIME_TYPES
+from openpyxl.cell.write_only import WriteOnlyCell
 from openpyxl.styles import Style, NumberFormat, DEFAULTS
 from openpyxl.worksheet import Worksheet
 from openpyxl.xml.constants import SHEET_MAIN_NS
@@ -30,6 +31,7 @@ from openpyxl.date_time import (
     time_to_days
 )
 from openpyxl.xml.constants import MAX_COLUMN, MAX_ROW, PACKAGE_XL
+from openpyxl.compat import safe_string
 from openpyxl.compat.numbers import NUMERIC_TYPES
 from openpyxl.exceptions import WorkbookAlreadySaved
 from openpyxl.writer.excel import ExcelWriter
@@ -253,55 +255,51 @@ class DumpWorksheet(Worksheet):
                                          ob.__class__.__name__))
 
             column = get_column_letter(col_idx)
-            coordinate = '%s%d' % (column, row_idx)
-            attributes = {'r': coordinate}
+            cell = WriteOnlyCell(self, column, row_idx, value=cell)
             if comment is not None:
-                comment._parent = CommentParentCell(coordinate,
-                                                    row_idx,
-                                                    column)
+
+                comment._parent = cell
                 self._comments.append(comment)
                 self._comment_count += 1
-
-            if isinstance(cell, bool):
-                dtype = DTYPE_BOOLEAN
-            elif isinstance(cell, NUMERIC_TYPES):
-                dtype = DTYPE_NUMERIC
-            elif isinstance(cell, TIME_TYPES):
-                dtype = DTYPE_DATETIME
-                if isinstance(cell, datetime.date):
-                    cell = to_excel(cell)
-                elif isinstance(cell, datetime.time):
-                    cell = time_to_days(cell)
-                elif isinstance(cell, datetime.timedelta):
-                    cell = timedelta_to_days(cell)
-                if style is None:
-                    # allow user-defined style if needed
-                    style = STYLES[dtype]['style']
-            elif cell.startswith('='):
-                dtype = DTYPE_FORMULA
-            else:
-                dtype = DTYPE_STRING
-                cell = self._strings.add(unicode(cell))
-
             if style is not None:
-                attributes['s'] = '%d' % self._styles.add(style)
+                cell.style = style
 
-            if dtype != DTYPE_FORMULA:
-                attributes['t'] = STYLES[dtype]['type']
-
-            start_tag(doc, 'c', attributes)
-
-            if dtype == DTYPE_FORMULA:
-                tag(doc, 'f', body='%s' % cell[1:])
-                tag(doc, 'v')
-            elif dtype == DTYPE_BOOLEAN:
-                tag(doc, 'v', body='%d' % cell)
-            else:
-                tag(doc, 'v', body='%s' % cell)
-
-            end_tag(doc, 'c')
-
+            self.write_cell(doc, cell)
         end_tag(doc, 'row')
+
+    def write_cell(self, doc, cell):
+        coordinate = cell.coordinate
+        attributes = {'r': coordinate}
+        if cell._style_id != 0:
+            attributes['s'] = '%d' % cell._style_id
+
+        if cell.data_type != cell.TYPE_FORMULA:
+            attributes['t'] = cell.data_type
+
+        value = cell.internal_value
+        if value in ('', None):
+            tag(doc, 'c', attributes)
+        else:
+            start_tag(doc, 'c', attributes)
+            if cell.data_type == cell.TYPE_STRING:
+                tag(doc, 'v', body='%s' % self._strings.add(value))
+            elif cell.data_type == cell.TYPE_FORMULA:
+                shared_formula = self.formula_attributes.get(coordinate)
+                if shared_formula is not None:
+                    attr = shared_formula
+                    if 't' in attr and attr['t'] == 'shared' and 'ref' not in attr:
+                        # Don't write body for shared formula
+                        tag(doc, 'f', attr=attr)
+                    else:
+                        tag(doc, 'f', attr=attr, body=value[1:])
+                else:
+                    tag(doc, 'f', body=value[1:])
+                tag(doc, 'v')
+            elif cell.data_type in (cell.TYPE_NUMERIC, cell.TYPE_BOOL):
+                tag(doc, 'v', body=safe_string(value))
+            else:
+                tag(doc, 'v', body=value)
+            end_tag(doc, 'c')
 
 
 def save_dump(workbook, filename):
