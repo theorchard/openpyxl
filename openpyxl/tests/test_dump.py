@@ -205,3 +205,12 @@ def test_illegal_method(method):
     fn = getattr(ws, method)
     with pytest.raises(NotImplementedError):
         fn()
+
+def test_save_empty_workbook():
+    fn = _get_test_filename()
+
+    wb = Workbook(write_only=True)
+    wb.save(fn)
+
+    wb = load_workbook(fn)
+    assert len(wb.worksheets) == 1

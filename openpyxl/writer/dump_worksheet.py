@@ -285,6 +285,8 @@ setattr(DumpWorksheet, 'merge_cells', removed_method)
 
 
 def save_dump(workbook, filename):
+    if workbook.worksheets == []:
+        workbook.create_sheet()
     writer = ExcelDumpWriter(workbook)
     writer.save(filename)
     return True
