@@ -22,13 +22,12 @@ from openpyxl.styles.fills import GradientFill, PatternFill
 class StyleWriter(object):
 
     def __init__(self, workbook):
-        self.workbook = workbook
-        self._style_properties = workbook.style_properties
+        self.wb = workbook
         self._root = Element('styleSheet', {'xmlns': SHEET_MAIN_NS})
 
     @property
     def styles(self):
-        return self.workbook.shared_styles
+        return self.wb.shared_styles
 
     def write_table(self):
         number_format_node = SubElement(self._root, 'numFmts')
@@ -249,9 +248,9 @@ class StyleWriter(object):
             {'name':"Normal", 'xfId':"0", 'builtinId':"0"})
 
     def _write_dxfs(self):
-        if self._style_properties and 'dxf_list' in self._style_properties:
-            dxfs = SubElement(self._root, 'dxfs', {'count': str(len(self._style_properties['dxf_list']))})
-            for d in self._style_properties['dxf_list']:
+        if self.wb.style_properties and 'dxf_list' in self.wb.style_properties:
+            dxfs = SubElement(self._root, 'dxfs', {'count': str(len(self.wb.style_properties['dxf_list']))})
+            for d in self.wb.style_properties['dxf_list']:
                 dxf = SubElement(dxfs, 'dxf')
                 if 'font' in d and d['font'] is not None:
                     font_node = SubElement(dxf, 'font')
