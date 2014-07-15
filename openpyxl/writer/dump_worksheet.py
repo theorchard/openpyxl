@@ -32,7 +32,6 @@ from openpyxl.date_time import (
 )
 from openpyxl.xml.constants import MAX_COLUMN, MAX_ROW, PACKAGE_XL
 from openpyxl.compat import safe_string
-from openpyxl.compat.numbers import NUMERIC_TYPES
 from openpyxl.exceptions import WorkbookAlreadySaved
 from openpyxl.writer.excel import ExcelWriter
 from openpyxl.writer.strings import write_string_table
@@ -43,25 +42,6 @@ from .worksheet import write_worksheet_cols, write_worksheet_format
 
 from openpyxl.xml.constants import (ARC_SHARED_STRINGS, PACKAGE_WORKSHEETS)
 
-ITERABLES = (list, tuple)
-
-
-DTYPE_DATETIME, DTYPE_STRING, DTYPE_NUMERIC, DTYPE_FORMULA, DTYPE_BOOLEAN \
-    = range(1, 6)
-
-DATETIME_STYLE = Style(number_format=NumberFormat(format_code=NumberFormat.FORMAT_DATE_YYYYMMDD2))
-
-STYLES = {DTYPE_DATETIME: {'type': Cell.TYPE_NUMERIC,
-                       'style': DATETIME_STYLE},
-          DTYPE_STRING: {'type': Cell.TYPE_STRING,
-                     'style': DEFAULTS},
-          DTYPE_NUMERIC: {'type': Cell.TYPE_NUMERIC,
-                      'style': DEFAULTS},
-          DTYPE_FORMULA: {'type': Cell.TYPE_FORMULA,
-                      'style': DEFAULTS},
-          DTYPE_BOOLEAN: {'type': Cell.TYPE_BOOL,
-                      'style': DEFAULTS},
-        }
 
 DESCRIPTORS_CACHE_SIZE = 50
 BOUNDING_BOX_PLACEHOLDER = 'A1:%s%d' % (get_column_letter(MAX_COLUMN), MAX_ROW)
@@ -70,10 +50,10 @@ BOUNDING_BOX_PLACEHOLDER = 'A1:%s%d' % (get_column_letter(MAX_COLUMN), MAX_ROW)
 class CommentParentCell(object):
     __slots__ = ('coordinate', 'row', 'column')
 
-    def __init__(self, coordinate, row, column):
-        self.coordinate = coordinate
-        self.row = row
-        self.column = column
+    def __init__(self, cell):
+        self.coordinate = cell.coordinate
+        self.row = cell.row
+        self.column = cell.column
 
 
 def create_temporary_file(suffix=''):
@@ -226,6 +206,8 @@ class DumpWorksheet(Worksheet):
         :type row: iterable
         """
         doc = self._get_content_generator()
+        cell = WriteOnlyCell(self, 'A', 1) # singleton
+
         self._max_row += 1
         span = len(row)
         self._max_col = max(self._max_col, span)
@@ -234,15 +216,15 @@ class DumpWorksheet(Worksheet):
                  'spans': '1:%d' % span}
         start_tag(doc, 'row', attrs)
 
-        for col_idx, cell in enumerate(row, 1):
+        for col_idx, value in enumerate(row, 1):
             style = None
             comment = None
-            if cell is None:
+            if value is None:
                 continue
-            elif isinstance(cell, dict):
-                dct = cell
-                cell = dct.get('value')
-                if cell is None:
+            elif isinstance(value, dict):
+                dct = value
+                value = dct.get('value')
+                if value is None:
                     continue
                 style = dct.get('style')
                 comment = dct.get('comment')
@@ -255,10 +237,12 @@ class DumpWorksheet(Worksheet):
                                          ob.__class__.__name__))
 
             column = get_column_letter(col_idx)
-            cell = WriteOnlyCell(self, column, row_idx, value=cell)
-            if comment is not None:
 
-                comment._parent = cell
+            cell.style_id = 0
+            cell.value = value
+            cell.coordinate = '%s%d' % (column, row_idx)
+            if comment is not None:
+                comment._parent = CommentParentCell(cell)
                 self._comments.append(comment)
                 self._comment_count += 1
             if style is not None:
