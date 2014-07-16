@@ -144,7 +144,7 @@ class DataValidation(object):
         self.formula1 = str(formula1)
         self.formula2 = str(formula2)
         self.allow_blank = allow_blank
-        self.attr_map = {}
+        self.attr_map = attr_map or {}
         self.cells = []
         self.ranges = []
 
