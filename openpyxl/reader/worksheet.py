@@ -163,7 +163,7 @@ class WorkSheetParser(object):
         if dim.index not in self.ws.row_dimensions:
             self.ws.row_dimensions[dim.index] = dim
         if row.get('customFormat') and dim.style:
-            self.ws._styles[rowId] = dim.style
+            self.ws._styles[dim.index] = dim.style
         for cell in safe_iterator(row, self.CELL_TAG):
             self.parse_cell(cell)
 
