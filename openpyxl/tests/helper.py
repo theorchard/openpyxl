@@ -35,7 +35,7 @@ from lxml.doctestcompare import LXMLOutputChecker, PARSE_XML
 from openpyxl.xml.functions import ElementTree
 
 # constants
-DATADIR = os.path.abspath(os.path.join(os.path.dirname(__file__), 'test_data'))
+DATADIR = os.path.abspath(os.path.join(os.path.dirname(__file__), 'data'))
 TMPDIR = os.path.join(gettempdir(), 'openpyxl_test_temp')
 
 

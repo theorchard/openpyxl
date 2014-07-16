@@ -28,5 +28,5 @@ def datadir():
     import os
     from py._path.local import LocalPath
     here = os.path.split(__file__)[0]
-    DATADIR = os.path.join(here, "test_data")
+    DATADIR = os.path.join(here, "data")
     return LocalPath(DATADIR)
