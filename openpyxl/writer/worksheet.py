@@ -251,9 +251,8 @@ def write_worksheet_conditional_formatting(doc, worksheet):
         end_tag(doc, 'conditionalFormatting')
 
 
-def write_worksheet_data(doc, worksheet, string_table, style_table=None):
-    """Write worksheet data to xml."""
-
+def get_rows_to_write(worksheet):
+    """Return all rows, and any cells that they contain"""
     # Ensure a blank cell exists if it has a style
     for styleCoord in iterkeys(worksheet._styles):
         if isinstance(styleCoord, str) and COORD_RE.search(styleCoord):
@@ -264,9 +263,18 @@ def write_worksheet_data(doc, worksheet, string_table, style_table=None):
     for cell in itervalues(worksheet._cells):
         cells_by_row.setdefault(cell.row, []).append(cell)
 
+    # make sure rows that only have a height set are returned
     for row_idx in worksheet.row_dimensions:
         if row_idx not in cells_by_row:
             cells_by_row[row_idx] = []
+
+    return cells_by_row
+
+
+def write_worksheet_data(doc, worksheet, string_table, style_table=None):
+    """Write worksheet data to xml."""
+
+    cells_by_row = get_rows_to_write(worksheet)
 
     start_tag(doc, 'sheetData')
     for row_idx in sorted(cells_by_row):
