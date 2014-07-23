@@ -13,6 +13,7 @@ Minor changes
 Create all style tags in a single pass
 Performance improvement when appending rows
 Cleaner conversion of Python to Excel values
+PR6 reserve formatting for empty rows
 
 
 Bug fixes
