@@ -10,7 +10,6 @@ import pytest
 from openpyxl.xml.functions import XMLGenerator, tostring
 from openpyxl import Workbook
 
-from .. strings import create_string_table
 from .. styles import StyleWriter
 from .. worksheet import write_worksheet
 
@@ -393,6 +392,13 @@ def test_write_cell(out, doc, worksheet, value, expected):
     diff = compare_xml(xml, expected)
     assert diff is None, diff
 
+def test_write_cell_string(out, doc, worksheet):
+    from .. worksheet import write_cell
+
+    ws = worksheet
+    ws['A1'] = "Hello"
+    write_cell(doc, ws, ws['A1'], None)
+    assert ws.parent.shared_strings == ["Hello"]
 
 def test_write_sheetdata(out, doc, worksheet):
     from .. worksheet import write_worksheet_data

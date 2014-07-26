@@ -31,17 +31,6 @@ from openpyxl.xml.functions import start_tag, end_tag, tag, XMLGenerator
 from openpyxl.collections import IndexedList
 
 
-def create_string_table(workbook):
-    """Compile the string table for a workbook."""
-
-    strings = set()
-    for sheet in workbook.worksheets:
-        for cell in itervalues(sheet._cells):
-            if cell.data_type == cell.TYPE_STRING and cell._value is not None:
-                strings.add(cell.value)
-    return IndexedList(sorted(strings))
-
-
 def write_string_table(string_table):
     """Write the string table xml."""
     temp_buffer = BytesIO()

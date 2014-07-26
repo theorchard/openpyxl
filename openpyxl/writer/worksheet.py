@@ -295,6 +295,7 @@ def write_worksheet_data(doc, worksheet, string_table, style_table=None):
 
 
 def write_cell(doc, worksheet, cell, string_table):
+    string_table = worksheet.parent.shared_strings
     coordinate = cell.coordinate
     attributes = {'r': coordinate}
     cell_style = worksheet._styles.get(coordinate)
@@ -310,7 +311,8 @@ def write_cell(doc, worksheet, cell, string_table):
     else:
         start_tag(doc, 'c', attributes)
         if cell.data_type == cell.TYPE_STRING:
-            tag(doc, 'v', body='%s' % string_table.index(value))
+            idx = string_table.add(value)
+            tag(doc, 'v', body='%s' % idx)
         elif cell.data_type == cell.TYPE_FORMULA:
             shared_formula = worksheet.formula_attributes.get(coordinate)
             if shared_formula is not None:

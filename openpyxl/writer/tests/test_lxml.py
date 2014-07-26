@@ -59,6 +59,15 @@ def test_write_cell(out, value, expected):
     diff = compare_xml(xml, expected)
     assert diff is None, diff
 
+def test_write_cell_string(out, worksheet):
+    from .. lxml_worksheet import write_cell
+
+    ws = worksheet
+    ws['A1'] = "Hello"
+    with xmlfile(out) as xf:
+        write_cell(xf, ws, ws['A1'], None)
+    assert ws.parent.shared_strings == ["Hello"]
+
 
 @pytest.fixture
 def write_rows():

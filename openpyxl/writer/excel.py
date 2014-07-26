@@ -46,7 +46,7 @@ from openpyxl.xml.constants import (
     PACKAGE_XL
     )
 from openpyxl.xml.functions import tostring
-from openpyxl.writer.strings import create_string_table, write_string_table
+from openpyxl.writer.strings import write_string_table
 from openpyxl.writer.workbook import (
     write_content_types,
     write_root_rels,
@@ -98,15 +98,13 @@ class ExcelWriter(object):
                         archive.writestr(name, vba_archive.read(name))
                         break
 
-        self._write_string_table(archive)
         self._write_worksheets(archive, self.style_writer)
+        self._write_string_table(archive)
 
     def _write_string_table(self, archive):
-        for ws in self.workbook.worksheets:
-            ws._garbage_collect()
-        self.shared_strings = create_string_table(self.workbook)
+        self.shared_strings = self.workbook.shared_strings
         archive.writestr(ARC_SHARED_STRINGS,
-                write_string_table(self.shared_strings))
+                write_string_table(self.workbook.shared_strings))
 
     def _write_images(self, images, archive, image_id):
         for img in images:
@@ -125,7 +123,7 @@ class ExcelWriter(object):
 
         for i, sheet in enumerate(self.workbook.worksheets):
             archive.writestr(PACKAGE_WORKSHEETS + '/sheet%d.xml' % (i + 1),
-                             write_worksheet(sheet, self.shared_strings,
+                             write_worksheet(sheet, self.workbook.shared_strings,
                                              ))
             if (sheet._charts or sheet._images
                 or sheet.relationships
