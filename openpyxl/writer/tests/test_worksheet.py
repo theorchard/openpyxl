@@ -134,7 +134,7 @@ def test_write_formula(out, doc, datadir):
     ws.cell('C4').value = '='
     ws.formula_attributes['C4'] = {'t': 'shared', 'si': '0'}
 
-    write_worksheet_data(doc, ws, [])
+    write_worksheet_data(doc, ws)
     doc.endDocument()
     xml = out.getvalue()
     expected = """
@@ -184,7 +184,7 @@ def test_write_height(out, doc, worksheet):
     ws.row_dimensions[ws.cell('F2').row].height = 30
     ws._garbage_collect()
 
-    write_worksheet_data(doc, ws, {})
+    write_worksheet_data(doc, ws)
     xml = out.getvalue()
     expected = """
      <sheetData>
@@ -386,7 +386,7 @@ def test_write_cell(out, doc, worksheet, value, expected):
 
     ws = worksheet
     ws['A1'] = value
-    write_cell(doc, ws, ws['A1'], ['Hello'])
+    write_cell(doc, ws, ws['A1'])
     doc.endDocument()
     xml = out.getvalue()
     diff = compare_xml(xml, expected)
@@ -397,7 +397,7 @@ def test_write_cell_string(out, doc, worksheet):
 
     ws = worksheet
     ws['A1'] = "Hello"
-    write_cell(doc, ws, ws['A1'], None)
+    write_cell(doc, ws, ws['A1'])
     assert ws.parent.shared_strings == ["Hello"]
 
 def test_write_sheetdata(out, doc, worksheet):
@@ -405,7 +405,7 @@ def test_write_sheetdata(out, doc, worksheet):
 
     ws = worksheet
     ws['A1'] = 10
-    write_worksheet_data(doc, ws, [])
+    write_worksheet_data(doc, ws)
     doc.endDocument()
     xml = out.getvalue()
     expected = """<sheetData><row r="1" spans="1:1"><c t="n" r="A1"><v>10</v></c></row></sheetData>"""

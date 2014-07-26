@@ -60,7 +60,7 @@ def write_worksheet(worksheet, shared_strings):
             write_sheetviews(xf, worksheet)
             write_format(xf, worksheet)
             write_cols(xf, worksheet)
-            write_rows(xf, worksheet, shared_strings)
+            write_rows(xf, worksheet)
 
             if worksheet.protection.sheet:
                 prot = Element('sheetProtection', dict(worksheet.protection))
@@ -146,7 +146,7 @@ def write_cols(xf, worksheet, style_table=None):
             xf.write(c)
 
 
-def write_rows(xf, worksheet, string_table, style_table=None):
+def write_rows(xf, worksheet):
     """Write worksheet data to xml."""
 
     cells_by_row = get_rows_to_write(worksheet)
@@ -164,10 +164,10 @@ def write_rows(xf, worksheet, string_table, style_table=None):
 
                 row_cells = cells_by_row[row_idx]
                 for cell in sorted(row_cells, key=row_sort):
-                    write_cell(xf, worksheet, cell, string_table)
+                    write_cell(xf, worksheet, cell)
 
 
-def write_cell(xf, worksheet, cell, string_table):
+def write_cell(xf, worksheet, cell):
     string_table = worksheet.parent.shared_strings
     coordinate = cell.coordinate
     attributes = {'r': coordinate}

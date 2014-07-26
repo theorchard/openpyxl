@@ -54,7 +54,7 @@ def test_write_cell(out, value, expected):
     ws = wb.active
     ws['A1'] = value
     with xmlfile(out) as xf:
-        write_cell(xf, ws, ws['A1'], ["Hello"])
+        write_cell(xf, ws, ws['A1'])
     xml = out.getvalue()
     diff = compare_xml(xml, expected)
     assert diff is None, diff
@@ -65,7 +65,7 @@ def test_write_cell_string(out, worksheet):
     ws = worksheet
     ws['A1'] = "Hello"
     with xmlfile(out) as xf:
-        write_cell(xf, ws, ws['A1'], None)
+        write_cell(xf, ws, ws['A1'])
     assert ws.parent.shared_strings == ["Hello"]
 
 
@@ -79,7 +79,7 @@ def test_write_sheetdata(out, worksheet, write_rows):
     ws = worksheet
     ws['A1'] = 10
     with xmlfile(out) as xf:
-        write_rows(xf, ws, [])
+        write_rows(xf, ws)
     xml = out.getvalue()
     expected = """<sheetData><row r="1" spans="1:1"><c t="n" r="A1"><v>10</v></c></row></sheetData>"""
     diff = compare_xml(xml, expected)
@@ -100,7 +100,7 @@ def test_write_formula(out, worksheet, write_rows):
     ws.formula_attributes['C4'] = {'t': 'shared', 'si': '0'}
 
     with xmlfile(out) as xf:
-        write_rows(xf, ws, [])
+        write_rows(xf, ws)
 
     xml = out.getvalue()
     expected = """
@@ -149,7 +149,7 @@ def test_row_height(out, worksheet, write_rows):
     ws._garbage_collect()
 
     with xmlfile(out) as xf:
-        write_rows(xf, ws, {})
+        write_rows(xf, ws)
     xml = out.getvalue()
     expected = """
      <sheetData>

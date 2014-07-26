@@ -94,7 +94,7 @@ def write_worksheet(worksheet, shared_strings):
     write_worksheet_sheetviews(doc, worksheet)
     write_worksheet_format(doc, worksheet)
     write_worksheet_cols(doc, worksheet)
-    write_worksheet_data(doc, worksheet, shared_strings)
+    write_worksheet_data(doc, worksheet)
     if worksheet.protection.sheet:
         tag(doc, 'sheetProtection', dict(worksheet.protection))
     write_worksheet_autofilter(doc, worksheet)
@@ -271,7 +271,7 @@ def get_rows_to_write(worksheet):
     return cells_by_row
 
 
-def write_worksheet_data(doc, worksheet, string_table, style_table=None):
+def write_worksheet_data(doc, worksheet):
     """Write worksheet data to xml."""
 
     cells_by_row = get_rows_to_write(worksheet)
@@ -288,13 +288,13 @@ def write_worksheet_data(doc, worksheet, string_table, style_table=None):
         start_tag(doc, 'row', attrs)
         row_cells = cells_by_row[row_idx]
         for cell in sorted(row_cells, key=row_sort):
-            write_cell(doc, worksheet, cell, string_table)
+            write_cell(doc, worksheet, cell)
 
         end_tag(doc, 'row')
     end_tag(doc, 'sheetData')
 
 
-def write_cell(doc, worksheet, cell, string_table):
+def write_cell(doc, worksheet, cell):
     string_table = worksheet.parent.shared_strings
     coordinate = cell.coordinate
     attributes = {'r': coordinate}
