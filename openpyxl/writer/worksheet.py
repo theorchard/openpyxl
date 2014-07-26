@@ -294,13 +294,15 @@ def write_worksheet_data(doc, worksheet):
     end_tag(doc, 'sheetData')
 
 
+from openpyxl.styles import Style
+default = Style()
+
 def write_cell(doc, worksheet, cell):
     string_table = worksheet.parent.shared_strings
     coordinate = cell.coordinate
     attributes = {'r': coordinate}
-    cell_style = worksheet._styles.get(coordinate)
-    if cell_style is not None:
-        attributes['s'] = '%d' % cell_style
+    if cell.style != default:
+        attributes['s'] = '%d' % worksheet.parent.shared_styles.add(cell.style)
 
     if cell.data_type != cell.TYPE_FORMULA:
         attributes['t'] = cell.data_type
