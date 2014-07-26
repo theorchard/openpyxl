@@ -1,7 +1,5 @@
 # Copyright (c) 2010-2014 openpyxl
 
-# Python stdlib imports
-import os.path
 
 # package imports
 from openpyxl.workbook import Workbook
