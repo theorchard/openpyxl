@@ -156,10 +156,7 @@ def read_named_ranges(xml_source, workbook):
 
         node_text = name_node.text
 
-        if node_text is None:
-            named_range = NamedRangeContainingValue(range_name, node_text)
-
-        elif refers_to_range(node_text):
+        if refers_to_range(node_text):
             destinations = split_named_range(node_text)
             # it can happen that a valid named range references
             # a missing worksheet, when Excel didn't properly maintain
@@ -169,6 +166,9 @@ def read_named_ranges(xml_source, workbook):
             if not destinations:
                 continue
             named_range = NamedRange(range_name, destinations)
+        else:
+            named_range = NamedRangeContainingValue(range_name, node_text)
+
 
         location_id = name_node.get("localSheetId")
         if location_id is not None:
