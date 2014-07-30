@@ -24,7 +24,16 @@ Bug fixes
 341 Cells with formulae do not round-trip
 
 
-2.0.4 (unreleased)
+2.0.5 (unreleased)
+==================
+
+
+Bug fixes
+---------
+348 incorrect casting of boolean strings
+
+
+2.0.4 (2014-06-25)
 ==================
 
 Minor changes
@@ -50,6 +59,7 @@ Updated docs
 
 Bug fixes
 ---------
+
 319 Cannot load Workbooks with vertAlign styling for fonts
 
 

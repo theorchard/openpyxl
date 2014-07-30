@@ -123,6 +123,12 @@ class Bool(Convertible):
 
     expected_type = bool
 
+    def __set__(self, instance, value):
+        if isinstance(value, str):
+            if value in ('false', 'f', '0'):
+                value = False
+        super(Bool, self).__set__(instance, value)
+
 
 class String(Typed):
 
