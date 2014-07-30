@@ -43,7 +43,9 @@ class TestBool:
                                  (1, True,),
                                  (0, False),
                                  ('true', True),
-                                 ('false', True),
+                                 ('false', False),
+                                 ('0', False),
+                                 ('f', False),
                                  ('', False),
                                  ([], False)
                              ]

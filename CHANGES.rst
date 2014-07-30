@@ -1,3 +1,12 @@
+2.0.5 (unreleased)
+==================
+
+
+Bug fixes
+---------
+348 incorrect casting of boolean strings
+
+
 2.0.4 (2014-06-25)
 ==================
 
