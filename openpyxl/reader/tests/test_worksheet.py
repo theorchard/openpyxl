@@ -103,12 +103,12 @@ def test_sheet_protection(datadir, Worksheet, WorkSheetParser):
         for _, tag in tree:
             parser.parse_sheet_protection(tag)
     assert dict(ws.protection) == {
-        'autoFilter': '1', 'deleteColumns': '1',
-        'deleteRows': '1', 'formatCells': '1', 'formatColumns': '1', 'formatRows':
-        '1', 'insertColumns': '1', 'insertHyperlinks': '1', 'insertRows': '1',
-        'objects': '0', 'password': 'DAA7', 'pivotTables': '1', 'scenarios': '0',
+        'autoFilter': '0', 'deleteColumns': '0',
+        'deleteRows': '0', 'formatCells': '0', 'formatColumns': '0', 'formatRows':
+        '0', 'insertColumns': '0', 'insertHyperlinks': '0', 'insertRows': '0',
+        'objects': '0', 'password': 'DAA7', 'pivotTables': '0', 'scenarios': '0',
         'selectLockedCells': '0', 'selectUnlockedCells': '0', 'sheet': '1', 'sort':
-        '1'
+        '0'
     }
 
 
