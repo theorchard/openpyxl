@@ -37,7 +37,7 @@ YELLOW = COLOR_INDEX[5]
 DARKYELLOW = COLOR_INDEX[19]
 
 
-aRGB_REGEX = re.compile("^([A-Fa-f0-9]{8})$")
+aRGB_REGEX = re.compile("^([A-Fa-f0-9]{8}|[A-Fa-f0-9]{6})$")
 
 
 class RGB(Descriptor):
@@ -46,6 +46,8 @@ class RGB(Descriptor):
         m = aRGB_REGEX.match(value)
         if m is None:
             raise ValueError("Colors must be aRGB hex values")
+        if len(value) == 6:
+            value = "00" + value
         super(RGB, self).__set__(instance, value)
 
 

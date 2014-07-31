@@ -1,10 +1,10 @@
 from openpyxl.styles.colors import Color
 import pytest
 
-
-def test_regex():
+@pytest.mark.parametrize("value", ['00FFFFFF', 'efefef'])
+def test_regex(value):
     from ..colors import aRGB_REGEX
-    assert aRGB_REGEX.match("00000000") is not None
+    assert aRGB_REGEX.match(value) is not None
 
 
 class TestColor:
