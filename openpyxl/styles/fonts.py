@@ -24,7 +24,7 @@ from __future__ import absolute_import
 
 from openpyxl.descriptors import Strict, Float, Integer, Set, Bool, String, Alias, Typed, MinMax
 from .hashable import HashableObject
-from .colors import Color
+from .colors import ColorDescriptor, BLACK
 
 
 class Font(HashableObject):
@@ -59,7 +59,7 @@ class Font(HashableObject):
                         UNDERLINE_SINGLE_ACCOUNTING]))
     underline = Alias("u")
     vertAlign = Set(values=set(['superscript', 'subscript', 'baseline', None]))
-    color = Typed(expected_type=Color)
+    color = ColorDescriptor()
     scheme = Set(values=(None, "major", "minor"))
 
     __fields__ = ('name',
@@ -79,7 +79,7 @@ class Font(HashableObject):
                   )
 
     def __init__(self, name='Calibri', sz=11, b=False, i=False, charset=None,
-                 u=None, strike=False, color=Color(), scheme=None, family=2, size=None,
+                 u=None, strike=False, color=BLACK, scheme=None, family=2, size=None,
                  bold=None, italic=None, strikethrough=None, underline=UNDERLINE_NONE,
                  vertAlign=None, outline=False, shadow=False, condense=False, extend=False):
         self.name = name

@@ -25,7 +25,7 @@ from __future__ import absolute_import
 from openpyxl.descriptors import Float, Set, Sequence, Alias, Typed
 from openpyxl.compat import safe_string
 
-from .colors import WHITE, Color
+from .colors import ColorDescriptor, Color
 from .hashable import HashableObject
 import warnings
 
@@ -79,9 +79,9 @@ class PatternFill(Fill):
 
     patternType = Set(values=fills)
     fill_type = Alias("patternType")
-    fgColor = Typed(expected_type=Color)
+    fgColor = ColorDescriptor()
     start_color = Alias("fgColor")
-    bgColor = Typed(expected_type=Color)
+    bgColor = ColorDescriptor()
     end_color = Alias("bgColor")
 
     def __init__(self, patternType=FILL_NONE, fgColor=Color(), bgColor=Color(),

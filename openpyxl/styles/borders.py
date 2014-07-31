@@ -4,7 +4,7 @@ from __future__ import absolute_import
 from openpyxl.compat import safe_string
 from openpyxl.descriptors import Set, Typed, Bool, Alias
 
-from .colors import Color
+from .colors import ColorDescriptor, BLACK
 from .hashable import HashableObject
 
 
@@ -35,7 +35,7 @@ class Side(HashableObject):
     __fields__ = ('style',
                   'color')
 
-    color = Typed(expected_type=Color, allow_none=True)
+    color = ColorDescriptor(allow_none=True)
     style = Set(values=(BORDER_NONE, BORDER_DASHDOT, BORDER_DASHDOTDOT,
                         BORDER_DASHED, BORDER_DOTTED, BORDER_DOUBLE, BORDER_HAIR, BORDER_MEDIUM,
                         BORDER_MEDIUMDASHDOT, BORDER_MEDIUMDASHDOTDOT, BORDER_MEDIUMDASHED,
