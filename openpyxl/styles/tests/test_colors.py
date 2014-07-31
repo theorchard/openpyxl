@@ -53,3 +53,15 @@ class TestColor:
         c = Color()
         with pytest.raises(TypeError):
             c.value = 4
+
+
+def test_color_descriptor():
+    from ..colors import ColorDescriptor
+
+    class DummyStyle(object):
+
+        value = ColorDescriptor('value')
+
+    style = DummyStyle()
+    style.value = "efefef"
+    assert dict(style.value) == {'rgb': '00efefef'}

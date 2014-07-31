@@ -2,8 +2,8 @@ from __future__ import absolute_import
 # Copyright (c) 2010-2014 openpyxl
 
 import re
-from openpyxl.compat import safe_string
-from openpyxl.descriptors import Descriptor
+from openpyxl.compat import safe_string, basestring
+from openpyxl.descriptors import Descriptor, Typed
 
 from .hashable import HashableObject
 from openpyxl.descriptors import String, Bool, Float, MinMax, Integer, Alias, Set
@@ -51,7 +51,6 @@ class RGB(Descriptor):
         super(RGB, self).__set__(instance, value)
 
 
-
 class Color(HashableObject):
     """Named colors for use in styles."""
 
@@ -97,3 +96,12 @@ class Color(HashableObject):
         # legacy
         return self.value
 
+
+class ColorDescriptor(Typed):
+
+    expected_type = Color
+
+    def __set__(self, instance, value):
+        if isinstance(value, basestring):
+            value = Color(rgb=value)
+        super(ColorDescriptor, self).__set__(instance, value)
