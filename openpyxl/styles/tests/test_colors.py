@@ -2,6 +2,11 @@ from openpyxl.styles.colors import Color
 import pytest
 
 
+def test_regex():
+    from ..colors import aRGB_REGEX
+    assert aRGB_REGEX.match("00000000") is not None
+
+
 class TestColor:
 
     def test_ctor(self):
