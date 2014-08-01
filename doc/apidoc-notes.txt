@@ -1,3 +1,0 @@
-When running apidoc for coverage we have to manually exclude all the tests. :-(
-
-sphinx-apidoc -f -T -o  source ../openpyxl ../openpyxl/charts/tests ../openpyxl/benchmarks ../openpyxl/cell/tests ../openpyxl/comments/tests ../openpyxl/descriptors/test* ../openpyxl/formatting/tests/ ../openpyxl/styles/tests/.. ../openpyxl/worksheet/tests ../openpyxl/writer/tests/ ../openpyxl/xml/tests ../openpyxl/conftest.py ../openpyxl/tests ../openpyxl/compat ../openpyxl/collections/test* ../openpyxl/reader/tests
