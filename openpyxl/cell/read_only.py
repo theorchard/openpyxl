@@ -51,7 +51,7 @@ class ReadOnlyCell(object):
     def number_format(self):
         if self.style_id is None:
             return
-        return self.style.number_format.format_code
+        return self.style.number_format
 
     @property
     def style_id(self):

@@ -40,7 +40,7 @@ from openpyxl.compat import unicode, tempfile
 from openpyxl.collections import IndexedList
 from openpyxl.worksheet import Worksheet
 from openpyxl.workbook import Workbook
-from openpyxl.styles import NumberFormat, Style
+from openpyxl.styles import numbers, Style
 from openpyxl.reader.worksheet import read_worksheet
 from openpyxl.reader.excel import load_workbook
 from openpyxl.exceptions import InvalidFileException
@@ -139,23 +139,23 @@ class TestReadWorkbookWithStyles(object):
 
     def test_read_general_style(self, workbook_with_styles):
         ws = workbook_with_styles
-        assert ws.cell('A1').style.number_format.format_code == NumberFormat.FORMAT_GENERAL
+        assert ws.cell('A1').style.number_format == numbers.FORMAT_GENERAL
 
     def test_read_date_style(self, workbook_with_styles):
         ws = workbook_with_styles
-        assert ws.cell('A2').style.number_format.format_code == NumberFormat.FORMAT_DATE_XLSX14
+        assert ws.cell('A2').style.number_format == numbers.FORMAT_DATE_XLSX14
 
     def test_read_number_style(self, workbook_with_styles):
         ws = workbook_with_styles
-        assert ws.cell('A3').style.number_format.format_code == NumberFormat.FORMAT_NUMBER_00
+        assert ws.cell('A3').style.number_format == numbers.FORMAT_NUMBER_00
 
     def test_read_time_style(self, workbook_with_styles):
         ws = workbook_with_styles
-        assert ws.cell('A4').style.number_format.format_code == NumberFormat.FORMAT_DATE_TIME3
+        assert ws.cell('A4').style.number_format == numbers.FORMAT_DATE_TIME3
 
     def test_read_percentage_style(self, workbook_with_styles):
         ws = workbook_with_styles
-        assert ws.cell('A5').style.number_format.format_code == NumberFormat.FORMAT_PERCENTAGE_00
+        assert ws.cell('A5').style.number_format == numbers.FORMAT_PERCENTAGE_00
 
 
 @pytest.fixture
@@ -183,11 +183,11 @@ class TestReadBaseDateFormat(object):
 
     def test_read_date_style_mac(self, date_mac_1904):
         ws = date_mac_1904["Sheet1"]
-        assert ws.cell('A1').style.number_format.format_code == NumberFormat.FORMAT_DATE_XLSX14
+        assert ws.cell('A1').style.number_format == numbers.FORMAT_DATE_XLSX14
 
     def test_read_date_style_win(self, date_std_1900):
         ws = date_std_1900["Sheet1"]
-        assert ws.cell('A1').style.number_format.format_code == NumberFormat.FORMAT_DATE_XLSX14
+        assert ws.cell('A1').style.number_format == numbers.FORMAT_DATE_XLSX14
 
     def test_read_date_value(sel, date_std_1900, date_mac_1904):
         win = date_std_1900["Sheet1"]

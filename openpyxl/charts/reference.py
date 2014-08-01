@@ -23,7 +23,7 @@ from __future__ import absolute_import
 # @author: see AUTHORS file
 
 from openpyxl.cell import get_column_letter
-from openpyxl.styles import NumberFormat, is_date_format, is_builtin
+from openpyxl.styles import numbers, is_date_format, is_builtin
 from openpyxl.descriptors import Tuple, Set, Strict
 
 

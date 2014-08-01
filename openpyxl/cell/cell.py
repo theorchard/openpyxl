@@ -55,7 +55,9 @@ from openpyxl.exceptions import (
     IllegalCharacterError
 )
 from openpyxl.units import points_to_pixels
-from openpyxl.styles import NumberFormat, is_date_format
+from openpyxl.styles import is_date_format
+from openpyxl.styles import numbers
+#from openpyxl.styles import NumberFormat
 
 
 # package imports
@@ -312,7 +314,7 @@ class Cell(object):
         percentage"""
         match = PERCENT_REGEX.match(value)
         if match:
-            self.number_format = NumberFormat.FORMAT_PERCENTAGE
+            self.number_format = numbers.FORMAT_PERCENTAGE
             return float(match.group('number')) / 100
 
 
@@ -324,13 +326,13 @@ class Cell(object):
             if match.group("microsecond") is not None:
                 value = value[:12]
                 pattern = "%M:%S.%f"
-                fmt = NumberFormat.FORMAT_DATE_TIME5
+                fmt = numbers.FORMAT_DATE_TIME5
             elif match.group('second') is None:
-                fmt = NumberFormat.FORMAT_DATE_TIME3
+                fmt = numbers.FORMAT_DATE_TIME3
                 pattern = "%H:%M"
             else:
                 pattern = "%H:%M:%S"
-                fmt = NumberFormat.FORMAT_DATE_TIME6
+                fmt = numbers.FORMAT_DATE_TIME6
             value = datetime.datetime.strptime(value, pattern)
             self.number_format = fmt
             return time_to_days(value)
@@ -340,13 +342,13 @@ class Cell(object):
         """Convert Python datetime to Excel and set formatting"""
         if isinstance(value, datetime.date):
             value = to_excel(value, self.base_date)
-            self.number_format = NumberFormat.FORMAT_DATE_YYYYMMDD2
+            self.number_format = numbers.FORMAT_DATE_YYYYMMDD2
         elif isinstance(value, datetime.time):
             value = time_to_days(value)
-            self.number_format = NumberFormat.FORMAT_DATE_TIME6
+            self.number_format = numbers.FORMAT_DATE_TIME6
         elif isinstance(value, datetime.timedelta):
             value = timedelta_to_days(value)
-            self.number_format = NumberFormat.FORMAT_DATE_TIMEDELTA
+            self.number_format = numbers.FORMAT_DATE_TIMEDELTA
         return value
 
     @property
@@ -397,12 +399,12 @@ class Cell(object):
     @property
     def number_format(self):
         style = self.parent.get_style(self.coordinate)
-        return style.number_format.format_code
+        return style.number_format
 
     @number_format.setter
     def number_format(self, format_code):
         """Set a new formatting code for numeric values"""
-        self.style = self.style.copy(number_format=NumberFormat(format_code=format_code))
+        self.style = self.style.copy(number_format=format_code)
 
     def _set_number_format(self, format_code):
         """Set a new formatting code for numeric values"""

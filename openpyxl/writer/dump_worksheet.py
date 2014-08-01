@@ -12,7 +12,7 @@ from openpyxl.compat import OrderedDict, unicode
 from openpyxl.comments.comments import Comment
 from openpyxl.cell import get_column_letter, Cell, TIME_TYPES
 from openpyxl.cell.write_only import WriteOnlyCell
-from openpyxl.styles import Style, NumberFormat, DEFAULTS
+from openpyxl.styles import Style, DEFAULTS
 from openpyxl.worksheet import Worksheet
 from openpyxl.xml.constants import SHEET_MAIN_NS
 from openpyxl.xml.functions import (

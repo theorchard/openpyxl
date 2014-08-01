@@ -16,6 +16,7 @@ from openpyxl.xml.functions import (
 from openpyxl.xml.constants import SHEET_MAIN_NS
 
 from openpyxl.styles import DEFAULTS, Protection
+from openpyxl.styles import numbers
 from openpyxl.styles.fills import GradientFill, PatternFill
 
 
@@ -193,11 +194,11 @@ class StyleWriter(object):
 
             nf = st.number_format
             if nf != DEFAULTS.number_format:
-                fmt_id = nf.builtin_format_id(nf.format_code)
+                fmt_id = numbers.builtin_format_id(nf)
                 if fmt_id is None:
                     if nf not in _custom_fmts:
                         fmt_id = _custom_fmts.add(nf) + 165
-                        self._write_number_format(number_format_node, fmt_id, nf.format_code)
+                        self._write_number_format(number_format_node, fmt_id, nf)
                     else:
                         fmt_id = _custom_fmts.index(nf)
                 vals['numFmtId'] = '%d' % fmt_id

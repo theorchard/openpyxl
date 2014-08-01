@@ -9,7 +9,7 @@ from openpyxl.xml.functions import fromstring, safe_iterator, localname
 from openpyxl.exceptions import MissingNumberFormat
 from openpyxl.styles import (
     Style,
-    NumberFormat,
+    numbers,
     Font,
     PatternFill,
     GradientFill,
@@ -165,7 +165,7 @@ class SharedStylesParser(object):
         if cell_xfs is None:  # can happen on bad OOXML writers (e.g. Gnumeric)
             return
 
-        builtin_formats = NumberFormat._BUILTIN_FORMATS
+        builtin_formats = numbers.BUILTIN_FORMATS
         cell_xfs_nodes = safe_iterator(cell_xfs, '{%s}xf' % SHEET_MAIN_NS)
         for index, cell_xfs_node in enumerate(cell_xfs_nodes):
             _style = {}
@@ -179,7 +179,7 @@ class SharedStylesParser(object):
                     format_code = fmt_code
                 else:
                     raise MissingNumberFormat('%s' % number_format_id)
-            _style['number_format'] = NumberFormat(format_code=format_code)
+            _style['number_format'] =format_code
 
             if bool(cell_xfs_node.get('applyAlignment')):
                 alignment = {}

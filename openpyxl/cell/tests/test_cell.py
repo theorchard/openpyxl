@@ -23,7 +23,7 @@ from openpyxl.cell import (
     absolute_coordinate
     )
 from openpyxl.comments import Comment
-from openpyxl.styles import NumberFormat
+from openpyxl.styles import numbers
 
 import decimal
 
@@ -229,7 +229,7 @@ class TestCellValueTypes(object):
 
     def test_number_format_style(self):
         self.cell.value = '12.6%'
-        assert NumberFormat.FORMAT_PERCENTAGE == self.cell.style.number_format.format_code
+        assert numbers.FORMAT_PERCENTAGE == self.cell.style.number_format
 
 
 @pytest.mark.parametrize("value, datatype",
@@ -357,7 +357,7 @@ def test_is_not_date_color_format():
     cell = Cell(ws, 'A', 1)
 
     cell.value = -13.5
-    cell.style = cell.style.copy(number_format=NumberFormat('0.00_);[Red]\(0.00\)'))
+    cell.style = cell.style.copy(number_format='0.00_);[Red]\(0.00\)')
 
     assert cell.is_date() is False
 

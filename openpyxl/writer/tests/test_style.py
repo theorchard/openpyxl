@@ -12,7 +12,7 @@ from openpyxl.formatting.rules import FormulaRule
 
 from openpyxl.styles import (
     Alignment,
-    NumberFormat,
+    numbers,
     Color,
     Font,
     GradientFill,
@@ -131,10 +131,10 @@ def test_write_font():
 def test_write_number_formats():
     wb = DummyWorkbook()
     from openpyxl.xml.functions import Element
-    from openpyxl.styles import NumberFormat, Style
+    from openpyxl.styles import Style
     wb.shared_styles = [
         Style(),
-        Style(number_format=NumberFormat('YYYY'))
+        Style(number_format='YYYY')
     ]
     writer = StyleWriter(wb)
     writer._write_number_format(writer._root, 0, "YYYY")
@@ -449,7 +449,7 @@ class TestCreateStyle(object):
         cls.worksheet.cell(coordinate='B5').value = now
         cls.worksheet.cell(coordinate='C14').value = 'This is a test'  # 1
         cls.worksheet.cell(coordinate='D9').value = '31.31415'  # 3
-        st = Style(number_format=NumberFormat(NumberFormat.FORMAT_NUMBER_00),
+        st = Style(number_format=numbers.FORMAT_NUMBER_00,
                    protection=Protection(locked=True))  # 4
         cls.worksheet.cell(coordinate='D9').style = st
         st2 = Style(protection=Protection(hidden=True))  # 5

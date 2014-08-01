@@ -34,7 +34,7 @@ from openpyxl.reader.style import read_style_table
 from openpyxl.writer.excel import save_virtual_workbook
 
 from openpyxl.styles import (
-    NumberFormat,
+    numbers,
     Color,
     Font,
     PatternFill,
@@ -103,7 +103,7 @@ def test_read_simple_style_mappings(datadir):
     with open("simple-styles.xml") as content:
         style_properties = read_style_table(content.read())[0]
         assert len(style_properties) == 4
-        assert NumberFormat._BUILTIN_FORMATS[9] == style_properties[1].number_format
+        assert numbers.BUILTIN_FORMATS[9] == style_properties[1].number_format
         assert 'yyyy-mm-dd' == style_properties[2].number_format
 
 
@@ -202,9 +202,9 @@ def test_change_existing_styles(datadir):
     ws.cell('A12').style = ws.cell('A12').style.copy(alignment=Alignment(vertical='bottom'))
     ws.cell('A13').style = ws.cell('A13').style.copy(alignment=Alignment(vertical='top'))
     ws.cell('A14').style = ws.cell('A14').style.copy(alignment=Alignment(vertical='center'))
-    ws.cell('A15').style = ws.cell('A15').style.copy(number_format=NumberFormat('0.00%'))
-    ws.cell('A16').style = ws.cell('A16').style.copy(number_format=NumberFormat('0.00'))
-    ws.cell('A17').style = ws.cell('A17').style.copy(number_format=NumberFormat('mm-dd-yy'))
+    ws.cell('A15').style = ws.cell('A15').style.copy(number_format='0.00%')
+    ws.cell('A16').style = ws.cell('A16').style.copy(number_format='0.00')
+    ws.cell('A17').style = ws.cell('A17').style.copy(number_format='mm-dd-yy')
     ws.unmerge_cells('A18:B18')
     ws.cell('A19').style = ws.cell('A19').style.copy(border=Border(top=Side(border_style=borders.BORDER_THIN,
                                                                                 color=Color('FF006600')),

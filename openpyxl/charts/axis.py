@@ -24,7 +24,7 @@ from __future__ import absolute_import
 
 import math
 
-from openpyxl.styles import NumberFormat, is_date_format
+from openpyxl.styles import numbers, is_date_format
 
 
 def less_than_one(value):
@@ -51,7 +51,7 @@ class Axis(object):
     label_offset = None
     cross_between = None
     orientation = ORIENTATION_MIN_MAX
-    number_format = NumberFormat()
+    number_format = numbers.FORMAT_GENERAL
     delete_axis = False
 
     def __init__(self, auto_axis=True):
