@@ -187,7 +187,6 @@ def builtin_format_id(fmt):
 
 class NumberFormatDescriptor(String):
 
-    allow_none = True
 
     def __set__(self, instance, value):
         if value is None:
