@@ -30,7 +30,8 @@ from openpyxl.descriptors import Alias
 def AliasProxyGet(self, instance, cls):
     return getattr(cls, self.alias)
 
-Alias.__get__ = AliasProxyGet
+if os.environ.get("APIDOC") == "True":
+    Alias.__get__ = AliasProxyGet
 
 # -- General configuration -----------------------------------------------------
 
