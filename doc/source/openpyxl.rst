@@ -15,6 +15,7 @@ Subpackages
     openpyxl.drawing
     openpyxl.formatting
     openpyxl.reader
+    openpyxl.styles
     openpyxl.workbook
     openpyxl.worksheet
     openpyxl.writer

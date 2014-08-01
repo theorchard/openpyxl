@@ -44,14 +44,6 @@ openpyxl.worksheet.page module
     :undoc-members:
     :show-inheritance:
 
-openpyxl.worksheet.password_hasher module
------------------------------------------
-
-.. automodule:: openpyxl.worksheet.password_hasher
-    :members:
-    :undoc-members:
-    :show-inheritance:
-
 openpyxl.worksheet.protection module
 ------------------------------------
 

@@ -24,6 +24,14 @@ sys.path.insert(0, os.path.abspath(os.path.join(up(up(os.getcwd())), '.')))
 
 import openpyxl
 
+
+from openpyxl.descriptors import Alias
+
+def AliasProxyGet(self, instance, cls):
+    return getattr(cls, self.alias)
+
+Alias.__get__ = AliasProxyGet
+
 # -- General configuration -----------------------------------------------------
 
 # If your documentation needs a minimal Sphinx version, state it here.
