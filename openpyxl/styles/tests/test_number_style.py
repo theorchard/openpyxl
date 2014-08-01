@@ -23,3 +23,17 @@ def test_format_comparisions(NumberFormat):
 def test_builtin_format(NumberFormat):
     fmt = NumberFormat(format_code='0.00')
     assert fmt.builtin_format_code(2) == fmt.format_code
+
+
+def test_number_descriptor():
+    from ..numbers import NumberFormatDescriptor
+
+    class Dummy:
+
+        value = NumberFormatDescriptor('value')
+
+        def __init__(self, value=None):
+            self.value = value
+
+    d = Dummy()
+    assert d.value == "General"

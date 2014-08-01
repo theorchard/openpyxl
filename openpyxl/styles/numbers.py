@@ -24,6 +24,7 @@ from __future__ import absolute_import
 
 import re
 
+from openpyxl.descriptors import String
 from .hashable import HashableObject
 
 BUILTIN_FORMATS = {
@@ -199,3 +200,13 @@ def builtin_format_code(index):
 def builtin_format_id(fmt):
     """Return the id of a standard style."""
     return BUILTIN_FORMATS_REVERSE.get(fmt)
+
+
+class NumberFormatDescriptor(String):
+
+    allow_none = True
+
+    def __set__(self, instance, value):
+        if value is None:
+            value = FORMAT_GENERAL
+        super(NumberFormatDescriptor, self).__set__(instance, value)
