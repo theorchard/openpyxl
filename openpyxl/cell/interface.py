@@ -1,7 +1,8 @@
 from __future__ import absolute_import
 # Copyright (c) 2010-2014 openpyxl
 
-from abc import ABC, abstractmethod, abstractproperty
+from openpyxl.compat.abc import ABC
+from abc import abstractmethod, abstractproperty
 
 
 class AbstractCell(ABC):
