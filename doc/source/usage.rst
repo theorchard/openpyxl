@@ -77,14 +77,14 @@ Using number formats
     # set date using a Python datetime
     ws['A1'] = datetime.datetime(2010, 7, 21)
 
-    print ws['A1'].style.number_format.format_code # returns 'yyyy-mm-dd'
+    print(ws['A1'].style.number_format) # returns 'yyyy-mm-dd'
 
     # set percentage using a string followed by the percent sign
     ws['B1'] = '3.14%'
 
-    print ws['B1'].value # returns 0.031400000000000004
+    print(ws['B1'].value) # returns 0.031400000000000004
 
-    print ws['B1'].style.number_format.format_code # returns '0%'
+    print(ws['B1'].style.number_format) # returns '0%'
 
 
 Using formulae
@@ -250,5 +250,3 @@ Fold columns (outline)
     ws = wb.create_sheet()
     ws.column_dimensions.group('A','D', hidden=True)
     wb.save('group.xlsx')
-
-

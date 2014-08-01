@@ -21,39 +21,39 @@ This is what the default `Style` looks like::
                     subscript=False,
                     underline='none',
                     strikethrough=False,
-                    color=Color(index='FF000000')),
+                    color='FF000000'),
           fill=Fill(fill_type=None,
                     rotation=0,
-                    start_color=Color(index='FFFFFFFF'),
-                    end_color=Color(index='FF000000')),
+                    start_color='FFFFFFFF',
+                    end_color='FF000000'),
           borders=Borders(left=Border(border_style='none',
-                                      color=Color(rgb='FF000000')),
+                                      color='FF000000'),
                           right=Border(border_style='none',
-                                       color=Color(rgb='FF000000')),
+                                       color='FF000000'),
                           top=Border(border_style='none',
-                                     color=Color(rgb='FF000000')),
+                                     color='FF000000'),
                           bottom=Border(border_style='none',
-                                        color=Color(rgb='FF000000')),
+                                        color='FF000000'),
                           diagonal=Border(border_style='none',
-                                          color=Color(rgb='FF000000')),
+                                          color='FF000000'),
                           diagonal_direction=0,
                           all_borders=Border(border_style='none',
-                                             color=Color(rgb='FF000000')),
+                                             color=FF000000'),
                           outline=Border(border_style='none',
-                                         color=Color(rgb='FF000000')),
+                                         color='FF000000'),
                           inside=Border(border_style='none',
-                                        color=Color(rgb='FF000000')),
+                                        color='FF000000'),
                           vertical=Border(border_style='none',
-                                          color=Color(rgb='FF000000')),
+                                          color='FF000000'),
                           horizontal=Border(border_style='none',
-                                            color=Color(rgb='FF000000'))),
+                                            color='FF000000')),
           alignment=Alignment(horizontal='general',
                               vertical='bottom',
                               text_rotation=0,
                               wrap_text=False,
                               shrink_to_fit=False,
                               indent=0),
-          number_format=NumberFormat(format_code='General'),
+          number_format='General',
           protection=Protection(locked='inherit',
                                 hidden='inherit'))
 
@@ -68,33 +68,40 @@ As you can see from the above box, there is a hierarchy between elements::
 
 So if you want to change the color of a Font, you have to redefine a Style, with a new Font, with a new Color::
 
->>> s = Style(font=Font(color=Color(colors.RED)))
->>> s.font.color = Color.BLUE # this will not work
->>> blue_s = Style(font=Font(color=Color(colors.BLUE)))
+>>> s = Style(font=Font(color=colors.RED))
+>>> s.font.color = colors.BLUE # this will not work
+>>> blue_s = Style(font=Font(color=colors.BLUE))
 
 However, if you have a Font you want to use multiple times, you are allowed to::
 
 >>> from openpyxl.styles import Font, Color
 >>>
->>> ft = Font(color=Color(colors.RED))
->>> s1 = Style(font=ft, number_format=NumberFormat('0%'))
->>> s2 = Style(font=ft, number_format=NumberFormat('dd-mm-yyyy'))
+>>> ft = Font(color=colors.RED)
+>>> s1 = Style(font=ft, number_format='0%')
+>>> s2 = Style(font=ft, number_format='dd-mm-yyyy')
+
+
+Copying styles
+--------------
 
 There is also a `copy()` function, which creates a new style based on another one, by **completely** replacing
 sub-elements by others
 
->>> from openpyxl.styles import Font, Style, NumberFormat
+:: doctest
+
+>>> from openpyxl.styles import Font, Style
 >>>
 >>> arial = Font(name='Arial', size=14)
 >>> tahoma = Font(name='Tahoma')
->>> s1 = Style(font=arial, number_format=NumberFormat('0%'))
+>>> s1 = Style(font=arial, number_format='0%')
 >>> s2 = s1.copy(font=tahoma)
 >>> s2.font.name
 'Tahoma'
->>> s2.number_format.format_code
+>>> s2.number_format
 '0%'
 >>> s2.font.size # 11 (tahoma does not re-specify size, so we use the default)
 11.0
+
 
 This might be surprising that we do not use the previous `Font` size,
 but this is not a bug, this is because of the immutable nature of styles,
@@ -113,7 +120,7 @@ Basic Font Colors
 >>> wb = Workbook()
 >>> ws = wb.active
 >>> ws['A1'] = 'This is red'
->>> ws['A1'].styles = Style(font=Font(color=Color(RED)))
+>>> ws['A1'].styles = Style(font=Font(color=RED))
 
 
 Edit Print Settings
@@ -185,8 +192,8 @@ There are many types of conditional formatting - below are some examples for set
 >>> ws = wb.active
 
 # Create fill
->>> redFill = Fill(start_color=Color('FFEE1111'),
-...                end_color=Color('FFEE1111'),
+>>> redFill = Fill(start_color='FFEE1111',
+...                end_color='FFEE1111',
 ...                fill_type=Fill.FILL_SOLID)
 
 # Add a two-color scale
