@@ -2,8 +2,7 @@ from __future__ import absolute_import
 # Copyright (c) 2010-2014 openpyxl
 
 
-from lxml.etree import Element, SubElement
-
+from openpyxl.xml.functions import Element, SubElement
 from openpyxl.xml.constants import (
     COMMENTS_NS,
     PKG_REL_NS,
