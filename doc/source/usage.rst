@@ -74,17 +74,17 @@ Using number formats
 >>> # set date using a Python datetime
 >>> ws['A1'] = datetime.datetime(2010, 7, 21)
 >>>
->>> print(ws['A1'].style.number_format)
-yyyy-mm-dd
+>>> ws['A1'].style.number_format
+'yyyy-mm-dd'
 >>>
 >>> # set percentage using a string followed by the percent sign
 >>> ws['B1'] = '3.14%'
 >>>
->>> print(ws['B1'].value)
-0.0314
+>>> ws['B1'].value
+0.031400000000000004
 >>>
->>> print(ws['B1'].style.number_format)
-0%
+>>> ws['B1'].style.number_format
+'0%'
 
 
 Using formulae
