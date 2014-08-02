@@ -6,6 +6,7 @@ Major changes
 "read_only" and "write_only" new flags for workbooks
 Support for reading and writing worksheet protection
 Support for reading hidden rows
+Cells now manage their styles directly
 
 
 Minor changes
