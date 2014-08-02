@@ -53,7 +53,7 @@ If you want to have cells with styles or comments then use a `WriteOnlyCell`
 >>> from openpyxl import Workbook
 >>> wb = Workbook(optimized_write = True)
 >>> ws = wb.create_sheet()
->>> from openpyxl.cell.write_only import WriteOnlyCell
+>>> from openpyxl.writer.dump_worksheet import WriteOnlyCell
 >>> from openpyxl.comments import Comment
 >>> from openpyxl.styles import Style, Font
 >>> cell = WriteOnlyCell(ws, value="hello world")

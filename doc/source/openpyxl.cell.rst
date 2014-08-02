@@ -36,14 +36,6 @@ openpyxl.cell.read_only module
     :undoc-members:
     :show-inheritance:
 
-openpyxl.cell.write_only module
--------------------------------
-
-.. automodule:: openpyxl.cell.write_only
-    :members:
-    :undoc-members:
-    :show-inheritance:
-
 
 Module contents
 ---------------
