@@ -428,5 +428,4 @@ def test_style():
     cell = ws['A1']
     new_style = Style(font=Font(bold=True))
     cell.style = new_style
-    assert cell.coordinate in ws._styles
     assert new_style in wb.shared_styles

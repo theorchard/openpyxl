@@ -91,8 +91,6 @@ class WorkSheetParser(object):
         data_type = element.get('t', 'n')
         coordinate = element.get('r')
         style_id = element.get('s')
-        if style_id is not None:
-            self.ws._styles[coordinate] = int(style_id)
 
         # assign formula to cell value unless only the data is desired
         if formula is not None and not self.data_only:
@@ -112,6 +110,8 @@ class WorkSheetParser(object):
                     self.ws.formula_attributes[coordinate]['ref'] = ref
 
         cell = self.ws[coordinate]
+        if style_id is not None:
+            cell._style = int(style_id)
 
         if value is not None:
             if data_type == 'n':

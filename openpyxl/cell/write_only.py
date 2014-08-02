@@ -16,8 +16,8 @@ class WriteOnlyCell(Cell):
 
     @property
     def style(self):
-        return self.parent.parent.shared_styles[self._style_id]
+        return self.parent.parent.shared_styles[self._style]
 
     @style.setter
     def style(self, new_style):
-        self._style_id = self.parent.parent.shared_styles.add(new_style)
+        self._style= self.parent.parent.shared_styles.add(new_style)

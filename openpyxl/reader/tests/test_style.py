@@ -121,52 +121,51 @@ def test_read_complex_style(datadir):
     ws = wb.get_active_sheet()
     assert ws.column_dimensions['A'].width == 31.1640625
 
-    style = partial(ws.get_style)
-    assert style('I').fill.start_color.value == 'FF006600'
-    assert style('I').font.color.value == 'FF3300FF'
-    assert style('A2').font.name == 'Arial'
-    assert style('A2').font.size == 10
-    assert not style('A2').font.bold
-    assert not style('A2').font.italic
-    assert style('A3').font.name == 'Arial'
-    assert style('A3').font.size == 12
-    assert style('A3').font.bold is True
-    assert not style('A3').font.italic
-    assert style('A4').font.name == 'Arial'
-    assert style('A4').font.size == 14
-    assert not style('A4').font.bold
-    assert style('A4').font.italic
-    assert style('A5').font.color.value == 'FF3300FF'
-    assert style('A6').font.color.value == 9
-    assert style('A7').fill.start_color.value == 'FFFFFF66'
-    assert style('A8').fill.start_color.value == 8
-    assert style('A9').alignment.horizontal == 'left'
-    assert style('A10').alignment.horizontal == 'right'
-    assert style('A11').alignment.horizontal == 'center'
-    assert style('A12').alignment.vertical == 'top'
-    assert style('A13').alignment.vertical == 'center'
-    assert style('A14').alignment.vertical == 'bottom'
-    assert style('A15').number_format == '0.00'
-    assert style('A16').number_format == 'mm-dd-yy'
-    assert style('A17').number_format == '0.00%'
+    assert ws.get_style('I').font == Font(sz=12.0, color='FF3300FF')
+    assert ws.get_style('I').fill == PatternFill(patternType='solid', fgColor='FF006600', bgColor=Color(indexed=64))
+
+    assert ws['A2'].font == Font(sz=10, name='Arial', color=Color(theme=1))
+    assert ws['A3'].font == Font(sz=12, name='Arial', bold=True, color=Color(theme=1))
+    assert ws['A4'].font == Font(sz=14, name='Arial', italic=True, color=Color(theme=1))
+
+    assert ws['A5'].font.color.value == 'FF3300FF'
+    assert ws['A6'].font.color.value == 9
+    assert ws['A7'].fill.start_color.value == 'FFFFFF66'
+    assert ws['A8'].fill.start_color.value == 8
+    assert ws['A9'].alignment.horizontal == 'left'
+    assert ws['A10'].alignment.horizontal == 'right'
+    assert ws['A11'].alignment.horizontal == 'center'
+    assert ws['A12'].alignment.vertical == 'top'
+    assert ws['A13'].alignment.vertical == 'center'
+    assert ws['A14'].alignment.vertical == 'bottom'
+    assert ws['A15'].number_format == '0.00'
+    assert ws['A16'].number_format == 'mm-dd-yy'
+    assert ws['A17'].number_format == '0.00%'
+
     assert 'A18:B18' in ws._merged_cells
     assert ws.cell('B18').merged
-    assert style('A19').border.top.color.value == 'FF006600'
-    assert style('A19').border.bottom.color.value == 'FF006600'
-    assert style('A19').border.left.color.value == 'FF006600'
-    assert style('A19').border.right.color.value == 'FF006600'
-    assert style('A21').border.top.color.value == 7
-    assert style('A21').border.bottom.color.value == 7
-    assert style('A21').border.left.color.value == 7
-    assert style('A21').border.right.color.value == 7
-    assert style('A23').fill.start_color.value == 'FFCCCCFF'
-    assert style('A23').border.top.color.value == 6
+
+    assert ws['A19'].border == Border(
+        left=Side(style='thin', color='FF006600'),
+        top=Side(style='thin', color='FF006600'),
+        right=Side(style='thin', color='FF006600'),
+        bottom=Side(style='thin', color='FF006600'),
+    )
+
+    assert ws['A21'].border == Border(
+        left=Side(style='double', color=Color(theme=7)),
+        top=Side(style='double', color=Color(theme=7)),
+        right=Side(style='double', color=Color(theme=7)),
+        bottom=Side(style='double', color=Color(theme=7)),
+    )
+
+    assert ws['A23'].fill == PatternFill(patternType='solid', start_color='FFCCCCFF', end_color=(Color(indexed=64)))
+    assert ws['A23'].border.top == Side(style='mediumDashed', color=Color(theme=6))
+
     assert 'A23:B24' in ws._merged_cells
-    assert ws.cell('A24').merged
-    assert ws.cell('B23').merged
-    assert ws.cell('B24').merged
-    assert style('A25').alignment.wrap_text
-    assert style('A26').alignment.shrink_to_fit
+
+    assert ws['A25'].alignment == Alignment(wrapText=True)
+    assert ws['A26'].alignment == Alignment(shrinkToFit=True)
 
 
 def test_change_existing_styles(datadir):
@@ -178,34 +177,78 @@ def test_change_existing_styles(datadir):
     ws.set_style('I', i_style.copy(fill=PatternFill(fill_type='solid',
                                              start_color=Color('FF442200')),
                                    font=Font(color=Color('FF002244'))))
+
+    assert ws.get_style('I').fill.start_color.value == 'FF442200'
+    assert ws.get_style('I').font.color.value == 'FF002244'
+
     ws.cell('A2').style = ws.cell('A2').style.copy(font=Font(name='Times New Roman',
                                                              size=12,
                                                              bold=True,
                                                              italic=True))
+    assert ws['A2'].font == Font(name='Times New Roman', size=12, bold=True,
+                                 italic=True)
+
     ws.cell('A3').style = ws.cell('A3').style.copy(font=Font(name='Times New Roman',
                                                              size=14,
                                                              bold=False,
                                                              italic=True))
+    assert ws['A3'].font == Font(name='Times New Roman', size=14,
+                                    bold=False, italic=True)
+
+
     ws.cell('A4').style = ws.cell('A4').style.copy(font=Font(name='Times New Roman',
                                                              size=16,
                                                              bold=True,
                                                              italic=False))
+    assert ws['A4'].font == Font(name='Times New Roman', size=16, bold=True,
+                                 italic=False)
+
     ws.cell('A5').style = ws.cell('A5').style.copy(font=Font(color=Color('FF66FF66')))
+    assert ws['A5'].font == Font(color='FF66FF66')
+
+
     ws.cell('A6').style = ws.cell('A6').style.copy(font=Font(color=Color(theme='1')))
+    assert ws['A6'].font == Font(color=Color(theme='1'))
+
     ws.cell('A7').style = ws.cell('A7').style.copy(fill=PatternFill(fill_type='solid',
                                                              start_color=Color('FF330066')))
+    assert ws['A7'].fill == PatternFill(fill_type='solid',
+                                        start_color=Color('FF330066'))
+
     ws.cell('A8').style = ws.cell('A8').style.copy(fill=PatternFill(fill_type='solid',
                                                              start_color=Color(theme='2')))
+    assert ws['A8'].fill == PatternFill(fill_type='solid',
+                                        start_color=Color(theme='2'))
+
     ws.cell('A9').style = ws.cell('A9').style.copy(alignment=Alignment(horizontal='center'))
+    assert ws['A9'].alignment == Alignment(horizontal='center')
+
     ws.cell('A10').style = ws.cell('A10').style.copy(alignment=Alignment(horizontal='left'))
+    assert ws['A10'].alignment == Alignment(horizontal='left')
+
     ws.cell('A11').style = ws.cell('A11').style.copy(alignment=Alignment(horizontal='right'))
+    assert ws['A11'].alignment == Alignment(horizontal='right')
+
     ws.cell('A12').style = ws.cell('A12').style.copy(alignment=Alignment(vertical='bottom'))
+    assert ws['A12'].alignment == Alignment(vertical='bottom')
+
     ws.cell('A13').style = ws.cell('A13').style.copy(alignment=Alignment(vertical='top'))
+    assert ws['A13'].alignment == Alignment(vertical='top')
+
     ws.cell('A14').style = ws.cell('A14').style.copy(alignment=Alignment(vertical='center'))
+    assert ws['A14'].alignment == Alignment(vertical='center')
+
     ws.cell('A15').style = ws.cell('A15').style.copy(number_format='0.00%')
+    assert ws['A15'].number_format == '0.00%'
+
     ws.cell('A16').style = ws.cell('A16').style.copy(number_format='0.00')
+    assert ws['A16'].number_format == '0.00'
+
     ws.cell('A17').style = ws.cell('A17').style.copy(number_format='mm-dd-yy')
+    assert ws['A17'].number_format == 'mm-dd-yy'
+
     ws.unmerge_cells('A18:B18')
+
     ws.cell('A19').style = ws.cell('A19').style.copy(border=Border(top=Side(border_style=borders.BORDER_THIN,
                                                                                 color=Color('FF006600')),
                                                                      bottom=Side(border_style=borders.BORDER_THIN,
@@ -214,6 +257,12 @@ def test_change_existing_styles(datadir):
                                                                                  color=Color('FF006600')),
                                                                      right=Side(border_style=borders.BORDER_THIN,
                                                                                   color=Color('FF006600'))))
+    assert ws['A19'].border == Border(
+        top=Side(border_style=borders.BORDER_THIN, color='FF006600'),
+        bottom=Side(border_style=borders.BORDER_THIN, color='FF006600'),
+        left=Side(border_style=borders.BORDER_THIN, color='FF006600'),
+        right=Side(border_style=borders.BORDER_THIN, color='FF006600'))
+
     ws.cell('A21').style = ws.cell('A21').style.copy(border=Border(top=Side(border_style=borders.BORDER_THIN,
                                                                                 color=Color(theme=7)),
                                                                      bottom=Side(border_style=borders.BORDER_THIN,
@@ -222,110 +271,26 @@ def test_change_existing_styles(datadir):
                                                                                  color=Color(theme=7)),
                                                                      right=Side(border_style=borders.BORDER_THIN,
                                                                                   color=Color(theme=7))))
+    assert ws['A21'].border == Border(
+        top=Side(border_style=borders.BORDER_THIN, color=Color(theme=7)),
+        bottom=Side(border_style=borders.BORDER_THIN, color=Color(theme=7)),
+        left=Side(border_style=borders.BORDER_THIN, color=Color(theme=7)),
+        right=Side(border_style=borders.BORDER_THIN, color=Color(theme=7)))
+
     ws.cell('A23').style = ws.cell('A23').style.copy(border=Border(top=Side(border_style=borders.BORDER_THIN,
                                                                                 color=Color(theme=6))),
                                                      fill=PatternFill(fill_type='solid',
                                                                start_color=Color('FFCCCCFF')))
-    ws.unmerge_cells('A23:B24')
-    ws.cell('A25').style = ws.cell('A25').style.copy(alignment=Alignment(wrap_text=False))
-    ws.cell('A26').style = ws.cell('A26').style.copy(alignment=Alignment(shrink_to_fit=False))
+    assert ws['A23'].border == Border(
+        top=Side(style=borders.BORDER_THIN, color=Color(theme=6))
+    )
 
-    saved_wb = save_virtual_workbook(wb)
-    new_wb = load_workbook(BytesIO(saved_wb))
-    ws = new_wb.get_active_sheet()
+    ws.unmerge_cells('A23:B24')
+
+    ws.cell('A25').style = ws.cell('A25').style.copy(alignment=Alignment(wrap_text=False))
+    assert ws['A25'].alignment == Alignment(wrap_text=False)
+
+    ws.cell('A26').style = ws.cell('A26').style.copy(alignment=Alignment(shrink_to_fit=False))
+    assert ws['A26'].alignment == Alignment(shrink_to_fit=False)
 
     assert ws.column_dimensions['A'].width == 20.0
-
-    style = partial(ws.get_style)
-
-    assert ws.get_style('I').fill.start_color.value == 'FF442200'
-    assert ws.get_style('I').font.color.value == 'FF002244'
-    assert style('A2').font.name == 'Times New Roman'
-    assert style('A2').font.size == 12
-    assert style('A2').font.bold
-    assert style('A2').font.italic
-    assert style('A3').font.name == 'Times New Roman'
-    assert style('A3').font.size == 14
-    assert not style('A3').font.bold
-    assert style('A3').font.italic
-    assert style('A4').font.name == 'Times New Roman'
-    assert style('A4').font.size == 16
-    assert style('A4').font.bold
-    assert not style('A4').font.italic
-    assert style('A5').font.color.value == 'FF66FF66'
-    assert style('A6').font.color.value == 1
-    assert style('A7').fill.start_color.value == 'FF330066'
-    assert style('A8').fill.start_color.value == 2
-    assert style('A9').alignment.horizontal == 'center'
-    assert style('A10').alignment.horizontal == 'left'
-    assert style('A11').alignment.horizontal == 'right'
-    assert style('A12').alignment.vertical == 'bottom'
-    assert style('A13').alignment.vertical == 'top'
-    assert style('A14').alignment.vertical == 'center'
-    assert style('A15').number_format == '0.00%'
-    assert style('A16').number_format == '0.00'
-    assert style('A17').number_format == 'mm-dd-yy'
-    assert 'A18:B18' not in ws._merged_cells
-    assert not ws.cell('B18').merged
-    assert style('A19').border.top.color.value == 'FF006600'
-    assert style('A19').border.bottom.color.value == 'FF006600'
-    assert style('A19').border.left.color.value == 'FF006600'
-    assert style('A19').border.right.color.value == 'FF006600'
-    assert style('A21').border.top.color.value == 7
-    assert style('A21').border.bottom.color.value == 7
-    assert style('A21').border.left.color.value == 7
-    assert style('A21').border.right.color.value == 7
-    assert style('A23').fill.start_color.value == 'FFCCCCFF'
-    assert style('A23').border.top.color.value == 6
-    assert 'A23:B24' not in ws._merged_cells
-    assert not ws.cell('A24').merged
-    assert not ws.cell('B23').merged
-    assert not ws.cell('B24').merged
-    assert not style('A25').alignment.wrap_text
-    assert not style('A26').alignment.shrink_to_fit
-
-    # Verify that previously duplicate styles remain the same
-    assert ws.column_dimensions['C'].width == 31.1640625
-    assert style('C2').font.name == 'Arial'
-    assert style('C2').font.size == 10
-    assert not style('C2').font.bold
-    assert not style('C2').font.italic
-    assert style('C3').font.name == 'Arial'
-    assert style('C3').font.size == 12
-    assert style('C3').font.bold
-    assert not style('C3').font.italic
-    assert style('C4').font.name == 'Arial'
-    assert style('C4').font.size == 14
-    assert not style('C4').font.bold
-    assert style('C4').font.italic
-    assert style('C5').font.color.value == 'FF3300FF'
-    assert style('C6').font.color.value == 9
-    assert style('C7').fill.start_color.value == 'FFFFFF66'
-    assert style('C8').fill.start_color.value == 8
-    assert style('C9').alignment.horizontal == 'left'
-    assert style('C10').alignment.horizontal == 'right'
-    assert style('C11').alignment.horizontal == 'center'
-    assert style('C12').alignment.vertical == 'top'
-    assert style('C13').alignment.vertical == 'center'
-    assert style('C14').alignment.vertical == 'bottom'
-    assert style('C15').number_format == '0.00'
-    assert style('C16').number_format == 'mm-dd-yy'
-    assert style('C17').number_format == '0.00%'
-    assert 'C18:D18' in ws._merged_cells
-    assert ws.cell('D18').merged
-    assert style('C19').border.top.color.value == 'FF006600'
-    assert style('C19').border.bottom.color.value == 'FF006600'
-    assert style('C19').border.left.color.value == 'FF006600'
-    assert style('C19').border.right.color.value == 'FF006600'
-    assert style('C21').border.top.color.value == 7
-    assert style('C21').border.bottom.color.value == 7
-    assert style('C21').border.left.color.value == 7
-    assert style('C21').border.right.color.value == 7
-    assert style('C23').fill.start_color.value == 'FFCCCCFF'
-    assert style('C23').border.top.color.value == 6
-    assert 'C23:D24' in ws._merged_cells
-    assert ws.cell('C24').merged
-    assert ws.cell('D23').merged
-    assert ws.cell('D24').merged
-    assert style('C25').alignment.wrap_text
-    assert style('C26').alignment.shrink_to_fit

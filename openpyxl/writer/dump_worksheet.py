@@ -242,8 +242,8 @@ class DumpWorksheet(Worksheet):
     def write_cell(self, doc, cell):
         coordinate = cell.coordinate
         attributes = {'r': coordinate}
-        if cell._style_id != 0:
-            attributes['s'] = '%d' % cell._style_id
+        if cell._style!= 0:
+            attributes['s'] = '%d' % cell._style
 
         if cell.data_type != cell.TYPE_FORMULA:
             attributes['t'] = cell.data_type

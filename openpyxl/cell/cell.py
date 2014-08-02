@@ -170,7 +170,7 @@ class Cell(object):
                  '_hyperlink_rel',
                  'merged',
                  '_comment',
-                 '_style_id',)
+                 '_style',)
 
     ERROR_CODES = ('#NULL!',
                    '#DIV/0!',
@@ -193,7 +193,7 @@ class Cell(object):
                    TYPE_NULL, TYPE_INLINE, TYPE_ERROR, TYPE_FORMULA_CACHE_STRING)
 
     def __init__(self, worksheet, column, row, value=None):
-        self._style_id = 0
+        self._style = 0
         self.column = column.upper()
         self.row = row
         self.coordinate = '%s%d' % (self.column, self.row)
@@ -398,8 +398,7 @@ class Cell(object):
 
     @property
     def number_format(self):
-        style = self.parent.get_style(self.coordinate)
-        return style.number_format
+        return self.style.number_format
 
     @number_format.setter
     def number_format(self, format_code):
@@ -423,16 +422,32 @@ class Cell(object):
     @property
     def has_style(self):
         """Check if the parent worksheet has a style for this cell"""
-        return self.coordinate in self.parent._styles
+        return self._style != 0
 
     @property
     def style(self):
         """Returns the :class:`openpyxl.style.Style` object for this cell"""
-        return self.parent.get_style(self.coordinate)
+        return self.parent.parent.shared_styles[self._style]
 
     @style.setter
     def style(self, new_style):
-        return self.parent.set_style(self.coordinate, new_style)
+        self._style = self.parent.parent.shared_styles.add(new_style)
+
+    @property
+    def font(self):
+        return self.style.font
+
+    @property
+    def fill(self):
+        return self.style.fill
+
+    @property
+    def border(self):
+        return self.style.border
+
+    @property
+    def alignment(self):
+        return self.style.alignment
 
     def offset(self, row=0, column=0):
         """Returns a cell location relative to this cell.
