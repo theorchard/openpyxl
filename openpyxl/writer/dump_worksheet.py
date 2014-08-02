@@ -13,6 +13,8 @@ from openpyxl.comments.comments import Comment
 from openpyxl.cell import get_column_letter, Cell, TIME_TYPES
 from openpyxl.styles import Style, DEFAULTS
 from openpyxl.worksheet import Worksheet
+from openpyxl.writer.worksheet import write_cell
+
 from openpyxl.xml.constants import SHEET_MAIN_NS
 from openpyxl.xml.functions import (
     XMLGenerator,
@@ -84,8 +86,6 @@ class DumpWorksheet(Worksheet):
         self._fileobj_content_name = create_temporary_file(suffix='.content')
         self._fileobj_name = create_temporary_file()
 
-        self._strings = self._parent.shared_strings
-        self._styles = self._parent.shared_styles
         self._comments = []
 
     def get_temporary_file(self, filename):
@@ -237,44 +237,10 @@ class DumpWorksheet(Worksheet):
                 comment._parent = CommentParentCell(cell)
                 self._comments.append(comment)
 
-            self.write_cell(doc, cell)
+            write_cell(doc, self, cell)
             if dirty_cell:
                 cell = WriteOnlyCell(self)
         end_tag(doc, 'row')
-
-    def write_cell(self, doc, cell):
-        coordinate = cell.coordinate
-        attributes = {'r': coordinate}
-        if cell._style!= 0:
-            attributes['s'] = '%d' % cell._style
-
-        if cell.data_type != cell.TYPE_FORMULA:
-            attributes['t'] = cell.data_type
-
-        value = cell.internal_value
-        if value in ('', None):
-            tag(doc, 'c', attributes)
-        else:
-            start_tag(doc, 'c', attributes)
-            if cell.data_type == cell.TYPE_STRING:
-                tag(doc, 'v', body='%s' % self._strings.add(value))
-            elif cell.data_type == cell.TYPE_FORMULA:
-                shared_formula = self.formula_attributes.get(coordinate)
-                if shared_formula is not None:
-                    attr = shared_formula
-                    if 't' in attr and attr['t'] == 'shared' and 'ref' not in attr:
-                        # Don't write body for shared formula
-                        tag(doc, 'f', attr=attr)
-                    else:
-                        tag(doc, 'f', attr=attr, body=value[1:])
-                else:
-                    tag(doc, 'f', body=value[1:])
-                tag(doc, 'v')
-            elif cell.data_type in (cell.TYPE_NUMERIC, cell.TYPE_BOOL):
-                tag(doc, 'v', body=safe_string(value))
-            else:
-                tag(doc, 'v', body=value)
-            end_tag(doc, 'c')
 
 
 def removed_method(*args, **kw):
