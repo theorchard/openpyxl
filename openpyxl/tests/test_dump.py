@@ -160,7 +160,7 @@ def test_datetime(value):
 
 
 def test_dump_with_font():
-    from openpyxl.cell.write_only import WriteOnlyCell
+    from openpyxl.writer.dump_worksheet import WriteOnlyCell
     test_filename = _get_test_filename()
 
     wb = Workbook(optimized_write=True)
@@ -179,7 +179,7 @@ def test_dump_with_font():
 
 
 def test_dump_with_comment():
-    from openpyxl.cell.write_only import WriteOnlyCell
+    from openpyxl.writer.dump_worksheet import WriteOnlyCell
     test_filename = _get_test_filename()
 
     wb = Workbook(optimized_write=True)

@@ -11,7 +11,6 @@ from tempfile import NamedTemporaryFile
 from openpyxl.compat import OrderedDict, unicode
 from openpyxl.comments.comments import Comment
 from openpyxl.cell import get_column_letter, Cell, TIME_TYPES
-from openpyxl.cell.write_only import WriteOnlyCell
 from openpyxl.styles import Style, DEFAULTS
 from openpyxl.worksheet import Worksheet
 from openpyxl.xml.constants import SHEET_MAIN_NS
@@ -61,6 +60,10 @@ def create_temporary_file(suffix=''):
                               prefix='openpyxl.', delete=False)
     filename = fobj.name
     return filename
+
+
+def WriteOnlyCell(ws=None, value=None):
+    return Cell(worksheet=ws, column='A', row=1, value=value)
 
 
 class DumpWorksheet(Worksheet):
@@ -222,7 +225,7 @@ class DumpWorksheet(Worksheet):
             dirty_cell = False
             column = get_column_letter(col_idx)
 
-            if isinstance(value, WriteOnlyCell):
+            if isinstance(value, Cell):
                 cell = value
                 dirty_cell = True # cell may have other properties than a value
             else:
@@ -236,7 +239,7 @@ class DumpWorksheet(Worksheet):
 
             self.write_cell(doc, cell)
             if dirty_cell:
-                cell = WriteOnlyCell()
+                cell = WriteOnlyCell(self)
         end_tag(doc, 'row')
 
     def write_cell(self, doc, cell):
