@@ -174,8 +174,8 @@ def write_cell(xf, worksheet, cell):
     string_table = worksheet.parent.shared_strings
     coordinate = cell.coordinate
     attributes = {'r': coordinate}
-    if cell.style != default:
-        attributes['s'] = '%d' % worksheet.parent.shared_styles.add(cell.style)
+    if cell.has_style:
+        attributes['s'] = '%d' % cell._style
 
     if cell.data_type != 'f':
         attributes['t'] = cell.data_type
