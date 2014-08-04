@@ -20,6 +20,7 @@ class DummyWorkbook:
         self.shared_strings = IndexedList()
         self.shared_styles = IndexedList()
         self._local_data = DummyLocalData()
+        self.encoding = "UTF-8"
 
     def get_sheet_names(self):
         return []
@@ -67,8 +68,9 @@ def test_dimensions(DumpWorksheet):
 def test_write_header(DumpWorksheet):
     ws = DumpWorksheet
     doc = ws.write_header()
-    doc._flush()
-    xml = open(ws._fileobj_header_name).read()
+    header = ws.get_temporary_file(ws._fileobj_header_name)
+    header.seek(0)
+    xml = header.read()
     xml += "</worksheet>"
     expected = """<worksheet xmlns:r="http://schemas.openxmlformats.org/officeDocument/2006/relationships" xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main">
     <sheetPr>
@@ -90,10 +92,11 @@ def test_write_header(DumpWorksheet):
 def test_append_data(DumpWorksheet):
     ws = DumpWorksheet
     doc = ws.append([1])
-    doc._flush()
     assert ws._max_col == 1
     assert ws._max_row == 1
-    xml = open(ws._fileobj_content_name).read()
+    content = ws.get_temporary_file(ws._fileobj_content_name)
+    content.seek(0)
+    xml = content.read()
     expected = """<row r="1" spans="1:1"><c r="A1" t="n"><v>1</v></c></row>"""
     diff = compare_xml(xml, expected)
     assert diff is None, diff
@@ -116,8 +119,9 @@ def test_append_cell(DumpWorksheet):
     cell._style = 5
     doc = ws.append([cell])
     assert ws.parent.shared_strings == ['Hello there']
-    doc._flush()
-    xml = open(ws._fileobj_content_name).read()
+    content = ws.get_temporary_file(ws._fileobj_content_name)
+    content.seek(0)
+    xml = content.read()
     expected = """<row r="1" spans="1:1"><c r="A1" t="s" s="5"><v>0</v></c></row>"""
     diff = compare_xml(xml, expected)
     assert diff is None, diff

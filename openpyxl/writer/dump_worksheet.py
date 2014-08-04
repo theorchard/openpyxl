@@ -233,7 +233,6 @@ class DumpWorksheet(Worksheet):
             if dirty_cell:
                 cell = WriteOnlyCell(self)
         end_tag(doc, 'row')
-        return doc
 
 
 def removed_method(*args, **kw):
