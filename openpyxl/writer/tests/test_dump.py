@@ -82,3 +82,15 @@ def test_write_header(DumpWorksheet):
     """
     diff = compare_xml(xml, expected)
     assert diff is None, diff
+
+
+def test_append_data(DumpWorksheet):
+    ws = DumpWorksheet
+    doc = ws.append([1])
+    doc._flush()
+    assert ws._max_col == 1
+    assert ws._max_row == 1
+    xml = open(ws._fileobj_content_name).read()
+    expected = """<row r="1" spans="1:1"><c r="A1" t="n"><v>1</v></c></row>"""
+    diff = compare_xml(xml, expected)
+    assert diff is None, diff
