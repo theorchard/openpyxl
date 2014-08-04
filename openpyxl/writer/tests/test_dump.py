@@ -126,7 +126,6 @@ def test_append_cell(DumpWorksheet):
 def test_close_content(DumpWorksheet):
     ws = DumpWorksheet
     ws._close_content()
-    doc = ws._get_content_generator
     content = open(ws._fileobj_content_name).read()
     expected = "</sheetData></worksheet>"
     content == expected
