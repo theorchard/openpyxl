@@ -13,7 +13,6 @@ from openpyxl.comments.comments import Comment
 from openpyxl.cell import get_column_letter, Cell, TIME_TYPES
 from openpyxl.styles import Style, DEFAULTS
 from openpyxl.worksheet import Worksheet
-from openpyxl.writer.worksheet import write_cell
 
 from openpyxl.xml.constants import SHEET_MAIN_NS
 from openpyxl.xml.functions import (
@@ -39,8 +38,11 @@ from openpyxl.writer.strings import write_string_table
 from openpyxl.writer.styles import StyleWriter
 from openpyxl.writer.comments import CommentWriter
 from .relations import write_rels
-from .worksheet import write_worksheet_cols, write_worksheet_format
-
+from .worksheet import (
+    write_cell,
+    write_worksheet_cols,
+    write_worksheet_format
+)
 from openpyxl.xml.constants import (ARC_SHARED_STRINGS, PACKAGE_WORKSHEETS)
 
 
