@@ -131,21 +131,6 @@ def test_close_content(DumpWorksheet):
     content == expected
 
 
-def test_write_fileobj(DumpWorksheet, tmpdir):
-    tmpdir.chdir()
-    ws = DumpWorksheet
-    ws._fileobj = ws.get_temporary_file(ws.filename)
-    with open("header.txt", "w") as header:
-        header.write("This is the header")
-    with open("body.txt", "w") as body:
-        body.write("This is the body")
-    ws._write_fileobj("header.txt")
-    ws._write_fileobj("body.txt")
-    with open(ws.filename) as concat:
-        content = concat.read()
-    assert content == "This is the headerThis is the body"
-
-
 def test_close(DumpWorksheet):
     ws = DumpWorksheet
     ws.write_header()

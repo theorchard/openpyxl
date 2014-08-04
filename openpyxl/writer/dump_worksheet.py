@@ -5,6 +5,7 @@ from __future__ import absolute_import
 """Write worksheets to xml representations in an optimized way"""
 
 import datetime
+import fileinput
 import os
 from tempfile import NamedTemporaryFile
 
@@ -161,24 +162,13 @@ class DumpWorksheet(Worksheet):
 
     def close(self):
         self._close_content()
-        self._fileobj = self.get_temporary_file(filename=self._fileobj_name)
-        self._write_fileobj(self._fileobj_header_name)
-        self._write_fileobj(self._fileobj_content_name)
-        self._fileobj.close()
-
-    def _write_fileobj(self, fobj_name):
-        fobj = self.get_temporary_file(filename=fobj_name)
-        fobj.flush()
-        fobj.seek(0)
-
-        while True:
-            chunk = fobj.read(4096)
-            if not chunk:
-                break
-            self._fileobj.write(chunk)
-
-        fobj.close()
-        self._fileobj.flush()
+        files = [self._fileobj_header_name, self._fileobj_content_name]
+        for f in files:
+            self.get_temporary_file(f).close()
+        output = self.get_temporary_file(self.filename)
+        for line in fileinput.input(files):
+            output.write(line)
+        output.close()
 
     def _close_content(self):
         doc = self._get_content_generator()
