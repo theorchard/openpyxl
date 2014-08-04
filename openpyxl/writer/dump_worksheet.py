@@ -189,9 +189,7 @@ class DumpWorksheet(Worksheet):
         """ XXX: this is ugly, but it allows to resume writing the file
         even after the handle is closed"""
 
-        # when I'll recreate the XMLGenerator, it will start writing at the
-        # begining of the file, erasing previously entered rows, so we have
-        # to move to the end of the file before adding new tags
+        # restart XMLGenerator at the end of the file to prevent it being overwritten
         handle = self.get_temporary_file(filename=self._fileobj_content_name)
         handle.seek(0, 2)
 
