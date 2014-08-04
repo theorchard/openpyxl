@@ -35,7 +35,6 @@ def DumpWorksheet():
 def test_ctor(DumpWorksheet):
     ws = DumpWorksheet
     assert isinstance(ws._parent, DummyWorkbook)
-    assert ws.saved is False
     assert ws.title == "TestWorkSheet"
     assert ws._max_col == 0
     assert ws._max_row == 0
@@ -161,3 +160,22 @@ def test_close(DumpWorksheet):
     """
     diff = compare_xml(xml, expected)
     assert diff is None, diff
+
+
+def test_cleanup(DumpWorksheet):
+    ws = DumpWorksheet
+    ws.close()
+    ws._cleanup()
+    assert ws._fileobj_header_name is None
+    assert ws._fileobj_content_name is None
+    assert ws._fileobj_name is None
+
+
+def test_cannot_save_twice(DumpWorksheet):
+    from .. dump_worksheet import WorkbookAlreadySaved
+    ws = DumpWorksheet
+    fname = ws.filename
+    ws.close()
+    ws._cleanup()
+    with pytest.raises(WorkbookAlreadySaved):
+        ws.get_temporary_file(fname)

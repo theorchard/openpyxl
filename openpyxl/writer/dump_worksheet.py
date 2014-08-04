@@ -81,7 +81,7 @@ class DumpWorksheet(Worksheet):
     def __init__(self, parent_workbook, title):
         Worksheet.__init__(self, parent_workbook, title)
 
-        self.saved = False
+        self.__saved = False
 
         self._max_col = 0
         self._max_row = 0
@@ -94,7 +94,7 @@ class DumpWorksheet(Worksheet):
         self._comments = []
 
     def get_temporary_file(self, filename):
-        if self.saved:
+        if self.__saved:
             raise WorkbookAlreadySaved('this workbook has already been saved '
                     'and cannot be modified or saved anymore.')
 
@@ -124,11 +124,17 @@ class DumpWorksheet(Worksheet):
     def filename(self):
         return self._fileobj_name
 
-    def _unset_temp_files(self):
-        for fn in (self._fileobj_content_name, self._fileobj_header_name, self._fileobj_name):
-            del self._descriptors_cache[fn]
-            os.remove(fn)
-            fn = None
+    def _cleanup(self):
+        """
+        Mark sheet as having been saved so no further changes are possible.
+        Remove file handlers from cache
+        """
+        for attr in ('_fileobj_content_name', '_fileobj_header_name', '_fileobj_name'):
+            obj = getattr(self, attr)
+            del self._descriptors_cache[obj]
+            os.remove(obj)
+            setattr(self, attr, None)
+        self.__saved = True
 
     def write_header(self):
 
@@ -279,8 +285,7 @@ class ExcelDumpWriter(ExcelWriter):
 
             sheet.close()
             archive.write(sheet.filename, PACKAGE_WORKSHEETS + '/sheet%d.xml' % (i + 1))
-            sheet._unset_temp_files()
-            sheet.saved = True
+            sheet._cleanup()
 
             # write comments
             if sheet._comments:
