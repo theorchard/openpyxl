@@ -6,6 +6,9 @@ import pytest
 from openpyxl.compat import file
 from openpyxl.tests.helper import compare_xml
 
+from openpyxl.collections import IndexedList
+
+
 class DummyLocalData:
 
     pass
@@ -14,8 +17,8 @@ class DummyLocalData:
 class DummyWorkbook:
 
     def __init__(self):
-        self.shared_strings = []
-        self.shared_styles = []
+        self.shared_strings = IndexedList()
+        self.shared_styles = IndexedList()
         self._local_data = DummyLocalData()
 
     def get_sheet_names(self):
@@ -94,3 +97,51 @@ def test_append_data(DumpWorksheet):
     expected = """<row r="1" spans="1:1"><c r="A1" t="n"><v>1</v></c></row>"""
     diff = compare_xml(xml, expected)
     assert diff is None, diff
+
+
+def test_write_only_cell():
+    from .. dump_worksheet import WriteOnlyCell
+    c = WriteOnlyCell()
+    assert c.parent is None
+    assert c.value is None
+    assert c.column == 'A'
+    assert c.row == 1
+
+
+def test_append_cell(DumpWorksheet):
+    from .. dump_worksheet import WriteOnlyCell
+    ws = DumpWorksheet
+    cell = WriteOnlyCell(ws, "Hello there")
+    assert ws.parent.shared_strings == []
+    cell._style = 5
+    doc = ws.append([cell])
+    assert ws.parent.shared_strings == ['Hello there']
+    doc._flush()
+    xml = open(ws._fileobj_content_name).read()
+    expected = """<row r="1" spans="1:1"><c r="A1" t="s" s="5"><v>0</v></c></row>"""
+    diff = compare_xml(xml, expected)
+    assert diff is None, diff
+
+
+def test_close_content(DumpWorksheet):
+    ws = DumpWorksheet
+    ws._close_content()
+    doc = ws._get_content_generator
+    content = open(ws._fileobj_content_name).read()
+    expected = "</sheetData></worksheet>"
+    content == expected
+
+
+def test_write_fileobj(DumpWorksheet, tmpdir):
+    tmpdir.chdir()
+    ws = DumpWorksheet
+    ws._fileobj = ws.get_temporary_file(ws.filename)
+    with open("header.txt", "w") as header:
+        header.write("This is the header")
+    with open("body.txt", "w") as body:
+        body.write("This is the body")
+    ws._write_fileobj("header.txt")
+    ws._write_fileobj("body.txt")
+    with open(ws.filename) as concat:
+        content = concat.read()
+    assert content == "This is the headerThis is the body"
