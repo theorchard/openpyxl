@@ -145,20 +145,6 @@ def test_append_after_save():
         ws.append(['hello'])
 
 
-@pytest.mark.parametrize("value",
-                         [
-                             time(12, 15, 30),
-                             datetime.now(),
-                             timedelta(1),
-                         ]
-                         )
-def test_datetime(value):
-    wb = Workbook(optimized_write=True)
-    ws = wb.create_sheet()
-    row = [value]
-    ws.append(row)
-
-
 def test_dump_with_font():
     from openpyxl.writer.dump_worksheet import WriteOnlyCell
     test_filename = _get_test_filename()
