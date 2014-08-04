@@ -145,3 +145,30 @@ def test_write_fileobj(DumpWorksheet, tmpdir):
     with open(ws.filename) as concat:
         content = concat.read()
     assert content == "This is the headerThis is the body"
+
+
+def test_close(DumpWorksheet):
+    ws = DumpWorksheet
+    ws.write_header()
+    header = ws.get_temporary_file(ws._fileobj_header_name)
+    header.write("<sheetData>") # well-formed XML needed
+    ws.close()
+    with open(ws.filename) as content:
+        xml = content.read()
+    expected = """
+    <worksheet xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main" xmlns:r="http://schemas.openxmlformats.org/officeDocument/2006/relationships">
+    <sheetPr>
+      <outlinePr summaryRight="1" summaryBelow="1"/>
+    </sheetPr>
+    <dimension ref="A1:A1"/>
+    <sheetViews>
+      <sheetView workbookViewId="0">
+        <selection activeCell="A1" sqref="A1"/>
+      </sheetView>
+    </sheetViews>
+    <sheetFormatPr defaultRowHeight="15" baseColWidth="10"/>
+    <sheetData/>
+    </worksheet>
+    """
+    diff = compare_xml(xml, expected)
+    assert diff is None, diff
