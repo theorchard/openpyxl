@@ -35,6 +35,7 @@ def DumpWorksheet():
 def test_ctor(DumpWorksheet):
     ws = DumpWorksheet
     assert isinstance(ws._parent, DummyWorkbook)
+    assert ws.saved is False
     assert ws.title == "TestWorkSheet"
     assert ws._max_col == 0
     assert ws._max_row == 0

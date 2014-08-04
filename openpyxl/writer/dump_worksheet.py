@@ -81,6 +81,8 @@ class DumpWorksheet(Worksheet):
     def __init__(self, parent_workbook, title):
         Worksheet.__init__(self, parent_workbook, title)
 
+        self.saved = False
+
         self._max_col = 0
         self._max_row = 0
         self._parent = parent_workbook
@@ -92,24 +94,23 @@ class DumpWorksheet(Worksheet):
         self._comments = []
 
     def get_temporary_file(self, filename):
+        if self.saved:
+            raise WorkbookAlreadySaved('this workbook has already been saved '
+                    'and cannot be modified or saved anymore.')
+
         if filename in self._descriptors_cache:
             fobj = self._descriptors_cache[filename]
             # re-insert the value so it does not get evicted
             # from cache soon
             del self._descriptors_cache[filename]
             self._descriptors_cache[filename] = fobj
-            return fobj
         else:
-            if filename is None:
-                raise WorkbookAlreadySaved('this workbook has already been saved '
-                        'and cannot be modified or saved anymore.')
-
             fobj = open(filename, 'r+')
             self._descriptors_cache[filename] = fobj
             if len(self._descriptors_cache) > DESCRIPTORS_CACHE_SIZE:
                 filename, fileobj = self._descriptors_cache.popitem(last=False)
                 fileobj.close()
-            return fobj
+        return fobj
 
     @property
     def _descriptors_cache(self):
@@ -123,16 +124,11 @@ class DumpWorksheet(Worksheet):
     def filename(self):
         return self._fileobj_name
 
-    @property
-    def _temp_files(self):
-        return (self._fileobj_content_name,
-                self._fileobj_header_name,
-                self._fileobj_name)
-
     def _unset_temp_files(self):
-        self._fileobj_header_name = None
-        self._fileobj_content_name = None
-        self._fileobj_name = None
+        for fn in (self._fileobj_content_name, self._fileobj_header_name, self._fileobj_name):
+            del self._descriptors_cache[fn]
+            os.remove(fn)
+            fn = None
 
     def write_header(self):
 
@@ -283,10 +279,8 @@ class ExcelDumpWriter(ExcelWriter):
 
             sheet.close()
             archive.write(sheet.filename, PACKAGE_WORKSHEETS + '/sheet%d.xml' % (i + 1))
-            for filename in sheet._temp_files:
-                del sheet._descriptors_cache[filename]
-                os.remove(filename)
             sheet._unset_temp_files()
+            sheet.saved = True
 
             # write comments
             if sheet._comments:
