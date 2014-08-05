@@ -60,6 +60,13 @@ def test_get_temporary_file(DumpWorksheet):
     assert fobj.mode == "r+"
 
 
+def test_get_content_generator(DumpWorksheet):
+    from xml.sax.saxutils import XMLGenerator
+    ws = DumpWorksheet
+    doc = ws._get_content_generator()
+    assert isinstance(doc, XMLGenerator)
+
+
 def test_dimensions(DumpWorksheet):
     ws = DumpWorksheet
     assert ws.get_dimensions() == 'A1'
