@@ -4,7 +4,11 @@ from __future__ import absolute_import
 from lxml.etree import xmlfile, Element, SubElement, tounicode
 
 from . dump_worksheet import DumpWorksheet, DESCRIPTORS_CACHE_SIZE
-from . lxml_worksheet import write_format, write_sheetviews
+from . lxml_worksheet import (
+    write_format,
+    write_sheetviews,
+    write_cols
+    )
 
 from openpyxl.xml.constants import SHEET_MAIN_NS
 
@@ -32,6 +36,7 @@ class LXMLWorksheet(DumpWorksheet):
 
                 write_sheetviews(xf, self)
                 write_format(xf, self)
+                write_cols(xf, self)
 
 
     def close_content(self):
