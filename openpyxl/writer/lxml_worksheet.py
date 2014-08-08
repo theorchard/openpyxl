@@ -167,9 +167,6 @@ def write_rows(xf, worksheet):
                     write_cell(xf, worksheet, cell)
 
 
-from openpyxl.styles import Style
-default = Style()
-
 def write_cell(xf, worksheet, cell):
     string_table = worksheet.parent.shared_strings
     coordinate = cell.coordinate
