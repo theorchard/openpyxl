@@ -15,14 +15,10 @@ def LXMLWorksheet():
 
 
 def test_write_header(LXMLWorksheet):
-    #return
     ws = LXMLWorksheet
     doc = ws.write_header()
-    header = ws.get_temporary_file(ws._fileobj_header_name)
-    header.seek(0)
+    header = open(ws.filename)
     xml = header.read()
-    xml += b"</worksheet>"
-    xml = str(xml, "utf-8")
     expected = """<worksheet xmlns:r="http://schemas.openxmlformats.org/officeDocument/2006/relationships" xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main">
     <sheetPr>
       <outlinePr summaryRight="1" summaryBelow="1"/>
@@ -37,7 +33,7 @@ def test_write_header(LXMLWorksheet):
     </worksheet>
     """
     diff = compare_xml(xml, expected)
-    #assert diff is None, diff
+    assert diff is None, diff
 
 
 def test_close_content(LXMLWorksheet):

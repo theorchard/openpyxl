@@ -11,47 +11,27 @@ from openpyxl.xml.constants import SHEET_MAIN_NS
 
 class LXMLWorksheet(DumpWorksheet):
 
-
     __saved = False
-
-
-    def get_temporary_file(self, filename):
-        if self.__saved:
-            raise WorkbookAlreadySaved('this workbook has already been saved '
-                    'and cannot be modified or saved anymore.')
-
-        if filename in self._descriptors_cache:
-            fobj = self._descriptors_cache[filename]
-            # re-insert the value so it does not get evicted
-            # from cache soon
-            del self._descriptors_cache[filename]
-            self._descriptors_cache[filename] = fobj
-        else:
-            fobj = open(filename, 'rb+')
-            self._descriptors_cache[filename] = fobj
-            if len(self._descriptors_cache) > DESCRIPTORS_CACHE_SIZE:
-                filename, fileobj = self._descriptors_cache.popitem(last=False)
-                fileobj.close()
-        return fobj
 
     def write_header(self):
         NSMAP = {None : SHEET_MAIN_NS}
-        fobj = self.get_temporary_file(self._fileobj_header_name)
 
-        with xmlfile(fobj) as xf:
-            xf.element("worksheet", nsmap=NSMAP)
-            pr = Element('sheetPr')
-            SubElement(pr, 'outlinePr',
-                       {'summaryBelow':
-                        '%d' %  (self.show_summary_below),
-                        'summaryRight': '%d' % (self.show_summary_right)})
-            if self.page_setup.fitToPage:
-                SubElement(pr, 'pageSetUpPr', {'fitToPage': '1'})
-            xf.write(pr)
-            del pr
+        with xmlfile(self.filename) as xf:
+            with xf.element("worksheet", nsmap=NSMAP):
+                pr = Element('sheetPr')
+                SubElement(pr, 'outlinePr',
+                           {'summaryBelow':
+                            '%d' %  (self.show_summary_below),
+                            'summaryRight': '%d' % (self.show_summary_right)})
+                if self.page_setup.fitToPage:
+                    SubElement(pr, 'pageSetUpPr', {'fitToPage': '1'})
+                xf.write(pr)
 
-            #write_sheetviews(xf, self)
-            #write_format(xf, self)
+                dim = Element('dimension', {'ref': 'A1:%s' % (self.get_dimensions())})
+                xf.write(dim)
+
+                write_sheetviews(xf, self)
+                write_format(xf, self)
 
 
     def close_content(self):
