@@ -1,6 +1,7 @@
 from __future__ import absolute_import
 # Copyright (c) 2010-2014 openpyxl
 
+from io import BytesIO
 from lxml.etree import xmlfile, Element, SubElement, tounicode
 
 from openpyxl.compat import safe_string
@@ -19,6 +20,7 @@ from openpyxl.xml.constants import SHEET_MAIN_NS
 class LXMLWorksheet(DumpWorksheet):
 
     __saved = False
+    writer = None
 
     def write_header(self):
         NSMAP = {None : SHEET_MAIN_NS}
@@ -44,17 +46,12 @@ class LXMLWorksheet(DumpWorksheet):
     def _write_row(self):
         with xmlfile(self._fileobj_content_name) as xf:
             with xf.element("sheetData"):
-                attrs = {'r': '%d' % self._max_row,
-                         'spans': '1:%d' % self._max_col}
-
-                with xf.element("row", attrs):
-                    try:
-                        while True:
-                            c = (yield)
-                            xf.write(c)
-                    except GeneratorExit:
-                        pass
-
+                try:
+                    while True:
+                        r = (yield)
+                        xf.write(r)
+                except GeneratorExit:
+                    pass
 
     def close_content(self):
         pass
@@ -73,8 +70,13 @@ class LXMLWorksheet(DumpWorksheet):
         span = len(row)
         self._max_col = max(self._max_col, span)
         row_idx = self._max_row
-        self.writer = self._write_row()
-        next(self.writer)
+        if self.writer is None:
+            self.writer = self._write_row()
+            next(self.writer)
+
+        attrs = {'r': '%d' % self._max_row,
+                 'spans': '1:%d' % self._max_col}
+        el = Element("row", attrs)
 
         for col_idx, value in enumerate(row, 1):
             if value is None:
@@ -95,9 +97,10 @@ class LXMLWorksheet(DumpWorksheet):
                 self._comments.append(comment)
 
             tree = write_cell(self, cell)
-            self.writer.send(tree)
+            el.append(tree)
             if dirty_cell:
                 cell = WriteOnlyCell(self)
+        self.writer.send(el)
 
 
 def write_cell(worksheet, cell):

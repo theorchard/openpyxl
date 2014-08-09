@@ -7,7 +7,6 @@ import decimal
 from lxml.etree import tostring
 
 from openpyxl.tests.helper import compare_xml
-from openpyxl.compat import unicode
 
 from . test_dump import DummyWorkbook
 
@@ -61,7 +60,7 @@ def test_write_cell(LXMLWorksheet, value, expected):
     ws = LXMLWorksheet
     c = Cell(ws, 'A', 1, value)
     el = write_cell(ws, c)
-    xml = unicode(tostring(el), "utf-8")
+    xml = tostring(el, encoding="unicode")
     diff = compare_xml(xml, expected)
     assert diff is None, diff
 
@@ -69,19 +68,28 @@ def test_write_cell(LXMLWorksheet, value, expected):
 def test_append(LXMLWorksheet):
     ws = LXMLWorksheet
     ws.append([1, "s"])
+    ws.append(['2', 3])
     ws.writer.close()
     with open(ws._fileobj_content_name) as rows:
         xml = rows.read()
     expected = """
     <sheetData>
-    <row r="1" spans="1:2">
-      <c r="A1" t="n">
-        <v>1</v>
-      </c>
-      <c r="B1" t="s">
-        <v>0</v>
-      </c>
-    </row>
+      <row r="1" spans="1:2">
+        <c r="A1" t="n">
+          <v>1</v>
+        </c>
+        <c r="B1" t="s">
+          <v>0</v>
+        </c>
+      </row>
+      <row r="2" spans="1:2">
+        <c r="A2" t="s">
+          <v>1</v>
+        </c>
+        <c r="B2" t="n">
+          <v>3</v>
+        </c>
+      </row>
     </sheetData>
     """
     diff = compare_xml(xml, expected)
