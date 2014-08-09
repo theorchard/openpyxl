@@ -51,6 +51,7 @@ class LXMLWorksheet(DumpWorksheet):
                     try:
                         while True:
                             c = (yield)
+                            xf.write(c)
                     except GeneratorExit:
                         pass
 

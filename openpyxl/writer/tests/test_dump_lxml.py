@@ -68,13 +68,21 @@ def test_write_cell(LXMLWorksheet, value, expected):
 
 def test_append(LXMLWorksheet):
     ws = LXMLWorksheet
-    ws.append([1])
-    ws.append(['s'])
+    ws.append([1, "s"])
     ws.writer.close()
     with open(ws._fileobj_content_name) as rows:
         xml = rows.read()
     expected = """
-    <sheetData><row spans="1:1" r="1"></row></sheetData>
+    <sheetData>
+    <row r="1" spans="1:2">
+      <c r="A1" t="n">
+        <v>1</v>
+      </c>
+      <c r="B1" t="s">
+        <v>0</v>
+      </c>
+    </row>
+    </sheetData>
     """
     diff = compare_xml(xml, expected)
     assert diff is None, diff
