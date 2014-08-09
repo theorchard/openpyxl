@@ -3,12 +3,15 @@ from __future__ import absolute_import
 
 from lxml.etree import xmlfile, Element, SubElement, tounicode
 
-from . dump_worksheet import DumpWorksheet, DESCRIPTORS_CACHE_SIZE
+from openpyxl.compat import safe_string
+from openpyxl.cell import get_column_letter, Cell
+
+from . dump_worksheet import DumpWorksheet, DESCRIPTORS_CACHE_SIZE, WriteOnlyCell
 from . lxml_worksheet import (
     write_format,
     write_sheetviews,
-    write_cols
-    )
+    write_cols,
+)
 
 from openpyxl.xml.constants import SHEET_MAIN_NS
 
@@ -38,6 +41,19 @@ class LXMLWorksheet(DumpWorksheet):
                 write_format(xf, self)
                 write_cols(xf, self)
 
+    def _write_row(self):
+        with xmlfile(self._fileobj_content_name) as xf:
+            with xf.element("sheetData"):
+                attrs = {'r': '%d' % self._max_row,
+                         'spans': '1:%d' % self._max_col}
+
+                with xf.element("row", attrs):
+                    try:
+                        while True:
+                            c = (yield)
+                    except GeneratorExit:
+                        pass
+
 
     def close_content(self):
         pass
@@ -46,6 +62,71 @@ class LXMLWorksheet(DumpWorksheet):
         pass
 
     def append(self, row):
-        pass
+        """
+        :param row: iterable containing values to append
+        :type row: iterable
+        """
+        cell = WriteOnlyCell(self) # singleton
+
+        self._max_row += 1
+        span = len(row)
+        self._max_col = max(self._max_col, span)
+        row_idx = self._max_row
+        writer = self._write_row()
+        next(writer)
+
+        for col_idx, value in enumerate(row, 1):
+            if value is None:
+                continue
+            dirty_cell = False
+            column = get_column_letter(col_idx)
+
+            if isinstance(value, Cell):
+                cell = value
+                dirty_cell = True # cell may have other properties than a value
+            else:
+                cell.value = value
+
+            cell.coordinate = '%s%d' % (column, row_idx)
+            if cell.comment is not None:
+                comment = cell.comment
+                comment._parent = CommentParentCell(cell)
+                self._comments.append(comment)
+
+            tree = write_cell(self, cell)
+            writer.send(tree)
+            if dirty_cell:
+                cell = WriteOnlyCell(self)
 
 
+def write_cell(worksheet, cell):
+    string_table = worksheet.parent.shared_strings
+    coordinate = cell.coordinate
+    attributes = {'r': coordinate}
+    if cell.has_style:
+        attributes['s'] = '%d' % cell._style
+
+    if cell.data_type != 'f':
+        attributes['t'] = cell.data_type
+
+    value = cell.internal_value
+
+    el = Element("c", attributes)
+
+    if cell.data_type == 'f':
+        shared_formula = worksheet.formula_attributes.get(coordinate, {})
+        if shared_formula is not None:
+            if (shared_formula.get('t') == 'shared'
+                and 'ref' not in shared_formula):
+                value = None
+        formula = SubElement(element, 'f', shared_formula)
+        if value is not None:
+            formula.text= value[1:]
+            value = None
+
+    if cell.data_type == 's':
+        value = string_table.add(value)
+    cell_content = SubElement(el, 'v')
+    if value is not None:
+        cell_content.text = safe_string(value)
+    return cell

@@ -41,4 +41,12 @@ def test_close_content(LXMLWorksheet):
 
 
 def test_append(LXMLWorksheet):
-    pass
+    ws = LXMLWorksheet
+    ws.append([1])
+    with open(ws._fileobj_content_name) as rows:
+        xml = rows.read()
+    expected = """
+    <sheetData><row spans="1:1" r="1"></row></sheetData>
+    """
+    diff = compare_xml(xml, expected)
+    assert diff is None, diff
