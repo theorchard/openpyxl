@@ -72,8 +72,8 @@ class LXMLWorksheet(DumpWorksheet):
         span = len(row)
         self._max_col = max(self._max_col, span)
         row_idx = self._max_row
-        writer = self._write_row()
-        next(writer)
+        self.writer = self._write_row()
+        next(self.writer)
 
         for col_idx, value in enumerate(row, 1):
             if value is None:
@@ -94,7 +94,7 @@ class LXMLWorksheet(DumpWorksheet):
                 self._comments.append(comment)
 
             tree = write_cell(self, cell)
-            writer.send(tree)
+            self.writer.send(tree)
             if dirty_cell:
                 cell = WriteOnlyCell(self)
 
@@ -112,6 +112,8 @@ def write_cell(worksheet, cell):
     value = cell.internal_value
 
     el = Element("c", attributes)
+    if value in ('', None):
+        return el
 
     if cell.data_type == 'f':
         shared_formula = worksheet.formula_attributes.get(coordinate, {})
@@ -119,7 +121,7 @@ def write_cell(worksheet, cell):
             if (shared_formula.get('t') == 'shared'
                 and 'ref' not in shared_formula):
                 value = None
-        formula = SubElement(element, 'f', shared_formula)
+        formula = SubElement(el, 'f', shared_formula)
         if value is not None:
             formula.text= value[1:]
             value = None
@@ -129,4 +131,4 @@ def write_cell(worksheet, cell):
     cell_content = SubElement(el, 'v')
     if value is not None:
         cell_content.text = safe_string(value)
-    return cell
+    return el
