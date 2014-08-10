@@ -22,11 +22,6 @@ def worksheet():
     return wb.active
 
 
-@pytest.fixture
-def out():
-    return BytesIO()
-
-
 @pytest.mark.parametrize("value, expected",
                          [
                              (9781231231230, """<c t="n" r="A1"><v>9781231231230</v></c>"""),
@@ -39,23 +34,27 @@ def out():
                              (None, """<c r="A1" t="s"></c>"""),
                              (datetime.date(2011, 12, 25), """<c r="A1" t="n" s="1"><v>40902</v></c>"""),
                          ])
-def test_write_cell(out, value, expected):
+def test_write_cell(value, expected):
     from .. lxml_worksheet import write_cell
 
     wb = Workbook()
     ws = wb.active
     ws['A1'] = value
+
+    out = BytesIO()
     with xmlfile(out) as xf:
         write_cell(xf, ws, ws['A1'])
     xml = out.getvalue()
     diff = compare_xml(xml, expected)
     assert diff is None, diff
 
-def test_write_cell_string(out, worksheet):
+def test_write_cell_string(worksheet):
     from .. lxml_worksheet import write_cell
 
     ws = worksheet
     ws['A1'] = "Hello"
+
+    out = BytesIO()
     with xmlfile(out) as xf:
         write_cell(xf, ws, ws['A1'])
     assert ws.parent.shared_strings == ["Hello"]
@@ -67,9 +66,11 @@ def write_rows():
     return write_rows
 
 
-def test_write_sheetdata(out, worksheet, write_rows):
+def test_write_sheetdata(worksheet, write_rows):
     ws = worksheet
     ws['A1'] = 10
+
+    out = BytesIO()
     with xmlfile(out) as xf:
         write_rows(xf, ws)
     xml = out.getvalue()
@@ -78,7 +79,7 @@ def test_write_sheetdata(out, worksheet, write_rows):
     assert diff is None, diff
 
 
-def test_write_formula(out, worksheet, write_rows):
+def test_write_formula(worksheet, write_rows):
     ws = worksheet
 
     ws.cell('F1').value = 10
@@ -91,6 +92,7 @@ def test_write_formula(out, worksheet, write_rows):
     ws.cell('C4').value = '='
     ws.formula_attributes['C4'] = {'t': 'shared', 'si': '0'}
 
+    out = BytesIO()
     with xmlfile(out) as xf:
         write_rows(xf, ws)
 
@@ -133,13 +135,14 @@ def test_write_formula(out, worksheet, write_rows):
     assert diff is None, diff
 
 
-def test_row_height(out, worksheet, write_rows):
+def test_row_height(worksheet, write_rows):
     ws = worksheet
     ws.cell('F1').value = 10
     ws.row_dimensions[ws.cell('F1').row].height = 30
     ws.row_dimensions[ws.cell('F2').row].height = 30
     ws._garbage_collect()
 
+    out = BytesIO()
     with xmlfile(out) as xf:
         write_rows(xf, ws)
     xml = out.getvalue()
@@ -250,7 +253,7 @@ def test_sheet_format(write_format, ColumnDimension, DummyWorksheet):
     assert diff is None, diff
 
 
-def test_outline_format(out, write_format, ColumnDimension, DummyWorksheet):
+def test_outline_format(write_format, ColumnDimension, DummyWorksheet):
     worksheet = DummyWorksheet
     worksheet.column_dimensions['A'] = ColumnDimension(outline_level=1)
     fmt = write_format(worksheet)
@@ -260,7 +263,7 @@ def test_outline_format(out, write_format, ColumnDimension, DummyWorksheet):
     assert diff is None, diff
 
 
-def test_outline_cols(out, write_cols, ColumnDimension, DummyWorksheet):
+def test_outline_cols(write_cols, ColumnDimension, DummyWorksheet):
     worksheet = DummyWorksheet
     worksheet.column_dimensions['A'] = ColumnDimension(outline_level=1)
     cols = write_cols(worksheet)
@@ -276,7 +279,7 @@ def write_autofilter():
     return write_autofilter
 
 
-def test_auto_filter(out, worksheet, write_autofilter):
+def test_auto_filter(worksheet, write_autofilter):
     ws = worksheet
     ws.auto_filter.ref = 'A1:F1'
     af = write_autofilter(ws)
@@ -286,7 +289,7 @@ def test_auto_filter(out, worksheet, write_autofilter):
     assert diff is None, diff
 
 
-def test_auto_filter_filter_column(out, worksheet, write_autofilter):
+def test_auto_filter_filter_column(worksheet, write_autofilter):
     ws = worksheet
     ws.auto_filter.ref = 'A1:F1'
     ws.auto_filter.add_filter_column(0, ["0"], blank=True)
@@ -306,7 +309,7 @@ def test_auto_filter_filter_column(out, worksheet, write_autofilter):
     assert diff is None, diff
 
 
-def test_auto_filter_sort_condition(out, worksheet, write_autofilter):
+def test_auto_filter_sort_condition(worksheet, write_autofilter):
     ws = worksheet
     ws.cell('A1').value = 'header'
     ws.cell('A2').value = 1
@@ -333,7 +336,7 @@ def write_sheetviews():
     return write_sheetviews
 
 
-def test_freeze_panes_horiz(out, worksheet, write_sheetviews):
+def test_freeze_panes_horiz(worksheet, write_sheetviews):
     ws = worksheet
     ws.freeze_panes = 'A4'
 
@@ -351,7 +354,7 @@ def test_freeze_panes_horiz(out, worksheet, write_sheetviews):
     assert diff is None, diff
 
 
-def test_freeze_panes_vert(out, worksheet, write_sheetviews):
+def test_freeze_panes_vert(worksheet, write_sheetviews):
     ws = worksheet
     ws.freeze_panes = 'D1'
 
@@ -369,7 +372,7 @@ def test_freeze_panes_vert(out, worksheet, write_sheetviews):
     assert diff is None, diff
 
 
-def test_freeze_panes_both(out, worksheet, write_sheetviews):
+def test_freeze_panes_both(worksheet, write_sheetviews):
     ws = worksheet
     ws.freeze_panes = 'D4'
 
@@ -395,7 +398,7 @@ def write_worksheet():
     return write_worksheet
 
 
-def test_merge(out, worksheet):
+def test_merge(worksheet):
     from .. lxml_worksheet import write_mergecells
 
     ws = worksheet
@@ -471,7 +474,7 @@ def test_no_pagebreaks(worksheet):
     pb = write_pagebreaks(worksheet)
     assert pb is None
 
-def test_data_validation(out, worksheet):
+def test_data_validation(worksheet):
     from .. lxml_worksheet import write_datavalidation
     from openpyxl.datavalidation import DataValidation, ValidationType
 
@@ -494,7 +497,7 @@ def test_data_validation(out, worksheet):
     assert diff is None, diff
 
 
-def test_hyperlink(out, worksheet):
+def test_hyperlink(worksheet):
     from .. lxml_worksheet import write_hyperlinks
 
     ws = worksheet
@@ -649,13 +652,14 @@ def write_conditional_formatting():
     return write_conditional_formatting
 
 
-def test_conditional_formatting_customRule(out, worksheet_with_cf, write_conditional_formatting):
+def test_conditional_formatting_customRule(worksheet_with_cf, write_conditional_formatting):
     from .. lxml_worksheet import write_conditional_formatting
 
     ws = worksheet_with_cf
 
     ws.conditional_formatting.add('C1:C10', {'type': 'expression', 'formula': ['ISBLANK(C1)'],
                                                     'stopIfTrue': '1', 'dxf': {}})
+    out = BytesIO()
     with xmlfile(out) as xf:
         write_conditional_formatting(xf, ws)
     xml = out.getvalue()
@@ -670,7 +674,7 @@ def test_conditional_formatting_customRule(out, worksheet_with_cf, write_conditi
     assert diff is None, diff
 
 
-def test_conditional_font(out, worksheet_with_cf, write_conditional_formatting):
+def test_conditional_font(worksheet_with_cf, write_conditional_formatting):
     """Test to verify font style written correctly."""
 
     # Create cf rule
@@ -690,6 +694,7 @@ def test_conditional_font(out, worksheet_with_cf, write_conditional_formatting):
                                              font=whiteFont,
                                              fill=redFill))
 
+    out = BytesIO()
     with xmlfile(out) as xf:
         write_conditional_formatting(xf, ws)
     xml = out.getvalue()
@@ -703,7 +708,7 @@ def test_conditional_font(out, worksheet_with_cf, write_conditional_formatting):
     assert diff is None, diff
 
 
-def test_formula_rule(out, worksheet_with_cf, write_conditional_formatting):
+def test_formula_rule(worksheet_with_cf, write_conditional_formatting):
     from openpyxl.formatting import FormulaRule
 
     ws = worksheet_with_cf
@@ -712,6 +717,7 @@ def test_formula_rule(out, worksheet_with_cf, write_conditional_formatting):
                                       formula=['ISBLANK(C1)'],
                                       stopIfTrue=True)
                                   )
+    out = BytesIO()
     with xmlfile(out) as xf:
         write_conditional_formatting(xf, ws)
     xml = out.getvalue()
@@ -726,7 +732,7 @@ def test_formula_rule(out, worksheet_with_cf, write_conditional_formatting):
     assert diff is None, diff
 
 
-def test_protection(out, worksheet, write_worksheet):
+def test_protection(worksheet, write_worksheet):
     ws = worksheet
     ws.protection.enable()
     xml = write_worksheet(ws, None)
@@ -751,7 +757,7 @@ def test_protection(out, worksheet, write_worksheet):
     assert diff is None, diff
 
 
-def test_write_comments(out, worksheet, write_worksheet):
+def test_write_comments(worksheet, write_worksheet):
     ws = worksheet
     worksheet._comment_count = 1
     xml = write_worksheet(ws, None)
