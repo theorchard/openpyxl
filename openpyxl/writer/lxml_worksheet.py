@@ -51,15 +51,15 @@ def write_worksheet(worksheet, shared_strings):
             if worksheet.page_setup.fitToPage:
                 SubElement(pr, 'pageSetUpPr', {'fitToPage': '1'})
             xf.write(pr)
-            del pr
 
             dim = Element('dimension', {'ref': '%s' % worksheet.calculate_dimension()})
             xf.write(dim)
-            del dim
 
-            write_sheetviews(xf, worksheet)
-            write_format(xf, worksheet)
-            write_cols(xf, worksheet)
+            xf.write(write_sheetviews(worksheet))
+            xf.write(write_format(worksheet))
+            cols = write_cols(worksheet)
+            if cols:
+                xf.write(cols)
             write_rows(xf, worksheet)
 
             if worksheet.protection.sheet:
@@ -67,11 +67,22 @@ def write_worksheet(worksheet, shared_strings):
                 xf.write(prot)
                 del prot
 
-            write_autofilter(xf, worksheet)
-            write_mergecells(xf, worksheet)
+            af = write_autofilter(worksheet)
+            if af:
+                xf.write(af)
+
+            merge = write_mergecells(worksheet)
+            if merge:
+                xf.write(merge)
+
             write_conditional_formatting(xf, worksheet)
-            write_datavalidation(xf, worksheet)
-            write_hyperlinks(xf, worksheet)
+            dv = write_datavalidation(worksheet)
+            if dv:
+                xf.write(dv)
+
+            hyper = write_hyperlinks(worksheet)
+            if hyper:
+                xf.write(hyper)
 
             options = worksheet.page_setup.options
             if options:
@@ -89,7 +100,9 @@ def write_worksheet(worksheet, shared_strings):
                 xf.write(page_setup)
                 del page_setup
 
-            write_header_footer(xf, worksheet)
+            hf = write_header_footer(worksheet)
+            if hf:
+                xf.write(hf)
 
             if worksheet._charts or worksheet._images:
                 drawing = Element('drawing', {'{%s}id' % REL_NS: 'rId1'})
@@ -105,7 +118,9 @@ def write_worksheet(worksheet, shared_strings):
                     legacy = Element('legacyDrawing', {'{%s}id' % REL_NS: rId})
                     xf.write(legacy)
 
-            write_pagebreaks(xf, worksheet)
+            pb = write_pagebreaks(worksheet)
+            if pb:
+                xf.write(pb)
 
             # add a legacyDrawing so that excel can draw comments
             if worksheet._comment_count > 0:
@@ -117,7 +132,7 @@ def write_worksheet(worksheet, shared_strings):
     return xml
 
 
-def write_cols(xf, worksheet):
+def write_cols(worksheet):
     """Write worksheet columns to xml.
 
     <cols> may never be empty -
@@ -135,14 +150,15 @@ def write_cols(xf, worksheet):
     if not cols:
         return
 
-    with xf.element('cols'):
-        for idx, col_def in sorted(cols):
-            v = "%d" % idx
-            cmin = col_def.get('min') or v
-            cmax = col_def.get('max') or v
-            col_def.update({'min': cmin, 'max': cmax})
-            c = Element('col', col_def)
-            xf.write(c)
+    el = Element('cols')
+
+    for idx, col_def in sorted(cols):
+        v = "%d" % idx
+        cmin = col_def.get('min') or v
+        cmax = col_def.get('max') or v
+        col_def.update({'min': cmin, 'max': cmax})
+        el.append(Element('col', col_def))
+    return el
 
 
 def write_rows(xf, worksheet):
@@ -201,7 +217,7 @@ def write_cell(xf, worksheet, cell):
                 xf.write(safe_string(value))
 
 
-def write_autofilter(xf, worksheet):
+def write_autofilter(worksheet):
     auto_filter = worksheet.auto_filter
     if auto_filter.ref is None:
         return
@@ -224,10 +240,10 @@ def write_autofilter(xf, worksheet):
                 if sort_condition.descending:
                     sort_attr['descending'] = '1'
                 SubElement(srt, 'sortCondtion', sort_attr)
-    xf.write(el)
+    return el
 
 
-def write_sheetviews(xf, worksheet):
+def write_sheetviews(worksheet):
     views = Element('sheetViews')
     view = SubElement(views, 'sheetView', {'workbookViewId': '0'})
     selectionAttrs = {}
@@ -257,10 +273,10 @@ def write_sheetviews(xf, worksheet):
                            'sqref': worksheet.selected_cell})
 
     SubElement(view, 'selection', selectionAttrs)
-    xf.write(views)
+    return views
 
 
-def write_format(xf, worksheet):
+def write_format(worksheet):
     attrs = {'defaultRowHeight': '15', 'baseColWidth': '10'}
     dimensions_outline = [dim.outline_level
                           for dim in itervalues(worksheet.column_dimensions)]
@@ -268,11 +284,10 @@ def write_format(xf, worksheet):
         outline_level = max(dimensions_outline)
         if outline_level:
             attrs['outlineLevelCol'] = str(outline_level)
-    with xf.element('sheetFormatPr', attrs):
-        pass
+    return Element('sheetFormatPr', attrs)
 
 
-def write_mergecells(xf, worksheet):
+def write_mergecells(worksheet):
     """Write merged cells to xml."""
     cells = worksheet._merged_cells
     if not cells:
@@ -282,10 +297,10 @@ def write_mergecells(xf, worksheet):
     for range_string in cells:
         attrs = {'ref': range_string}
         SubElement(merge, 'mergeCell', attrs)
-    xf.write(merge)
+    return merge
 
 
-def write_datavalidation(xf, worksheet):
+def write_datavalidation(worksheet):
     """ Write data validation(s) to xml."""
     # Filter out "empty" data-validation objects (i.e. with 0 cells)
     required_dvs = [x for x in worksheet._data_validations
@@ -301,10 +316,10 @@ def write_datavalidation(xf, worksheet):
             SubElement(dv, 'formula1').text = data_validation.formula1
         if data_validation.formula2:
             SubElement(dv, 'formula2').text = data_validation.formula2
-    xf.write(dvs)
+    return dvs
 
 
-def write_header_footer(xf, worksheet):
+def write_header_footer(worksheet):
     header = worksheet.header_footer.getHeader()
     footer = worksheet.header_footer.getFooter()
     if header or footer:
@@ -313,20 +328,21 @@ def write_header_footer(xf, worksheet):
             SubElement(tag, 'oddHeader').text = header
         if worksheet.header_footer.hasFooter():
             SubElement(tag, 'oddFooter').text = footer
-        xf.write(tag)
+        return tag
 
 
-def write_pagebreaks(xf, worksheet):
+def write_pagebreaks(worksheet):
     breaks = worksheet.page_breaks
     if breaks:
         tag = Element( 'rowBreaks', {'count': str(len(breaks)),
                                      'manualBreakCount': str(len(breaks))})
         for b in breaks:
-            SubElement(tag, 'brk', {'id': str(b), 'man': 'true', 'max': '16383',
-                             'min': '0'})
+            tag.append(Element('brk', {'id': str(b), 'man': 'true', 'max': '16383',
+                             'min': '0'}))
+        return tag
 
 
-def write_hyperlinks(xf, worksheet):
+def write_hyperlinks(worksheet):
     """Write worksheet hyperlinks to xml."""
     tag = Element('hyperlinks')
     for cell in worksheet.get_cell_collection():
@@ -336,7 +352,7 @@ def write_hyperlinks(xf, worksheet):
                      '{%s}id' % REL_NS: cell.hyperlink_rel_id}
             SubElement(tag, 'hyperlink', attrs)
     if tag.getchildren():
-        xf.write(tag)
+        return tag
 
 
 def write_conditional_formatting(xf, worksheet):

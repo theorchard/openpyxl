@@ -8,7 +8,7 @@ from io import BytesIO
 
 # package
 from openpyxl import Workbook
-from lxml.etree import xmlfile, Element
+from lxml.etree import xmlfile, Element, tostring
 
 # test imports
 import pytest
@@ -187,45 +187,42 @@ def ColumnDimension():
     return ColumnDimension
 
 
-def test_no_cols(out, write_cols, DummyWorksheet, root_xml):
+def test_no_cols(write_cols, DummyWorksheet):
 
-    write_cols(root_xml, DummyWorksheet)
-    assert out.getvalue() == b"<test/>"
+    cols = write_cols(DummyWorksheet)
+    assert cols is None
 
 
-def test_col_widths(out, write_cols, ColumnDimension, DummyWorksheet):
+def test_col_widths(write_cols, ColumnDimension, DummyWorksheet):
     ws = DummyWorksheet
     ws.column_dimensions['A'] = ColumnDimension(width=4)
-    with xmlfile(out) as xf:
-        write_cols(xf, ws)
-    xml = out.getvalue()
+    cols = write_cols(ws)
+    xml = tostring(cols, encoding="unicode")
     expected = """<cols><col width="4" min="1" max="1" customWidth="1"></col></cols>"""
     diff = compare_xml(xml, expected)
     assert diff is None, diff
 
 
-def test_col_style(out, write_cols, ColumnDimension, DummyWorksheet):
+def test_col_style(write_cols, ColumnDimension, DummyWorksheet):
     ws = DummyWorksheet
     ws.column_dimensions['A'] = ColumnDimension()
     ws._styles['A'] = 1
-    with xmlfile(out) as xf:
-        write_cols(xf, ws)
-    xml = out.getvalue()
+    cols = write_cols(ws)
+    xml = tostring(cols, encoding="unicode")
     expected = """<cols><col max="1" min="1" style="1"></col></cols>"""
     diff = compare_xml(xml, expected)
     assert diff is None, diff
 
 
-def test_lots_cols(out, write_cols, ColumnDimension, DummyWorksheet):
+def test_lots_cols(write_cols, ColumnDimension, DummyWorksheet):
     ws = DummyWorksheet
     from openpyxl.cell import get_column_letter
     for i in range(1, 15):
         label = get_column_letter(i)
         ws._styles[label] = i
         ws.column_dimensions[label] = ColumnDimension()
-    with xmlfile(out) as xf:
-        write_cols(xf, ws)
-    xml = out.getvalue()
+    cols = write_cols(ws)
+    xml = tostring(cols, encoding="unicode")
     expected = """<cols>
    <col max="1" min="1" style="1"></col>
    <col max="2" min="2" style="2"></col>
@@ -253,10 +250,9 @@ def write_format():
     return write_format
 
 
-def test_sheet_format(out, write_format, ColumnDimension, DummyWorksheet):
-    with xmlfile(out) as xf:
-        write_format(xf, DummyWorksheet)
-    xml = out.getvalue()
+def test_sheet_format(write_format, ColumnDimension, DummyWorksheet):
+    fmt = write_format(DummyWorksheet)
+    xml = tostring(fmt, encoding="unicode")
     expected = """<sheetFormatPr defaultRowHeight="15" baseColWidth="10"/>"""
     diff = compare_xml(expected, xml)
     assert diff is None, diff
@@ -265,9 +261,8 @@ def test_sheet_format(out, write_format, ColumnDimension, DummyWorksheet):
 def test_outline_format(out, write_format, ColumnDimension, DummyWorksheet):
     worksheet = DummyWorksheet
     worksheet.column_dimensions['A'] = ColumnDimension(outline_level=1)
-    with xmlfile(out) as xf:
-        write_format(xf, worksheet)
-    xml = out.getvalue()
+    fmt = write_format(worksheet)
+    xml = tostring(fmt, encoding="unicode")
     expected = """<sheetFormatPr defaultRowHeight="15" baseColWidth="10" outlineLevelCol="1" />"""
     diff = compare_xml(expected, xml)
     assert diff is None, diff
@@ -276,9 +271,8 @@ def test_outline_format(out, write_format, ColumnDimension, DummyWorksheet):
 def test_outline_cols(out, write_cols, ColumnDimension, DummyWorksheet):
     worksheet = DummyWorksheet
     worksheet.column_dimensions['A'] = ColumnDimension(outline_level=1)
-    with xmlfile(out) as xf:
-        write_cols(xf, worksheet)
-    xml = out.getvalue()
+    cols = write_cols(worksheet)
+    xml = tostring(cols, encoding="unicode")
     expected = """<cols><col max="1" min="1" outlineLevel="1"/></cols>"""
     diff = compare_xml(expected, xml)
     assert diff is None, diff
@@ -293,9 +287,8 @@ def write_autofilter():
 def test_auto_filter(out, worksheet, write_autofilter):
     ws = worksheet
     ws.auto_filter.ref = 'A1:F1'
-    with xmlfile(out) as xf:
-        write_autofilter(xf, ws)
-    xml = out.getvalue()
+    af = write_autofilter(ws)
+    xml = tostring(af, encoding="unicode")
     expected = """<autoFilter ref="A1:F1"></autoFilter>"""
     diff = compare_xml(xml, expected)
     assert diff is None, diff
@@ -306,9 +299,8 @@ def test_auto_filter_filter_column(out, worksheet, write_autofilter):
     ws.auto_filter.ref = 'A1:F1'
     ws.auto_filter.add_filter_column(0, ["0"], blank=True)
 
-    with xmlfile(out) as xf:
-        write_autofilter(xf, ws)
-    xml = out.getvalue()
+    af = write_autofilter(ws)
+    xml = tostring(af, encoding="unicode")
     expected = """
     <autoFilter ref="A1:F1">
       <filterColumn colId="0">
@@ -330,9 +322,8 @@ def test_auto_filter_sort_condition(out, worksheet, write_autofilter):
     ws.auto_filter.ref = 'A2:A3'
     ws.auto_filter.add_sort_condition('A2:A3', descending=True)
 
-    with xmlfile(out) as xf:
-        write_autofilter(xf, ws)
-    xml = out.getvalue()
+    af = write_autofilter(ws)
+    xml = tostring(af, encoding="unicode")
     expected = """
     <autoFilter ref="A2:A3">
     <sortState ref="A2:A3">
@@ -354,9 +345,8 @@ def test_freeze_panes_horiz(out, worksheet, write_sheetviews):
     ws = worksheet
     ws.freeze_panes = 'A4'
 
-    with xmlfile(out) as xf:
-        write_sheetviews(xf, ws)
-    xml = out.getvalue()
+    views = write_sheetviews(ws)
+    xml = tostring(views, encoding="unicode")
     expected = """
     <sheetViews>
     <sheetView workbookViewId="0">
@@ -373,9 +363,8 @@ def test_freeze_panes_vert(out, worksheet, write_sheetviews):
     ws = worksheet
     ws.freeze_panes = 'D1'
 
-    with xmlfile(out) as xf:
-        write_sheetviews(xf, ws)
-    xml = out.getvalue()
+    views = write_sheetviews(ws)
+    xml = tostring(views, encoding="unicode")
     expected = """
     <sheetViews>
       <sheetView workbookViewId="0">
@@ -392,9 +381,8 @@ def test_freeze_panes_both(out, worksheet, write_sheetviews):
     ws = worksheet
     ws.freeze_panes = 'D4'
 
-    with xmlfile(out) as xf:
-        write_sheetviews(xf, ws)
-    xml = out.getvalue()
+    views = write_sheetviews(ws)
+    xml = tostring(views, encoding="unicode")
     expected = """
     <sheetViews>
       <sheetView workbookViewId="0">
@@ -423,9 +411,8 @@ def test_merge(out, worksheet):
     ws.cell('B1').value = 'Cell B1'
 
     ws.merge_cells('A1:B1')
-    with xmlfile(out) as xf:
-        write_mergecells(xf, ws)
-    xml = out.getvalue()
+    merge = write_mergecells(ws)
+    xml = tostring(merge, encoding="unicode")
     expected = """
       <mergeCells count="1">
         <mergeCell ref="A1:B1"/>
@@ -435,15 +422,14 @@ def test_merge(out, worksheet):
     assert diff is None, diff
 
 
-def test_no_merge(out, worksheet, root_xml):
+def test_no_merge(worksheet):
     from .. lxml_worksheet import write_mergecells
 
-    write_mergecells(root_xml, worksheet)
-    xml = out.getvalue()
-    expected = b"<test/>"
+    merge = write_mergecells(worksheet)
+    assert merge is None
 
 
-def test_header_footer(out, worksheet):
+def test_header_footer(worksheet):
     ws = worksheet
     ws.header_footer.left_header.text = "Left Header Text"
     ws.header_footer.center_header.text = "Center Header Text"
@@ -468,9 +454,8 @@ def test_header_footer(out, worksheet):
     ws.header_footer.right_footer.font_color = "AABBCC"
 
     from .. lxml_worksheet import write_header_footer
-    with xmlfile(out) as xf:
-        write_header_footer(xf, ws)
-    xml = out.getvalue()
+    hf = write_header_footer(ws)
+    xml = tostring(hf, encoding="unicode")
     expected = """
     <headerFooter>
       <oddHeader>&amp;L&amp;"Calibri,Regular"&amp;K000000Left Header Text&amp;C&amp;"Arial,Regular"&amp;6&amp;K445566Center Header Text&amp;R&amp;"Arial,Bold"&amp;8&amp;K112233Right Header Text</oddHeader>
@@ -481,19 +466,18 @@ def test_header_footer(out, worksheet):
     assert diff is None, diff
 
 
-def test_no_header(out, worksheet, root_xml):
+def test_no_header(worksheet):
     from .. lxml_worksheet import write_header_footer
 
-    write_header_footer(root_xml, worksheet)
-    assert out.getvalue() == b"<test/>"
+    hf = write_header_footer(worksheet)
+    assert hf is None
 
 
-def test_no_pagebreaks(out, worksheet, root_xml):
+def test_no_pagebreaks(worksheet):
     from .. lxml_worksheet import write_pagebreaks
 
-    write_pagebreaks(root_xml, worksheet)
-    assert out.getvalue() == b"<test/>"
-
+    pb = write_pagebreaks(worksheet)
+    assert pb is None
 
 def test_data_validation(out, worksheet):
     from .. lxml_worksheet import write_datavalidation
@@ -504,9 +488,8 @@ def test_data_validation(out, worksheet):
     dv.add_cell(ws['A1'])
     ws.add_data_validation(dv)
 
-    with xmlfile(out) as xf:
-        write_datavalidation(xf, worksheet)
-    xml = out.getvalue()
+    dv = write_datavalidation(worksheet)
+    xml = tostring(dv, encoding="unicode")
     expected = """
     <dataValidations count="1">
     <dataValidation allowBlank="0" showErrorMessage="1" showInputMessage="1" sqref="A1" type="list">
@@ -526,9 +509,8 @@ def test_hyperlink(out, worksheet):
     ws.cell('A1').value = "test"
     ws.cell('A1').hyperlink = "http://test.com"
 
-    with xmlfile(out) as xf:
-        write_hyperlinks(xf, ws)
-    xml = out.getvalue()
+    hyper = write_hyperlinks(ws)
+    xml = tostring(hyper, encoding="unicode")
     expected = """
     <hyperlinks xmlns:r="http://schemas.openxmlformats.org/officeDocument/2006/relationships">
       <hyperlink display="http://test.com" r:id="rId1" ref="A1"/>
@@ -538,11 +520,11 @@ def test_hyperlink(out, worksheet):
     assert diff is None, diff
 
 
-def test_no_hyperlink(out, worksheet, root_xml):
+def test_no_hyperlink(worksheet):
     from .. lxml_worksheet import write_hyperlinks
 
-    write_hyperlinks(root_xml, worksheet)
-    assert out.getvalue() == b"<test/>"
+    l = write_hyperlinks(worksheet)
+    assert l is None
 
 
 def test_empty_worksheet(worksheet, write_worksheet):
