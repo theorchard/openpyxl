@@ -98,11 +98,10 @@ class ExcelWriter(object):
                         archive.writestr(name, vba_archive.read(name))
                         break
 
-        self._write_worksheets(archive, self.style_writer)
+        self._write_worksheets(archive)
         self._write_string_table(archive)
 
     def _write_string_table(self, archive):
-        self.shared_strings = self.workbook.shared_strings
         archive.writestr(ARC_SHARED_STRINGS,
                 write_string_table(self.workbook.shared_strings))
 
@@ -114,7 +113,7 @@ class ExcelWriter(object):
             image_id += 1
         return image_id
 
-    def _write_worksheets(self, archive, style_writer):
+    def _write_worksheets(self, archive):
         drawing_id = 1
         chart_id = 1
         image_id = 1
