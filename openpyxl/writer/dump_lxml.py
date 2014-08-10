@@ -39,9 +39,11 @@ class LXMLWorksheet(DumpWorksheet):
                 dim = Element('dimension', {'ref': 'A1:%s' % (self.get_dimensions())})
                 xf.write(dim)
 
-                write_sheetviews(xf, self)
-                write_format(xf, self)
-                write_cols(xf, self)
+                xf.write(write_sheetviews(self))
+                xf.write(write_format(self))
+                cols = write_cols(self)
+                if cols:
+                    xf.write(cols)
 
     def _write_row(self):
         with xmlfile(self._fileobj_content_name) as xf:
