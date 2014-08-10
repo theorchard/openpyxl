@@ -185,11 +185,10 @@ def write_worksheet_format(doc, worksheet):
     tag(doc, 'sheetFormatPr', attrs)
 
 
-def write_worksheet_cols(doc, worksheet, style_table=None):
+def write_worksheet_cols(doc, worksheet):
     """Write worksheet columns to xml.
 
-    style_table is ignored but required
-    for compatibility with the dumped worksheet <cols> may never be empty -
+    <cols> may never be empty -
     spec says must contain at least one child
     """
     cols = []

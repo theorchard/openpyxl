@@ -117,11 +117,10 @@ def write_worksheet(worksheet, shared_strings):
     return xml
 
 
-def write_cols(xf, worksheet, style_table=None):
+def write_cols(xf, worksheet):
     """Write worksheet columns to xml.
 
-    style_table is ignored but required
-    for compatibility with the dumped worksheet <cols> may never be empty -
+    <cols> may never be empty -
     spec says must contain at least one child
     """
     cols = []
