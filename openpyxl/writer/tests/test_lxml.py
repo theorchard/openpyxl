@@ -27,14 +27,6 @@ def out():
     return BytesIO()
 
 
-@pytest.fixture
-def root_xml(out):
-    """Root element for use when checking that nothing is written"""
-    with xmlfile(out) as xf:
-        xf.write(Element("test"))
-        return xf
-
-
 @pytest.mark.parametrize("value, expected",
                          [
                              (9781231231230, """<c t="n" r="A1"><v>9781231231230</v></c>"""),
