@@ -250,16 +250,7 @@ class DumpCommentWriter(CommentWriter):
 
 class ExcelDumpWriter(ExcelWriter):
 
-    def __init__(self, workbook):
-        self.workbook = workbook
-        self.style_writer = StyleWriter(workbook)
-
-    def _write_string_table(self, archive):
-        shared_strings = self.workbook.shared_strings
-        archive.writestr(ARC_SHARED_STRINGS,
-                write_string_table(shared_strings))
-
-    def _write_worksheets(self, archive, style_writer):
+    def _write_worksheets(self, archive):
         drawing_id = 1
         comments_id = 1
 
