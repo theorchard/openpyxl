@@ -121,4 +121,29 @@ def test_cannot_save_twice(LXMLWorksheet):
     ws = LXMLWorksheet
     ws.close()
     with pytest.raises(WorkbookAlreadySaved):
+        ws.close()
+    with pytest.raises(WorkbookAlreadySaved):
         ws.append([1])
+
+
+def test_close(LXMLWorksheet):
+    ws = LXMLWorksheet
+    ws.close()
+    with open(ws.filename) as src:
+        xml = src.read()
+    expected = """
+    <worksheet xmlns:r="http://schemas.openxmlformats.org/officeDocument/2006/relationships" xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main">
+    <sheetPr>
+      <outlinePr summaryRight="1" summaryBelow="1"/>
+    </sheetPr>
+    <sheetViews>
+      <sheetView workbookViewId="0">
+        <selection sqref="A1" activeCell="A1"/>
+      </sheetView>
+    </sheetViews>
+    <sheetFormatPr baseColWidth="10" defaultRowHeight="15"/>
+    <sheetData/>
+    </worksheet>
+    """
+    diff = compare_xml(xml, expected)
+    assert diff is None, diff

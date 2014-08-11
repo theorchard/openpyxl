@@ -2,6 +2,7 @@ from __future__ import absolute_import
 # Copyright (c) 2010-2014 openpyxl
 
 from io import BytesIO
+import os
 from lxml.etree import xmlfile, Element, SubElement
 
 from openpyxl.compat import safe_string
@@ -20,8 +21,11 @@ from . lxml_worksheet import (
     write_cols,
 )
 
-from openpyxl.xml.constants import SHEET_MAIN_NS
-
+from openpyxl.xml.constants import (
+    SHEET_MAIN_NS,
+    PACKAGE_WORKSHEETS,
+    PACKAGE_XL
+)
 
 class LXMLWorksheet(DumpWorksheet):
     """
@@ -38,10 +42,7 @@ class LXMLWorksheet(DumpWorksheet):
         """
         Generator that creates the XML file and the sheet header
         """
-        if self.__saved:
-            raise WorkbookAlreadySaved(
-                'this workbook has already been saved and cannot be modified or saved anymore.'
-            )
+
         NSMAP = {None : SHEET_MAIN_NS}
 
         with xmlfile(self.filename) as xf:
@@ -54,13 +55,10 @@ class LXMLWorksheet(DumpWorksheet):
                 if self.page_setup.fitToPage:
                     SubElement(pr, 'pageSetUpPr', {'fitToPage': '1'})
                 xf.write(pr)
-
-                #dim = Element('dimension', {'ref': 'A1:%s' % (self.get_dimensions())})
-                #xf.write(dim)
-
                 xf.write(write_sheetviews(self))
                 xf.write(write_format(self))
-                cols = write_cols(self) # any
+
+                cols = write_cols(self)
                 if cols:
                     xf.write(cols)
 
@@ -73,9 +71,16 @@ class LXMLWorksheet(DumpWorksheet):
                         pass
 
     def close(self):
-        if self.writer is not None:
-            self.writer.close()
+        if self.__saved:
+            self._already_saved()
+        if self.writer is None:
+            self.writer = self._write_header()
+            next(self.writer)
+        self.writer.close()
         self.__saved = True
+
+    def _cleanup(self):
+        os.remove(self.filename)
 
     def append(self, row):
         """
@@ -118,7 +123,14 @@ class LXMLWorksheet(DumpWorksheet):
             el.append(tree)
             if dirty_cell:
                 cell = WriteOnlyCell(self)
-        self.writer.send(el)
+        try:
+            self.writer.send(el)
+        except StopIteration:
+            self._already_saved()
+
+    def _already_saved(self):
+        raise WorkbookAlreadySaved('Workbook has already been saved and cannot be modified or saved anymore.')
+
 
 
 def write_cell(worksheet, cell):
@@ -185,3 +197,11 @@ class LXMLDumpWriter(ExcelWriter):
                 archive.writestr(PACKAGE_XL + '/drawings/commentsDrawing%d.vml' % comments_id,
                     cw.write_comments_vml())
                 comments_id += 1
+
+
+def save_dump(workbook, filename):
+    if workbook.worksheets == []:
+        workbook.create_sheet()
+    writer = LXMLDumpWriter(workbook)
+    writer.save(filename)
+    return True
