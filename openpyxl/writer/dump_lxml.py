@@ -12,6 +12,7 @@ from . dump_worksheet import (
     DumpWorksheet,
     WriteOnlyCell,
     DumpCommentWriter,
+    WorkbookAlreadySaved,
 )
 from . lxml_worksheet import (
     write_format,
@@ -88,7 +89,7 @@ class LXMLWorksheet(DumpWorksheet):
         self._max_col = max(self._max_col, span)
         row_idx = self._max_row
         if self.writer is None:
-            #self.writer = self._write_header()
+            self.writer = self._write_header()
             next(self.writer)
 
         attrs = {'r': '%d' % self._max_row,

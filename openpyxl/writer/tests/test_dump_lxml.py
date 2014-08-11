@@ -113,3 +113,12 @@ def test_append(LXMLWorksheet):
     """
     diff = compare_xml(xml, expected)
     assert diff is None, diff
+
+
+def test_cannot_save_twice(LXMLWorksheet):
+    from .. dump_worksheet import WorkbookAlreadySaved
+
+    ws = LXMLWorksheet
+    ws.close()
+    with pytest.raises(WorkbookAlreadySaved):
+        ws.append([1])
