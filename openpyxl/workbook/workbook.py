@@ -25,7 +25,7 @@ from openpyxl.xml.constants import SHEET_MAIN_NS
 from openpyxl.compat import deprecated
 
 if LXML:
-    from openpyxl.writer.dump_lxml import LXMLWorksheet as DumpWorksheet, save_dump
+    from openpyxl.writer.dump_lxml import LXMLWorksheet as DumpWorksheet
 
 
 class DocumentProperties(object):

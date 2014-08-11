@@ -8,11 +8,9 @@ from lxml.etree import xmlfile, Element, SubElement, tostring
 from openpyxl.compat import safe_string
 from openpyxl.cell import get_column_letter, Cell
 
-from . excel import ExcelWriter
 from . dump_worksheet import (
     DumpWorksheet,
     WriteOnlyCell,
-    DumpCommentWriter,
     CommentParentCell,
     WorkbookAlreadySaved,
 )
@@ -21,13 +19,11 @@ from . lxml_worksheet import (
     write_sheetviews,
     write_cols,
 )
-from .relations import write_rels
 
 from openpyxl.xml.constants import (
     SHEET_MAIN_NS,
-    PACKAGE_WORKSHEETS,
-    PACKAGE_XL
 )
+from openpyxl.xml.functions import XMLGenerator
 
 class LXMLWorksheet(DumpWorksheet):
     """
@@ -39,6 +35,10 @@ class LXMLWorksheet(DumpWorksheet):
 
     __saved = False
     writer = None
+
+    def write_header(self):
+        """Dummy method to preserve API compatibility with DumpWorksheet"""
+        return XMLGenerator(BytesIO())
 
     def _write_header(self):
         """
@@ -168,40 +168,3 @@ def write_cell(worksheet, cell):
     if value is not None:
         cell_content.text = safe_string(value)
     return el
-
-
-class LXMLDumpWriter(ExcelWriter):
-    """
-    Customised handling of worksheets
-    """
-
-    def _write_worksheets(self, archive):
-        drawing_id = 1
-        comments_id = 1
-
-        for i, sheet in enumerate(self.workbook.worksheets, 1):
-
-            sheet.close()
-            archive.write(sheet.filename, PACKAGE_WORKSHEETS + '/sheet%d.xml' % i)
-            sheet._cleanup()
-
-            # write comments
-            if sheet._comments:
-                rels = write_rels(sheet, drawing_id, comments_id)
-                archive.writestr( PACKAGE_WORKSHEETS +
-                                  '/_rels/sheet%d.xml.rels' % i, tostring(rels) )
-
-                cw = DumpCommentWriter(sheet)
-                archive.writestr(PACKAGE_XL + '/comments%d.xml' % comments_id,
-                    cw.write_comments())
-                archive.writestr(PACKAGE_XL + '/drawings/commentsDrawing%d.vml' % comments_id,
-                    cw.write_comments_vml())
-                comments_id += 1
-
-
-def save_dump(workbook, filename):
-    if workbook.worksheets == []:
-        workbook.create_sheet()
-    writer = LXMLDumpWriter(workbook)
-    writer.save(filename)
-    return True
