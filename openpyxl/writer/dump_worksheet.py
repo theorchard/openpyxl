@@ -4,7 +4,7 @@ from __future__ import absolute_import
 
 """Write worksheets to xml representations in an optimized way"""
 
-import fileinput
+from fileinput import FileInput
 import os
 from tempfile import NamedTemporaryFile
 
@@ -155,7 +155,7 @@ class DumpWorksheet(Worksheet):
         for f in files:
             self.get_temporary_file(f).close()
         output = self.get_temporary_file(self.filename)
-        for line in fileinput.input(files):
+        for line in FileInput(files):
             output.write(line)
         output.close()
 
