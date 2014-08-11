@@ -3,7 +3,7 @@ from __future__ import absolute_import
 
 from io import BytesIO
 import os
-from lxml.etree import xmlfile, Element, SubElement
+from lxml.etree import xmlfile, Element, SubElement, tostring
 
 from openpyxl.compat import safe_string
 from openpyxl.cell import get_column_letter, Cell
@@ -13,6 +13,7 @@ from . dump_worksheet import (
     DumpWorksheet,
     WriteOnlyCell,
     DumpCommentWriter,
+    CommentParentCell,
     WorkbookAlreadySaved,
 )
 from . lxml_worksheet import (
@@ -20,6 +21,7 @@ from . lxml_worksheet import (
     write_sheetviews,
     write_cols,
 )
+from .relations import write_rels
 
 from openpyxl.xml.constants import (
     SHEET_MAIN_NS,
