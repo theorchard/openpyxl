@@ -188,10 +188,8 @@ class LXMLDumpWriter(ExcelWriter):
             # write comments
             if sheet._comments:
                 rels = write_rels(sheet, drawing_id, comments_id)
-                archive.writestr(
-                    PACKAGE_WORKSHEETS + '/_rels/sheet%d.xml.rels' % (i + 1),
-                    tostring(rels)
-                        )
+                archive.writestr( PACKAGE_WORKSHEETS +
+                                  '/_rels/sheet%d.xml.rels' % i, tostring(rels) )
 
                 cw = DumpCommentWriter(sheet)
                 archive.writestr(PACKAGE_XL + '/comments%d.xml' % comments_id,

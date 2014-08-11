@@ -115,6 +115,17 @@ def test_append(LXMLWorksheet):
     assert diff is None, diff
 
 
+def test_cell_comment(LXMLWorksheet):
+    ws = LXMLWorksheet
+    from openpyxl.comments import Comment
+    from .. dump_worksheet import WriteOnlyCell
+    cell = WriteOnlyCell(ws, 1)
+    comment = Comment('hello', 'me')
+    cell.comment = comment
+    ws.append([cell])
+    assert ws._comments == [comment]
+
+
 def test_cannot_save_twice(LXMLWorksheet):
     from .. dump_worksheet import WorkbookAlreadySaved
 
