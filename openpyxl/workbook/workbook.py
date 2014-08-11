@@ -19,9 +19,13 @@ from openpyxl.styles import Style
 from openpyxl.writer.excel import save_workbook
 from openpyxl.exceptions import ReadOnlyWorkbookException
 from openpyxl.date_time import CALENDAR_WINDOWS_1900
+from openpyxl.xml import LXML
 from openpyxl.xml.functions import fromstring
 from openpyxl.xml.constants import SHEET_MAIN_NS
 from openpyxl.compat import deprecated
+
+if LXML:
+    from openpyxl.writer.dump_lxml import LXMLWorksheet as DumpWorksheet, save_dump
 
 
 class DocumentProperties(object):
