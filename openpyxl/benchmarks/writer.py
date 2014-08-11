@@ -13,10 +13,10 @@ def writer(optimised, cols, rows):
     """
     wb = openpyxl.Workbook(optimized_write=optimised)
     ws = wb.create_sheet()
-    row = range(cols)
+    row = list(range(cols))
     for idx in range(rows):
         if not (idx + 1) % rows/10:
-            progress = "." * ((idx + 1) / (1 + rows/10))
+            progress = "." * int((idx + 1) / (1 + rows/10))
             sys.stdout.write("\r" + progress)
             sys.stdout.flush()
         ws.append(row)
@@ -34,12 +34,16 @@ def timer(fn, **kw):
     result = []
     cols = kw.get("cols", 0)
     rows = kw.get("rows", 0)
+    if hasattr(fn, 'func_name'):
+        func_name = fn.func_name
+    else:
+        func_name = fn.__name__
     for opt in (False, True):
         kw.update(optimised=opt)
-        print "{} cols {} rows, Worksheet is {}".format(cols, rows,
-                                                        opt and "optimised" or "not optimised")
-        times = timeit.repeat("{}(**{})".format(fn.func_name, kw),
-                              setup="from __main__ import {}".format(fn.func_name),
+        print("{} cols {} rows, Worksheet is {}".format(cols, rows,
+                                                        opt and "optimised" or "not optimised"))
+        times = timeit.repeat("{}(**{})".format(func_name, kw),
+                              setup="from __main__ import {}".format(func_name),
                               number = 1,
                               repeat = 3
         )
