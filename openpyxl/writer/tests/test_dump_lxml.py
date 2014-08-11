@@ -1,13 +1,15 @@
 from __future__ import absolute_import
 # Copyright (c) 2010-2014 openpyxl
 
-import pytest
+
 import datetime
 import decimal
-from lxml.etree import tostring
+from io import BytesIO
+from lxml.etree import tostring, tounicode, xmlfile
 
 from openpyxl.tests.helper import compare_xml
 
+import pytest
 from . test_dump import DummyWorkbook
 
 @pytest.fixture
@@ -18,20 +20,23 @@ def LXMLWorksheet():
 
 def test_write_header(LXMLWorksheet):
     ws = LXMLWorksheet
-    doc = ws.write_header()
+    doc = ws._write_header()
+    next(doc)
+    doc.close()
     header = open(ws.filename)
     xml = header.read()
-    expected = """<worksheet xmlns:r="http://schemas.openxmlformats.org/officeDocument/2006/relationships" xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main">
+    expected = """
+    <worksheet xmlns:r="http://schemas.openxmlformats.org/officeDocument/2006/relationships" xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main">
     <sheetPr>
       <outlinePr summaryRight="1" summaryBelow="1"/>
     </sheetPr>
-    <dimension ref="A1:A1"/>
     <sheetViews>
       <sheetView workbookViewId="0">
         <selection sqref="A1" activeCell="A1"/>
       </sheetView>
     </sheetViews>
     <sheetFormatPr baseColWidth="10" defaultRowHeight="15"/>
+    <sheetData/>
     </worksheet>
     """
     diff = compare_xml(xml, expected)
@@ -60,18 +65,32 @@ def test_write_cell(LXMLWorksheet, value, expected):
     ws = LXMLWorksheet
     c = Cell(ws, 'A', 1, value)
     el = write_cell(ws, c)
-    xml = tostring(el, encoding="unicode")
+    xml = tounicode(el)
     diff = compare_xml(xml, expected)
     assert diff is None, diff
 
 
 def test_append(LXMLWorksheet):
     ws = LXMLWorksheet
+
+    def _writer(doc):
+        with xmlfile(doc) as xf:
+            with xf.element('sheetData'):
+                try:
+                    while True:
+                        body = (yield)
+                        xf.write(body)
+                except GeneratorExit:
+                    pass
+
+    doc = BytesIO()
+    ws.writer = _writer(doc)
+    next(ws.writer)
+
     ws.append([1, "s"])
     ws.append(['2', 3])
     ws.writer.close()
-    with open(ws._fileobj_content_name) as rows:
-        xml = rows.read()
+    xml = doc.getvalue()
     expected = """
     <sheetData>
       <row r="1" spans="1:2">

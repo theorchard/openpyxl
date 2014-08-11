@@ -2,12 +2,17 @@ from __future__ import absolute_import
 # Copyright (c) 2010-2014 openpyxl
 
 from io import BytesIO
-from lxml.etree import xmlfile, Element, SubElement, tounicode
+from lxml.etree import xmlfile, Element, SubElement
 
 from openpyxl.compat import safe_string
 from openpyxl.cell import get_column_letter, Cell
 
-from . dump_worksheet import DumpWorksheet, DESCRIPTORS_CACHE_SIZE, WriteOnlyCell
+from . excel import ExcelWriter
+from . dump_worksheet import (
+    DumpWorksheet,
+    WriteOnlyCell,
+    DumpCommentWriter,
+)
 from . lxml_worksheet import (
     write_format,
     write_sheetviews,
@@ -18,11 +23,24 @@ from openpyxl.xml.constants import SHEET_MAIN_NS
 
 
 class LXMLWorksheet(DumpWorksheet):
+    """
+    Streaming worksheet using lxml
+    Optimised to reduce memory by writing rows just in time
+    Cells can be styled and have comments
+    Styles for rows and columns must be applied before writing cells
+    """
 
     __saved = False
     writer = None
 
-    def write_header(self):
+    def _write_header(self):
+        """
+        Generator that creates the XML file and the sheet header
+        """
+        if self.__saved:
+            raise WorkbookAlreadySaved(
+                'this workbook has already been saved and cannot be modified or saved anymore.'
+            )
         NSMAP = {None : SHEET_MAIN_NS}
 
         with xmlfile(self.filename) as xf:
@@ -36,30 +54,27 @@ class LXMLWorksheet(DumpWorksheet):
                     SubElement(pr, 'pageSetUpPr', {'fitToPage': '1'})
                 xf.write(pr)
 
-                dim = Element('dimension', {'ref': 'A1:%s' % (self.get_dimensions())})
-                xf.write(dim)
+                #dim = Element('dimension', {'ref': 'A1:%s' % (self.get_dimensions())})
+                #xf.write(dim)
 
                 xf.write(write_sheetviews(self))
                 xf.write(write_format(self))
-                cols = write_cols(self)
+                cols = write_cols(self) # any
                 if cols:
                     xf.write(cols)
 
-    def _write_row(self):
-        with xmlfile(self._fileobj_content_name) as xf:
-            with xf.element("sheetData"):
-                try:
-                    while True:
-                        r = (yield)
-                        xf.write(r)
-                except GeneratorExit:
-                    pass
+                with xf.element("sheetData"):
+                    try:
+                        while True:
+                            r = (yield)
+                            xf.write(r)
+                    except GeneratorExit:
+                        pass
 
-    def close_content(self):
-        pass
-
-    def _get_content_generator(self):
-        pass
+    def close(self):
+        if self.writer is not None:
+            self.writer.close()
+        self.__saved = True
 
     def append(self, row):
         """
@@ -73,7 +88,7 @@ class LXMLWorksheet(DumpWorksheet):
         self._max_col = max(self._max_col, span)
         row_idx = self._max_row
         if self.writer is None:
-            self.writer = self._write_row()
+            #self.writer = self._write_header()
             next(self.writer)
 
         attrs = {'r': '%d' % self._max_row,
@@ -138,3 +153,34 @@ def write_cell(worksheet, cell):
     if value is not None:
         cell_content.text = safe_string(value)
     return el
+
+
+class LXMLDumpWriter(ExcelWriter):
+    """
+    Customised handling of worksheets
+    """
+
+    def _write_worksheets(self, archive):
+        drawing_id = 1
+        comments_id = 1
+
+        for i, sheet in enumerate(self.workbook.worksheets, 1):
+
+            sheet.close()
+            archive.write(sheet.filename, PACKAGE_WORKSHEETS + '/sheet%d.xml' % i)
+            sheet._cleanup()
+
+            # write comments
+            if sheet._comments:
+                rels = write_rels(sheet, drawing_id, comments_id)
+                archive.writestr(
+                    PACKAGE_WORKSHEETS + '/_rels/sheet%d.xml.rels' % (i + 1),
+                    tostring(rels)
+                        )
+
+                cw = DumpCommentWriter(sheet)
+                archive.writestr(PACKAGE_XL + '/comments%d.xml' % comments_id,
+                    cw.write_comments())
+                archive.writestr(PACKAGE_XL + '/drawings/commentsDrawing%d.vml' % comments_id,
+                    cw.write_comments_vml())
+                comments_id += 1
