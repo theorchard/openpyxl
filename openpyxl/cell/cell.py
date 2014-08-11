@@ -405,11 +405,6 @@ class Cell(object):
         """Set a new formatting code for numeric values"""
         self.style = self.style.copy(number_format=format_code)
 
-    def _set_number_format(self, format_code):
-        """Set a new formatting code for numeric values"""
-        warnings.warn("cell._set_number_format(value) is deprecated use cell.number_format = value instead")
-        self.number_format = format_code
-
     def is_date(self):
         """Whether the value is formatted as a date
 
