@@ -423,9 +423,6 @@ class Worksheet(object):
             else:
                 obj = self.column_dimensions[obj]
         return obj.style
-        #style_id = self._styles.get(coordinate, 0)
-        #style = self.parent.shared_styles[style_id].copy()
-        #return style
 
     @deprecated("Set styles directly on cells, columns or rows")
     def set_style(self, coordinate, style):
@@ -437,7 +434,6 @@ class Worksheet(object):
             else:
                 obj = self.column_dimensions[obj]
         obj.style = style
-        #self._styles[coordinate] = self.parent.shared_styles.add(style)
 
     def set_printer_settings(self, paper_size, orientation):
         """Set printer settings """
