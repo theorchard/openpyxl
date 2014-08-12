@@ -148,6 +148,7 @@ class WorkSheetParser(object):
                 column = get_column_letter(colId)
                 attrs = dict(col.attrib)
                 attrs['index'] = column
+                attrs['worksheet'] = self.ws
                 if column not in self.ws.column_dimensions:
                     dim = ColumnDimension(**attrs)
                     self.ws.column_dimensions[column] = dim

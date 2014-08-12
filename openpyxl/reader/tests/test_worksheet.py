@@ -6,6 +6,8 @@ from lxml.etree import iterparse, fromstring
 
 from openpyxl.xml.constants import SHEET_MAIN_NS
 from openpyxl.cell import Cell
+from openpyxl.collections import IndexedList
+from openpyxl.styles import Style
 
 
 @pytest.fixture
@@ -14,6 +16,10 @@ def Worksheet(Workbook):
 
         _guess_types = False
         data_only = False
+
+        def __init__(self):
+            self.shared_styles = IndexedList(range(28))
+            self.shared_styles.add(Style())
 
 
     from openpyxl.styles import numbers
@@ -78,6 +84,21 @@ def test_hidden_col(datadir, Worksheet, WorkSheetParser):
             parser.parse_column_dimensions(col)
     assert 'D' in ws.column_dimensions
     assert dict(ws.column_dimensions['D']) == {'customWidth': '1', 'hidden': '1', 'max': '4', 'min': '4'}
+
+
+def test_styled_col(datadir, Worksheet, WorkSheetParser):
+    datadir.chdir()
+    ws = Worksheet
+    parser = WorkSheetParser
+    with open("complex-styles-worksheet.xml", "rb") as src:
+        cols = iterparse(src, tag='{%s}col' % SHEET_MAIN_NS)
+        for _, col in cols:
+            parser.parse_column_dimensions(col)
+    assert 'I' in ws.column_dimensions
+    cd = ws.column_dimensions['I']
+    assert cd._style == 28
+    assert cd.style == Style()
+    assert dict(cd) ==  {'customWidth': '1', 'max': '9', 'min': '9', 'width': '25', 'style':'28'}
 
 
 def test_hidden_row(datadir, Worksheet, WorkSheetParser):

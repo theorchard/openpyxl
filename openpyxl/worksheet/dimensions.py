@@ -19,15 +19,17 @@ class Dimension(Strict):
     outlineLevel = Integer(allow_none=True)
     outline_level = Alias('outlineLevel')
     collapsed = Bool()
+    _style = None
 
     def __init__(self, index, hidden, outlineLevel,
-                 collapsed, worksheet, visible=True):
+                 collapsed, worksheet, visible=True, style=None):
         self.index = index
         self.hidden = hidden
         self.outlineLevel = outlineLevel
         self.collapsed = collapsed
         self.worksheet = worksheet
-        self._style = None
+        if style is not None: # accept pointer when parsing
+            self._style = int(style)
 
     def __iter__(self):
         for key in self.__fields__[1:]:
@@ -82,13 +84,12 @@ class RowDimension(Dimension):
         if height is not None:
             ht = height
         self.ht = ht
-        self.s = s
         if visible is not None:
             hidden = not visible
         if outline_level is not None:
             outlineLevel = outlineLevel
         super(RowDimension, self).__init__(index, hidden, outlineLevel,
-                                           collapsed, worksheet)
+                                           collapsed, worksheet, style=s)
 
     @property
     def customFormat(self):
@@ -149,10 +150,8 @@ class ColumnDimension(Dimension):
         if outline_level is not None:
             outlineLevel = outline_level
         self.collapsed = collapsed
-        if style is not None:
-            self._style = style
         super(ColumnDimension, self).__init__(index, hidden, outlineLevel,
-                                              collapsed, worksheet)
+                                              collapsed, worksheet, style=style)
 
     @property
     def customWidth(self):
@@ -161,7 +160,10 @@ class ColumnDimension(Dimension):
 
     def __iter__(self):
         for key in self.__fields__[1:]:
-            value = getattr(self, key)
+            if key == 'style':
+                value = getattr(self, '_style')
+            else:
+                value = getattr(self, key)
             if value:
                 yield key, safe_string(value)
 
