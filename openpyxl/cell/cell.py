@@ -168,7 +168,6 @@ class Cell(object):
                  'parent',
                  'xf_index',
                  '_hyperlink_rel',
-                 'merged',
                  '_comment',
                  '_style',)
 
@@ -205,7 +204,6 @@ class Cell(object):
         if value is not None:
             self.value = value
         self.xf_index = 0
-        self.merged = False
         self._comment = None
 
     @property

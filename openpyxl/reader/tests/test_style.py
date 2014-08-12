@@ -143,7 +143,6 @@ def test_read_complex_style(datadir):
     assert ws['A17'].number_format == '0.00%'
 
     assert 'A18:B18' in ws._merged_cells
-    assert ws.cell('B18').merged
 
     assert ws['A19'].border == Border(
         left=Side(style='thin', color='FF006600'),

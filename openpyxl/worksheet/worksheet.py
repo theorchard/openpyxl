@@ -155,7 +155,7 @@ class Worksheet(object):
         """Delete cells that are not storing a value."""
         delete_list = []
         for coordinate, cell in iteritems(self._cells):
-            if (not cell.merged and cell.value in ('', None)
+            if (cell.value in ('', None)
             and cell.comment is None
             and (coordinate not in self._styles or cell.style == DEFAULTS_STYLE)):
                 delete_list.append(coordinate)
@@ -495,10 +495,10 @@ class Worksheet(object):
                     "'coordinate' or for 'start_row', 'start_column', 'end_row' *and* 'end_column'"
                 raise InsufficientCoordinatesException(msg)
             else:
-                range_string = '%s%s:%s%s' % (get_column_letter(start_column + 1),
-                                              start_row + 1,
-                                              get_column_letter(end_column + 1),
-                                              end_row + 1)
+                range_string = '%s%s:%s%s' % (get_column_letter(start_column),
+                                              start_row,
+                                              get_column_letter(end_column),
+                                              end_row)
         elif ":" not in range_string:
             if COORD_RE.match(range_string):
                 return # Single cell
@@ -507,21 +507,27 @@ class Worksheet(object):
         else:
             range_string = range_string.replace('$', '')
 
-        # Make sure top_left cell exists - is this necessary?
+        if range_string not in self._merged_cells:
+            self._merged_cells.append(range_string)
+
+        cells = self._cells_from_range(range_string)
+        # only the top-left cell is preserved
+        from itertools import islice
+        for c in islice(cells, 1, None):
+            if c in self._cells:
+                del self._cells[c]
+
+    def _cells_from_range(self, range_string):
+        """
+        Get individual addresses for every cell in a range
+        """
         min_col, min_row = coordinate_from_string(range_string.split(':')[0])
         max_col, max_row = coordinate_from_string(range_string.split(':')[1])
         min_col = column_index_from_string(min_col)
         max_col = column_index_from_string(max_col)
-        # Blank out the rest of the cells in the range
-        for col in range(min_col, max_col + 1):
-            for row in range(min_row, max_row + 1):
-                if not (row == min_row and col == min_col):
-                    # PHPExcel adds cell and specifically blanks it out if it doesn't exist
-                    self._get_cell('%s%s' % (get_column_letter(col), row)).value = None
-                    self._get_cell('%s%s' % (get_column_letter(col), row)).merged = True
-
-        if range_string not in self._merged_cells:
-            self._merged_cells.append(range_string)
+        for col in range(min_col, max_col+1):
+            for row in range(min_row, max_row+1):
+                yield '%s%d' % (get_column_letter(col), row)
 
     def unmerge_cells(self, range_string=None, start_row=None, start_column=None, end_row=None, end_column=None):
         """ Remove merge on a cell range.  Range is a cell range (e.g. A1:E1) """
@@ -531,7 +537,7 @@ class Worksheet(object):
                     "'coordinate' or for 'start_row', 'start_column', 'end_row' *and* 'end_column'"
                 raise InsufficientCoordinatesException(msg)
             else:
-                range_string = '%s%s:%s%s' % (get_column_letter(start_column + 1), start_row + 1, get_column_letter(end_column + 1), end_row + 1)
+                range_string = '%s%s:%s%s' % (get_column_letter(start_column), start_row, get_column_letter(end_column), end_row)
         elif len(range_string.split(':')) != 2:
             msg = "Range must be a cell range (e.g. A1:E1)"
             raise InsufficientCoordinatesException(msg)
@@ -540,15 +546,7 @@ class Worksheet(object):
 
         if range_string in self._merged_cells:
             self._merged_cells.remove(range_string)
-            min_col, min_row = coordinate_from_string(range_string.split(':')[0])
-            max_col, max_row = coordinate_from_string(range_string.split(':')[1])
-            min_col = column_index_from_string(min_col)
-            max_col = column_index_from_string(max_col)
-            # Mark cell as unmerged
-            for col in range(min_col, max_col + 1):
-                for row in range(min_row, max_row + 1):
-                    if not (row == min_row and col == min_col):
-                        self._get_cell('%s%s' % (get_column_letter(col), row)).merged = False
+
         else:
             msg = 'Cell range %s not known as merged.' % range_string
             raise InsufficientCoordinatesException(msg)

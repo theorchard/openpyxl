@@ -295,6 +295,43 @@ class TestWorksheet(object):
         ws.freeze_panes = ws.cell('A1')
         assert ws.freeze_panes is None
 
+    def test_cells_from_range(self):
+        ws = Worksheet(self.wb)
+        cells = ws._cells_from_range("A1:D4")
+        assert list(cells) == [
+            'A1', 'A2', 'A3', 'A4',
+            'B1', 'B2', 'B3', 'B4',
+            'C1', 'C2', 'C3', 'C4',
+            'D1', 'D2', 'D3', 'D4'
+                               ]
+
+
+    def test_merge_range_string(self):
+        ws = Worksheet(self.wb)
+        ws['A1'] = 1
+        ws['D4'] = 16
+        ws.merge_cells(range_string="A1:D4")
+        assert ws._merged_cells == ["A1:D4"]
+        assert 'D4' not in ws._cells
+
+
+    def test_merge_coordinate(self):
+        ws = Worksheet(self.wb)
+        ws.merge_cells(start_row=1, start_column=1, end_row=4, end_column=4)
+        assert ws._merged_cells == ["A1:D4"]
+
+
+    def test_unmerge_range_string(self):
+        ws = Worksheet(self.wb)
+        ws._merged_cells = ["A1:D4"]
+        ws.unmerge_cells("A1:D4")
+
+
+    def test_unmerge_coordinate(self):
+        ws = Worksheet(self.wb)
+        ws._merged_cells = ["A1:D4"]
+        ws.unmerge_cells(start_row=1, start_column=1, end_row=4, end_column=4)
+
 
 class TestPositioning(object):
     def test_point(self):
