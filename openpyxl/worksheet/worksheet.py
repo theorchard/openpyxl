@@ -125,8 +125,8 @@ class Worksheet(object):
         self.print_gridlines = False
         self.show_summary_below = True
         self.show_summary_right = True
-        self.default_row_dimension = RowDimension()
-        self.default_column_dimension = ColumnDimension()
+        self.default_row_dimension = RowDimension(worksheet=self)
+        self.default_column_dimension = ColumnDimension(worksheet=self)
         self._auto_filter = AutoFilter()
         self._freeze_panes = None
         self.paper_size = None
@@ -286,9 +286,9 @@ class Worksheet(object):
             new_cell = openpyxl.cell.Cell(self, column, row)
             self._cells[coordinate] = new_cell
             if column not in self.column_dimensions:
-                self.column_dimensions[column] = ColumnDimension(column)
+                self.column_dimensions[column] = ColumnDimension(column, worksheet=self)
             if row not in self.row_dimensions:
-                self.row_dimensions[row] = RowDimension(row)
+                self.row_dimensions[row] = RowDimension(row, worksheet=self)
         return self._cells[coordinate]
 
     def __getitem__(self, key):
