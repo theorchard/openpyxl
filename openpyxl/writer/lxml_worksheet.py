@@ -72,7 +72,7 @@ def write_worksheet(worksheet, shared_strings):
                 xf.write(af)
 
             merge = write_mergecells(worksheet)
-            if merge:
+            if merge is not None:
                 xf.write(merge)
 
             write_conditional_formatting(xf, worksheet)
