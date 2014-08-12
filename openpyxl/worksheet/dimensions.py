@@ -109,6 +109,15 @@ class RowDimension(Dimension):
     def s(self, style):
         self.style = style
 
+    def __iter__(self):
+        for key in self.__fields__[1:]:
+            if key == 's':
+                value = getattr(self, '_style')
+            else:
+                value = getattr(self, key)
+            if value:
+                yield key, safe_string(value)
+
 
 class ColumnDimension(Dimension):
     """Information about the display properties of a column."""

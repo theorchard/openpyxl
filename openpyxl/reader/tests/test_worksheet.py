@@ -114,6 +114,23 @@ def test_hidden_row(datadir, Worksheet, WorkSheetParser):
     assert dict(ws.row_dimensions[2]) == {'hidden': '1'}
 
 
+def test_styled_row(datadir, Worksheet, WorkSheetParser):
+    datadir.chdir()
+    ws = Worksheet
+    parser = WorkSheetParser
+    parser.shared_strings = dict((i, i) for i in range(30))
+
+    with open("complex-styles-worksheet.xml", "rb") as src:
+        rows = iterparse(src, tag='{%s}row' % SHEET_MAIN_NS)
+        for _, row in rows:
+            parser.parse_row_dimensions(row)
+    assert 23 in ws.row_dimensions
+    rd = ws.row_dimensions[23]
+    assert rd._style == 28
+    assert rd.style == Style()
+    assert dict(rd) == {'s':'28', 'customFormat':'1'}
+
+
 def test_sheet_protection(datadir, Worksheet, WorkSheetParser):
     datadir.chdir()
     ws = Worksheet

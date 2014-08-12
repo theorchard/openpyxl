@@ -157,6 +157,7 @@ class WorkSheetParser(object):
 
     def parse_row_dimensions(self, row):
         attrs = dict(row.attrib)
+        attrs['worksheet'] = self.ws
         for key in set(attrs):
             if key.startswith('{'): #ignore custom namespaces
                 del attrs[key]
