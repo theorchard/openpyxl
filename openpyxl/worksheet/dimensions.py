@@ -152,8 +152,6 @@ class ColumnDimension(Dimension):
     # def col_label(self):
         # return get_column_letter(self.index)
 
-del Base
-
 
 class DimensionHolder(OrderedDict):
     "hold (row|column)dimensions and allow operations over them"
