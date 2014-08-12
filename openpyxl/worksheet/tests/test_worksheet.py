@@ -191,13 +191,13 @@ class TestWorksheet(object):
         assert ws.max_row == 0
 
 
-    def test_range(self):
+    def test_append_range(self):
         ws = Worksheet(self.wb)
         ws.append(range(30))
         assert ws['AD1'].value == 29
 
 
-    def test_iterator(self):
+    def test_append_iterator(self):
         def itty():
             for i in range(30):
                 yield i
