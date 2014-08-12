@@ -589,11 +589,13 @@ class Worksheet(object):
                 self.cell(row=row_idx, column=col_idx).value = content
 
         else:
-            raise TypeError('Value must be a list, a generator, or a dict. Supplied value is {0}'.format(
-                type(iterable))
-                            )
+            self._invalid_row(iterable)
         self.row_dimensions[row_idx] = RowDimension(row_idx)
 
+    def _invalid_row(self, iterable):
+        raise TypeError('Value must be a list, tuple, range or generator, or a dict. Supplied value is {0}'.format(
+            type(iterable))
+                        )
 
     @property
     def rows(self):
