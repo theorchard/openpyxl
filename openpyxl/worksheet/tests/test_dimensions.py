@@ -3,6 +3,7 @@ from __future__ import absolute_import
 
 import pytest
 
+from openpyxl.collections import IndexedList
 
 def test_invalid_dimension_ctor():
     from .. dimensions import Dimension
@@ -10,8 +11,19 @@ def test_invalid_dimension_ctor():
         d = Dimension()
 
 class DummyWorkbook:
+
+    def __init__(self):
+        self.shared_styles = IndexedList()
+
     def get_sheet_names(self):
         return []
+
+
+class DummyWorksheet:
+
+    def __init__(self):
+        self.parent = DummyWorkbook()
+
 
 def test_dimension():
     from .. dimensions import Dimension
@@ -21,7 +33,8 @@ def test_dimension():
 
 def test_dimension_interface():
     from .. dimensions import Dimension
-    d = Dimension(1, True, 1, False)
+    d = Dimension(1, True, 1, False, None)
+    assert d.worksheet is None
     assert dict(d) == {'hidden': '1', 'outlineLevel': '1'}
 
 
@@ -33,7 +46,7 @@ def test_dimension_interface():
                          )
 def test_row_dimension(key, value, expected):
     from .. dimensions import RowDimension
-    rd = RowDimension()
+    rd = RowDimension(worksheet=DummyWorksheet())
     setattr(rd, key, value)
     assert dict(rd) == expected
 

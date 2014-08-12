@@ -21,11 +21,13 @@ class Dimension(Strict):
     collapsed = Bool()
 
     def __init__(self, index, hidden, outlineLevel,
-                 collapsed, visible=True):
+                 collapsed, worksheet, visible=True):
         self.index = index
         self.hidden = hidden
         self.outlineLevel = outlineLevel
         self.collapsed = collapsed
+        self.worksheet = worksheet
+        self._style = None
 
     def __iter__(self):
         for key in self.__fields__[1:]:
@@ -37,6 +39,16 @@ class Dimension(Strict):
     def visible(self):
         return not self.hidden
 
+    @property
+    def style(self):
+        if self._style is not None:
+            return self.worksheet.parent.shared_styles[self._style]
+
+    @style.setter
+    def style(self, style):
+        if style is not None:
+            self._style = self.worksheet.parent.shared_styles.add(style)
+
 
 class RowDimension(Dimension):
     """Information about the display properties of a row."""
@@ -45,8 +57,6 @@ class RowDimension(Dimension):
     r = Alias('index')
     ht = Float(allow_none=True)
     height = Alias('ht')
-    s = Integer(allow_none=True)
-    style = Alias('s')
     thickBot = Bool()
     thickTop = Bool()
 
@@ -60,27 +70,25 @@ class RowDimension(Dimension):
                  outlineLevel=0,
                  outline_level=None,
                  collapsed=False,
-                 style=None,
                  visible=None,
                  height=None,
                  r=None,
                  spans=None,
                  thickBot=None,
-                 thickTop=None):
+                 thickTop=None,
+                 worksheet=None):
         if r is not None:
             index = r
         if height is not None:
             ht = height
         self.ht = ht
-        if style is not None:
-            s = style
         self.s = s
         if visible is not None:
             hidden = not visible
         if outline_level is not None:
             outlineLevel = outlineLevel
         super(RowDimension, self).__init__(index, hidden, outlineLevel,
-                                           collapsed)
+                                           collapsed, worksheet)
 
     @property
     def customFormat(self):
@@ -92,6 +100,14 @@ class RowDimension(Dimension):
         """Always true if there is a height for the row"""
         return self.ht is not None
 
+    @property
+    def s(self):
+        return self.style
+
+    @s.setter
+    def s(self, style):
+        self.style = style
+
 
 class ColumnDimension(Dimension):
     """Information about the display properties of a column."""
@@ -100,7 +116,6 @@ class ColumnDimension(Dimension):
     bestFit = Bool()
     auto_size = Alias('bestFit')
     index = String()
-    style = Integer(allow_none=True)
     min = Integer(allow_none=True)
     max = Integer(allow_none=True)
     collapsed = Bool()
@@ -121,9 +136,9 @@ class ColumnDimension(Dimension):
                  max=None,
                  customWidth=False, # do not write
                  visible=None,
-                 auto_size=None):
+                 auto_size=None,
+                 worksheet=None):
         self.width = width
-        self.style = style
         self.min = min
         self.max = max
         if visible is not None:
@@ -134,8 +149,10 @@ class ColumnDimension(Dimension):
         if outline_level is not None:
             outlineLevel = outline_level
         self.collapsed = collapsed
+        if style is not None:
+            self._style = style
         super(ColumnDimension, self).__init__(index, hidden, outlineLevel,
-                                              collapsed)
+                                              collapsed, worksheet)
 
     @property
     def customWidth(self):
