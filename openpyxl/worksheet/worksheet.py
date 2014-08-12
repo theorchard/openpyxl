@@ -6,6 +6,7 @@ from __future__ import absolute_import
 
 # Python stdlib imports
 import re
+from inspect import isgenerator
 
 # compatibility imports
 from openpyxl.compat import (
@@ -552,14 +553,14 @@ class Worksheet(object):
             msg = 'Cell range %s not known as merged.' % range_string
             raise InsufficientCoordinatesException(msg)
 
-    def append(self, list_or_dict):
+    def append(self, iterable):
         """Appends a group of values at the bottom of the current sheet.
 
         * If it's a list: all values are added in order, starting from the first column
         * If it's a dict: values are assigned to the columns indicated by the keys (numbers or letters)
 
-        :param list_or_dict: list or dict containing values to append
-        :type list_or_dict: list/tuple or dict
+        :param iterable: list, range or generator, or dict containing values to append
+        :type iterable: list/tuple/range/generator or dict
 
         Usage:
 
@@ -567,27 +568,30 @@ class Worksheet(object):
         * **or** append({'A' : 'This is A1', 'C' : 'This is C1'})
         * **or** append({1 : 'This is A1', 3 : 'This is C1'})
 
-        :raise: TypeError when list_or_dict is neither a list/tuple nor a dict
+        :raise: TypeError when iterable is neither a list/tuple nor a dict
 
         """
         row_idx = self.max_row + 1
         self.row_dimensions[row_idx] = RowDimension(row_idx)
-        if isinstance(list_or_dict, (list, tuple)):
-            for col_idx, content in enumerate(list_or_dict, 1):
+        if (isinstance(iterable, (list, tuple, range))
+            or isgenerator(iterable)):
+            for col_idx, content in enumerate(iterable, 1):
                 col = get_column_letter(col_idx)
                 if col not in self.column_dimensions:
                     self.column_dimensions[col] = ColumnDimension(col)
                 cell = Cell(self, col, row_idx, content)
                 self._cells['%s%d' % (col, row_idx)] = cell
 
-        elif isinstance(list_or_dict, dict):
-            for col_idx, content in iteritems(list_or_dict):
+        elif isinstance(iterable, dict):
+            for col_idx, content in iteritems(iterable):
                 if isinstance(col_idx, basestring):
                     col_idx = column_index_from_string(col_idx)
                 self.cell(row=row_idx, column=col_idx).value = content
 
         else:
-            raise TypeError('list_or_dict must be a list or a dict')
+            raise TypeError('Value must be a list, a generator, or a dict. Supplied value is {0}'.format(
+                type(iterable))
+                            )
 
     @property
     def rows(self):

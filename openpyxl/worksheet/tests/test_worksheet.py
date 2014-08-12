@@ -188,6 +188,24 @@ class TestWorksheet(object):
         with pytest.raises(TypeError):
             ws.append("test")
 
+
+    def test_range(self):
+        ws = Worksheet(self.wb)
+        ws.append(range(30))
+        assert ws['AD1'].value == 29
+
+
+    def test_iterator(self):
+        def itty():
+            for i in range(30):
+                yield i
+
+        ws = Worksheet(self.wb)
+        gen = itty()
+        ws.append(gen)
+        assert ws['AD1'].value == 29
+
+
     def test_append_2d_list(self):
 
         ws = Worksheet(self.wb)
