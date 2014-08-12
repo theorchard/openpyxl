@@ -306,6 +306,17 @@ class TestWorksheet(object):
            ['A4', 'B4', 'C4', 'D4'],
                                ]
 
+    def test_cells_from_range_offset(self):
+        ws = Worksheet(self.wb)
+        cells = ws._cells_from_range("A1:D4", 1, 2)
+        cells = [list(row) for row in cells]
+        assert cells == [
+           ['C2', 'D2', 'E2', 'F2'],
+           ['C3', 'D3', 'E3', 'F3'],
+           ['C4', 'D4', 'E4', 'F4'],
+           ['C5', 'D5', 'E5', 'F5'],
+                               ]
+
 
     def test_merge_range_string(self):
         ws = Worksheet(self.wb)
