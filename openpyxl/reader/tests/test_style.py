@@ -121,8 +121,8 @@ def test_read_complex_style(datadir):
     ws = wb.get_active_sheet()
     assert ws.column_dimensions['A'].width == 31.1640625
 
-    assert ws.get_style('I').font == Font(sz=12.0, color='FF3300FF')
-    assert ws.get_style('I').fill == PatternFill(patternType='solid', fgColor='FF006600', bgColor=Color(indexed=64))
+    assert ws.column_dimensions['I'].style.font == Font(sz=12.0, color='FF3300FF')
+    assert ws.column_dimensions['I'].style.fill == PatternFill(patternType='solid', fgColor='FF006600', bgColor=Color(indexed=64))
 
     assert ws['A2'].font == Font(sz=10, name='Arial', color=Color(theme=1))
     assert ws['A3'].font == Font(sz=12, name='Arial', bold=True, color=Color(theme=1))
@@ -173,13 +173,13 @@ def test_change_existing_styles(datadir):
     ws = wb.get_active_sheet()
 
     ws.column_dimensions['A'].width = 20
-    i_style = ws.get_style('I')
-    ws.set_style('I', i_style.copy(fill=PatternFill(fill_type='solid',
+    i_style = ws.column_dimensions['I'].style
+    ws.column_dimensions['I'].style = i_style.copy(fill=PatternFill(fill_type='solid',
                                              start_color=Color('FF442200')),
-                                   font=Font(color=Color('FF002244'))))
+                                   font=Font(color=Color('FF002244')))
 
-    assert ws.get_style('I').fill.start_color.value == 'FF442200'
-    assert ws.get_style('I').font.color.value == 'FF002244'
+    assert ws.column_dimensions['I'].style.fill.start_color.value == 'FF442200'
+    assert ws.column_dimensions['I'].style.font.color.value == 'FF002244'
 
     ws.cell('A2').style = ws.cell('A2').style.copy(font=Font(name='Times New Roman',
                                                              size=12,

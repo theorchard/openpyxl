@@ -412,14 +412,32 @@ class Worksheet(object):
             else:
                 return tuple(result)
 
+    @deprecated("Access styles directly from cells, columns or rows")
     def get_style(self, coordinate):
         """Return a copy of the style object for the specified cell."""
-        style_id = self._styles.get(coordinate, 0)
-        style = self.parent.shared_styles[style_id].copy()
-        return style
+        try:
+            obj = self[coordinate]
+        except ValueError:
+            if isinstance(coordinate, int):
+                obj = self.row_dimensions[obj]
+            else:
+                obj = self.column_dimensions[obj]
+        return obj.style
+        #style_id = self._styles.get(coordinate, 0)
+        #style = self.parent.shared_styles[style_id].copy()
+        #return style
 
+    @deprecated("Set styles directly on cells, columns or rows")
     def set_style(self, coordinate, style):
-        self._styles[coordinate] = self.parent.shared_styles.add(style)
+        try:
+            obj = self[coordinate]
+        except ValueError:
+            if isinstance(coordinate, int):
+                obj = self.row_dimensions[obj]
+            else:
+                obj = self.column_dimensions[obj]
+        obj.style = style
+        #self._styles[coordinate] = self.parent.shared_styles.add(style)
 
     def set_printer_settings(self, paper_size, orientation):
         """Set printer settings """

@@ -41,7 +41,7 @@ def test_dimension_interface():
 @pytest.mark.parametrize("key, value, expected",
                          [
                              ('ht', 1, {'ht':'1', 'customHeight':'1'}),
-                             ('style', 10, {'s':'10', 'customFormat':'1'}),
+                             ('_style', 10, {'s':'10', 'customFormat':'1'}),
                          ]
                          )
 def test_row_dimension(key, value, expected):

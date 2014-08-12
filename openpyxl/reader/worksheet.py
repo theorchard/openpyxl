@@ -152,8 +152,6 @@ class WorkSheetParser(object):
                 if column not in self.ws.column_dimensions:
                     dim = ColumnDimension(**attrs)
                     self.ws.column_dimensions[column] = dim
-                    if dim.style is not None:
-                        self.ws._styles[column] = dim.style
 
     def parse_row_dimensions(self, row):
         attrs = dict(row.attrib)
@@ -164,8 +162,6 @@ class WorkSheetParser(object):
         dim = RowDimension(**attrs)
         if dim.index not in self.ws.row_dimensions:
             self.ws.row_dimensions[dim.index] = dim
-        if row.get('customFormat') and dim.style:
-            self.ws._styles[dim.index] = dim.style
         for cell in safe_iterator(row, self.CELL_TAG):
             self.parse_cell(cell)
 

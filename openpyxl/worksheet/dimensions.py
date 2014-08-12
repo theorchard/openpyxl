@@ -94,7 +94,7 @@ class RowDimension(Dimension):
     @property
     def customFormat(self):
         """Always true if there is a style for the row"""
-        return self.style is not None
+        return self._style is not None
 
     @property
     def customHeight(self):
