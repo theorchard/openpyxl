@@ -353,27 +353,12 @@ class Worksheet(object):
         if ':' in range_string:
             # R1C1 range
             result = []
-            min_range, max_range = range_string.split(':')
-            min_col, min_row = coordinate_from_string(min_range)
-            max_col, max_row = coordinate_from_string(max_range)
-            if column:
-                min_col = get_column_letter(
-                    column_index_from_string(min_col) + column)
-                max_col = get_column_letter(
-                    column_index_from_string(max_col) + column)
-            min_col = column_index_from_string(min_col)
-            max_col = column_index_from_string(max_col)
-            cache_cols = {}
-            for col in range(min_col, max_col + 1):
-                cache_cols[col] = get_column_letter(col)
-            rows = range(min_row + row, max_row + row + 1)
-            cols = range(min_col, max_col + 1)
-            for row in rows:
-                new_row = []
-                for col in cols:
-                    new_row.append(self.cell('%s%s' % (cache_cols[col], row)))
-                result.append(tuple(new_row))
+            cells = self._cells_from_range(range_string, row_offset=row,
+                                          column_offset=column)
+            for row in cells:
+                result.append(tuple(self[col] for col in row))
             return tuple(result)
+
         else:
             try:
                 return self.cell(coordinate=range_string, row=row,
@@ -512,12 +497,12 @@ class Worksheet(object):
 
         cells = self._cells_from_range(range_string)
         # only the top-left cell is preserved
-        from itertools import islice
-        for c in islice(cells, 1, None):
+        from itertools import islice, chain
+        for c in islice(chain.from_iterable(cells), 1, None):
             if c in self._cells:
                 del self._cells[c]
 
-    def _cells_from_range(self, range_string):
+    def _cells_from_range(self, range_string, row_offset=0, column_offset=0):
         """
         Get individual addresses for every cell in a range
         """
@@ -525,9 +510,8 @@ class Worksheet(object):
         max_col, max_row = coordinate_from_string(range_string.split(':')[1])
         min_col = column_index_from_string(min_col)
         max_col = column_index_from_string(max_col)
-        for col in range(min_col, max_col+1):
-            for row in range(min_row, max_row+1):
-                yield '%s%d' % (get_column_letter(col), row)
+        for row in range(min_row+row_offset, max_row+1 + row_offset):
+            yield ('%s%d' % (get_column_letter(col), row) for col in range(min_col + column_offset, max_col+1 + column_offset))
 
     def unmerge_cells(self, range_string=None, start_row=None, start_column=None, end_row=None, end_column=None):
         """ Remove merge on a cell range.  Range is a cell range (e.g. A1:E1) """
