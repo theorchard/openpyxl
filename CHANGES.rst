@@ -19,6 +19,7 @@ Create all style tags in a single pass
 Performance improvement when appending rows
 Cleaner conversion of Python to Excel values
 PR6 reserve formatting for empty rows
+standard worksheets can append from ranges and generators
 
 
 Bug fixes
@@ -26,6 +27,7 @@ Bug fixes
 153 Cannot read visibility of sheets and rows
 181 No content type for worksheets
 241 Cannot read sheets with inline strings
+322 1-indexing for merged cells
 341 Cells with formulae do not round-trip
 
 
