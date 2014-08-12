@@ -110,17 +110,43 @@ attributes which are different from the default, even when you copy a `Style`.
 
 Keep this in mind when working with styles and you should be fine.
 
+
 Basic Font Colors
 -----------------
+Colors are usually RGB or aRGB hexvalues. The `colors` module contains some constants
+
+:: doctest
+
+>>> from openpyxl.styles import Font
+>>> from openpyxl.styles.colors import RED
+>>> font = Font(color=RED)
+>>> font = Font(color="FFBB00")
+
+There is also support for legacy indexed colors as well as themes and tints
+
+>>> from openpyxl.styles.colors import Color
+>>> c = Color(indexed=32)
+>>> c = Color(theme=6, tint=0.5)
+
+
+Applying Styles
+---------------
+Styles are applied directly to cells
+
 :: doctest
 
 >>> from openpyxl.workbook import Workbook
->>> from openpyxl.styles import Style, Font
->>> from openpyxl.styles.colors import RED
+>>> from openpyxl.styles import Style
 >>> wb = Workbook()
 >>> ws = wb.active
->>> ws['A1'] = 'This is red'
->>> ws['A1'].style = Style(font=Font(color=RED))
+>>> c = ws['A1']
+>>> c.style = Style()
+
+Styles are also applied to columns and rows
+>>> col = ws.column_dimensions['A']
+>>> col.style = Style()
+>>> row = ws.row_dimensions[1]
+>>> row.style = Style()
 
 
 Edit Print Settings
