@@ -2,6 +2,7 @@ from __future__ import absolute_import
 # Copyright (c) 2010-2014 openpyxl
 
 from io import BytesIO
+from inspect import isgenerator
 import os
 from lxml.etree import xmlfile, Element, SubElement, tostring
 
@@ -89,6 +90,9 @@ class LXMLWorksheet(DumpWorksheet):
         :param row: iterable containing values to append
         :type row: iterable
         """
+        if (not isinstance(row, (list, tuple, range))
+            and not isgenerator(row)):
+            self._invalid_row(row)
         cell = WriteOnlyCell(self) # singleton
 
         self._max_row += 1

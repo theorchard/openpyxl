@@ -115,6 +115,13 @@ def test_append(LXMLWorksheet):
     assert diff is None, diff
 
 
+@pytest.mark.parametrize("row", ("string", dict()))
+def test_invalid_append(LXMLWorksheet, row):
+    ws = LXMLWorksheet
+    with pytest.raises(TypeError):
+        ws.append(row)
+
+
 def test_cell_comment(LXMLWorksheet):
     ws = LXMLWorksheet
     from openpyxl.comments import Comment

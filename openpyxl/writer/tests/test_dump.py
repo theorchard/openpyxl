@@ -113,6 +113,13 @@ def test_append_data(DumpWorksheet):
     assert diff is None, diff
 
 
+@pytest.mark.parametrize("row", ("string", dict()))
+def test_invalid_append(DumpWorksheet, row):
+    ws = DumpWorksheet
+    with pytest.raises(TypeError):
+        ws.append(row)
+
+
 def test_write_only_cell():
     from .. dump_worksheet import WriteOnlyCell
     c = WriteOnlyCell()

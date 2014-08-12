@@ -5,6 +5,7 @@ from __future__ import absolute_import
 """Write worksheets to xml representations in an optimized way"""
 
 from fileinput import FileInput
+from inspect import isgenerator
 import os
 from tempfile import NamedTemporaryFile
 
@@ -187,6 +188,10 @@ class DumpWorksheet(Worksheet):
         :param row: iterable containing values to append
         :type row: iterable
         """
+        if (not isinstance(row, (list, tuple, range))
+            and not isgenerator(row)):
+            self._invalid_row(row)
+
         doc = self._get_content_generator()
         cell = WriteOnlyCell(self) # singleton
 
@@ -221,6 +226,11 @@ class DumpWorksheet(Worksheet):
                 cell = WriteOnlyCell(self)
         end_tag(doc, 'row')
 
+
+    def _invalid_row(self, iterable):
+        raise TypeError('Value must be a list, tuple, range or a generator Supplied value is {0}'.format(
+            type(iterable))
+                        )
 
 def removed_method(*args, **kw):
     raise NotImplementedError
