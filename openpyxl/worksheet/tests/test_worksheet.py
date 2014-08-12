@@ -185,8 +185,10 @@ class TestWorksheet(object):
 
     def test_bad_append(self):
         ws = Worksheet(self.wb)
+        assert ws.max_row == 0
         with pytest.raises(TypeError):
             ws.append("test")
+        assert ws.max_row == 0
 
 
     def test_range(self):

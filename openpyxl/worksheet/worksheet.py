@@ -572,7 +572,7 @@ class Worksheet(object):
 
         """
         row_idx = self.max_row + 1
-        self.row_dimensions[row_idx] = RowDimension(row_idx)
+
         if (isinstance(iterable, (list, tuple, range))
             or isgenerator(iterable)):
             for col_idx, content in enumerate(iterable, 1):
@@ -592,6 +592,8 @@ class Worksheet(object):
             raise TypeError('Value must be a list, a generator, or a dict. Supplied value is {0}'.format(
                 type(iterable))
                             )
+        self.row_dimensions[row_idx] = RowDimension(row_idx)
+
 
     @property
     def rows(self):
