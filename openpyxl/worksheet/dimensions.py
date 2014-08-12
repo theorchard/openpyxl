@@ -7,13 +7,7 @@ from openpyxl.descriptors import Integer, Float, Bool, Strict, String, Alias
 from openpyxl.compat import OrderedDict
 
 
-class Base(Strict):
-    # Base class for avoiding conflicts between descriptors and slots in Python 3
-    __fields__ = ()
-    __slots__ = __fields__
-
-
-class Dimension(Base):
+class Dimension(Strict):
     """Information about the display properties of a row or column."""
     __fields__ = ('index',
                  'hidden',
