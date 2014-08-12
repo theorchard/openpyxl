@@ -21,6 +21,7 @@ class DummyWorksheet:
     def __init__(self):
         self._styles = {}
         self.column_dimensions = {}
+        self.parent = Workbook()
 
 
 @pytest.fixture
@@ -78,8 +79,9 @@ def test_write_col_widths(out, doc, write_cols, ColumnDimension):
 
 def test_write_cols_style(out, doc, write_cols, ColumnDimension):
     worksheet = DummyWorksheet()
-    worksheet.column_dimensions['A'] = ColumnDimension()
-    worksheet._styles['A'] = 1
+    cd = ColumnDimension()
+    worksheet.column_dimensions['A'] = cd
+    cd._style = 1
     write_cols(doc, worksheet)
     doc.endDocument()
     xml = out.getvalue()
@@ -93,8 +95,9 @@ def test_write_lots_cols(out, doc, write_cols, ColumnDimension):
     from openpyxl.cell import get_column_letter
     for i in range(1, 15):
         label = get_column_letter(i)
-        worksheet._styles[label] = i
-        worksheet.column_dimensions[label] = ColumnDimension()
+        cd = ColumnDimension()
+        cd._style = i
+        worksheet.column_dimensions[label] = cd
     write_cols(doc, worksheet)
     doc.endDocument()
     xml = out.getvalue()
