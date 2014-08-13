@@ -210,14 +210,16 @@ There are many types of conditional formatting - below are some examples for set
 >>> # add2ColorScale(range_string, start_type, start_value, start_color, end_type, end_value, end_color)
 >>> # Takes colors in excel 'FFRRGGBB' style.
 >>> ws.conditional_formatting.add('A1:A10',
-...             ColorScaleRule(start_type='min', start_color='FFAA0000',
-...                           end_type='max', end_color='FF00AA00'))
+...             ColorScaleRule(start_type='min', start_color=Color('FFAA0000'),
+...                           end_type='max', end_color=Color('FF00AA00'))
+...                           )
 >>>
 >>> # Add a three-color scale
 >>> ws.conditional_formatting.add('B1:B10',
-...                ColorScaleRule(start_type='percentile', start_value=10, start_color='FFAA0000',
-...                            mid_type='percentile', mid_value=50, mid_color='FF0000AA',
-...                            end_type='percentile', end_value=90, end_color='FF00AA00'))
+...                ColorScaleRule(start_type='percentile', start_value=10, start_color=Color('FFAA0000'),
+...                            mid_type='percentile', mid_value=50, mid_color=Color('FF0000AA'),
+...                            end_type='percentile', end_value=90, end_color=Color('FF00AA00'))
+...                              )
 >>>
 >>> # Add a conditional formatting based on a cell comparison
 >>> # addCellIs(range_string, operator, formula, stopIfTrue, wb, font, border, fill)
