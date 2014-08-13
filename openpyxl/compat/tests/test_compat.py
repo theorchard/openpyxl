@@ -38,3 +38,18 @@ def test_itervalues(dictionary):
     from openpyxl.compat import itervalues
     d = dictionary
     assert set(itervalues(d)) == set([1, 'b', 'd'])
+
+
+from .. import deprecated
+
+def test_deprecated_function(recwarn):
+
+    @deprecated("no way")
+    def fn(*args, **kw):
+        return "Hello world"
+
+    fn()
+    w = recwarn.pop()
+    assert issubclass(w.category, DeprecationWarning)
+    assert w.filename
+    assert w.lineno

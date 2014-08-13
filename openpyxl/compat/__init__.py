@@ -64,11 +64,15 @@ class deprecated(object):
         def new_func(*args, **kwargs):
             msg = "Call to deprecated function {} ({})".format(f.__name__,
                                                                self.reason)
+            if hasattr(f, 'func_code'):
+                _code = f.func_code
+            else:
+                _code = f.__code__
             warnings.warn_explicit(
                 '{}.'.format(msg),
-                category=UserWarning,
-                filename=f.func_code.co_filename,
-                lineno=f.func_code.co_firstlineno + 1
+                category=DeprecationWarning,
+                filename=_code.co_filename,
+                lineno=_code.co_firstlineno + 1
             )
             return f(*args, **kwargs)
         return new_func
