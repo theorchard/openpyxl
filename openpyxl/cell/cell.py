@@ -473,7 +473,7 @@ class Cell(object):
         for col_idx in range(left_columns):
             letter = get_column_letter(col_idx + 1)
             if letter in column_dimensions:
-                cdw = column_dimensions.get(letter).width
+                cdw = column_dimensions.get(letter).width or default_width
                 if cdw > 0:
                     left_anchor += points_to_pixels(cdw)
                     continue
@@ -485,7 +485,7 @@ class Cell(object):
         default_height = points_to_pixels(DEFAULT_ROW_HEIGHT)
         for row_idx in range(1, top_rows + 1):
             if row_idx in row_dimensions:
-                rdh = row_dimensions[row_idx].height
+                rdh = row_dimensions[row_idx].height or default_height
                 if rdh > 0:
                     top_anchor += points_to_pixels(rdh)
                     continue
