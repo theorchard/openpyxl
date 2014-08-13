@@ -77,7 +77,7 @@ There are several ways to contribute, even if you can't code (or can't code well
       documentation, it's pretty hard to do anything with it
 
     - proposing compatibility fixes for different versions of Python: we support
-      2.6 to 3.3, so if it does not work on your environment, let us know :-)
+      2.6 to 3.4, so if it does not work on your environment, let us know :-)
 
 
 Installation
