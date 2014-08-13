@@ -85,7 +85,7 @@ def write_worksheet(worksheet, shared_strings):
                 xf.write(hyper)
 
             options = worksheet.page_setup.options
-            if options is not None:
+            if options:
                 print_options = Element('printOptions', options)
                 xf.write(print_options)
                 del print_options
@@ -95,7 +95,7 @@ def write_worksheet(worksheet, shared_strings):
             del margins
 
             setup = worksheet.page_setup.setup
-            if setup is not None:
+            if setup:
                 page_setup = Element('pageSetup', setup)
                 xf.write(page_setup)
                 del page_setup
