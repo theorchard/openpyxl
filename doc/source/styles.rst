@@ -11,51 +11,49 @@ or range of cells.
 Each :class:`openpyxl.styles.Style` object is composed of many sub-styles, each controlling a
 dimension of the styling.
 
-This is what the default `Style` looks like::
+This is what the default `Style` looks like
 
-    Style(font=Font(name='Calibri',
-                    size=11,
-                    bold=False,
-                    italic=False,
-                    superscript=False,
-                    subscript=False,
-                    underline='none',
-                    strikethrough=False,
-                    color='FF000000'),
-          fill=Fill(fill_type=None,
-                    rotation=0,
-                    start_color='FFFFFFFF',
-                    end_color='FF000000'),
-          borders=Borders(left=Border(border_style='none',
-                                      color='FF000000'),
-                          right=Border(border_style='none',
-                                       color='FF000000'),
-                          top=Border(border_style='none',
-                                     color='FF000000'),
-                          bottom=Border(border_style='none',
-                                        color='FF000000'),
-                          diagonal=Border(border_style='none',
-                                          color='FF000000'),
-                          diagonal_direction=0,
-                          all_borders=Border(border_style='none',
-                                             color=FF000000'),
-                          outline=Border(border_style='none',
-                                         color='FF000000'),
-                          inside=Border(border_style='none',
-                                        color='FF000000'),
-                          vertical=Border(border_style='none',
-                                          color='FF000000'),
-                          horizontal=Border(border_style='none',
-                                            color='FF000000')),
-          alignment=Alignment(horizontal='general',
-                              vertical='bottom',
-                              text_rotation=0,
-                              wrap_text=False,
-                              shrink_to_fit=False,
-                              indent=0),
-          number_format='General',
-          protection=Protection(locked='inherit',
-                                hidden='inherit'))
+:: doctest
+
+>>> from openpyxl.styles import Style, PatternFill, Border, Side, Alignment, Protection, Font
+>>> s = Style(font=Font(name='Calibri',
+...                 size=11,
+...                 bold=False,
+...                 italic=False,
+...                 vertAlign=None,
+...                 underline='none',
+...                 strike=False,
+...                 color='FF000000'),
+...       fill=PatternFill(fill_type=None,
+...                 start_color='FFFFFFFF',
+...                 end_color='FF000000'),
+...       border=Border(left=Side(border_style=None,
+...                                color='FF000000'),
+...                      right=Side(border_style=None,
+...                                 color='FF000000'),
+...                      top=Side(border_style=None,
+...                               color='FF000000'),
+...                      bottom=Side(border_style=None,
+...                                  color='FF000000'),
+...                      diagonal=Side(border_style=None,
+...                                    color='FF000000'),
+...                      diagonal_direction=0,
+...                      outline=Side(border_style=None,
+...                                   color='FF000000'),
+...                      vertical=Side(border_style=None,
+...                                    color='FF000000'),
+...                      horizontal=Side(border_style=None,
+...                                     color='FF000000')),
+...     alignment=Alignment(horizontal='general',
+...                         vertical='bottom',
+...                         text_rotation=0,
+...                         wrap_text=False,
+...                         shrink_to_fit=False,
+...                         indent=0),
+...     number_format='General',
+...     protection=Protection(locked='inherit',
+...                           hidden='inherit'))
+>>>
 
 Pretty big, huh ?
 There is one thing to understand about openpyxl's `Styles` : they are immutable.
@@ -68,6 +66,7 @@ As you can see from the above box, there is a hierarchy between elements::
 
 So if you want to change the color of a Font, you have to redefine a Style, with a new Font, with a new Color::
 
+>>> from openpyxl.styles import colors
 >>> s = Style(font=Font(color=colors.RED))
 >>> s.font.color = colors.BLUE # this will not work
 >>> blue_s = Style(font=Font(color=colors.BLUE))
@@ -75,6 +74,7 @@ So if you want to change the color of a Font, you have to redefine a Style, with
 However, if you have a Font you want to use multiple times, you are allowed to::
 
 >>> from openpyxl.styles import Font, Color
+>>> from openpyxl.styles import colors
 >>>
 >>> ft = Font(color=colors.RED)
 >>> s1 = Style(font=ft, number_format='0%')
@@ -142,7 +142,8 @@ Styles are applied directly to cells
 >>> c = ws['A1']
 >>> c.style = Style()
 
-Styles are also applied to columns and rows
+Styles are also applied to columns and rows::
+
 >>> col = ws.column_dimensions['A']
 >>> col.style = Style()
 >>> row = ws.row_dimensions[1]
@@ -167,26 +168,10 @@ Edit Print Settings
 >>> ws.page_setup.verticalCentered = True
 
 
-Merge / Unmerge cells
----------------------
-::
-
->>>  from openpyxl.workbook import Workbook
->>>
->>> wb = Workbook()
->>> ws = wb.active
->>>
->>> ws.merge_cells('A1:B1')
->>> ws.unmerge_cells('A1:B1')
-
-# or
->>> ws.merge_cells(start_row=2,start_col=1,end_row=2,end_col=4)
->>> ws.unmerge_cells(start_row=2,start_col=1,end_row=2,end_col=4)
-
 
 Header / Footer
 ---------------
-::
+:: doctest
 
 >>> from openpyxl.workbook import Workbook
 >>>
@@ -207,53 +192,59 @@ Conditional Formatting
 
 There are many types of conditional formatting - below are some examples for setting this within an excel file.
 
-::
+:: doctest
 
 >>> from openpyxl import Workbook
->>>
->>> from openpyxl.styles import Color, Fill, Font, Border
->>>.from openpyxl.formatting import ColorScaleRule, CellIsRule, FormulaRule
+>>> from openpyxl.styles import Color, PatternFill, Font, Border
+>>> from openpyxl.formatting import ColorScaleRule, CellIsRule, FormulaRule
 >>>
 >>> wb = Workbook()
 >>> ws = wb.active
-
-# Create fill
->>> redFill = Fill(start_color='FFEE1111',
+>>>
+>>> # Create fill
+>>> redFill = PatternFill(start_color='FFEE1111',
 ...                end_color='FFEE1111',
-...                fill_type=Fill.FILL_SOLID)
-
-# Add a two-color scale
-# add2ColorScale(range_string, start_type, start_value, start_color, end_type, end_value, end_color)
-# Takes colors in excel 'FFRRGGBB' style.
->>> ws.conditional_formatting.add('A1:A10', ColorScaleRule(start_type='min', start_color='FFAA0000',
-...                                                        end_type='max', end_color='FF00AA00'))
-
-# Add a three-color scale
->>> ws.conditional_formatting.add('B1:B10', ColorScaleRule(start_type='percentile', start_value=10, start_color='FFAA0000',
-...                                                        mid_type='percentile', mid_value=50, mid_color='FF0000AA',
-...                                                        end_type='percentile', end_value=90, end_color='FF00AA00'))
-
-# Add a conditional formatting based on a cell comparison
-# addCellIs(range_string, operator, formula, stopIfTrue, wb, font, border, fill)
-# Format if cell is less than 'formula'
->>> ws.conditional_formatting.add('C2:C10', CellIsRule(operator='lessThan', formula=['C$1'], stopIfTrue=True, fill=redFill))
-
-# Format if cell is between 'formula'
->>> ws.conditional_formatting.add('D2:D10', CellIsRule(operator='between', formula=['1','5'], stopIfTrue=True, fill=redFill))
-
-# Format using a formula
->>> ws.conditional_formatting.add('E1:E10',  FormulaRule(formula=['ISBLANK(E1)'], stopIfTrue=True, fill=redFill))
-
-# Aside from the 2-color and 3-color scales, format rules take fonts, borders and fills for styling:
+...                fill_type='solid')
+>>>
+>>> # Add a two-color scale
+>>> # add2ColorScale(range_string, start_type, start_value, start_color, end_type, end_value, end_color)
+>>> # Takes colors in excel 'FFRRGGBB' style.
+>>> ws.conditional_formatting.add('A1:A10',
+...             ColorScaleRule(start_type='min', start_color='FFAA0000',
+...                           end_type='max', end_color='FF00AA00'))
+>>>
+>>> # Add a three-color scale
+>>> ws.conditional_formatting.add('B1:B10',
+...                ColorScaleRule(start_type='percentile', start_value=10, start_color='FFAA0000',
+...                            mid_type='percentile', mid_value=50, mid_color='FF0000AA',
+...                            end_type='percentile', end_value=90, end_color='FF00AA00'))
+>>>
+>>> # Add a conditional formatting based on a cell comparison
+>>> # addCellIs(range_string, operator, formula, stopIfTrue, wb, font, border, fill)
+>>> # Format if cell is less than 'formula'
+>>> ws.conditional_formatting.add('C2:C10',
+...             CellIsRule(operator='lessThan', formula=['C$1'], stopIfTrue=True, fill=redFill))
+>>>
+>>> # Format if cell is between 'formula'
+>>> ws.conditional_formatting.add('D2:D10',
+...             CellIsRule(operator='between', formula=['1','5'], stopIfTrue=True, fill=redFill))
+>>>
+>>> # Format using a formula
+>>> ws.conditional_formatting.add('E1:E10',
+...             FormulaRule(formula=['ISBLANK(E1)'], stopIfTrue=True, fill=redFill))
+>>>
+>>> # Aside from the 2-color and 3-color scales, format rules take fonts, borders and fills for styling:
 >>> myFont = Font()
 >>> myBorder = Border()
->>> ws.conditional_formatting.add('E1:E10',  FormulaRule(formula=['E1=0'], font=myFont, border=myBorder, fill=redFill))
-
-# Custom formatting
-# There are many types of conditional formatting - it's possible to add additional types directly:
->>> ws.conditional_formatting.add('E1:E10',  {'type': 'expression', 'dxf': {'fill': redFill},
-...                                           'formula': ['ISBLANK(E1)'], 'stopIfTrue': '1'})
-
-# Before writing, call setDxfStyles before saving when adding a conditional format that has a font/border/fill
+>>> ws.conditional_formatting.add('E1:E10',
+...             FormulaRule(formula=['E1=0'], font=myFont, border=myBorder, fill=redFill))
+>>>
+>>> # Custom formatting
+>>> # There are many types of conditional formatting - it's possible to add additional types directly:
+>>> ws.conditional_formatting.add('E1:E10',
+...             {'type': 'expression', 'dxf': {'fill': redFill},
+...              'formula': ['ISBLANK(E1)'], 'stopIfTrue': '1'})
+>>>
+>>> # Before writing, call setDxfStyles before saving when adding a conditional format that has a font/border/fill
 >>> ws.conditional_formatting.setDxfStyles(wb)
 >>> wb.save("test.xlsx")
