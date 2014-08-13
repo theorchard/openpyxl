@@ -71,7 +71,7 @@ class deprecated(object):
     def __call__(self, obj, *args, **kwargs):
         @wraps(obj)
         def new_func(*args, **kwargs):
-            msg = "Call to deprecated function or class {} ({})".format(obj.__name__,
+            msg = "Call to deprecated function or class {0} ({1})".format(obj.__name__,
                                                                self.reason)
             if inspect.isfunction(obj):
                 _code = self._wrap_function(obj)
@@ -79,7 +79,7 @@ class deprecated(object):
                 _code = self._wrap_class(obj)
 
             warnings.warn_explicit(
-                '{}.'.format(msg),
+                '{0}.'.format(msg),
                 category=UserWarning,
                 filename=_code.co_filename,
                 lineno=_code.co_firstlineno + 1
