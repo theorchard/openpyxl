@@ -45,11 +45,49 @@ from .. import deprecated
 def test_deprecated_function(recwarn):
 
     @deprecated("no way")
-    def fn(*args, **kw):
+    def fn():
         return "Hello world"
 
     fn()
     w = recwarn.pop()
-    assert issubclass(w.category, DeprecationWarning)
+    assert issubclass(w.category, UserWarning)
     assert w.filename
     assert w.lineno
+    assert "no way" in str(w.message)
+
+
+def test_deprecated_class(recwarn):
+
+    @deprecated("")
+    class Simple:
+
+        pass
+    s = Simple()
+    w = recwarn.pop()
+    assert issubclass(w.category, UserWarning)
+    assert w.filename
+    assert w.lineno
+
+
+def test_deprecated_method(recwarn):
+
+    class Simple:
+
+        @deprecated("")
+        def do(self):
+            return "Nothing"
+
+    s = Simple()
+    s.do()
+    w = recwarn.pop()
+    assert issubclass(w.category, UserWarning)
+    assert w.filename
+    assert w.lineno
+
+
+def test_no_deprecation_reason():
+
+    with pytest.raises(TypeError):
+        @deprecated
+        def fn():
+            return
