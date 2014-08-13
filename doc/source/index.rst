@@ -176,6 +176,13 @@ Working with styles
 
     styles
 
+Conditional Formatting
+++++++++++++++++++++++
+
+.. toctree::
+
+    formatting
+
 Data Validation
 +++++++++++++++
 
