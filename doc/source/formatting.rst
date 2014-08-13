@@ -3,7 +3,7 @@ Conditional Formatting
 
 There are many types of conditional formatting - below are some examples for setting this within an excel file.
 
-:: doctest
+.. :: doctest
 
 >>> from openpyxl import Workbook
 >>> from openpyxl.styles import Color, PatternFill, Font, Border

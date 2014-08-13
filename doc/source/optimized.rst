@@ -33,22 +33,22 @@ Here again, the regular :class:`openpyxl.worksheet.Worksheet` has been replaced
 by a faster alternative, the :class:`openpyxl.writer.dump_worksheet.DumpWorksheet`.
 When you want to dump large amounts of data, you might find optimized writer helpful
 
-:: doctest
+.. :: doctest
 
 >>> from openpyxl import Workbook
 >>> wb = Workbook(optimized_write = True)
 >>> ws = wb.create_sheet()
-
-    # now we'll fill it with 100 rows x 200 columns
-
+>>>
+>>> # now we'll fill it with 100 rows x 200 columns
+>>>
 >>> for irow in range(100):
 ...     ws.append(['%d' % i for i in range(200)])
-
-    # wb.save('new_big_file.xlsx') # don't forget to save !
+>>> # save the file
+>>> wb.save('new_big_file.xlsx') # doctest: + SKIP
 
 If you want to have cells with styles or comments then use a `WriteOnlyCell`
 
-:: doctest
+.. :: doctest
 
 >>> from openpyxl import Workbook
 >>> wb = Workbook(optimized_write = True)
@@ -61,10 +61,20 @@ If you want to have cells with styles or comments then use a `WriteOnlyCell`
 >>> cell.comment = Comment(text="A comment", author="Author's Name")
 
 
-This will append one new row with 3 cells, one text cell with custom font and font size, a float and an empty cell that will be discarded anyway.
+This will append one new row with 3 cells, one text cell with custom font and
+font size, a float and an empty cell that will be discarded anyway.
 
 .. warning::
 
-    * Those worksheet only have an append() method, it's not possible to access independent cells directly (through cell() or range()). They are write-only.
-    * It is able to export unlimited amount of data (even more than Excel can handle actually), while keeping memory usage under 10Mb.
-    * A workbook using the optimized writer can only be saved once. After that, every attempt to save the workbook or append() to an existing worksheet will raise an :class:`openpyxl.shared.exc.WorkbookAlreadySaved` exception.
+    * Those worksheet only have an append() method, it's not possible to
+    access independent cells directly (through cell() or range()). They are
+    write-only.
+
+    * It is able to export unlimited amount of data (even more than Excel can
+    handle actually), while keeping memory usage under 10Mb.
+
+    * A workbook using the optimized writer can only be saved once. After
+    that, every attempt to save the workbook or append() to an existing
+    worksheet will raise an :class:`openpyxl.shared.exc.WorkbookAlreadySaved`
+    exception.
+

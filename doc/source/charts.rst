@@ -24,6 +24,8 @@ Creating a chart
 Charts are composed of at least one series of one or more data points. Series
 themselves are comprised of references to cell ranges.
 
+.. :: doctest
+
 >>> from openpyxl import Workbook
 >>> wb = Workbook()
 >>> ws = wb.active

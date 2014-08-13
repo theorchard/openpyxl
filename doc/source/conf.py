@@ -236,9 +236,10 @@ man_pages = [
 intersphinx_mapping = {'http://docs.python.org/': None}
 
 doctest_global_setup = """
-import os
+import os, shutil
 if not os.path.exists("tmp"):
     os.mkdir("tmp")
+shutil.copy("logo.png", "tmp")
 os.chdir("tmp")
 """
 doctest_global_cleanup = """

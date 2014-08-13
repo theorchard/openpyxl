@@ -13,6 +13,8 @@ Adding a comment to a cell
 
 Comments have a text attribute and an author attribute, which must both be set
 
+.. :: doctest
+
 >>> from openpyxl import Workbook
 >>> from openpyxl.comments import Comment
 >>> wb = Workbook()
@@ -26,6 +28,8 @@ Comments have a text attribute and an author attribute, which must both be set
 
 You cannot assign the same Comment object to two different cells. Doing so
 raises an AttributeError.
+
+.. :: doctest
 
 >>> from openpyxl import Workbook
 >>> from openpyxl.comments import Comment

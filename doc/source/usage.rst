@@ -3,7 +3,7 @@ Simple usage
 
 Write a workbook
 ------------------
-:: doctest
+.. :: doctest
 
 >>> from openpyxl import Workbook
 >>> from openpyxl.compat import range
@@ -11,7 +11,7 @@ Write a workbook
 >>>
 >>> wb = Workbook()
 >>>
->>> dest_filename = r'empty_book.xlsx'
+>>> dest_filename = 'empty_book.xlsx'
 >>>
 >>> ws = wb.active
 >>>
@@ -33,7 +33,7 @@ Write a workbook
 
 Read an existing workbook
 -------------------------
-:: doctest
+.. :: doctest
 
 >>> from openpyxl import load_workbook
 >>> wb = load_workbook(filename = 'empty_book.xlsx')
@@ -65,7 +65,7 @@ D18
 
 Using number formats
 --------------------
-:: doctest
+.. :: doctest
 
 >>> import datetime
 >>> from openpyxl import Workbook
@@ -89,7 +89,7 @@ Using number formats
 
 Using formulae
 --------------
-:: doctest
+.. :: doctest
 
 >>> from openpyxl import Workbook
 >>> wb = Workbook()
@@ -105,7 +105,7 @@ Using formulae
 
 Merge / Unmerge cells
 ---------------------
-:: doctest
+.. :: doctest
 
 >>> from openpyxl.workbook import Workbook
 >>>
@@ -122,7 +122,7 @@ Merge / Unmerge cells
 
 Inserting an image
 -------------------
-::
+.. :: doctest
 
 >>> from openpyxl import Workbook
 >>> from openpyxl.drawing import Image
@@ -144,11 +144,13 @@ Inserting an image
 >>> # the top left offset needed to put the image
 >>> # at a specific cell can be automatically calculated
 >>> img2.anchor(ws['D12'])
+(('D', 12), ('D', 20))
 >>>
 >>> # one can also position the image relative to the specified cell
 >>> # this can be advantageous if the spreadsheet is later resized
 >>> # (this might not work as expected in LibreOffice)
 >>> img3.anchor(ws['G20'], anchortype='oneCell')
+((6, 19), None)
 >>>
 >>> # afterwards one can still add additional offsets from the cell
 >>> img3.drawing.left = 5
@@ -163,7 +165,7 @@ Inserting an image
 
 Fold columns (outline)
 ----------------------
-::
+.. :: doctest
 
 >>> import openpyxl
 >>> wb = openpyxl.Workbook(True)

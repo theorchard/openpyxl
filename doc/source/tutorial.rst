@@ -177,8 +177,9 @@ Once we have a :class:`openpyxl.cell.Cell`, we can assign it a value::
     >>> print(d.value)
     3.14
 
-There is also a neat format detection feature that converts data on the fly::
+You can also enable type and format inference::
 
+    >>> wb = Workbook(guess_types=True)
     >>> c.value = '12%'
     >>> print(c.value)
     0.12

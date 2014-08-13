@@ -13,7 +13,7 @@ dimension of the styling.
 
 This is what the default `Style` looks like
 
-:: doctest
+.. :: doctest
 
 >>> from openpyxl.styles import Style, PatternFill, Border, Side, Alignment, Protection, Font
 >>> s = Style(font=Font(name='Calibri',
@@ -87,7 +87,7 @@ Copying styles
 There is also a `copy()` function, which creates a new style based on another one, by **completely** replacing
 sub-elements by others
 
-:: doctest
+.. :: doctest
 
 >>> from openpyxl.styles import Font, Style
 >>>
@@ -115,7 +115,7 @@ Basic Font Colors
 -----------------
 Colors are usually RGB or aRGB hexvalues. The `colors` module contains some constants
 
-:: doctest
+.. :: doctest
 
 >>> from openpyxl.styles import Font
 >>> from openpyxl.styles.colors import RED
@@ -133,7 +133,7 @@ Applying Styles
 ---------------
 Styles are applied directly to cells
 
-:: doctest
+.. :: doctest
 
 >>> from openpyxl.workbook import Workbook
 >>> from openpyxl.styles import Style
@@ -152,7 +152,7 @@ Styles are also applied to columns and rows::
 
 Edit Print Settings
 -------------------
-::
+.. :: doctest
 
 >>> from openpyxl.workbook import Workbook
 >>>
@@ -171,7 +171,7 @@ Edit Print Settings
 
 Header / Footer
 ---------------
-:: doctest
+.. :: doctest
 
 >>> from openpyxl.workbook import Workbook
 >>>
