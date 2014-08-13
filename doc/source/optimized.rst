@@ -36,7 +36,7 @@ When you want to dump large amounts of data, you might find optimized writer hel
 .. :: doctest
 
 >>> from openpyxl import Workbook
->>> wb = Workbook(optimized_write = True)
+>>> wb = Workbook(write_only=True)
 >>> ws = wb.create_sheet()
 >>>
 >>> # now we'll fill it with 100 rows x 200 columns
@@ -44,7 +44,7 @@ When you want to dump large amounts of data, you might find optimized writer hel
 >>> for irow in range(100):
 ...     ws.append(['%d' % i for i in range(200)])
 >>> # save the file
->>> wb.save('new_big_file.xlsx') # doctest: + SKIP
+>>> wb.save('new_big_file.xlsx') # doctest: +SKIP
 
 If you want to have cells with styles or comments then use a `WriteOnlyCell`
 
