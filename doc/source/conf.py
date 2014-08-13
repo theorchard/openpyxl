@@ -12,7 +12,6 @@
 # serve to show the default.
 
 import sys, os
-import os.path
 
 # If extensions (or modules to document with autodoc) are in another directory,
 # add these directories to sys.path here. If the directory is relative to the
@@ -235,3 +234,16 @@ man_pages = [
 
 # Example configuration for intersphinx: refer to the Python standard library.
 intersphinx_mapping = {'http://docs.python.org/': None}
+
+doctest_global_setup = """
+import os
+if not os.path.exists("tmp"):
+    os.mkdir("tmp")
+os.chdir("tmp")
+"""
+doctest_global_cleanup = """
+import shutil
+import os
+os.chdir("..")
+shutil.rmtree("tmp")
+"""
