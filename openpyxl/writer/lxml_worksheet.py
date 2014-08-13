@@ -77,15 +77,15 @@ def write_worksheet(worksheet, shared_strings):
 
             write_conditional_formatting(xf, worksheet)
             dv = write_datavalidation(worksheet)
-            if dv:
+            if dv is not None:
                 xf.write(dv)
 
             hyper = write_hyperlinks(worksheet)
-            if hyper:
+            if hyper is not None:
                 xf.write(hyper)
 
             options = worksheet.page_setup.options
-            if options:
+            if options is not None:
                 print_options = Element('printOptions', options)
                 xf.write(print_options)
                 del print_options
@@ -95,13 +95,13 @@ def write_worksheet(worksheet, shared_strings):
             del margins
 
             setup = worksheet.page_setup.setup
-            if setup:
+            if setup is not None:
                 page_setup = Element('pageSetup', setup)
                 xf.write(page_setup)
                 del page_setup
 
             hf = write_header_footer(worksheet)
-            if hf:
+            if hf is not None:
                 xf.write(hf)
 
             if worksheet._charts or worksheet._images:

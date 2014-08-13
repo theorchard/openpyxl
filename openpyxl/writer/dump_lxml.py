@@ -62,7 +62,7 @@ class LXMLWorksheet(DumpWorksheet):
                 xf.write(write_format(self))
 
                 cols = write_cols(self)
-                if cols:
+                if cols is not None:
                     xf.write(cols)
 
                 with xf.element("sheetData"):
