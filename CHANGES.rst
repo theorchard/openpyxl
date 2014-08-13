@@ -8,7 +8,7 @@ Support for reading and writing worksheet protection
 Support for reading hidden rows
 Cells now manage their styles directly
 ColumnDimension and RowDimension object manage their styles directly
-Use xmlfile for writing worksheets if available – around 3 times faster
+Use xmlfile for writing worksheets if available - around 3 times faster
 
 
 Minor changes
