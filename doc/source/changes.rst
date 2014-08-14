@@ -216,7 +216,7 @@ Minor changes
 -------------
 
 * load_workbook now accepts data_only to allow extracting values only from
-formulae. Default is false.
+  formulae. Default is false.
 * Images can now be anchored to cells
 * Docs updated
 * Provisional benchmarking

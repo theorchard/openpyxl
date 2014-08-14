@@ -34,10 +34,8 @@ here = os.path.abspath(os.path.dirname(__file__))
 try:
     with open(os.path.join(here, 'README.rst')) as f:
         README = f.read()
-    with open(os.path.join(here, 'CHANGES.rst')) as f:
-        CHANGES = f.read()
 except IOError:
-    README = CHANGES = ''
+    README = ''
 
 
 __author__ = 'See AUTHORS'
@@ -63,7 +61,7 @@ setup(name='openpyxl',
     # metadata
     version=get_version(),
     description="A Python library to read/write Excel 2007 xlsx/xlsm files",
-    long_description=README + '\n\n' + CHANGES,
+    long_description=README,
     author=__author__,
     author_email=__author_email__,
     url=__url__,
