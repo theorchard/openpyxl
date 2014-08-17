@@ -10,7 +10,7 @@ def Protection():
 
 def test_default(Protection):
     pt = Protection()
-    assert dict(pt) == {}
+    assert dict(pt) == {'hidden':'0', 'locked':'1'}
 
 
 def test_round_trip(Protection):

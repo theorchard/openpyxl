@@ -91,6 +91,23 @@ def test_read_gradient_fill(StyleReader, datadir):
         assert list(reader.parse_fills()) == expected
 
 
+
+def test_unprotected_cell(StyleReader, datadir):
+    datadir.chdir()
+    with open ("worksheet_unprotected_style.xml") as src:
+        reader = StyleReader(src.read())
+    from openpyxl.styles import Font
+    reader.font_list = [Font(), Font(), Font(), Font(), Font()]
+    reader.parse_cell_xfs()
+    assert len(reader.shared_styles) == 3
+    # default is cells are locked
+    style = reader.shared_styles[0]
+    assert style.protection.locked is True
+
+    style = reader.shared_styles[2]
+    assert style.protection.locked is False
+
+
 def test_read_cell_style(datadir):
     datadir.chdir()
     with open("empty-workbook-styles.xml") as content:
