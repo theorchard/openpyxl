@@ -1,7 +1,7 @@
 from __future__ import absolute_import
 # Copyright (c) 2010-2014 openpyxl
 
-from openpyxl.descriptors import Set, Bool, Integer, MinMax, Min
+from openpyxl.descriptors import Set, Bool, Integer, MinMax, Min, Alias
 
 from .hashable import HashableObject
 
