@@ -58,7 +58,7 @@ def write_worksheet(worksheet, shared_strings):
             xf.write(write_sheetviews(worksheet))
             xf.write(write_format(worksheet))
             cols = write_cols(worksheet)
-            if cols:
+            if cols is not None:
                 xf.write(cols)
             write_rows(xf, worksheet)
 
@@ -68,7 +68,7 @@ def write_worksheet(worksheet, shared_strings):
                 del prot
 
             af = write_autofilter(worksheet)
-            if af:
+            if af is not None:
                 xf.write(af)
 
             merge = write_mergecells(worksheet)
@@ -119,7 +119,7 @@ def write_worksheet(worksheet, shared_strings):
                     xf.write(legacy)
 
             pb = write_pagebreaks(worksheet)
-            if pb:
+            if pb is not None:
                 xf.write(pb)
 
             # add a legacyDrawing so that excel can draw comments
