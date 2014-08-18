@@ -209,7 +209,7 @@ def write_cell(xf, worksheet, cell):
 
         if cell.data_type == 's':
             value = string_table.add(value)
-        with xf.element("v") as v:
+        with xf.element("v"):
             if value is not None:
                 xf.write(safe_string(value))
 

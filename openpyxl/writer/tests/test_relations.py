@@ -8,7 +8,6 @@ from openpyxl import Workbook
 from openpyxl.xml.functions import tostring
 
 # test imports
-import pytest
 from openpyxl.tests.helper import compare_xml
 
 

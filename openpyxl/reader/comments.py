@@ -26,11 +26,10 @@ import os.path
 
 from openpyxl.comments import Comment
 from openpyxl.xml.constants import (
-    PACKAGE_XL,
     PACKAGE_WORKSHEET_RELS,
-    PACKAGE_WORKSHEETS,
     SHEET_MAIN_NS,
-    COMMENTS_NS
+    COMMENTS_NS,
+    PACKAGE_XL,
     )
 from openpyxl.xml.functions import fromstring, safe_iterator
 

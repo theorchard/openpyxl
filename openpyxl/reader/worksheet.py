@@ -2,14 +2,13 @@ from __future__ import absolute_import
 # Copyright (c) 2010-2014 openpyxl
 
 """Reader for a single worksheet."""
-from io import BytesIO, StringIO
+from io import BytesIO
 
 # compatibility imports
 from openpyxl.xml.functions import iterparse
 
 # package imports
 from openpyxl.cell import get_column_letter
-from openpyxl.cell import Cell
 from openpyxl.worksheet import Worksheet, ColumnDimension, RowDimension
 from openpyxl.worksheet.iter_worksheet import IterableWorksheet
 from openpyxl.worksheet.page import PageMargins
@@ -17,7 +16,6 @@ from openpyxl.worksheet.protection import SheetProtection
 from openpyxl.xml.constants import SHEET_MAIN_NS
 from openpyxl.xml.functions import safe_iterator
 from openpyxl.styles import Color
-from openpyxl.styles import colors
 from openpyxl.formatting import ConditionalFormatting
 
 

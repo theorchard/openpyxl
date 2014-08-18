@@ -42,7 +42,7 @@ class TestGradientFill:
     def test_invalid_sequence(self, GradientFill):
         colors = [BLACK, WHITE]
         with pytest.raises(TypeError):
-            gf = GradientFill(stop=colors)
+            GradientFill(stop=colors)
 
 
     def test_dict_interface(self, GradientFill):

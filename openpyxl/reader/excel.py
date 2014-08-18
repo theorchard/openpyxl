@@ -49,7 +49,6 @@ from openpyxl.xml.constants import (
     ARC_WORKBOOK,
     ARC_STYLE,
     ARC_THEME,
-    PACKAGE_XL,
 )
 
 from openpyxl.workbook import Workbook, DocumentProperties

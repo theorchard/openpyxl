@@ -8,7 +8,7 @@ from openpyxl.collections import IndexedList
 def test_invalid_dimension_ctor():
     from .. dimensions import Dimension
     with pytest.raises(TypeError):
-        d = Dimension()
+        Dimension()
 
 class DummyWorkbook:
 
@@ -28,7 +28,7 @@ class DummyWorksheet:
 def test_dimension():
     from .. dimensions import Dimension
     with pytest.raises(TypeError):
-        d = Dimension()
+        Dimension()
 
 
 def test_dimension_interface():
@@ -65,7 +65,6 @@ def test_col_dimensions(key, value, expected):
 
 def test_group_columns_simple():
     from ..worksheet import Worksheet
-    from ..dimensions import ColumnDimension
     ws = Worksheet(parent_workbook=DummyWorkbook())
     dims = ws.column_dimensions
     dims.group('A', 'C', 1)
@@ -78,7 +77,6 @@ def test_group_columns_simple():
 
 def test_group_columns_collapse():
     from ..worksheet import Worksheet
-    from ..dimensions import ColumnDimension
     ws = Worksheet(parent_workbook=DummyWorkbook())
     dims = ws.column_dimensions
     dims.group('A', 'C', 1, hidden=True)

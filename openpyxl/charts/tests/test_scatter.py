@@ -1,5 +1,10 @@
 import pytest
 
+from openpyxl.xml.constants import CHART_NS
+from openpyxl.writer.charts import ScatterChartWriter
+
+from openpyxl.tests.helper import get_xml, compare_xml
+
 
 class TestScatterChart:
 
@@ -21,11 +26,7 @@ def scatter_chart(ws, ScatterChart, Reference, Series):
                                       xvalues=Reference(ws, (1, 2), (11, 2))))
     return chart
 
-import os
-from openpyxl.xml.constants import CHART_NS
-from openpyxl.writer.charts import ScatterChartWriter
 
-from openpyxl.tests.helper import get_xml, compare_xml
 
 
 class TestScatterChartWriter(object):

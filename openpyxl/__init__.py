@@ -22,8 +22,6 @@
 # @author: see AUTHORS file
 
 """Imports for the openpyxl package."""
-import warnings
-
 from openpyxl.xml import LXML
 
 from openpyxl.workbook import Workbook

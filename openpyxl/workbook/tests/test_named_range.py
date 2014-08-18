@@ -47,7 +47,6 @@ def test_bad_range_name():
 def test_range_name_worksheet_special_chars(datadir):
 
     ws = DummyWS('My Sheeet with a , and \'')
-    wb = DummyWB(ws)
 
     datadir.chdir()
     with open('workbook_namedrange.xml') as src:

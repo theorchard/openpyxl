@@ -42,6 +42,6 @@ class Relationship(object):
 
     def __repr__(self):
         root = Element("{%s}Relationships" % PKG_REL_NS)
-        body = SubElement(root, "{%s}Relationship" % PKG_REL_NS, self.__dict__)
+        SubElement(root, "{%s}Relationship" % PKG_REL_NS, self.__dict__)
         return tostring(root)
 

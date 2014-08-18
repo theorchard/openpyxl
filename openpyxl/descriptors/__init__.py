@@ -7,7 +7,6 @@ http://chimera.labs.oreilly.com/books/1230000000393/ch08.html#_discussion_130
 """
 
 from openpyxl.compat import basestring, bytes
-from numbers import Number
 
 class Descriptor(object):
 

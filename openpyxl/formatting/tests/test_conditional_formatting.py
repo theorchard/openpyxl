@@ -7,7 +7,6 @@ from io import BytesIO
 from openpyxl import Workbook
 from openpyxl.formatting import ConditionalFormatting
 from openpyxl.formatting.rules import ColorScaleRule, CellIsRule, FormulaRule
-from openpyxl.compat import iterkeys
 
 # package imports
 from openpyxl.reader.excel import load_workbook
@@ -16,7 +15,7 @@ from openpyxl.xml.constants import ARC_STYLE
 from openpyxl.xml.functions import XMLGenerator
 from openpyxl.writer.worksheet import write_worksheet_conditional_formatting
 from openpyxl.writer.styles import StyleWriter
-from openpyxl.styles import Color, PatternFill, Font, Border, Side, HashableObject
+from openpyxl.styles import Color, PatternFill, Font, Border, Side
 from openpyxl.styles import borders, fills, colors
 
 # test imports

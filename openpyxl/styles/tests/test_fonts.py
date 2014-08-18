@@ -1,6 +1,5 @@
 from openpyxl.styles.fonts import Font
 
-import pytest
 
 class TestFont:
 
