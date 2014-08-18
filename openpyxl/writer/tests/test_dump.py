@@ -3,7 +3,6 @@ from __future__ import absolute_import
 
 import pytest
 
-from openpyxl.compat import file
 from openpyxl.tests.helper import compare_xml
 
 from openpyxl.collections import IndexedList
@@ -78,7 +77,7 @@ def test_dimensions(DumpWorksheet):
 
 def test_write_header(DumpWorksheet):
     ws = DumpWorksheet
-    doc = ws.write_header()
+    ws.write_header()
     header = ws.get_temporary_file(ws._fileobj_header_name)
     header.seek(0)
     xml = header.read()
@@ -102,7 +101,7 @@ def test_write_header(DumpWorksheet):
 
 def test_append_data(DumpWorksheet):
     ws = DumpWorksheet
-    doc = ws.append([1])
+    ws.append([1])
     assert ws._max_col == 1
     assert ws._max_row == 1
     content = ws.get_temporary_file(ws._fileobj_content_name)
@@ -135,7 +134,7 @@ def test_append_cell(DumpWorksheet):
     cell = WriteOnlyCell(ws, "Hello there")
     assert ws.parent.shared_strings == []
     cell._style = 5
-    doc = ws.append([cell])
+    ws.append([cell])
     assert ws.parent.shared_strings == ['Hello there']
     content = ws.get_temporary_file(ws._fileobj_content_name)
     content.seek(0)

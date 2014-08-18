@@ -7,7 +7,6 @@ from io import BytesIO
 from lxml.etree import xmlfile, Element, SubElement, fromstring
 
 from openpyxl.compat import (
-    iterkeys,
     itervalues,
     safe_string,
     iteritems
@@ -15,10 +14,8 @@ from openpyxl.compat import (
 from openpyxl.cell import (
     column_index_from_string,
     coordinate_from_string,
-    COORD_RE
 )
 from openpyxl.xml.constants import (
-    PKG_REL_NS,
     REL_NS,
     SHEET_MAIN_NS
 )

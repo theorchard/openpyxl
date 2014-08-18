@@ -21,17 +21,11 @@
 # @license: http://www.opensource.org/licenses/mit-license.php
 # @author: see AUTHORS file
 
-# Python stdlib imports
-import datetime
-from functools import partial
-from io import BytesIO
-
 import pytest
 
 # package imports
 from openpyxl.reader.excel import load_workbook
 from openpyxl.reader.style import read_style_table
-from openpyxl.writer.excel import save_virtual_workbook
 
 from openpyxl.styles import (
     numbers,
@@ -41,14 +35,9 @@ from openpyxl.styles import (
     GradientFill,
     Border,
     Side,
-    Protection,
-    Style
+    Alignment
 )
-from openpyxl.styles import colors, fills, borders
-
-# test imports
-from openpyxl.tests.helper import get_xml, compare_xml
-from openpyxl.styles.alignment import Alignment
+from openpyxl.styles import borders
 
 
 @pytest.fixture

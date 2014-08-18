@@ -8,7 +8,7 @@ from io import BytesIO
 
 # package
 from openpyxl import Workbook
-from lxml.etree import xmlfile, Element, tostring
+from lxml.etree import xmlfile, tostring
 
 # test imports
 import pytest

@@ -25,16 +25,13 @@
 
 # Python stdlib imports
 from datetime import datetime
-from io import BytesIO, StringIO
-import os.path
-from operator import itemgetter
+from io import BytesIO
 from tempfile import NamedTemporaryFile
-import zipfile
 
 import pytest
 
 # compatibility imports
-from openpyxl.compat import unicode, tempfile
+from openpyxl.compat import unicode
 
 # package imports
 from openpyxl.collections import IndexedList
@@ -123,10 +120,9 @@ def test_read_empty_archive(datadir):
 
 
 @pytest.mark.xfail
-def test_read_workbook_with_no_properties():
-    genuine_wb = os.path.join(DATADIR, 'genuine', \
-                'empty_with_no_properties.xlsx')
-    load_workbook(filename=genuine_wb)
+def test_read_workbook_with_no_properties(datadir):
+    datadir.join('genuine').chdir()
+    load_workbook('empty_with_no_properties.xlsx')
 
 
 @pytest.fixture

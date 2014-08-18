@@ -6,7 +6,7 @@ from openpyxl.compat import safe_string, basestring
 from openpyxl.descriptors import Descriptor, Typed
 
 from .hashable import HashableObject
-from openpyxl.descriptors import String, Bool, Float, MinMax, Integer, Alias, Set
+from openpyxl.descriptors import String, Bool, MinMax, Integer
 
 # Default Color Index as per 18.8.27 of ECMA Part 4
 COLOR_INDEX = (

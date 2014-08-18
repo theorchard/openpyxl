@@ -36,11 +36,7 @@ from xml.sax.saxutils import XMLGenerator
 
 XMLGenerator = partial(XMLGenerator, encoding="utf-8")
 
-from xml.sax.xmlreader import AttributesImpl
-
-
 # compatibility
-from openpyxl.compat import OrderedDict
 
 # package imports
 from openpyxl import LXML
