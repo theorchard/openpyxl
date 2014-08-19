@@ -113,12 +113,6 @@ def test_read_empty_file(datadir):
         load_workbook('null_file.xlsx')
 
 
-def test_read_empty_archive(datadir):
-    datadir.join("reader").chdir()
-    with pytest.raises(InvalidFileException):
-        load_workbook('null_archive.xlsx')
-
-
 @pytest.mark.xfail
 def test_read_workbook_with_no_properties(datadir):
     datadir.join('genuine').chdir()
