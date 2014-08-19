@@ -48,6 +48,7 @@ def test_write_hidden_worksheet():
     </bookViews>
     <sheets>
       <sheet name="Sheet" sheetId="1" state="hidden" r:id="rId1"/>
+      <sheet name="Sheet1" sheetId="2" r:id="rId2"/>
     </sheets>
       <definedNames/>
       <calcPr calcId="124519" calcMode="auto" fullCalcOnLoad="1"/>
