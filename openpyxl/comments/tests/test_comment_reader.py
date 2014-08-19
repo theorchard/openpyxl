@@ -66,7 +66,10 @@ def test_comments_cell_association(datadir):
     assert wb['Sheet1'].cell(coordinate="D1").comment.text == "Cuke:\nSecond Comment"
 
 
+@pytest.mark.xfail
 def test_comments_with_iterators(datadir):
     datadir.chdir()
     wb = load_workbook('comments.xlsx', use_iterators=True)
     ws = wb['Sheet1']
+    assert ws.cell(coordinate="A1").comment.author == "Cuke"
+    assert ws.cell(coordinate="A1").comment.text == "Cuke:\nFirst Comment"
