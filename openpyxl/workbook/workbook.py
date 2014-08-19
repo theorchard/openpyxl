@@ -34,8 +34,7 @@ class DocumentProperties(object):
     def __init__(self):
         self.creator = 'Unknown'
         self.last_modified_by = self.creator
-        self.created = datetime.datetime.now()
-        self.modified = datetime.datetime.now()
+        self.modified = self.created = datetime.datetime.now()
         self.title = 'Untitled'
         self.subject = ''
         self.description = ''

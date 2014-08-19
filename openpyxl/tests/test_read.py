@@ -113,10 +113,26 @@ def test_read_empty_file(datadir):
         load_workbook('null_file.xlsx')
 
 
-@pytest.mark.xfail
-def test_read_workbook_with_no_properties(datadir):
+def test_read_workbook_with_no_core_properties(datadir):
+    from openpyxl.workbook import DocumentProperties
+    from openpyxl.reader.excel import _load_workbook
+    from zipfile import ZipFile
     datadir.join('genuine').chdir()
-    load_workbook('empty_with_no_properties.xlsx')
+    archive = ZipFile('empty_with_no_properties.xlsx')
+    wb = Workbook()
+    default_props = DocumentProperties()
+    _load_workbook(wb, archive, None, False, False)
+    prop = wb.properties
+    assert prop.creator == default_props.creator
+    assert prop.last_modified_by == default_props.last_modified_by
+    assert prop.title == default_props.title
+    assert prop.subject == default_props.subject
+    assert prop.description == default_props.description
+    assert prop.category == default_props.category
+    assert prop.keywords == default_props.keywords
+    assert prop.company == default_props.company
+    assert prop.created.timetuple()[:9] == default_props.created.timetuple()[:9] # might break if tests run on the stoke of midnight
+    assert prop.modified == prop.created
 
 
 @pytest.fixture

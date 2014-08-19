@@ -197,9 +197,9 @@ def _load_workbook(wb, archive, filename, read_only, keep_vba):
     # get workbook-level information
     try:
         wb.properties = read_properties_core(archive.read(ARC_CORE))
-        wb._read_workbook_settings(archive.read(ARC_WORKBOOK))
     except KeyError:
         wb.properties = DocumentProperties()
+    wb._read_workbook_settings(archive.read(ARC_WORKBOOK))
 
     try:
         shared_strings = read_string_table(archive.read(ARC_SHARED_STRINGS))
