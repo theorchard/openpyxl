@@ -1,28 +1,7 @@
 # Copyright (c) 2010-2014 openpyxl
-#
-# Permission is hereby granted, free of charge, to any person obtaining a copy
-# of this software and associated documentation files (the "Software"), to deal
-# in the Software without restriction, including without limitation the rights
-# to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-# copies of the Software, and to permit persons to whom the Software is
-# furnished to do so, subject to the following conditions:
-#
-# The above copyright notice and this permission notice shall be included in
-# all copies or substantial portions of the Software.
-#
-# THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-# IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-# FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-# AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-# LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-# OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
-# THE SOFTWARE.
-#
-# @license: http://www.opensource.org/licenses/mit-license.php
-# @author: see AUTHORS file
 
 
-from zipfile import ZipFile, ZIP_DEFLATED
+from zipfile import ZipFile
 
 from openpyxl.workbook import Workbook
 from openpyxl.worksheet import Worksheet
@@ -32,12 +11,14 @@ from openpyxl.xml.functions import fromstring
 
 import pytest
 
+
 def test_get_author_list():
     xml = """<?xml version="1.0" standalone="yes"?><comments
     xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main"><authors>
     <author>Cuke</author><author>Not Cuke</author></authors><commentList>
     </commentList></comments>"""
     assert comments._get_author_list(fromstring(xml)) == ['Cuke', 'Not Cuke']
+
 
 def test_read_comments():
     xml = """<?xml version="1.0" standalone="yes"?>
@@ -66,13 +47,15 @@ def test_read_comments():
         assert ws.cell(coordinate=cell).comment.text == text
         assert ws.cell(coordinate=cell).comment._parent == ws.cell(coordinate=cell)
 
+
 def test_get_comments_file(datadir):
     datadir.chdir()
-    archive = ZipFile('comments.xlsx', 'r', ZIP_DEFLATED)
+    archive = ZipFile('comments.xlsx')
     valid_files = archive.namelist()
     assert comments.get_comments_file('sheet1.xml', archive, valid_files) == 'xl/comments1.xml'
     assert comments.get_comments_file('sheet3.xml', archive, valid_files) == 'xl/comments2.xml'
     assert comments.get_comments_file('sheet2.xml', archive, valid_files) is None
+
 
 def test_comments_cell_association(datadir):
     datadir.chdir()
@@ -82,8 +65,8 @@ def test_comments_cell_association(datadir):
     assert wb['Sheet2'].cell(coordinate="A1").comment is None
     assert wb['Sheet1'].cell(coordinate="D1").comment.text == "Cuke:\nSecond Comment"
 
-@pytest.mark.xfail
+
 def test_comments_with_iterators(datadir):
     datadir.chdir()
     wb = load_workbook('comments.xlsx', use_iterators=True)
-    ws = wb.get_sheet_by_name(name='Sheet1')
+    ws = wb['Sheet1']
