@@ -3,3 +3,12 @@ directory = shippable/codecoverage
 
 [xml]
 output = shippable/codecoverage/coverage.xml
+
+[report]
+exclude_lines =
+    pragma: no cover
+
+omit =
+    */benchmarks/*
+    */tests/*
+    */test_*
