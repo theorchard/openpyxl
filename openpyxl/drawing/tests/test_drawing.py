@@ -1,8 +1,6 @@
 from __future__ import absolute_import
 # Copyright (c) 2010-2014 openpyxl
 
-import os
-
 import pytest
 
 from openpyxl.xml.constants import CHART_DRAWING_NS, SHEET_DRAWING_NS

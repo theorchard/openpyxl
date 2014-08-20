@@ -5,7 +5,7 @@ from __future__ import absolute_import
 import datetime
 import decimal
 from io import BytesIO
-from lxml.etree import tostring, tounicode, xmlfile
+from lxml.etree import tounicode, xmlfile
 
 from openpyxl.tests.helper import compare_xml
 

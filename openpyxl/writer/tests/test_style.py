@@ -3,9 +3,7 @@
 import pytest
 
 from io import BytesIO
-import os.path
 import datetime
-from functools import partial
 
 from openpyxl.formatting import ConditionalFormatting
 from openpyxl.formatting.rules import FormulaRule
@@ -130,7 +128,6 @@ def test_write_font():
 
 def test_write_number_formats():
     wb = DummyWorkbook()
-    from openpyxl.xml.functions import Element
     from openpyxl.styles import Style
     wb.shared_styles = [
         Style(),

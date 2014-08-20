@@ -25,13 +25,11 @@ from __future__ import absolute_import
 """Write worksheets to xml representations."""
 
 # Python stdlib imports
-import decimal
 from io import BytesIO
-from operator import attrgetter
 
 # compatibility imports
 
-from openpyxl.compat import long, safe_string, itervalues
+from openpyxl.compat import safe_string, itervalues
 
 # package imports
 from openpyxl.cell import (
@@ -40,8 +38,6 @@ from openpyxl.cell import (
     COORD_RE
 )
 from openpyxl.xml.functions import (
-    Element,
-    SubElement,
     XMLGenerator,
     start_tag,
     end_tag,
@@ -50,10 +46,7 @@ from openpyxl.xml.functions import (
 )
 from openpyxl.xml.constants import (
     SHEET_MAIN_NS,
-    PKG_REL_NS,
     REL_NS,
-    COMMENTS_NS,
-    VML_NS
 )
 from openpyxl.compat.itertools import iteritems, iterkeys
 from openpyxl.formatting import ConditionalFormatting

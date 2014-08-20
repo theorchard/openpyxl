@@ -27,7 +27,7 @@ from datetime import datetime, date, timedelta, time
 import pytest
 
 # package imports
-from openpyxl.date_time import CALENDAR_MAC_1904, CALENDAR_WINDOWS_1900
+from openpyxl.date_time import CALENDAR_MAC_1904
 
 
 def test_datetime_to_W3CDTF():
@@ -123,4 +123,4 @@ def test_days_to_time():
     from openpyxl.date_time import days_to_time
     td = timedelta(0, 51320, 1600)
     FUT = days_to_time
-    assert days_to_time(td) == time(14, 15, 20, 1600)
+    assert FUT(td) == time(14, 15, 20, 1600)

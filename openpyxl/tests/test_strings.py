@@ -2,7 +2,6 @@
 
 
 # package imports
-from openpyxl.workbook import Workbook
 from openpyxl.reader.strings import read_string_table
 
 from openpyxl.tests.helper import compare_xml

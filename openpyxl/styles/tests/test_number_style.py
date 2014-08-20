@@ -1,6 +1,5 @@
 # Copyright (c) 2010-2014 openpyxl
 
-import pytest
 from openpyxl.styles import numbers
 
 

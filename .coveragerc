@@ -5,11 +5,10 @@ directory = shippable/codecoverage
 output = shippable/codecoverage/coverage.xml
 
 [report]
-exclude_lines = 
-	pragma: no cover
-	from|import
+exclude_lines =
+    pragma: no cover
 
-omit = 
-	*/benchmarks/*
-	*/tests/*
-	*/test_*
+omit =
+    */benchmarks/*
+    */tests/*
+    */test_*

@@ -21,17 +21,11 @@
 # @license: http://www.opensource.org/licenses/mit-license.php
 # @author: see AUTHORS file
 
-# Python stdlib imports
-import datetime
-from functools import partial
-from io import BytesIO
-
 import pytest
 
 # package imports
 from openpyxl.reader.excel import load_workbook
 from openpyxl.reader.style import read_style_table
-from openpyxl.writer.excel import save_virtual_workbook
 
 from openpyxl.styles import (
     numbers,
@@ -41,14 +35,9 @@ from openpyxl.styles import (
     GradientFill,
     Border,
     Side,
-    Protection,
-    Style
+    Alignment
 )
-from openpyxl.styles import colors, fills, borders
-
-# test imports
-from openpyxl.tests.helper import get_xml, compare_xml
-from openpyxl.styles.alignment import Alignment
+from openpyxl.styles import borders
 
 
 @pytest.fixture
@@ -89,6 +78,23 @@ def test_read_gradient_fill(StyleReader, datadir):
     with open("bug284-styles.xml") as src:
         reader = StyleReader(src.read())
         assert list(reader.parse_fills()) == expected
+
+
+
+def test_unprotected_cell(StyleReader, datadir):
+    datadir.chdir()
+    with open ("worksheet_unprotected_style.xml") as src:
+        reader = StyleReader(src.read())
+    from openpyxl.styles import Font
+    reader.font_list = [Font(), Font(), Font(), Font(), Font()]
+    reader.parse_cell_xfs()
+    assert len(reader.shared_styles) == 3
+    # default is cells are locked
+    style = reader.shared_styles[0]
+    assert style.protection.locked is True
+
+    style = reader.shared_styles[2]
+    assert style.protection.locked is False
 
 
 def test_read_cell_style(datadir):

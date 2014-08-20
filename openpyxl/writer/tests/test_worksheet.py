@@ -7,10 +7,9 @@ from io import BytesIO
 
 import pytest
 
-from openpyxl.xml.functions import XMLGenerator, tostring
+from openpyxl.xml.functions import XMLGenerator
 from openpyxl import Workbook
 
-from .. styles import StyleWriter
 from .. worksheet import write_worksheet
 
 from openpyxl.tests.helper import compare_xml

@@ -5,7 +5,6 @@ from openpyxl.units import pixels_to_EMU
 
 from .axis import CategoryAxis, ValueAxis
 from .chart import Chart
-from .series import Series
 
 
 class GraphChart(Chart):

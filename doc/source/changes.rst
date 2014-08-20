@@ -28,6 +28,7 @@ Bug fixes
 181 No content type for worksheets
 241 Cannot read sheets with inline strings
 322 1-indexing for merged cells
+339 Correctly handle removal of cell protection
 341 Cells with formulae do not round-trip
 
 
@@ -216,7 +217,7 @@ Minor changes
 -------------
 
 * load_workbook now accepts data_only to allow extracting values only from
-formulae. Default is false.
+  formulae. Default is false.
 * Images can now be anchored to cells
 * Docs updated
 * Provisional benchmarking

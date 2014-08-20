@@ -22,12 +22,11 @@ from __future__ import absolute_import
 # @license: http://www.opensource.org/licenses/mit-license.php
 # @author: see AUTHORS file
 
-from openpyxl.descriptors import Float, Set, Sequence, Alias, Typed
+from openpyxl.descriptors import Float, Set, Sequence, Alias
 from openpyxl.compat import safe_string
 
 from .colors import ColorDescriptor, Color
 from .hashable import HashableObject
-import warnings
 
 
 FILL_NONE = 'none'

@@ -16,7 +16,6 @@ from openpyxl.writer.excel import (
     save_workbook,
     save_virtual_workbook,
     )
-from openpyxl.writer.worksheet import write_worksheet
 
 from .. workbook import write_workbook, write_workbook_rels
 
@@ -34,12 +33,11 @@ def test_write_auto_filter(datadir):
         assert diff is None, diff
 
 
-@pytest.mark.xfail
-# This should actually fail because you cannot hide the only sheet of a workbook
 def test_write_hidden_worksheet():
     wb = Workbook()
     ws = wb.active
     ws.sheet_state = ws.SHEETSTATE_HIDDEN
+    wb.create_sheet()
     xml = write_workbook(wb)
     expected = """
     <workbook xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main" xmlns:r="http://schemas.openxmlformats.org/officeDocument/2006/relationships">
@@ -50,6 +48,7 @@ def test_write_hidden_worksheet():
     </bookViews>
     <sheets>
       <sheet name="Sheet" sheetId="1" state="hidden" r:id="rId1"/>
+      <sheet name="Sheet1" sheetId="2" r:id="rId2"/>
     </sheets>
       <definedNames/>
       <calcPr calcId="124519" calcMode="auto" fullCalcOnLoad="1"/>
@@ -57,6 +56,14 @@ def test_write_hidden_worksheet():
     """
     diff = compare_xml(xml, expected)
     assert diff is None, diff
+
+
+def test_write_hidden_single_worksheet():
+    wb = Workbook()
+    ws = wb.active
+    ws.sheet_state = ws.SHEETSTATE_HIDDEN
+    with pytest.raises(ValueError):
+        write_workbook(wb)
 
 
 def test_write_empty_workbook(tmpdir):

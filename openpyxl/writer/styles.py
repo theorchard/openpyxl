@@ -15,7 +15,7 @@ from openpyxl.xml.functions import (
     )
 from openpyxl.xml.constants import SHEET_MAIN_NS
 
-from openpyxl.styles import DEFAULTS, Protection
+from openpyxl.styles import DEFAULTS
 from openpyxl.styles import numbers
 from openpyxl.styles.fills import GradientFill, PatternFill
 
@@ -134,7 +134,7 @@ class StyleWriter(object):
 
     def _write_cell_style_xfs(self):
         cell_style_xfs = SubElement(self._root, 'cellStyleXfs', {'count':'1'})
-        xf = SubElement(cell_style_xfs, 'xf',
+        SubElement(cell_style_xfs, 'xf',
             {'numFmtId':"0", 'fontId':"0", 'fillId':"0", 'borderId':"0"})
 
     def _write_cell_xfs(self, number_format_node, fonts_node, fills_node, borders_node):
@@ -224,10 +224,10 @@ class StyleWriter(object):
         number_format_node.attrib['count'] = '%d' % len(_custom_fmts)
 
     def _write_number_format(self, node, fmt_id, format_code):
-        fmt_node = SubElement(node, 'numFmt',
-                              {'numFmtId':'%d' % (fmt_id),
-                               'formatCode':'%s' % format_code}
-                              )
+        SubElement(node, 'numFmt',
+                   {'numFmtId':'%d' % (fmt_id),
+                    'formatCode':'%s' % format_code}
+                   )
 
 
     def _write_alignment(self, node, alignment):
@@ -245,7 +245,7 @@ class StyleWriter(object):
 
     def _write_cell_style(self):
         cell_styles = SubElement(self._root, 'cellStyles', {'count':'1'})
-        cell_style = SubElement(cell_styles, 'cellStyle',
+        SubElement(cell_styles, 'cellStyle',
             {'name':"Normal", 'xfId':"0", 'builtinId':"0"})
 
     def _write_dxfs(self):
@@ -294,6 +294,6 @@ class StyleWriter(object):
 
     def _write_table_styles(self):
 
-        table_styles = SubElement(self._root, 'tableStyles',
+        SubElement(self._root, 'tableStyles',
             {'count':'0', 'defaultTableStyle':'TableStyleMedium9',
             'defaultPivotStyle':'PivotStyleLight16'})

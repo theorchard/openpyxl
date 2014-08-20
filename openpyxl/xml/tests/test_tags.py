@@ -4,8 +4,6 @@ from io import BytesIO
 import pytest
 
 from openpyxl.xml.functions import start_tag, end_tag, tag, XMLGenerator
-from openpyxl.xml.constants import SHEET_MAIN_NS
-
 
 @pytest.fixture(scope="class")
 def doc():
@@ -45,5 +43,5 @@ def test_start_tag_attrs(doc, root):
 
 
 def test_tag(doc, root):
-    t = tag(root, "start", {'height':"10"}, "words")
+    tag(root, "start", {'height':"10"}, "words")
     assert doc.getvalue() == b"""<start height="10">words</start>"""

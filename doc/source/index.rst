@@ -21,6 +21,12 @@ the new Office Open XML format.
 
 All kudos to the PHPExcel team as openpyxl is a Python port of PHPExcel http://www.phpexcel.net/
 
+Sample code:
+++++++++++++
+
+.. literalinclude:: example.py
+
+
 User List
 ---------
 
@@ -213,3 +219,11 @@ Indices and tables
 * :ref:`genindex`
 * :ref:`modindex`
 * :ref:`search`
+
+
+Release Notes
+=============
+
+.. toctree::
+
+    changes

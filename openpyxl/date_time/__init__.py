@@ -7,7 +7,6 @@ from __future__ import division
 # Python stdlib imports
 import datetime
 import re
-import warnings
 
 from jdcal import (
     gcal2jd,

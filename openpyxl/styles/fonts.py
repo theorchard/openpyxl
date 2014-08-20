@@ -22,7 +22,7 @@ from __future__ import absolute_import
 # @license: http://www.opensource.org/licenses/mit-license.php
 # @author: see AUTHORS file
 
-from openpyxl.descriptors import Strict, Float, Integer, Set, Bool, String, Alias, Typed, MinMax
+from openpyxl.descriptors import Float, Integer, Set, Bool, String, Alias, MinMax
 from .hashable import HashableObject
 from .colors import ColorDescriptor, BLACK
 

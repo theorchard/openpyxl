@@ -81,7 +81,7 @@ def DummyCell(dummy_sheet):
     class DummyStyle(object):
         number_format = 'd-mmm-yy'
 
-    idx = dummy_sheet.parent.shared_styles.add(DummyStyle())
+    dummy_sheet.parent.shared_styles.add(DummyStyle())
     cell = ReadOnlyCell(dummy_sheet, None, None, "23596", 'n', '1')
     return cell
 

@@ -32,7 +32,6 @@ from openpyxl.xml.constants import (
     DCTERMS_NS,
     SHEET_MAIN_NS,
     CONTYPES_NS,
-    PACKAGE_XL,
     PKG_REL_NS,
     REL_NS,
     ARC_CONTENT_TYPES,
@@ -52,7 +51,6 @@ from openpyxl.workbook.named_range import (
     refers_to_range
     )
 
-import os
 import datetime
 import re
 

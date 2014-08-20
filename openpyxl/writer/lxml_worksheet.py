@@ -7,7 +7,6 @@ from io import BytesIO
 from lxml.etree import xmlfile, Element, SubElement, fromstring
 
 from openpyxl.compat import (
-    iterkeys,
     itervalues,
     safe_string,
     iteritems
@@ -15,10 +14,8 @@ from openpyxl.compat import (
 from openpyxl.cell import (
     column_index_from_string,
     coordinate_from_string,
-    COORD_RE
 )
 from openpyxl.xml.constants import (
-    PKG_REL_NS,
     REL_NS,
     SHEET_MAIN_NS
 )
@@ -58,7 +55,7 @@ def write_worksheet(worksheet, shared_strings):
             xf.write(write_sheetviews(worksheet))
             xf.write(write_format(worksheet))
             cols = write_cols(worksheet)
-            if cols:
+            if cols is not None:
                 xf.write(cols)
             write_rows(xf, worksheet)
 
@@ -68,7 +65,7 @@ def write_worksheet(worksheet, shared_strings):
                 del prot
 
             af = write_autofilter(worksheet)
-            if af:
+            if af is not None:
                 xf.write(af)
 
             merge = write_mergecells(worksheet)
@@ -119,7 +116,7 @@ def write_worksheet(worksheet, shared_strings):
                     xf.write(legacy)
 
             pb = write_pagebreaks(worksheet)
-            if pb:
+            if pb is not None:
                 xf.write(pb)
 
             # add a legacyDrawing so that excel can draw comments
@@ -212,7 +209,7 @@ def write_cell(xf, worksheet, cell):
 
         if cell.data_type == 's':
             value = string_table.add(value)
-        with xf.element("v") as v:
+        with xf.element("v"):
             if value is not None:
                 xf.write(safe_string(value))
 

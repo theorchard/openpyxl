@@ -4,7 +4,7 @@ from __future__ import absolute_import
 from openpyxl.compat import safe_string
 from openpyxl.descriptors import Set, Typed, Bool, Alias
 
-from .colors import ColorDescriptor, BLACK
+from .colors import ColorDescriptor
 from .hashable import HashableObject
 
 
