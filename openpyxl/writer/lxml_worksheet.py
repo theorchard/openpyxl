@@ -242,7 +242,10 @@ def write_autofilter(worksheet):
 
 def write_sheetviews(worksheet):
     views = Element('sheetViews')
-    view = SubElement(views, 'sheetView', {'workbookViewId': '0'})
+    sheetviewAttrs = {'workbookViewId': '0'}
+    if not worksheet.show_gridlines:
+        sheetviewAttrs['showGridLines'] = '0'
+    view = SubElement(views, 'sheetView', sheetviewAttrs)
     selectionAttrs = {}
     topLeftCell = worksheet.freeze_panes
     if topLeftCell:
