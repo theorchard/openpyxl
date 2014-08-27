@@ -134,7 +134,10 @@ def write_worksheet(worksheet, shared_strings):
 
 def write_worksheet_sheetviews(doc, worksheet):
     start_tag(doc, 'sheetViews')
-    start_tag(doc, 'sheetView', {'workbookViewId': '0'})
+    sheetviewAttrs = {'workbookViewId': '0'}
+    if not worksheet.show_gridlines:
+        sheetviewAttrs['showGridLines'] = '0'
+    start_tag(doc, 'sheetView', sheetviewAttrs)
     selectionAttrs = {}
     topLeftCell = worksheet.freeze_panes
     if topLeftCell:
