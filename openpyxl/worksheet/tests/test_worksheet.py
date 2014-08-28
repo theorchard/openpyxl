@@ -122,8 +122,6 @@ class TestWorksheet(object):
     def test_cell_range_name(self):
         ws = Worksheet(self.wb)
         self.wb.create_named_range('test_range_single', ws, 'B12')
-        with pytest.raises(CellCoordinatesException):
-            ws.cell('test_range_single')
         c_range_name = ws.range('test_range_single')
         c_range_coord = ws.range('B12')
         c_cell = ws.cell('B12')
