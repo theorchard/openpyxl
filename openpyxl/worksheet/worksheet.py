@@ -365,10 +365,65 @@ class Worksheet(object):
 
 
     def get_squared_range(self, min_col, min_row, max_col, max_row):
+        """Returns a 2D array of cells
+
+        :param min_col: smallest column index (1-based index)
+        :type min_col: int
+
+        :param min_row: smallest row index (1-based index)
+        :type min_row: int
+
+        :param max_col: largest column index (1-based index)
+        :type max_col: int
+
+        :param max_row: smallest row index (1-based index)
+        :type max_row: int
+        """
+
         for row in range(min_row, max_row+1):
             yield(self['%s%d' % (get_column_letter(col), row)] for col in range(min_col, max_col+1))
 
 
+    def get_named_range(self, range_string):
+        """
+        Returns a 2D array of cells, with optional row and column offsets.
+
+        :param range_string: `named range` name
+        :type range_string: string
+
+        :rtype: tuples of tuples of :class:`openpyxl.cell.Cell
+        """
+        named_range = self._parent.get_named_range(range_string)
+        if named_range is None:
+            msg = '%s is not a valid range name' % range_string
+            raise NamedRangeException(msg)
+        if isinstance(named_range, NamedRangeContainingValue):
+            msg = '%s refers to a value, not a range' % range_string
+            raise NamedRangeException(msg)
+
+        result = []
+        for destination in named_range.destinations:
+            worksheet, cells_range = destination
+
+            if worksheet is not self:
+                msg = 'Range %s is not defined on worksheet %s' % \
+                    (cells_range, self.title)
+                raise NamedRangeException(msg)
+
+            content = self.range(cells_range)
+
+            if isinstance(content, tuple):
+                for cells in content:
+                    result.extend(cells)
+            else:
+                result.append(content)
+        return tuple(result)
+
+
+    @deprecated("""
+    Use .iter_rows() working with coordinates 'A1:D4',
+    and .get_squared_range() when working with indices (1, 1, 4, 4)
+    and .get_named_range() for named ranges""")
     def range(self, range_string, row=0, column=0):
         """Returns a 2D array of cells, with optional row and column offsets.
 
@@ -390,39 +445,12 @@ class Worksheet(object):
         if m is not None:
             result = []
             for row in self.iter_rows(_rs, row_offset=row, column_offset=column):
-            #cells = self._cells_from_range(_rs, row_offset=row,
-                                           #column_offset=column)
-            #for row in cells:
                 result.append(tuple(col for col in row))
             return tuple(result)
 
         else:
-            # named range
-            named_range = self._parent.get_named_range(range_string)
-            if named_range is None:
-                msg = '%s is not a valid range name' % range_string
-                raise NamedRangeException(msg)
-            if isinstance(named_range, NamedRangeContainingValue):
-                msg = '%s refers to a value, not a range' % range_string
-                raise NamedRangeException(msg)
+            return self.get_named_range(range_string)
 
-            result = []
-            for destination in named_range.destinations:
-                worksheet, cells_range = destination
-
-                if worksheet is not self:
-                    msg = 'Range %s is not defined on worksheet %s' % \
-                        (cells_range, self.title)
-                    raise NamedRangeException(msg)
-
-                content = self.range(cells_range)
-
-                if isinstance(content, tuple):
-                    for cells in content:
-                        result.extend(cells)
-                else:
-                    result.append(content)
-            return tuple(result)
 
 
     @deprecated("Access styles directly from cells, columns or rows")
