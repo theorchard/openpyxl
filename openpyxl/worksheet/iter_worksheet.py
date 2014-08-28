@@ -95,35 +95,6 @@ class IterableWorksheet(Worksheet):
             return self.iter_rows(key)
         return self.cell(key)
 
-    def iter_rows(self, range_string=None, row_offset=0, column_offset=1):
-        """ Returns a squared range based on the `range_string` parameter,
-        using generators.
-
-        :param range_string: range of cells (e.g. 'A1:C4')
-        :type range_string: string
-
-        :param row_offset: additional rows (e.g. 4)
-        :type row: int
-
-        :param column_offset: additonal columns (e.g. 3)
-        :type column: int
-
-        :rtype: generator
-
-        """
-        if range_string is not None:
-            min_col, min_row, max_col, max_row = self._range_boundaries(range_string)
-            max_col += column_offset
-            max_row += row_offset
-        else:
-            min_col = column_index_from_string(self.min_col)
-            max_col = self.max_col
-            if max_col is not None:
-                max_col = column_index_from_string(self.max_col) + 1
-            min_row = self.min_row
-            max_row = self.max_row
-
-        return self.get_squared_range(min_col, min_row, max_col, max_row)
 
     def get_squared_range(self, min_col, min_row, max_col, max_row):
         """
@@ -131,7 +102,7 @@ class IterableWorksheet(Worksheet):
         Missing cells will be created.
         """
         if max_col is not None:
-            expected_columns = [get_column_letter(ci) for ci in range(min_col, max_col)]
+            expected_columns = [get_column_letter(ci) for ci in range(min_col, max_col + 1)]
         else:
             expected_columns = []
         row_counter = min_row
@@ -197,10 +168,6 @@ class IterableWorksheet(Worksheet):
         result = list(self.iter_rows(coordinate))
         if result:
             return result[0][0]
-
-    def range(self, *args, **kwargs):
-        # TODO return a range of cells, basically get_squared_range with same interface as Worksheet
-        raise NotImplementedError("use 'iter_rows()' instead")
 
     @property
     def rows(self):
