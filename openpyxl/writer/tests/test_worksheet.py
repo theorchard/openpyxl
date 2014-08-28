@@ -370,6 +370,38 @@ def test_freeze_panes_both(out, doc, worksheet, write_worksheet_sheetviews):
     assert diff is None, diff
 
 
+def test_show_gridlines_false(out, doc, worksheet, write_worksheet_sheetviews):
+    ws = worksheet
+    ws.show_gridlines = False
+
+    write_worksheet_sheetviews(doc, ws)
+    xml = out.getvalue()
+    expected = """
+    <sheetViews>
+      <sheetView showGridLines="0" workbookViewId="0">
+        <selection activeCell="A1" sqref="A1"></selection>
+      </sheetView>
+    </sheetViews>
+    """
+    diff = compare_xml(xml,expected)
+    assert diff is None, diff
+
+def test_show_gridlines_true(out, doc, worksheet, write_worksheet_sheetviews):
+    ws = worksheet
+    ws.show_gridlines = True
+
+    write_worksheet_sheetviews(doc, ws)
+    xml = out.getvalue()
+    expected = """
+    <sheetViews>
+      <sheetView workbookViewId="0">
+        <selection activeCell="A1" sqref="A1"></selection>
+      </sheetView>
+    </sheetViews>
+    """
+    diff = compare_xml(xml,expected)
+    assert diff is None, diff
+
 
 @pytest.mark.parametrize("value, expected",
                          [
