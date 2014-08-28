@@ -238,7 +238,7 @@ class TestWorksheet(object):
     @pytest.mark.parametrize("row, column, coordinate",
                              [
                                  (1, 0, 'A1'),
-                                 (9, 2, 'C9')
+                                 (9, 2, 'C9'),
                              ])
     def test_iter_rows(self, row, column, coordinate):
         from itertools import islice
@@ -249,15 +249,6 @@ class TestWorksheet(object):
         rows = ws.iter_rows()
         first_row = tuple(next(islice(rows, row-1, row)))
         assert first_row[column].coordinate == coordinate
-
-        #rows = ws.iter_rows()
-
-        #last_row = tuple(next(islice(rows, 8, 9)))
-        #assert first_row[0].coordinate == 'A1'
-        #assert last_row[-1].coordinate == 'C9'
-
-        #rows = tuple(ws.iter_rows())
-        #assert tuple(rows[0])[0] == ()
 
 
     def test_rows(self):
