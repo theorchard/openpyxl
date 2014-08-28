@@ -337,7 +337,7 @@ class Worksheet(object):
         return 'A1:%s%d' % (get_column_letter(self.max_column or 1), self.max_row or 1)
 
 
-    def iter_rows(self, range_string=None, row=0, column=0):
+    def iter_rows(self, range_string=None, row_offset=0, column_offset=0):
         """
         Returns a squared range based on the `range_string` parameter,
         using generators.
@@ -354,12 +354,20 @@ class Worksheet(object):
 
         :rtype: generator
         """
-        if range_string is None:
-            range_string = self.calculate_dimension()
+        if range_string is not None:
+            min_col, min_row, max_col, max_row = self._range_boundaries(range_string)
+        else:
+            min_col, min_row, max_col, max_row = (1, 1, self.max_column, self.max_row)
+        return self.get_squared_range(min_col + column_offset,
+                                      min_row + row_offset,
+                                      max_col + column_offset,
+                                      max_row + row_offset)
 
-        for row in self._cells_from_range(range_string, row_offset=row,
-                                          column_offset=column):
-            yield (self[col] for col in row)
+
+    def get_squared_range(self, min_col, min_row, max_col, max_row):
+        for row in range(min_row, max_row+1):
+            yield(self['%s%d' % (get_column_letter(col), row)] for col in range(min_col, max_col+1))
+
 
     def range(self, range_string, row=0, column=0):
         """Returns a 2D array of cells, with optional row and column offsets.
@@ -381,10 +389,11 @@ class Worksheet(object):
          # R1C1 range
         if m is not None:
             result = []
-            cells = self._cells_from_range(_rs, row_offset=row,
-                                           column_offset=column)
-            for row in cells:
-                result.append(tuple(self[col] for col in row))
+            for row in self.iter_rows(_rs, row_offset=row, column_offset=column):
+            #cells = self._cells_from_range(_rs, row_offset=row,
+                                           #column_offset=column)
+            #for row in cells:
+                result.append(tuple(col for col in row))
             return tuple(result)
 
         else:
