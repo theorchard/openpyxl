@@ -525,7 +525,8 @@ class Worksheet(object):
 
     def _cells_from_range(self, range_string, row_offset=0, column_offset=0):
         """
-        Get individual addresses for every cell in a range
+        Get individual addresses for every cell in a range.
+        Yields one row at a time.
         """
         min_col, min_row, max_col, max_row = self._range_boundaries(range_string)
         for row in range(min_row+row_offset, max_row+1 + row_offset):
