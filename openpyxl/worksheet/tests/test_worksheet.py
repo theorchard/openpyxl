@@ -85,8 +85,9 @@ class TestWorksheet(object):
         ws = Worksheet(self.wb)
         self.wb.create_named_range('test_range', ws, 'C5')
         xlrange = ws.range('test_range')
-        assert isinstance(xlrange, Cell)
-        assert 5 == xlrange.row
+        cell = xlrange[0]
+        assert isinstance(cell, Cell)
+        assert cell.row == 5
 
     def test_bad_named_range(self):
         ws = Worksheet(self.wb)
@@ -125,8 +126,9 @@ class TestWorksheet(object):
         c_range_name = ws.range('test_range_single')
         c_range_coord = ws.range('B12')
         c_cell = ws.cell('B12')
-        assert c_range_coord == c_range_name
-        assert c_range_coord == c_cell
+        assert c_range_coord == ((c_cell,),)
+        assert c_range_name == (c_cell,)
+
 
     def test_garbage_collect(self):
         ws = Worksheet(self.wb)

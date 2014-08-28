@@ -15,6 +15,7 @@ from openpyxl.xml.functions import iterparse
 # package
 from openpyxl.worksheet import Worksheet
 from openpyxl.cell import (
+    ABSOLUTE_RE,
     coordinate_from_string,
     column_index_from_string,
     get_column_letter,
@@ -33,13 +34,16 @@ def read_dimension(source):
     for _event, element in it:
         if element.tag == DIMENSION_TAG:
             dim = element.get("ref")
-            if ':' in dim:
-                start, stop = dim.split(':')
+            m = ABSOLUTE_RE.match(dim.upper())
+            min_col, min_row, sep, max_col, max_row = m.groups()
+            min_row = int(min_row)
+            if max_col is None or max_row is None:
+                max_col = min_col
+                max_row = min_row
             else:
-                start = stop = dim
-            min_col, min_row = coordinate_from_string(start)
-            max_col, max_row = coordinate_from_string(stop)
+                max_row = int(max_row)
             return min_col, min_row, max_col, max_row
+
         elif element.tag == DATA_TAG:
             # Dimensions missing
             break

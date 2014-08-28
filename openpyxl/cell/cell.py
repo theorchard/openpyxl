@@ -42,7 +42,16 @@ from openpyxl.styles import numbers
 
 # constants
 COORD_RE = re.compile('^[$]?([A-Z]+)[$]?(\d+)$')
-ABSOLUTE_RE = re.compile('^[$]?([A-Z]+)[$]?(\d+)(:[$]?([A-Z]+)[$]?(\d+))?$')
+ABSOLUTE_RE = re.compile(
+'''^[$]?
+(?P<min_col>[A-Z]+)
+[$]?
+(?P<min_row>\d+)
+(:[$]?
+(?P<max_col>[A-Z]+)
+[$]?
+(?P<max_row>\d+))?$''',
+re.VERBOSE)
 ILLEGAL_CHARACTERS_RE = re.compile(r'[\000-\010]|[\013-\014]|[\016-\037]')
 
 TIME_TYPES = (datetime.datetime, datetime.date, datetime.time, datetime.timedelta)
@@ -73,7 +82,7 @@ def coordinate_from_string(coord_string):
 
 def absolute_coordinate(coord_string):
     """Convert a coordinate to an absolute coordinate string (B12 -> $B$12)"""
-    m = ABSOLUTE_RE.match(coord_string)
+    m = ABSOLUTE_RE.match(coord_string.upper())
     if m:
         parts = m.groups()
         if all(parts[-2:]):

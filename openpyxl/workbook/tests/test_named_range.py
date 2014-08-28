@@ -95,7 +95,7 @@ def test_merged_cells_named_range(datadir):
 
     wb = load_workbook('merge_range.xlsx')
     ws = wb.worksheets[0]
-    cell = ws.range('TRAP_3')
+    cell = ws.range('TRAP_3')[0]
     assert 'B15' == cell.coordinate
     assert 10 == cell.value
 

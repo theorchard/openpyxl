@@ -22,6 +22,7 @@ import openpyxl.cell
 from openpyxl.cell import (
     coordinate_from_string,
     COORD_RE,
+    ABSOLUTE_RE,
     column_index_from_string,
     get_column_letter,
     Cell
@@ -350,22 +351,18 @@ class Worksheet(object):
         :rtype: tuples of tuples of :class:`openpyxl.cell.Cell`
 
         """
-        if ':' in range_string:
-            # R1C1 range
+        _rs = range_string.upper()
+        m = ABSOLUTE_RE.match(_rs)
+         # R1C1 range
+        if m is not None:
             result = []
-            cells = self._cells_from_range(range_string, row_offset=row,
-                                          column_offset=column)
+            cells = self._cells_from_range(_rs, row_offset=row,
+                                           column_offset=column)
             for row in cells:
                 result.append(tuple(self[col] for col in row))
             return tuple(result)
 
         else:
-            try:
-                return self.cell(coordinate=range_string, row=row,
-                                 column=column)
-            except CellCoordinatesException:
-                pass
-
             # named range
             named_range = self._parent.get_named_range(range_string)
             if named_range is None:
@@ -377,7 +374,6 @@ class Worksheet(object):
 
             result = []
             for destination in named_range.destinations:
-
                 worksheet, cells_range = destination
 
                 if worksheet is not self:
@@ -392,11 +388,8 @@ class Worksheet(object):
                         result.extend(cells)
                 else:
                     result.append(content)
+            return tuple(result)
 
-            if len(result) == 1:
-                return result[0]
-            else:
-                return tuple(result)
 
     @deprecated("Access styles directly from cells, columns or rows")
     def get_style(self, coordinate):
@@ -509,16 +502,17 @@ class Worksheet(object):
         (min_col, min_row, max_col, max_row)
         Cell coordinates will be converted into a range with the cell at both end
         """
-        _range = range_string.split(":")
-        min_col, min_row = coordinate_from_string(_range[0])
+        m = ABSOLUTE_RE.match(range_string)
+        min_col, min_row, sep, max_col, max_row = m.groups()
         min_col = column_index_from_string(min_col)
+        min_row = int(min_row)
 
-        if len(_range) == 2:
-            max_col, max_row = coordinate_from_string(_range[1])
-            max_col = column_index_from_string(max_col)
-        else:
-            max_row = min_row
+        if max_col is None or max_row is None:
             max_col = min_col
+            max_row = min_row
+        else:
+            max_col = column_index_from_string(max_col)
+            max_row = int(max_row)
 
         return min_col, min_row, max_col, max_row
 
