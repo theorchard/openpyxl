@@ -386,6 +386,7 @@ def test_show_gridlines_false(out, doc, worksheet, write_worksheet_sheetviews):
     diff = compare_xml(xml,expected)
     assert diff is None, diff
 
+
 def test_show_gridlines_true(out, doc, worksheet, write_worksheet_sheetviews):
     ws = worksheet
     ws.show_gridlines = True
