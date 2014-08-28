@@ -502,16 +502,35 @@ class Worksheet(object):
             if c in self._cells:
                 del self._cells[c]
 
+
+    def _range_boundaries(self, range_string):
+        """
+        Convert a range string into a tuple of boundaries:
+        (min_col, min_row, max_col, max_row)
+        Cell coordinates will be converted into a range with the cell at both end
+        """
+        _range = range_string.split(":")
+        min_col, min_row = coordinate_from_string(_range[0])
+        min_col = column_index_from_string(min_col)
+
+        if len(_range) == 2:
+            max_col, max_row = coordinate_from_string(_range[1])
+            max_col = column_index_from_string(max_col)
+        else:
+            max_row = min_row
+            max_col = min_col
+
+        return min_col, min_row, max_col, max_row
+
+
     def _cells_from_range(self, range_string, row_offset=0, column_offset=0):
         """
         Get individual addresses for every cell in a range
         """
-        min_col, min_row = coordinate_from_string(range_string.split(':')[0])
-        max_col, max_row = coordinate_from_string(range_string.split(':')[1])
-        min_col = column_index_from_string(min_col)
-        max_col = column_index_from_string(max_col)
+        min_col, min_row, max_col, max_row = self._range_boundaries(range_string)
         for row in range(min_row+row_offset, max_row+1 + row_offset):
             yield ('%s%d' % (get_column_letter(col), row) for col in range(min_col + column_offset, max_col+1 + column_offset))
+
 
     def unmerge_cells(self, range_string=None, start_row=None, start_column=None, end_row=None, end_column=None):
         """ Remove merge on a cell range.  Range is a cell range (e.g. A1:E1) """

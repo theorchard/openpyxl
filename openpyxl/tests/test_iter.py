@@ -27,7 +27,7 @@ import os.path
 import pytest
 
 from openpyxl.tests.helper import DATADIR
-from openpyxl.worksheet.iter_worksheet import get_range_boundaries, read_dimension
+from openpyxl.worksheet.iter_worksheet import read_dimension
 from openpyxl.reader.excel import load_workbook
 from openpyxl.compat import range, izip
 
@@ -113,13 +113,6 @@ class TestDims(TestWorksheet):
         wb = self._open_wb()
         ws = wb[sheetname]
         assert ws.get_highest_column() == col
-
-
-def test_get_boundaries_range():
-    assert get_range_boundaries('C1:C4') == (3, 1, 4, 4)
-
-def test_get_boundaries_one():
-    assert get_range_boundaries('C1') == (3, 1, 4, 1)
 
 
 class TestText(TestWorksheet):

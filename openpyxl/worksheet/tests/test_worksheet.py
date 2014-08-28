@@ -63,6 +63,17 @@ class TestWorksheet(object):
         ws.cell('B12').value = 'AAA'
         assert 'A1:B12' == ws.calculate_dimension()
 
+
+    @pytest.mark.parametrize('range_string, coords',
+                             [
+                                 ('C1:C4', (3, 1, 3, 4)),
+                                 ('C1', (3, 1, 3, 1)),
+                             ])
+    def test_bounds(self, range_string, coords):
+        ws = Worksheet(self.wb)
+        assert ws._range_boundaries(range_string) == coords
+
+
     def test_worksheet_range(self):
         ws = Worksheet(self.wb)
         xlrange = ws.range('A1:C4')

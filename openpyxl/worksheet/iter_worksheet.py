@@ -46,25 +46,6 @@ from openpyxl.xml.functions import safe_iterator
 from openpyxl.xml.constants import SHEET_MAIN_NS
 
 
-def get_range_boundaries(range_string, row_offset=0, column_offset=1):
-
-    if ':' in range_string:
-        min_range, max_range = range_string.split(':')
-        min_col, min_row = coordinate_from_string(min_range)
-        max_col, max_row = coordinate_from_string(max_range)
-
-        min_col = column_index_from_string(min_col)
-        max_col = column_index_from_string(max_col) + 1
-
-    else:
-        min_col, min_row = coordinate_from_string(range_string)
-        min_col = column_index_from_string(min_col)
-        max_col = min_col + column_offset
-        max_row = min_row + row_offset
-
-    return (min_col, min_row, max_col, max_row)
-
-
 def read_dimension(source):
     min_row = min_col =  max_row = max_col = None
     DIMENSION_TAG = '{%s}dimension' % SHEET_MAIN_NS
@@ -131,7 +112,7 @@ class IterableWorksheet(Worksheet):
             return self.iter_rows(key)
         return self.cell(key)
 
-    def iter_rows(self, range_string='', row_offset=0, column_offset=1):
+    def iter_rows(self, range_string=None, row_offset=0, column_offset=1):
         """ Returns a squared range based on the `range_string` parameter,
         using generators.
 
@@ -147,8 +128,10 @@ class IterableWorksheet(Worksheet):
         :rtype: generator
 
         """
-        if range_string:
-            min_col, min_row, max_col, max_row = get_range_boundaries(range_string, row_offset, column_offset)
+        if range_string is not None:
+            min_col, min_row, max_col, max_row = self._range_boundaries(range_string)
+            max_col += column_offset
+            max_row += row_offset
         else:
             min_col = column_index_from_string(self.min_col)
             max_col = self.max_col
