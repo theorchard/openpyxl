@@ -234,6 +234,32 @@ class TestWorksheet(object):
         for e, v in zip(expected, flatten(vals)):
             assert e == tuple(v)
 
+
+    @pytest.mark.parametrize("row, column, coordinate",
+                             [
+                                 (1, 0, 'A1'),
+                                 (9, 2, 'C9')
+                             ])
+    def test_iter_rows(self, row, column, coordinate):
+        from itertools import islice
+        ws = Worksheet(self.wb)
+        ws.cell('A1').value = 'first'
+        ws.cell('C9').value = 'last'
+        assert ws.calculate_dimension() == 'A1:C9'
+        rows = ws.iter_rows()
+        first_row = tuple(next(islice(rows, row-1, row)))
+        assert first_row[column].coordinate == coordinate
+
+        #rows = ws.iter_rows()
+
+        #last_row = tuple(next(islice(rows, 8, 9)))
+        #assert first_row[0].coordinate == 'A1'
+        #assert last_row[-1].coordinate == 'C9'
+
+        #rows = tuple(ws.iter_rows())
+        #assert tuple(rows[0])[0] == ()
+
+
     def test_rows(self):
 
         ws = Worksheet(self.wb)
@@ -244,9 +270,11 @@ class TestWorksheet(object):
         rows = ws.rows
 
         assert len(rows) == 9
+        first_row = rows[0]
+        last_row = rows[-1]
 
-        assert rows[0][0].value == 'first'
-        assert rows[-1][-1].value == 'last'
+        assert first_row[0].value == 'first' and first_row[0].coordinate == 'A1'
+        assert last_row[-1].value == 'last'
 
     def test_cols(self):
 

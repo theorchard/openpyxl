@@ -336,6 +336,31 @@ class Worksheet(object):
 
         return 'A1:%s%d' % (get_column_letter(self.max_column or 1), self.max_row or 1)
 
+
+    def iter_rows(self, range_string=None, row=0, column=0):
+        """
+        Returns a squared range based on the `range_string` parameter,
+        using generators.
+        If no range is passed, will iterate over all cells in the worksheet
+
+        :param range_string: range of cells (e.g. 'A1:C4')
+        :type range_string: string
+
+        :param row_offset: additional rows (e.g. 4)
+        :type row: int
+
+        :param column_offset: additonal columns (e.g. 3)
+        :type column: int
+
+        :rtype: generator
+        """
+        if range_string is None:
+            range_string = self.calculate_dimension()
+
+        for row in self._cells_from_range(range_string, row_offset=row,
+                                          column_offset=column):
+            yield (self[col] for col in row)
+
     def range(self, range_string, row=0, column=0):
         """Returns a 2D array of cells, with optional row and column offsets.
 
@@ -595,7 +620,8 @@ class Worksheet(object):
 
     @property
     def rows(self):
-        return self.range(self.calculate_dimension())
+        """Iterate over all rows in the worksheet"""
+        return tuple(tuple(row) for row in self.iter_rows())
 
     @property
     def columns(self):
