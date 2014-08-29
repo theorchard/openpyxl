@@ -267,6 +267,12 @@ class TestWorksheet(object):
         assert first_row[0].value == 'first' and first_row[0].coordinate == 'A1'
         assert last_row[-1].value == 'last'
 
+
+    def test_no_cols(self):
+        ws = Worksheet(self.wb)
+        assert ws.columns == ((),)
+
+
     def test_cols(self):
 
         ws = Worksheet(self.wb)
