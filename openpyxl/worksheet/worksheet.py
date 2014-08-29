@@ -576,15 +576,15 @@ class Worksheet(object):
         return min_col, min_row, max_col, max_row
 
 
-    def _cells_from_range(self, range_string, row_offset=0, column_offset=0):
+    def _cells_from_range(self, range_string):
         """
         Get individual addresses for every cell in a range.
         Yields one row at a time.
         """
         min_col, min_row, max_col, max_row = self._range_boundaries(range_string)
-        for row in range(min_row+row_offset, max_row+1 + row_offset):
+        for row in range(min_row, max_row+1):
             yield tuple('%s%d' % (get_column_letter(col), row)
-                        for col in range(min_col + column_offset, max_col+1 + column_offset))
+                        for col in range(min_col, max_col+1))
 
 
     def unmerge_cells(self, range_string=None, start_row=None, start_column=None, end_row=None, end_column=None):
