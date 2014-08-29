@@ -338,6 +338,27 @@ class Worksheet(object):
         return 'A1:%s%d' % (get_column_letter(self.max_column or 1), self.max_row or 1)
 
 
+    def _range_boundaries(self, range_string):
+        """
+        Convert a range string into a tuple of boundaries:
+        (min_col, min_row, max_col, max_row)
+        Cell coordinates will be converted into a range with the cell at both end
+        """
+        m = ABSOLUTE_RE.match(range_string)
+        min_col, min_row, sep, max_col, max_row = m.groups()
+        min_col = column_index_from_string(min_col)
+        min_row = int(min_row)
+
+        if max_col is None or max_row is None:
+            max_col = min_col
+            max_row = min_row
+        else:
+            max_col = column_index_from_string(max_col)
+            max_row = int(max_row)
+
+        return min_col, min_row, max_col, max_row
+
+
     def iter_rows(self, range_string=None, row_offset=0, column_offset=0):
         """
         Returns a squared range based on the `range_string` parameter,
@@ -522,6 +543,18 @@ class Worksheet(object):
         """Drawings and hyperlinks create relationships"""
         self._parent.relationships.append(obj)
 
+
+    def _cells_from_range(self, range_string):
+        """
+        Get individual addresses for every cell in a range.
+        Yields one row at a time.
+        """
+        min_col, min_row, max_col, max_row = self._range_boundaries(range_string)
+        for row in range(min_row, max_row+1):
+            yield tuple('%s%d' % (get_column_letter(col), row)
+                        for col in range(min_col, max_col+1))
+
+
     def merge_cells(self, range_string=None, start_row=None, start_column=None, end_row=None, end_column=None):
         """ Set merge on a cell range.  Range is a cell range (e.g. A1:E1) """
         if not range_string:
@@ -553,38 +586,6 @@ class Worksheet(object):
         for c in islice(chain.from_iterable(cells), 1, None):
             if c in self._cells:
                 del self._cells[c]
-
-
-    def _range_boundaries(self, range_string):
-        """
-        Convert a range string into a tuple of boundaries:
-        (min_col, min_row, max_col, max_row)
-        Cell coordinates will be converted into a range with the cell at both end
-        """
-        m = ABSOLUTE_RE.match(range_string)
-        min_col, min_row, sep, max_col, max_row = m.groups()
-        min_col = column_index_from_string(min_col)
-        min_row = int(min_row)
-
-        if max_col is None or max_row is None:
-            max_col = min_col
-            max_row = min_row
-        else:
-            max_col = column_index_from_string(max_col)
-            max_row = int(max_row)
-
-        return min_col, min_row, max_col, max_row
-
-
-    def _cells_from_range(self, range_string):
-        """
-        Get individual addresses for every cell in a range.
-        Yields one row at a time.
-        """
-        min_col, min_row, max_col, max_row = self._range_boundaries(range_string)
-        for row in range(min_row, max_row+1):
-            yield tuple('%s%d' % (get_column_letter(col), row)
-                        for col in range(min_col, max_col+1))
 
 
     def unmerge_cells(self, range_string=None, start_row=None, start_column=None, end_row=None, end_column=None):
