@@ -5,6 +5,7 @@ from __future__ import absolute_import
 
 
 # Python stdlib imports
+from itertools import islice, chain
 import re
 from inspect import isgenerator
 
@@ -552,7 +553,6 @@ class Worksheet(object):
 
         cells = self._cells_from_range(range_string)
         # only the top-left cell is preserved
-        from itertools import islice, chain
         for c in islice(chain.from_iterable(cells), 1, None):
             if c in self._cells:
                 del self._cells[c]
@@ -668,8 +668,8 @@ class Worksheet(object):
         cols = []
         for col_idx in range(self.max_column):
             cells = self.get_squared_range(col_idx + 1, min_row, col_idx + 1, max_row)
-            col = tuple(next(c) for c in cells)
-            cols.append(col)
+            col = chain.from_iterable(cells)
+            cols.append(tuple(col))
         return tuple(cols)
 
     def point_pos(self, left=0, top=0):
