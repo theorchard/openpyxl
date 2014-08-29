@@ -1,5 +1,6 @@
 from io import BytesIO
 from lxml.etree import xmlfile
+import os
 from random import randint
 
 from openpyxl import Workbook
@@ -95,6 +96,22 @@ def styled_sheet():
     #wb.save(get_output_path('test_openpyxl_style_std_pregen.xlsx'))
 
 
+def read_workbook():
+    from openpyxl import load_workbook
+    folder = os.path.split(__file__)[0]
+    src = os.path.join(folder, "files", "very_large.xlsx")
+    wb = load_workbook(src)
+    return wb
+
+
+def rows(wb):
+    ws = wb.active
+    rows = ws.iter_rows()
+    for r, row in enumerate(rows):
+        for c, col in enumerate(row):
+            pass
+    print((r+1)* (c+1), "cells")
+
 """
 Sample use
 import cProfile
@@ -104,9 +121,11 @@ cProfile.run("profiling.lxml_writer(ws)", sort="tottime")
 
 if __name__ == '__main__':
     import cProfile
-    ws = make_worksheet()
+    #ws = make_worksheet()
+    wb = read_workbook()
+    cProfile.run("rows(wb)", sort="tottime")
     #cProfile.run("make_worksheet()", sort="tottime")
-    cProfile.run("sax_writer(ws)", sort="tottime")
+    #cProfile.run("sax_writer(ws)", sort="tottime")
     #cProfile.run("lxml_writer(ws)", sort="tottime")
     #generate_format_data()
     #cProfile.run("styled_sheet()", sort="tottime")
