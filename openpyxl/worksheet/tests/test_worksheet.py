@@ -296,7 +296,7 @@ class TestWorksheet(object):
 
     def test_auto_filter(self):
         ws = Worksheet(self.wb)
-        ws.auto_filter.ref = ws.range('a1:f1')
+        ws.auto_filter.ref = ws.iter_rows('a1:f1')
         assert ws.auto_filter.ref == 'A1:F1'
 
         ws.auto_filter.ref = ''

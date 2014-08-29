@@ -355,7 +355,7 @@ class Worksheet(object):
         :rtype: generator
         """
         if range_string is not None:
-            min_col, min_row, max_col, max_row = self._range_boundaries(range_string)
+            min_col, min_row, max_col, max_row = self._range_boundaries(range_string.upper())
         else:
             min_col, min_row, max_col, max_row = (1, 1, self.max_column, self.max_row)
         return self.get_squared_range(min_col + column_offset,

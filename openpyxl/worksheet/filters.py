@@ -22,6 +22,7 @@ from __future__ import absolute_import
 # @license: http://www.opensource.org/licenses/mit-license.php
 # @author: see AUTHORS file
 
+from itertools import islice
 
 def normalize_reference(cell_range):
     # Normalize range to a str or None
@@ -29,8 +30,12 @@ def normalize_reference(cell_range):
         cell_range = None
     elif isinstance(cell_range, str):
         cell_range = cell_range.upper()
-    else:  # Assume a range
-        cell_range = cell_range[0][0].coordinate + ':' + cell_range[-1][-1].coordinate
+    else:  # Assume a row generator
+        cell_range = tuple(cell_range)
+        first_cell = next(cell_range[0])
+        for r in cell_range:
+            last_cell = tuple(r)[-1]
+        cell_range = "%s:%s" % (first_cell.coordinate, last_cell.coordinate)
     return cell_range
 
 
