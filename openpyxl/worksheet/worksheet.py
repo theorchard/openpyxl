@@ -446,14 +446,10 @@ class Worksheet(object):
         m = ABSOLUTE_RE.match(_rs)
          # R1C1 range
         if m is not None:
-            result = []
-            for row in self.iter_rows(_rs, row_offset=row, column_offset=column):
-                result.append(tuple(col for col in row))
-            return tuple(result)
-
+            rows = self.iter_rows(_rs, row_offset=row, column_offset=column)
+            return tuple(row for row in rows)
         else:
             return self.get_named_range(range_string)
-
 
 
     @deprecated("Access styles directly from cells, columns or rows")
@@ -588,7 +584,8 @@ class Worksheet(object):
         """
         min_col, min_row, max_col, max_row = self._range_boundaries(range_string)
         for row in range(min_row+row_offset, max_row+1 + row_offset):
-            yield ('%s%d' % (get_column_letter(col), row) for col in range(min_col + column_offset, max_col+1 + column_offset))
+            yield tuple('%s%d' % (get_column_letter(col), row)
+                        for col in range(min_col + column_offset, max_col+1 + column_offset))
 
 
     def unmerge_cells(self, range_string=None, start_row=None, start_column=None, end_row=None, end_column=None):
@@ -660,7 +657,7 @@ class Worksheet(object):
     @property
     def rows(self):
         """Iterate over all rows in the worksheet"""
-        return tuple(tuple(row) for row in self.iter_rows())
+        return tuple(row for row in self.iter_rows())
 
     @property
     def columns(self):
