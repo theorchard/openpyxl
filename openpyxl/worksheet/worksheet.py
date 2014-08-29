@@ -662,13 +662,14 @@ class Worksheet(object):
 
     @property
     def columns(self):
-        max_row = self.get_highest_row()
+        """Iterate over all columns in the worksheet"""
+        max_row = self.max_row
+        min_row = 1
         cols = []
-        for col_idx in range(self.get_highest_column()):
-            col = get_column_letter(col_idx + 1)
-            res = self.range('%s1:%s%d' % (col, col, max_row))
-            cols.append(tuple([x[0] for x in res]))
-
+        for col_idx in range(self.max_column):
+            cells = self.get_squared_range(col_idx + 1, min_row, col_idx + 1, max_row)
+            col = tuple(next(c) for c in cells)
+            cols.append(col)
         return tuple(cols)
 
     def point_pos(self, left=0, top=0):
