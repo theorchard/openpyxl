@@ -379,10 +379,12 @@ class Worksheet(object):
 
         :param max_row: smallest row index (1-based index)
         :type max_row: int
+
+        :rtype: generator
         """
 
         for row in range(min_row, max_row+1):
-            yield(self['%s%d' % (get_column_letter(col), row)] for col in range(min_col, max_col+1))
+            yield tuple (self['%s%d' % (get_column_letter(col), row)] for col in range(min_col, max_col+1))
 
 
     def get_named_range(self, range_string):

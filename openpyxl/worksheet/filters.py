@@ -32,9 +32,8 @@ def normalize_reference(cell_range):
         cell_range = cell_range.upper()
     else:  # Assume a row generator
         cell_range = tuple(cell_range)
-        first_cell = next(cell_range[0])
-        for r in cell_range:
-            last_cell = tuple(r)[-1]
+        first_cell = cell_range[0][0]
+        last_cell = cell_range[-1][-1]
         cell_range = "%s:%s" % (first_cell.coordinate, last_cell.coordinate)
     return cell_range
 

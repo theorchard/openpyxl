@@ -98,7 +98,10 @@ class TestWorksheet(object):
             ('A3', 'B3', 'C3' ),
             ('A4', 'B4', 'C4' ),
         ]
+
         rows = ws.iter_rows('A1:C4')
+        rows = tuple(rows)
+        #assert tuple(rows) == expected
         for row, coord in zip(rows, expected):
             assert tuple(c.coordinate for c in row) == coord
 
