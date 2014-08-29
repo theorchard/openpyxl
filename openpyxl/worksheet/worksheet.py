@@ -297,7 +297,7 @@ class Worksheet(object):
     def __getitem__(self, key):
         """Convenience access by Excel style address"""
         if isinstance(key, slice):
-            return self.range("{0}:{1}".format(key.start, key.stop))
+            return self.iter_rows("{0}:{1}".format(key.start, key.stop))
         return self._get_cell(key)
 
     def __setitem__(self, key, value):
@@ -416,13 +416,9 @@ class Worksheet(object):
                     (cells_range, self.title)
                 raise NamedRangeException(msg)
 
-            content = self.range(cells_range)
+            for row in self.iter_rows(cells_range):
+                result.extend(row)
 
-            if isinstance(content, tuple):
-                for cells in content:
-                    result.extend(cells)
-            else:
-                result.append(content)
         return tuple(result)
 
 

@@ -90,7 +90,7 @@ class TestWorksheet(object):
             assert tuple(c.coordinate for c in row) == coord
 
 
-    def test_worksheet_range(self):
+    def test_iter_rows(self, ):
         ws = Worksheet(self.wb)
         expected = [
             ('A1', 'B1', 'C1' ),
@@ -100,41 +100,53 @@ class TestWorksheet(object):
         ]
 
         rows = ws.iter_rows('A1:C4')
-        rows = tuple(rows)
-        #assert tuple(rows) == expected
         for row, coord in zip(rows, expected):
             assert tuple(c.coordinate for c in row) == coord
 
-    def test_worksheet_named_range(self):
+
+    def test_iter_rows_offset(self):
+        ws = Worksheet(self.wb)
+        rows = ws.iter_rows('A1:C4', 1, 3)
+        expected = [
+            ('D2', 'E2', 'F2' ),
+            ('D3', 'E3', 'F3' ),
+            ('D4', 'E4', 'F4' ),
+            ('D5', 'E5', 'F5' ),
+        ]
+
+        for row, coord in zip(rows, expected):
+            assert tuple(c.coordinate for c in row) == coord
+
+
+    def test_worksheet(self, recwarn):
+        ws = Worksheet(self.wb)
+        rows = ws.range("A1:D4")
+        w = recwarn.pop()
+        assert issubclass(w.category, UserWarning)
+
+
+    def test_get_named_range(self):
         ws = Worksheet(self.wb)
         self.wb.create_named_range('test_range', ws, 'C5')
-        xlrange = ws.get_named_range('test_range')
+        xlrange = tuple(ws.get_named_range('test_range'))
         cell = xlrange[0]
         assert isinstance(cell, Cell)
         assert cell.row == 5
 
-    def test_bad_named_range(self):
+
+    def test_get_bad_named_range(self):
         ws = Worksheet(self.wb)
         with pytest.raises(NamedRangeException):
             ws.get_named_range('bad_range')
 
-    def test_named_range_wrong_sheet(self):
+
+    def test_get_named_range_wrong_sheet(self):
         ws1 = Worksheet(self.wb)
         ws2 = Worksheet(self.wb)
         self.wb.create_named_range('wrong_sheet_range', ws1, 'C5')
         with pytest.raises(NamedRangeException):
             ws2.get_named_range('wrong_sheet_range')
 
-    def test_worksheet_range_offset(self):
-        ws = Worksheet(self.wb)
-        rows = ws.iter_rows('A1:C4', 1, 3)
-        rows = tuple(tuple(row) for row in rows)
-        assert len(rows) == 4
-        first_row = rows[0]
-        last_row = rows[-1]
-        assert len(first_row) == 3
-        assert first_row[0].coordinate == 'D2'
-        assert last_row[-1].coordinate == 'F5'
 
     def test_cell_alternate_coordinates(self):
         ws = Worksheet(self.wb)
@@ -346,8 +358,10 @@ class TestWorksheet(object):
     def test_getslice(self):
         ws = Worksheet(self.wb)
         cell_range = ws['A1':'B2']
-        assert isinstance(cell_range, tuple)
-        assert (cell_range) == ((ws['A1'], ws['B1']), (ws['A2'], ws['B2']))
+        assert tuple(cell_range) == (
+            (ws['A1'], ws['B1']),
+            (ws['A2'], ws['B2'])
+        )
 
 
     def test_freeze(self):

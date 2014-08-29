@@ -87,7 +87,7 @@ def test_oddly_shaped_named_ranges(datadir, count, range_name):
     datadir.chdir()
     wb = load_workbook('merge_range.xlsx')
     ws = wb.worksheets[0]
-    assert len(ws.range(range_name)) == count
+    assert len(ws.get_named_range(range_name)) == count
 
 
 def test_merged_cells_named_range(datadir):
@@ -95,7 +95,7 @@ def test_merged_cells_named_range(datadir):
 
     wb = load_workbook('merge_range.xlsx')
     ws = wb.worksheets[0]
-    cell = ws.range('TRAP_3')[0]
+    cell = ws.get_named_range('TRAP_3')[0]
     assert 'B15' == cell.coordinate
     assert 10 == cell.value
 
@@ -145,13 +145,13 @@ class TestNameRefersToValue:
 
 
     def test_worksheet_range(self):
-        range = self.ws.range("MyRef")
+        range = self.ws.get_named_range("MyRef")
         assert range.coordinate == "A1"
 
 
     def test_worksheet_range_error_on_value_range(self):
         with pytest.raises(NamedRangeException):
-            self.ws.range("MyValue")
+            self.ws.get_named_range("MyValue")
 
 
     def test_handles_scope(self):

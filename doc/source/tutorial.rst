@@ -108,13 +108,13 @@ Ranges of cells can be accessed using slicing ::
 
     >>> cell_range = ws['A1':'C2']
 
-You can also use the :func:`openpyxl.worksheet.Worksheet.range` method::
+You can also use the :func:`openpyxl.worksheet.Worksheet.iter_rows` method::
 
-    >>> ws.range('A1:C2')
+    >>> tuple(ws.iter_rows('A1:C2'))
     ((<Cell Sheet1.A1>, <Cell Sheet1.B1>, <Cell Sheet1.C1>),
      (<Cell Sheet1.A2>, <Cell Sheet1.B2>, <Cell Sheet1.C2>))
 
-    >>> for row in ws.range('A1:C2'):
+    >>> for row in ws.iter_rows('A1:C2'):
     ...        for cell in row:
     ...            print cell
     <Cell Sheet1.A1>
