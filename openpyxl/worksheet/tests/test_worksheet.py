@@ -389,6 +389,20 @@ class TestWorksheet(object):
            ['A4', 'B4', 'C4', 'D4'],
                                ]
 
+    def test_merged_cells_lookup(self):
+        ws = Worksheet(self.wb)
+        ws._merged_cells.append("A1:N50")
+        merged = ws.merged_cells
+        assert 'A1' in merged
+        assert 'N50' in merged
+        assert 'A51' not in merged
+        assert 'O1' not in merged
+
+
+    def test_merged_cell_ranges(self):
+        ws = Worksheet(self.wb)
+        assert ws.merged_cell_ranges == []
+
 
     def test_merge_range_string(self):
         ws = Worksheet(self.wb)

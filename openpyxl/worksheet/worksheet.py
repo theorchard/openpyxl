@@ -588,6 +588,22 @@ class Worksheet(object):
                 del self._cells[c]
 
 
+    @property
+    def merged_cells(self):
+        """Utility for checking whether a cell has been merged or not"""
+        cells = set()
+        for _range in self._merged_cells:
+            for row in self._cells_from_range(_range):
+                cells = cells.union(set(row))
+        return cells
+
+
+    @property
+    def merged_cell_ranges(self):
+        """Public attribute for which cells have been merged"""
+        return self._merged_cells
+
+
     def unmerge_cells(self, range_string=None, start_row=None, start_column=None, end_row=None, end_column=None):
         """ Remove merge on a cell range.  Range is a cell range (e.g. A1:E1) """
         if not range_string:
