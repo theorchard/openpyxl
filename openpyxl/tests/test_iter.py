@@ -8,7 +8,7 @@ import pytest
 from openpyxl.tests.helper import DATADIR
 from openpyxl.worksheet.iter_worksheet import read_dimension
 from openpyxl.reader.excel import load_workbook
-from openpyxl.compat import range, izip
+from openpyxl.compat import range, zip
 
 
 def test_open_many_sheets(datadir):
@@ -104,7 +104,7 @@ class TestText(TestWorksheet):
     def test_read_fast_integrated(self):
         wb = self._open_wb()
         ws = wb.get_sheet_by_name(name = self.sheet_name)
-        for row, expected_row in izip(ws.iter_rows(), self.expected):
+        for row, expected_row in zip(ws.iter_rows(), self.expected):
             row_values = [x.value for x in row]
             assert row_values == expected_row
 
@@ -122,7 +122,7 @@ class TestIntegers(TestWorksheet):
     def test_read_fast_integrated(self):
         wb = self._open_wb()
         ws = wb.get_sheet_by_name(name = self.sheet_name)
-        for row, expected_row in izip(ws.iter_rows(self.query_range), self.expected):
+        for row, expected_row in zip(ws.iter_rows(self.query_range), self.expected):
             row_values = [x.value for x in row]
             assert row_values == expected_row
 
@@ -136,7 +136,7 @@ class TestFloats(TestWorksheet):
     def test_read_fast_integrated(self):
         wb = self._open_wb()
         ws = wb.get_sheet_by_name(name = self.sheet_name)
-        for row, expected_row in izip(ws.iter_rows(self.query_range), self.expected):
+        for row, expected_row in zip(ws.iter_rows(self.query_range), self.expected):
             row_values = [x.value for x in row]
             assert row_values == expected_row
 

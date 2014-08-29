@@ -1,12 +1,9 @@
-try:
-    from itertools import ifilter
-except ImportError:
-    ifilter = filter
+from __future__ import absolute_import
 
 try:
-    from itertools import izip
+    from itertools import izip as zip
 except ImportError:
-    izip = zip
+    zip = zip
 
 try:
     range = xrange

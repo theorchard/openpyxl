@@ -1,7 +1,10 @@
 # Copyright (c) 2010-2014 openpyxl
 
-# tes imports
+# test imports
 import pytest
+
+# compatibility imports
+from openpyxl.compat import zip
 
 # package imports
 from openpyxl.workbook import Workbook
