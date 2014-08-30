@@ -170,16 +170,18 @@ class SharedStylesParser(object):
         for index, cell_xfs_node in enumerate(cell_xfs_nodes):
             _style = {}
 
-            number_format_id = int(cell_xfs_node.get('numFmtId'))
-            if number_format_id < 164:
-                format_code = builtin_formats.get(number_format_id, 'General')
-            else:
-                fmt_code = self.custom_num_formats.get(number_format_id)
-                if fmt_code is not None:
-                    format_code = fmt_code
+            num_fmt = cell_xfs_node.get('numFmtId')
+            if num_fmt is not None:
+                num_fmt = int(num_fmt)
+                if num_fmt < 164:
+                    format_code = builtin_formats.get(num_fmt, 'General')
                 else:
-                    raise MissingNumberFormat('%s' % number_format_id)
-            _style['number_format'] =format_code
+                    fmt_code = self.custom_num_formats.get(num_fmt)
+                    if fmt_code is not None:
+                        format_code = fmt_code
+                    else:
+                        raise MissingNumberFormat('%s' % num_fmt)
+                _style['number_format'] = format_code
 
             if bool(cell_xfs_node.get('applyAlignment')):
                 alignment = {}

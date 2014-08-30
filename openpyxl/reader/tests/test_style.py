@@ -83,6 +83,24 @@ def test_read_cell_style(datadir):
         assert len(style_properties) == 3
 
 
+def test_read_xf_no_number_format(datadir, StyleReader):
+    datadir.chdir()
+    with open("no_number_format.xml") as src:
+        reader = StyleReader(src.read())
+
+    from openpyxl.styles import Font
+    reader.font_list = [Font(), Font()]
+    reader.parse_cell_xfs()
+
+    styles = reader.shared_styles
+    assert len(styles) == 3
+    assert styles[0].number_format == 'General'
+    assert styles[1].number_format == 'General'
+    assert styles[2].number_format == 'mm-dd-yy'
+
+
+
+
 def test_read_simple_style_mappings(datadir):
     datadir.chdir()
     with open("simple-styles.xml") as content:
