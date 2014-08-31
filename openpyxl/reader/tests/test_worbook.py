@@ -151,3 +151,14 @@ def test_missing_content_type(datadir, DummyArchive):
         archive.writestr(ARC_WORKBOOK_RELS, src.read())
     sheets = list(detect_worksheets(archive))
     assert sheets == [{'path': 'xl/worksheets/sheet1.xml', 'title': 'Sheet 1'}]
+
+
+def test_strings_content_type(datadir, DummyArchive):
+    from ..workbook import detect_strings
+
+    archive = DummyArchive
+    datadir.chdir()
+    with open("sharedStrings2.xml") as src:
+        archive.writestr(ARC_CONTENT_TYPES, src.read())
+    path = detect_strings(archive)
+    assert path == 'xl/sharedStrings2.xml'

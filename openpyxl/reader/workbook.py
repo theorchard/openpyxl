@@ -121,6 +121,16 @@ def detect_worksheets(archive):
             yield rel
 
 
+def detect_strings(archive):
+    # not all archives use sharedStrings.xml
+    strings_mime = "application/vnd.openxmlformats-officedocument.spreadsheetml.sharedStrings+xml"
+    for part, mime in read_content_types(archive):
+        if mime == strings_mime:
+            if part.startswith("/"):
+                part = part[1:]
+            return part
+
+
 def read_named_ranges(xml_source, workbook):
     """Read named ranges, excluding poorly defined ranges."""
     sheetnames = set(sheet.title for sheet in workbook.worksheets)
