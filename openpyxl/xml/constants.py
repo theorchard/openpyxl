@@ -59,20 +59,19 @@ DCORE_NS = 'http://purl.org/dc/elements/1.1/'
 DCTERMS_NS = 'http://purl.org/dc/terms/'
 DCTERMS_PREFIX = 'dcterms'
 
-# Relations
-REL_NS = "http://schemas.openxmlformats.org/officeDocument/2006/relationships"
+# Document
+DOC_NS = "http://schemas.openxmlformats.org/officeDocument/2006/"
+REL_NS = DOC_NS + "relationships"
 COMMENTS_NS = REL_NS + "/comments"
 VML_NS =  REL_NS + "/vmlDrawing"
+VTYPES_NS = DOC_NS + 'docPropsVTypes'
+XPROPS_NS = DOC_NS + '/extended-properties'
 
 # Package
 PKG_NS = "http://schemas.openxmlformats.org/package/2006/"
 PKG_REL_NS = PKG_NS + "relationships"
 COREPROPS_NS = PKG_NS + 'metadata/core-properties'
 CONTYPES_NS = PKG_NS + 'content-types'
-
-# Document
-VTYPES_NS = 'http://schemas.openxmlformats.org/officeDocument/2006/docPropsVTypes'
-XPROPS_NS = 'http://schemas.openxmlformats.org/officeDocument/2006/extended-properties'
 
 XSI_NS = 'http://www.w3.org/2001/XMLSchema-instance'
 XML_NS = 'http://www.w3.org/XML/1998/namespace'
