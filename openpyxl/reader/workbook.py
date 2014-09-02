@@ -85,12 +85,13 @@ def read_rels(archive):
     for element in safe_iterator(tree, '{%s}Relationship' % PKG_REL_NS):
         rId = element.get('Id')
         pth = element.get("Target")
+        typ = element.get('Type')
         # normalise path
         if pth.startswith("/xl"):
             pth = pth.replace("/xl", "xl")
         elif not pth.startswith("xl") and not pth.startswith(".."):
             pth = "xl/" + pth
-        yield rId, {'path':pth}
+        yield rId, {'path':pth, 'type':typ}
 
 
 def read_sheets(archive):
