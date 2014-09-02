@@ -26,3 +26,13 @@ def test_read_external_ref(datadir):
         if pth['type'] == '%s/externalLink' % REL_NS:
             assert pth['path'] == 'xl/externalLinks/externalLink1.xml'
 
+
+def test_read_defined_names(datadir):
+    from openpyxl.workbook.external import parse_names
+    datadir.chdir()
+    with open("externalLink1.xml") as src:
+        xml = src.read()
+    names = tuple(parse_names(xml))
+    assert names[0].name == 'B2range'
+    assert names[0].refersTo == "='Sheet1'!$A$1:$A$10"
+
