@@ -50,27 +50,40 @@ ARC_STYLE = PACKAGE_XL + '/styles.xml'
 ARC_THEME = PACKAGE_THEME + '/theme1.xml'
 ARC_SHARED_STRINGS = PACKAGE_XL + '/sharedStrings.xml'
 ARC_CUSTOM_UI = 'customUI/customUI.xml'
-ARC_VBA = ('xl/vba', 'xl/activeX', 'xl/drawings', 'xl/media', 'xl/ctrlProps', 'xl/worksheets/_rels', 'customUI', 'xl/printerSettings')
+ARC_VBA = ('xl/vba', 'xl/activeX', 'xl/drawings', 'xl/media', 'xl/ctrlProps',
+           'xl/worksheets/_rels', 'customUI', 'xl/printerSettings')
 
-# namespaces
-CHART_NS = "http://schemas.openxmlformats.org/drawingml/2006/chart"
-DRAWING_NS = "http://schemas.openxmlformats.org/drawingml/2006/main"
-COMMENTS_NS = "http://schemas.openxmlformats.org/officeDocument/2006/relationships/comments"
-VML_NS = "http://schemas.openxmlformats.org/officeDocument/2006/relationships/vmlDrawing"
-SHEET_DRAWING_NS = "http://schemas.openxmlformats.org/drawingml/2006/spreadsheetDrawing"
-CHART_DRAWING_NS = "http://schemas.openxmlformats.org/drawingml/2006/chartDrawing"
-REL_NS = "http://schemas.openxmlformats.org/officeDocument/2006/relationships"
-PKG_REL_NS = 'http://schemas.openxmlformats.org/package/2006/relationships'
-VTYPES_NS = 'http://schemas.openxmlformats.org/officeDocument/2006/docPropsVTypes'
-XPROPS_NS = 'http://schemas.openxmlformats.org/officeDocument/2006/extended-properties'
-COREPROPS_NS = 'http://schemas.openxmlformats.org/package/2006/metadata/core-properties'
-CONTYPES_NS = 'http://schemas.openxmlformats.org/package/2006/content-types'
+## namespaces
+# Dublin Core
 DCORE_NS = 'http://purl.org/dc/elements/1.1/'
 DCTERMS_NS = 'http://purl.org/dc/terms/'
 DCTERMS_PREFIX = 'dcterms'
+
+# Relations
+REL_NS = "http://schemas.openxmlformats.org/officeDocument/2006/relationships"
+COMMENTS_NS = REL_NS + "/comments"
+VML_NS =  REL_NS + "/vmlDrawing"
+
+# Package
+PKG_NS = "http://schemas.openxmlformats.org/package/2006/"
+PKG_REL_NS = PKG_NS + "relationships"
+COREPROPS_NS = PKG_NS + 'metadata/core-properties'
+CONTYPES_NS = PKG_NS + 'content-types'
+
+# Document
+VTYPES_NS = 'http://schemas.openxmlformats.org/officeDocument/2006/docPropsVTypes'
+XPROPS_NS = 'http://schemas.openxmlformats.org/officeDocument/2006/extended-properties'
+
 XSI_NS = 'http://www.w3.org/2001/XMLSchema-instance'
 XML_NS = 'http://www.w3.org/XML/1998/namespace'
 SHEET_MAIN_NS = 'http://schemas.openxmlformats.org/spreadsheetml/2006/main'
+
+# Drawing
+CHART_NS = "http://schemas.openxmlformats.org/drawingml/2006/chart"
+DRAWING_NS = "http://schemas.openxmlformats.org/drawingml/2006/main"
+SHEET_DRAWING_NS = "http://schemas.openxmlformats.org/drawingml/2006/spreadsheetDrawing"
+CHART_DRAWING_NS = "http://schemas.openxmlformats.org/drawingml/2006/chartDrawing"
+
 CUSTOMUI_NS = 'http://schemas.microsoft.com/office/2006/relationships/ui/extensibility'
 
 
