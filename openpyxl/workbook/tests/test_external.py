@@ -27,6 +27,15 @@ def test_read_external_ref(datadir):
             assert pth['path'] == 'xl/externalLinks/externalLink1.xml'
 
 
+def test_read_external_link(datadir):
+    from openpyxl.workbook.external import parse_books
+    datadir.chdir()
+    with open("externalLink1.xml.rels") as src:
+        xml = src.read()
+    books = tuple(parse_books(xml))
+    assert books[0].Id == 'rId1'
+
+
 def test_read_defined_names(datadir):
     from openpyxl.workbook.external import parse_names
     datadir.chdir()

@@ -2,22 +2,11 @@ from __future__ import absolute_import
 # Copyright (c) 2010-2014 openpyxl
 
 from openpyxl.collections import IndexedList
-from openpyxl.descriptors import String, Strict
-from openpyxl.xml.constants import SHEET_MAIN_NS
+from openpyxl.descriptors import String, Strict, Sequence
+from openpyxl.xml.constants import SHEET_MAIN_NS, REL_NS, PKG_REL_NS
 from openpyxl.xml.functions import fromstring, safe_iterator
 
 """Manage links to external Workbooks"""
-
-
-class ExternalRelationship(object):
-
-    """
-    Map the relationship of one workbook to another
-    """
-
-    def __init__(self, Target, TargetMode):
-        self.Target = Target
-        self.TargetMode = TargetMode
 
 
 class ExternalRange(Strict):
@@ -38,9 +27,36 @@ class ExternalRange(Strict):
         self.sheetId = sheetId
 
 
+class ExternalBook(Strict):
+
+    """
+    Map the relationship of one workbook to another
+    """
+
+    Id = String()
+    Type = String()
+    Target = String()
+    TargetMode = String()
+    links = Sequence(type=ExternalRange)
+
+    def __init__(self, Id, Type, Target, TargetMode):
+        self.Id = Id
+        self.Type = Type
+        self.Target = Target
+        self.TargetMode = TargetMode
+
+
+def parse_books(xml):
+    tree = fromstring(xml)
+    rels = tree.findall('{%s}Relationship' % PKG_REL_NS)
+    for r in rels:
+        yield ExternalBook(**r.attrib)
+
+
+
 def parse_names(xml):
     tree = fromstring(xml)
     book = tree.find('{%s}externalBook' % SHEET_MAIN_NS)
     names = book.find('{%s}definedNames' % SHEET_MAIN_NS)
-    for __n in safe_iterator(names, '{%s}definedName' % SHEET_MAIN_NS):
-        yield ExternalRange(**dict(__n.attrib))
+    for n in safe_iterator(names, '{%s}definedName' % SHEET_MAIN_NS):
+        yield ExternalRange(**n.attrib)
