@@ -4,15 +4,15 @@ from __future__ import absolute_import
 """Serialise external links"""
 
 
-from openpyxl.xml.constants import SHEET_MAIN_NS, PKG_REL_NS
+from openpyxl.xml.constants import SHEET_MAIN_NS, REL_NS
 from openpyxl.xml.functions import Element, SubElement
 
 
-def write_external_link(book, links):
+def write_external_link(links):
     """Serialise links to ranges in a single external worbook"""
-    tree = Element("{%s}externalLink" % SHEET_MAIN_NS)
-    tree.append(Element("{%s}externalBook", {'{%s}id' % PKG_REL_NS:'rId1'}))
-    external_ranges = SubElement(tree, "definedNames")
+    root = Element("{%s}externalLink" % SHEET_MAIN_NS)
+    book =  SubElement(root, "{%s}externalBook" % SHEET_MAIN_NS, {'{%s}id' % REL_NS:'rId1'})
+    external_ranges = SubElement(book, "{%s}definedNames" % SHEET_MAIN_NS)
     for l in links:
-        external_ranges.append(Element("{%s}definedName"), dict(l))
-
+        external_ranges.append(Element("{%s}definedName" % SHEET_MAIN_NS, dict(l)))
+    return root

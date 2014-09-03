@@ -4,6 +4,7 @@ from io import BytesIO
 from zipfile import ZipFile
 
 import pytest
+from openpyxl.tests.helper import compare_xml, get_xml
 
 from openpyxl.reader.workbook import read_rels
 from openpyxl.xml.constants import (
@@ -12,6 +13,7 @@ from openpyxl.xml.constants import (
     PKG_REL_NS,
     REL_NS,
 )
+from openpyxl.xml.functions import tostring
 
 
 def test_read_external_ref(datadir):
@@ -59,3 +61,24 @@ def test_dict_external_range():
     rng = ExternalRange("something_special", "='Sheet1'!$A$1:$B$2")
     assert dict(rng) == {'name':'something_special', 'refersTo':"='Sheet1'!$A$1:$B$2"}
 
+
+def test_write_external_link(datadir):
+    from openpyxl.workbook.external import ExternalRange
+    from openpyxl.workbook.external.writer import write_external_link
+    link1 = ExternalRange('r1', 'over_there!$A$1:$B$2')
+    link2 = ExternalRange('r2', 'somewhere_else!$C$10:$D$12')
+    links = [link1, link2]
+    el = write_external_link(links)
+    xml = get_xml(el)
+    expected = """
+    <externalLink xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main">
+      <externalBook xmlns:r="http://schemas.openxmlformats.org/officeDocument/2006/relationships" r:id="rId1">
+        <definedNames>
+          <definedName name="r1" refersTo="over_there!$A$1:$B$2"/>
+          <definedName name="r2" refersTo="somewhere_else!$C$10:$D$12"/>
+        </definedNames>
+      </externalBook>
+    </externalLink>
+    """
+    diff = compare_xml(xml, expected)
+    assert diff is None, diff
