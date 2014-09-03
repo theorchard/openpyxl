@@ -27,6 +27,13 @@ class ExternalRange(Strict):
         self.sheetId = sheetId
 
 
+    def __iter__(self):
+        for attr in ('name', 'refersTo', 'sheetId'):
+            value = getattr(self, name, None)
+            if value is not None:
+                yield attr, value
+
+
 class ExternalBook(Strict):
 
     """
@@ -44,6 +51,11 @@ class ExternalBook(Strict):
         self.Type = Type
         self.Target = Target
         self.TargetMode = TargetMode
+
+    def __iter__(self):
+        for attr in ('Id', 'Type', 'TargetMode', 'Target'):
+            value = getattr(self, attr)
+            yield attr, value
 
 
 def parse_books(xml):
