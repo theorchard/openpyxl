@@ -36,12 +36,12 @@ def test_read_external_link(datadir):
     assert books[0].Id == 'rId1'
 
 
-def test_read_defined_names(datadir):
-    from openpyxl.workbook.external import parse_names
+def test_read_external_ranges(datadir):
+    from openpyxl.workbook.external import parse_ranges
     datadir.chdir()
     with open("externalLink1.xml") as src:
         xml = src.read()
-    names = tuple(parse_names(xml))
+    names = tuple(parse_ranges(xml))
     assert names[0].name == 'B2range'
     assert names[0].refersTo == "='Sheet1'!$A$1:$A$10"
 

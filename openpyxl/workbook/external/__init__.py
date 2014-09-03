@@ -62,7 +62,7 @@ def parse_books(xml):
 
 
 
-def parse_names(xml):
+def parse_ranges(xml):
     tree = fromstring(xml)
     book = tree.find('{%s}externalBook' % SHEET_MAIN_NS)
     names = book.find('{%s}definedNames' % SHEET_MAIN_NS)
