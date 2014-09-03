@@ -52,3 +52,10 @@ def test_dict_external_book():
     assert dict(book) == {'Id':'rId1', 'Target':'book1.xlsx',
                           'TargetMode':'External',
                           'Type':'http://schemas.openxmlformats.org/officeDocument/2006/relationships/externalLinkPath'}
+
+
+def test_dict_external_range():
+    from openpyxl.workbook.external import ExternalRange
+    rng = ExternalRange("something_special", "='Sheet1'!$A$1:$B$2")
+    assert dict(rng) == {'name':'something_special', 'refersTo':"='Sheet1'!$A$1:$B$2"}
+

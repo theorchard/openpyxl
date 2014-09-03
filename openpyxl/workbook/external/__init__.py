@@ -49,7 +49,7 @@ class ExternalRange(Strict):
 
     def __iter__(self):
         for attr in ('name', 'refersTo', 'sheetId'):
-            value = getattr(self, name, None)
+            value = getattr(self, attr, None)
             if value is not None:
                 yield attr, value
 
