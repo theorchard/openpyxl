@@ -45,3 +45,10 @@ def test_read_defined_names(datadir):
     assert names[0].name == 'B2range'
     assert names[0].refersTo == "='Sheet1'!$A$1:$A$10"
 
+
+def test_dict_external_book():
+    from openpyxl.workbook.external import ExternalBook
+    book = ExternalBook('rId1', "book1.xlsx")
+    assert dict(book) == {'Id':'rId1', 'Target':'book1.xlsx',
+                          'TargetMode':'External',
+                          'Type':'http://schemas.openxmlformats.org/officeDocument/2006/relationships/externalLinkPath'}

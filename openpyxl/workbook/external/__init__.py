@@ -15,15 +15,13 @@ class ExternalBook(Strict):
     """
 
     Id = String()
-    Type = String()
+    Type = "http://schemas.openxmlformats.org/officeDocument/2006/relationships/externalLinkPath"
+    TargetMode = "External"
     Target = String()
-    TargetMode = String()
 
-    def __init__(self, Id, Type, Target, TargetMode):
+    def __init__(self, Id, Target, TargetMode=None, Type=None):
         self.Id = Id
-        self.Type = Type
         self.Target = Target
-        self.TargetMode = TargetMode
 
     def __iter__(self):
         for attr in ('Id', 'Type', 'TargetMode', 'Target'):
