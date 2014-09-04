@@ -65,7 +65,7 @@ REL_NS = DOC_NS + "relationships"
 COMMENTS_NS = REL_NS + "/comments"
 VML_NS =  REL_NS + "/vmlDrawing"
 VTYPES_NS = DOC_NS + 'docPropsVTypes'
-XPROPS_NS = DOC_NS + '/extended-properties'
+XPROPS_NS = DOC_NS + 'extended-properties'
 
 # Package
 PKG_NS = "http://schemas.openxmlformats.org/package/2006/"
