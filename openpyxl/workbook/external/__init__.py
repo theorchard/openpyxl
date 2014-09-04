@@ -22,6 +22,7 @@ class ExternalBook(Strict):
     def __init__(self, Id, Target, TargetMode=None, Type=None):
         self.Id = Id
         self.Target = Target
+        links = []
 
     def __iter__(self):
         for attr in ('Id', 'Type', 'TargetMode', 'Target'):
@@ -67,3 +68,16 @@ def parse_ranges(xml):
     names = book.find('{%s}definedNames' % SHEET_MAIN_NS)
     for n in safe_iterator(names, '{%s}definedName' % SHEET_MAIN_NS):
         yield ExternalRange(**n.attrib)
+
+
+def parse_external_links(rels, archive):
+    for rId, d in rels:
+        if d['type'] == EXTERNAL_LINK:
+            pth = os.path.split()
+            f_name = pth[-1]
+            dir_name = pth[:-1]
+            book_path = os.path.join(dir_name, "_rels", f_name + ".rels")
+            xml = archive.read(book_path)
+            Book = parse_books(xml)
+            Book.links = list(parse_ranges(d['path']))
+            yield Book

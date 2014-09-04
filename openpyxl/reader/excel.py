@@ -33,6 +33,7 @@ from openpyxl.xml.constants import (
 )
 
 from openpyxl.workbook import Workbook, DocumentProperties
+from openpyxl.workbook.external import parse_external_links
 from openpyxl.reader.strings import read_string_table
 from openpyxl.reader.style import read_style_table
 from openpyxl.reader.workbook import (
@@ -41,6 +42,7 @@ from openpyxl.reader.workbook import (
     read_properties_core,
     read_excel_base_date,
     detect_worksheets,
+    read_rels,
 )
 from openpyxl.reader.worksheet import read_worksheet
 from openpyxl.reader.comments import read_comments, get_comments_file
@@ -185,6 +187,7 @@ def _load_workbook(wb, archive, filename, read_only, keep_vba):
 
     # what content types do we have?
     cts = dict(read_content_types(archive))
+    rels = dict
 
     strings_path = cts.get(SHARED_STRINGS)
     if strings_path is not None:
@@ -237,4 +240,5 @@ def _load_workbook(wb, archive, filename, read_only, keep_vba):
     wb._named_ranges = list(read_named_ranges(archive.read(ARC_WORKBOOK), wb))
 
     if EXTERNAL_LINK in cts:
-        pass
+        rels = read_rels(archive)
+        wb._external_links = list(parse_external_links(rels, archive))

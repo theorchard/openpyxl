@@ -71,6 +71,7 @@ class Workbook(object):
         self.worksheets = []
         self._active_sheet_index = 0
         self._named_ranges = []
+        self._external_links = []
         self.properties = DocumentProperties()
         self.style = Style()
         self.security = DocumentSecurity()
