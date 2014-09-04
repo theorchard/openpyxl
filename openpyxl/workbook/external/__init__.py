@@ -61,7 +61,6 @@ def parse_books(xml):
         yield ExternalBook(**r.attrib)
 
 
-
 def parse_ranges(xml):
     tree = fromstring(xml)
     book = tree.find('{%s}externalBook' % SHEET_MAIN_NS)
