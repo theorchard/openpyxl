@@ -289,7 +289,7 @@ def write_workbook(workbook):
     return tostring(root)
 
 
-_rel = partial(Element, '{%s}Relationship' % PKG_REL_NS)
+RelationElement = partial(Element, '{%s}Relationship' % PKG_REL_NS)
 
 
 def write_workbook_rels(workbook):
@@ -299,26 +299,34 @@ def write_workbook_rels(workbook):
     for i, _ in enumerate(workbook.worksheets, 1):
         attrs = {'Id': 'rId%d' % i, 'Target': 'worksheets/sheet%s.xml' % i,
                  'Type': '%s/worksheet' % REL_NS}
-        root.append(_rel(attrs))
+        root.append(RelationElement(attrs))
 
     i += 1
     attrs = {'Id': 'rId%d' % i, 'Target': 'sharedStrings.xml',
              'Type': '%s/sharedStrings' % REL_NS}
-    root.append(_rel(attrs))
+    root.append(RelationElement(attrs))
 
     i += 1
     attrs = {'Id': 'rId%d' % i, 'Target': 'styles.xml',
              'Type': '%s/styles' % REL_NS}
-    root.append(_rel(attrs))
+    root.append(RelationElement(attrs))
 
-    i +=1
+    i += 1
     attrs = {'Id': 'rId%d' % i, 'Target': 'theme/theme1.xml',
              'Type': '%s/theme' % REL_NS}
-    root.append(_rel(attrs))
+    root.append(RelationElement(attrs))
 
     if workbook.vba_archive:
-        i +=1
+        i += 1
         attrs = {'Id': 'rId%d' % i, 'Target': 'vbaProject.bin',
                  'Type': 'http://schemas.microsoft.com/office/2006/relationships/vbaProject'}
-        root.append(_rel(attrs))
+        root.append(RelationElement(attrs))
+
+    external_links = wb._external_links
+    if external_links:
+        for idx, link in enumerate(external_links, i+1):
+            attrs = {'Id':'rId%' % idx, 'Target':'externalLinks/externalLink%d' % idx,
+                     'Type':'%s/externalLink' % REL_NS}
+            root.append(RelationElement(attrs))
+
     return tostring(root)
