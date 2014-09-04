@@ -97,3 +97,10 @@ def test_read_archive(datadir):
     expected = ["='Sheet1'!$A$1:$A$10", ]
     for link, exp in zip(book.links, expected):
         assert link.refersTo == exp
+
+
+def test_load_workbook(datadir):
+    datadir.chdir()
+    from openpyxl import load_workbook
+    wb = load_workbook('book1.xlsx')
+    assert len(wb._external_links) == 1

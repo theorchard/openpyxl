@@ -33,7 +33,7 @@ from openpyxl.xml.constants import (
 )
 
 from openpyxl.workbook import Workbook, DocumentProperties
-from openpyxl.workbook.external import parse_external_links
+from openpyxl.workbook.external import detect_external_links
 from openpyxl.reader.strings import read_string_table
 from openpyxl.reader.style import read_style_table
 from openpyxl.reader.workbook import (
@@ -241,4 +241,4 @@ def _load_workbook(wb, archive, filename, read_only, keep_vba):
 
     if EXTERNAL_LINK in cts:
         rels = read_rels(archive)
-        wb._external_links = list(parse_external_links(rels, archive))
+        wb._external_links = list(detect_external_links(rels, archive))
