@@ -75,7 +75,7 @@ def read_content_types(archive):
     root = fromstring(xml_source)
     contents_root = root.findall('{%s}Override' % CONTYPES_NS)
     for type in contents_root:
-        yield type.get('PartName'), type.get('ContentType')
+        yield type.get('ContentType'), type.get('PartName')
 
 
 def read_rels(archive):
@@ -110,7 +110,7 @@ def detect_worksheets(archive):
     # workbook_rels has a list of relIds and paths but no titles
     # rels = {'id':{'title':'', 'path':''} }
     content_types = read_content_types(archive)
-    valid_sheets = dict((path, ct) for path, ct in content_types if ct == VALID_WORKSHEET)
+    valid_sheets = dict((path, ct) for ct, path in content_types if ct == VALID_WORKSHEET)
     rels = dict(read_rels(archive))
     for rId, title, state in read_sheets(archive):
         rel = rels[rId]
@@ -125,7 +125,7 @@ def detect_worksheets(archive):
 def detect_strings(archive):
     # not all archives use sharedStrings.xml
     strings_mime = "application/vnd.openxmlformats-officedocument.spreadsheetml.sharedStrings+xml"
-    for part, mime in read_content_types(archive):
+    for mime, part in read_content_types(archive):
         if mime == strings_mime:
             if part.startswith("/"):
                 part = part[1:]

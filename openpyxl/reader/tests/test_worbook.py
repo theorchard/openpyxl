@@ -122,20 +122,20 @@ def test_read_content_types(datadir, DummyArchive):
         archive.writestr(ARC_CONTENT_TYPES, src.read())
 
     assert list(read_content_types(archive)) == [
-    ('/xl/workbook.xml', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet.main+xml'),
-    ('/xl/worksheets/sheet1.xml', 'application/vnd.openxmlformats-officedocument.spreadsheetml.worksheet+xml'),
-    ('/xl/chartsheets/sheet1.xml', 'application/vnd.openxmlformats-officedocument.spreadsheetml.chartsheet+xml'),
-    ('/xl/worksheets/sheet2.xml', 'application/vnd.openxmlformats-officedocument.spreadsheetml.worksheet+xml'),
-    ('/xl/theme/theme1.xml', 'application/vnd.openxmlformats-officedocument.theme+xml'),
-    ('/xl/styles.xml', 'application/vnd.openxmlformats-officedocument.spreadsheetml.styles+xml'),
-    ('/xl/sharedStrings.xml', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sharedStrings+xml'),
-    ('/xl/drawings/drawing1.xml', 'application/vnd.openxmlformats-officedocument.drawing+xml'),
-    ('/xl/charts/chart1.xml', 'application/vnd.openxmlformats-officedocument.drawingml.chart+xml'),
-    ('/xl/drawings/drawing2.xml', 'application/vnd.openxmlformats-officedocument.drawing+xml'),
-    ('/xl/charts/chart2.xml', 'application/vnd.openxmlformats-officedocument.drawingml.chart+xml'),
-    ('/xl/calcChain.xml', 'application/vnd.openxmlformats-officedocument.spreadsheetml.calcChain+xml'),
-    ('/docProps/core.xml', 'application/vnd.openxmlformats-package.core-properties+xml'),
-    ('/docProps/app.xml', 'application/vnd.openxmlformats-officedocument.extended-properties+xml')
+    ('application/vnd.openxmlformats-officedocument.spreadsheetml.sheet.main+xml', '/xl/workbook.xml'),
+    ('application/vnd.openxmlformats-officedocument.spreadsheetml.worksheet+xml', '/xl/worksheets/sheet1.xml'),
+    ('application/vnd.openxmlformats-officedocument.spreadsheetml.chartsheet+xml', '/xl/chartsheets/sheet1.xml'),
+    ('application/vnd.openxmlformats-officedocument.spreadsheetml.worksheet+xml', '/xl/worksheets/sheet2.xml',),
+    ('application/vnd.openxmlformats-officedocument.theme+xml', '/xl/theme/theme1.xml'),
+    ('application/vnd.openxmlformats-officedocument.spreadsheetml.styles+xml', '/xl/styles.xml'),
+    ('application/vnd.openxmlformats-officedocument.spreadsheetml.sharedStrings+xml', '/xl/sharedStrings.xml'),
+    ('application/vnd.openxmlformats-officedocument.drawing+xml', '/xl/drawings/drawing1.xml'),
+    ('application/vnd.openxmlformats-officedocument.drawingml.chart+xml','/xl/charts/chart1.xml'),
+    ('application/vnd.openxmlformats-officedocument.drawing+xml', '/xl/drawings/drawing2.xml'),
+    ('application/vnd.openxmlformats-officedocument.drawingml.chart+xml', '/xl/charts/chart2.xml'),
+    ('application/vnd.openxmlformats-officedocument.spreadsheetml.calcChain+xml', '/xl/calcChain.xml'),
+    ('application/vnd.openxmlformats-package.core-properties+xml', '/docProps/core.xml'),
+    ('application/vnd.openxmlformats-officedocument.extended-properties+xml', '/docProps/app.xml')
     ]
 
 
