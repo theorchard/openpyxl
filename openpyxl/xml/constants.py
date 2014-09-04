@@ -66,7 +66,7 @@ COMMENTS_NS = REL_NS + "/comments"
 VML_NS =  REL_NS + "/vmlDrawing"
 VTYPES_NS = DOC_NS + 'docPropsVTypes'
 XPROPS_NS = DOC_NS + 'extended-properties'
-EXTERNAL_LINK = REL_NS + "/externalLink"
+EXTERNAL_LINK_NS = REL_NS + "/externalLink"
 
 # Package
 PKG_NS = "http://schemas.openxmlformats.org/package/2006/"

@@ -1,8 +1,15 @@
 from __future__ import absolute_import
 # Copyright (c) 2010-2014 openpyxl
 
+import os.path
+
 from openpyxl.descriptors import String, Strict
-from openpyxl.xml.constants import SHEET_MAIN_NS, REL_NS, PKG_REL_NS
+from openpyxl.xml.constants import (
+    SHEET_MAIN_NS,
+    REL_NS,
+    PKG_REL_NS,
+    EXTERNAL_LINK_NS,
+)
 from openpyxl.xml.functions import fromstring, safe_iterator
 
 """Manage links to external Workbooks"""
@@ -59,7 +66,7 @@ def parse_books(xml):
     tree = fromstring(xml)
     rels = tree.findall('{%s}Relationship' % PKG_REL_NS)
     for r in rels:
-        yield ExternalBook(**r.attrib)
+        return ExternalBook(**r.attrib)
 
 
 def parse_ranges(xml):
@@ -70,14 +77,16 @@ def parse_ranges(xml):
         yield ExternalRange(**n.attrib)
 
 
-def parse_external_links(rels, archive):
+def detect_external_links(rels, archive):
     for rId, d in rels:
-        if d['type'] == EXTERNAL_LINK:
-            pth = os.path.split()
+        if d['type'] == EXTERNAL_LINK_NS:
+            pth = os.path.split(d['path'])
             f_name = pth[-1]
-            dir_name = pth[:-1]
+            dir_name = "/".join(pth[:-1])
             book_path = os.path.join(dir_name, "_rels", f_name + ".rels")
-            xml = archive.read(book_path)
-            Book = parse_books(xml)
-            Book.links = list(parse_ranges(d['path']))
+            book_xml = archive.read(book_path)
+            Book = parse_books(book_xml)
+
+            range_xml = archive.read(d['path'])
+            Book.links = list(range_xml)
             yield Book

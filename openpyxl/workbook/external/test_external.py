@@ -34,8 +34,8 @@ def test_read_external_link(datadir):
     datadir.chdir()
     with open("externalLink1.xml.rels") as src:
         xml = src.read()
-    books = tuple(parse_books(xml))
-    assert books[0].Id == 'rId1'
+    book = parse_books(xml)
+    assert book.Id == 'rId1'
 
 
 def test_read_external_ranges(datadir):
@@ -82,3 +82,14 @@ def test_write_external_link(datadir):
     """
     diff = compare_xml(xml, expected)
     assert diff is None, diff
+
+
+def test_read_archive(datadir):
+    from openpyxl.reader.workbook import read_rels
+    from openpyxl.workbook.external import detect_external_links
+    datadir.chdir()
+    archive = ZipFile("book1.xlsx")
+    rels = read_rels(archive)
+    links = detect_external_links(rels, archive)
+    links = tuple(links)
+    assert len(links) == 1
