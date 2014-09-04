@@ -24,6 +24,8 @@ from __future__ import absolute_import
 
 """Write the workbook global settings to the archive."""
 
+from functools import partial
+
 # package imports
 
 from openpyxl import LXML
@@ -287,25 +289,36 @@ def write_workbook(workbook):
     return tostring(root)
 
 
+_rel = partial(Element, '{%s}Relationship' % PKG_REL_NS)
+
+
 def write_workbook_rels(workbook):
     """Write the workbook relationships xml."""
     root = Element('{%s}Relationships' % PKG_REL_NS)
-    for i in range(1, len(workbook.worksheets) + 1):
-        SubElement(root, '{%s}Relationship' % PKG_REL_NS,
-                   {'Id': 'rId%d' % i, 'Target': 'worksheets/sheet%s.xml' % i,
-                    'Type': '%s/worksheet' % REL_NS})
-    rid = len(workbook.worksheets) + 1
-    SubElement(root, '{%s}Relationship' % PKG_REL_NS,
-               {'Id': 'rId%d' % rid, 'Target': 'sharedStrings.xml',
-                'Type': '%s/sharedStrings' % REL_NS})
-    SubElement(root, '{%s}Relationship' % PKG_REL_NS,
-               {'Id': 'rId%d' % (rid + 1), 'Target': 'styles.xml',
-                'Type': '%s/styles' % REL_NS})
-    SubElement(root, '{%s}Relationship' % PKG_REL_NS,
-               {'Id': 'rId%d' % (rid + 2), 'Target': 'theme/theme1.xml',
-                'Type': '%s/theme' % REL_NS})
+
+    for i, _ in enumerate(workbook.worksheets, 1):
+        attrs = {'Id': 'rId%d' % i, 'Target': 'worksheets/sheet%s.xml' % i,
+                 'Type': '%s/worksheet' % REL_NS}
+        root.append(_rel(attrs))
+
+    i += 1
+    attrs = {'Id': 'rId%d' % i, 'Target': 'sharedStrings.xml',
+             'Type': '%s/sharedStrings' % REL_NS}
+    root.append(_rel(attrs))
+
+    i += 1
+    attrs = {'Id': 'rId%d' % i, 'Target': 'styles.xml',
+             'Type': '%s/styles' % REL_NS}
+    root.append(_rel(attrs))
+
+    i +=1
+    attrs = {'Id': 'rId%d' % i, 'Target': 'theme/theme1.xml',
+             'Type': '%s/theme' % REL_NS}
+    root.append(_rel(attrs))
+
     if workbook.vba_archive:
-        SubElement(root, '{%s}Relationship' % PKG_REL_NS,
-                   {'Id': 'rId%d' % (rid + 3), 'Target': 'vbaProject.bin',
-                    'Type': 'http://schemas.microsoft.com/office/2006/relationships/vbaProject'})
+        i +=1
+        attrs = {'Id': 'rId%d' % i, 'Target': 'vbaProject.bin',
+                 'Type': 'http://schemas.microsoft.com/office/2006/relationships/vbaProject'}
+        root.append(_rel(attrs))
     return tostring(root)
