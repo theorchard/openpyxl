@@ -90,6 +90,10 @@ def test_read_archive(datadir):
     datadir.chdir()
     archive = ZipFile("book1.xlsx")
     rels = read_rels(archive)
-    links = detect_external_links(rels, archive)
-    links = tuple(links)
-    assert len(links) == 1
+    books = detect_external_links(rels, archive)
+    book = tuple(books)[0]
+    assert book.Target == "book2.xlsx"
+
+    expected = ["='Sheet1'!$A$1:$A$10", ]
+    for link, exp in zip(book.links, expected):
+        assert link.refersTo == exp

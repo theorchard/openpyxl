@@ -88,5 +88,5 @@ def detect_external_links(rels, archive):
             Book = parse_books(book_xml)
 
             range_xml = archive.read(d['path'])
-            Book.links = list(range_xml)
+            Book.links = list(parse_ranges(range_xml))
             yield Book
