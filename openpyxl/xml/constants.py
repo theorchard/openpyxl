@@ -98,5 +98,6 @@ NAMESPACES = {
 }
 
 ## Mime types
-SHARED_STRINGS = "application/vnd.openxmlformats-officedocument.spreadsheetml.sharedStrings+xml"
-
+SPREADSHEET = "application/vnd.openxmlformats-officedocument.spreadsheetml"
+SHARED_STRINGS = SPREADSHEET + ".sharedStrings+xml"
+EXTERNAL_LINK = SPREADSHEET + ".externalLink+xml"
