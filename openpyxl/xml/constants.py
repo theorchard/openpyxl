@@ -96,3 +96,7 @@ NAMESPACES = {
     'xml': XML_NS,
     'main': SHEET_MAIN_NS
 }
+
+## Mime types
+SHARED_STRINGS = "application/vnd.openxmlformats-officedocument.spreadsheetml.sharedStrings+xml"
+

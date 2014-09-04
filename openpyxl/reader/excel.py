@@ -28,17 +28,18 @@ from openpyxl.xml.constants import (
     ARC_WORKBOOK,
     ARC_STYLE,
     ARC_THEME,
+    SHARED_STRINGS,
 )
 
 from openpyxl.workbook import Workbook, DocumentProperties
 from openpyxl.reader.strings import read_string_table
 from openpyxl.reader.style import read_style_table
 from openpyxl.reader.workbook import (
+    read_content_types,
     read_named_ranges,
     read_properties_core,
     read_excel_base_date,
     detect_worksheets,
-    detect_strings,
 )
 from openpyxl.reader.worksheet import read_worksheet
 from openpyxl.reader.comments import read_comments, get_comments_file
@@ -181,8 +182,13 @@ def _load_workbook(wb, archive, filename, read_only, keep_vba):
         wb.properties = DocumentProperties()
     wb._read_workbook_settings(archive.read(ARC_WORKBOOK))
 
-    strings_path = detect_strings(archive)
+    # what content types do we have?
+    cts = dict(read_content_types(archive))
+
+    strings_path = cts.get(SHARED_STRINGS)
     if strings_path is not None:
+        if strings_path.startswith("/"):
+            strings_path = strings_path[1:]
         shared_strings = read_string_table(archive.read(strings_path))
     else:
         shared_strings = []
