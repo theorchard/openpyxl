@@ -52,7 +52,8 @@ from openpyxl.xml.constants import (
     REL_NS,
     ARC_CUSTOM_UI,
     ARC_CONTENT_TYPES,
-    ARC_ROOT_RELS
+    ARC_ROOT_RELS,
+    EXTERNAL_LINK,
 )
 from openpyxl.xml.functions import tostring, fromstring
 from openpyxl.date_time import datetime_to_W3CDTF
@@ -160,6 +161,11 @@ def write_content_types(workbook):
                 {'PartName': '/xl/comments%d.xml' % comments_id,
                  'ContentType': 'application/vnd.openxmlformats-officedocument.spreadsheetml.comments+xml'})
             comments_id += 1
+
+    for idx, _ in enumerate(workbook._external_links, 1):
+        el = Element('{%s}Override' % CONTYPES_NS,
+                     {'PartName':'/xl/externalLinks/externalLink{0}.xml'.format(idx),
+                      'ContentType': EXTERNAL_LINK})
 
     return tostring(root)
 
