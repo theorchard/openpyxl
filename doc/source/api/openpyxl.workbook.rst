@@ -1,6 +1,13 @@
 openpyxl.workbook package
 =========================
 
+Subpackages
+-----------
+
+.. toctree::
+
+    openpyxl.workbook.external
+
 Submodules
 ----------
 
