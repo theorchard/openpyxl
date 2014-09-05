@@ -257,7 +257,7 @@ def write_workbook(workbook):
             sheet_node.set('state', sheet.sheet_state)
 
     # external references
-    if getattr(workbook, '_external_references', []):
+    if getattr(workbook, '_external_links', []):
         external_references = SubElement(root, '{%s}externalReferences' % SHEET_MAIN_NS)
         # need to match a counter with a workbook's relations
         counter = len(workbook.worksheets) + 3 # strings, styles, theme
