@@ -340,8 +340,8 @@ def write_workbook_rels(workbook):
 
     external_links = workbook._external_links
     if external_links:
-        for idx, link in enumerate(external_links, i+1):
-            attrs = {'Id':'rId%d' % idx, 'Target':'externalLinks/externalLink%d' % idx,
+        for idx, link in enumerate(external_links, 1):
+            attrs = {'Id':'rId%d' % (i + idx), 'Target':'externalLinks/externalLink%d.xml' % idx,
                      'Type':'%s/externalLink' % REL_NS}
             root.append(RelationElement(attrs))
 
