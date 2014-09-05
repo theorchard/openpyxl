@@ -166,6 +166,7 @@ def write_content_types(workbook):
         el = Element('{%s}Override' % CONTYPES_NS,
                      {'PartName':'/xl/externalLinks/externalLink{0}.xml'.format(idx),
                       'ContentType': EXTERNAL_LINK})
+        root.append(el)
 
     return tostring(root)
 
