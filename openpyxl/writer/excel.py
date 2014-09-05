@@ -61,6 +61,11 @@ from openpyxl.writer.drawings import DrawingWriter, ShapeWriter
 from openpyxl.writer.charts import ChartWriter
 from .relations import write_rels
 from openpyxl.writer.worksheet import write_worksheet
+from openpyxl.workbook.external.writer import (
+    write_external_link,
+    write_external_book_rel
+)
+
 from openpyxl import LXML
 if LXML is True:
     from . lxml_worksheet import write_worksheet
@@ -100,6 +105,7 @@ class ExcelWriter(object):
 
         self._write_worksheets(archive)
         self._write_string_table(archive)
+        self._write_external_links(archive)
 
     def _write_string_table(self, archive):
         archive.writestr(ARC_SHARED_STRINGS,
@@ -165,6 +171,22 @@ class ExcelWriter(object):
                 archive.writestr(PACKAGE_XL + '/drawings/commentsDrawing%d.vml' % comments_id,
                     cw.write_comments_vml())
                 comments_id += 1
+
+    def _write_external_links(self, archive):
+        """Write links to external workbooks"""
+        wb = self.workbook
+        for idx, book in enumerate(wb._external_links, 1):
+            el = write_external_link(book.links)
+            rel = write_external_book_rel(book)
+            archive.writestr(
+                "{0}/externalLinks/externalLink{1}.xml".format(PACKAGE_XL, idx),
+                 tostring(el)
+            )
+            archive.writestr(
+                "{0}/externalLinks/_rels/externalLink{1}.xml.rels".format(PACKAGE_XL, idx),
+                tostring(rel)
+            )
+
 
     def save(self, filename):
         """Write data into the archive."""

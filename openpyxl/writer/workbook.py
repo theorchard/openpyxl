@@ -322,10 +322,10 @@ def write_workbook_rels(workbook):
                  'Type': 'http://schemas.microsoft.com/office/2006/relationships/vbaProject'}
         root.append(RelationElement(attrs))
 
-    external_links = wb._external_links
+    external_links = workbook._external_links
     if external_links:
         for idx, link in enumerate(external_links, i+1):
-            attrs = {'Id':'rId%' % idx, 'Target':'externalLinks/externalLink%d' % idx,
+            attrs = {'Id':'rId%d' % idx, 'Target':'externalLinks/externalLink%d' % idx,
                      'Type':'%s/externalLink' % REL_NS}
             root.append(RelationElement(attrs))
 
