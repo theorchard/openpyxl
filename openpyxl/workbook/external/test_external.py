@@ -124,16 +124,18 @@ def test_load_workbook(datadir):
 
 def test_write_workbook(datadir, tmpdir):
     datadir.chdir()
-    with ZipFile("book1.xlsx") as src:
-        orig_files = set(src.namelist())
+    src = ZipFile("book1.xlsx")
+    orig_files = set(src.namelist())
+    src.close()
 
     from openpyxl import load_workbook
     wb = load_workbook("book1.xlsx")
     tmpdir.chdir()
     wb.save("book1.xlsx")
 
-    with ZipFile("book1.xlsx") as src:
-        out_files = set(src.namelist())
+    src = ZipFile("book1.xlsx")
+    out_files = set(src.namelist())
+    src.close()
     # remove files from archive that the other can't have
     out_files.discard("xl/sharedStrings.xml")
     orig_files.discard("xl/calcChain.xml")
