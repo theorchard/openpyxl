@@ -83,7 +83,7 @@ def detect_external_links(rels, archive):
             pth = os.path.split(d['path'])
             f_name = pth[-1]
             dir_name = "/".join(pth[:-1])
-            book_path = os.path.join(dir_name, "_rels", f_name + ".rels")
+            book_path = "{0}/_rels/{1}.rels".format (dir_name, f_name)
             book_xml = archive.read(book_path)
             Book = parse_books(book_xml)
 
