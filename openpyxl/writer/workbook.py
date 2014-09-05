@@ -249,6 +249,16 @@ def write_workbook(workbook):
                 raise ValueError("The only worksheet of a workbook cannot be hidden")
             sheet_node.set('state', sheet.sheet_state)
 
+    # external references
+    external_references = SubElement(root, '{%s}externalReferences' % SHEET_MAIN_NS)
+    # need to match a counter with a workbook's relations
+    counter = len(workbook.worksheets) + 3 # strings, styles, theme
+    if workbook.vba_archive:
+        counter += 1
+    for idx, _ in enumerate(workbook._external_links, counter+1):
+        ext = Element("{%s}externalReference" % SHEET_MAIN_NS, {"{%s}id" % REL_NS:"rId%d" % counter})
+        external_references.append(ext)
+
     # Defined names
     defined_names = SubElement(root, '{%s}definedNames' % SHEET_MAIN_NS)
 
