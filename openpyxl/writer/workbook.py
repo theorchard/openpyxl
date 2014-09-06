@@ -264,7 +264,7 @@ def write_workbook(workbook):
         if workbook.vba_archive:
             counter += 1
         for idx, _ in enumerate(workbook._external_links, counter+1):
-            ext = Element("{%s}externalReference" % SHEET_MAIN_NS, {"{%s}id" % REL_NS:"rId%d" % counter})
+            ext = Element("{%s}externalReference" % SHEET_MAIN_NS, {"{%s}id" % REL_NS:"rId%d" % idx})
             external_references.append(ext)
 
     # Defined names
