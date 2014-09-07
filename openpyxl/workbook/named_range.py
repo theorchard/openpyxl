@@ -36,6 +36,7 @@ NAMED_RANGE_RE = re.compile("""
 ^(('(?P<quoted>([^']|'')*)')|(?P<notquoted>[^']*))
 !(?P<range>(\$([A-Za-z]+))?(\$([0-9]+))?(:(\$([A-Za-z]+))?(\$([0-9]+))?)?)""", re.VERBOSE)
 SPLIT_NAMED_RANGE_RE = re.compile(r"((?:[^,']|'(?:[^']|'')*')+)")
+EXTERNAL_RE = re.compile(r"(?P<external>\[\d+\])?(?P<range_string>.*)")
 
 
 class NamedRange(object):

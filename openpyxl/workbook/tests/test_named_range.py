@@ -55,6 +55,18 @@ def test_split(range_string, result):
     assert list(split_named_range(range_string)) == result
 
 
+@pytest.mark.parametrize("range_string, external",
+                         [
+                             ("'My Sheet'!$D$8", None),
+                             ("Sheet1!$A$1", None),
+                             ("[1]Sheet1!$A$1", "[1]"),
+                             ("[1]!B2range", "[1]"),
+                         ])
+def test_external_range(range_string, external):
+    from .. named_range import EXTERNAL_RE
+    assert EXTERNAL_RE.match(range_string).group('external') == external
+
+
 def test_split_no_quotes():
     assert [('HYPOTHESES', '$B$3:$L$3'), ] == list(split_named_range('HYPOTHESES!$B$3:$L$3'))
 
