@@ -44,8 +44,15 @@ def test_check_range(range_string):
     assert NAMED_RANGE_RE.match(range_string) is not None
 
 
-def test_split():
-    assert [('My Sheet', '$D$8'), ] == list(split_named_range("'My Sheet'!$D$8"))
+@pytest.mark.parametrize("range_string, result",
+                         [
+                             ("'My Sheet'!$D$8", [('My Sheet', '$D$8'), ]),
+                             ("Sheet1!$A$1", [('Sheet1', '$A$1')]),
+                             ("[1]Sheet1!$A$1", [('[1]Sheet1', '$A$1')]),
+                             ("[1]!B2range", [('[1]', '')]),
+                         ])
+def test_split(range_string, result):
+    assert list(split_named_range(range_string)) == result
 
 
 def test_split_no_quotes():
