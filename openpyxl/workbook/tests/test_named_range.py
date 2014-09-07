@@ -1,3 +1,4 @@
+from __future__ import absolute_import
 # Copyright (c) 2010-2014 openpyxl
 
 # Python stdlib imports
@@ -29,6 +30,18 @@ class DummyWB:
     def __getitem__(self, key):
         if key == self.ws.title:
             return self.ws
+
+
+@pytest.mark.parametrize("range_string",
+                         [
+                             "'My Sheet'!$D$8",
+                             "Sheet1!$A$1",
+                             "[1]Sheet1!$A$1",
+                             "[1]!B2range",
+                         ])
+def test_check_range(range_string):
+    from .. named_range import NAMED_RANGE_RE
+    assert NAMED_RANGE_RE.match(range_string) is not None
 
 
 def test_split():
