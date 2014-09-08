@@ -293,6 +293,9 @@ def _write_defined_names(workbook, names):
     """
     for named_range in workbook.get_named_ranges():
         attrs = dict(named_range)
+        if named_range.scope is not None:
+            attrs['localSheetId'] = '%d' % workbook.get_index(named_range.scope)
+
         name = Element('{%s}definedName' % SHEET_MAIN_NS, attrs)
         name.text = named_range.value
         names.append(name)
