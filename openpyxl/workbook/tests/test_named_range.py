@@ -50,6 +50,13 @@ def test_check_range(range_string):
                              ("Sheet1!$A$1", [('Sheet1', '$A$1')]),
                              ("[1]Sheet1!$A$1", [('[1]Sheet1', '$A$1')]),
                              ("[1]!B2range", [('[1]', '')]),
+                             ("Sheet1!$C$5:$C$7,Sheet1!$C$9:$C$11,Sheet1!$E$5:$E$7,Sheet1!$E$9:$E$11,Sheet1!$D$8",
+                              [('Sheet1', '$C$5:$C$7'),
+                               ('Sheet1', '$C$9:$C$11'),
+                               ('Sheet1', '$E$5:$E$7'),
+                               ('Sheet1', '$E$9:$E$11'),
+                               ('Sheet1', '$D$8')
+                               ]),
                          ])
 def test_split(range_string, result):
     assert list(split_named_range(range_string)) == result
@@ -70,6 +77,24 @@ def test_external_range(range_string, external):
 def test_dict_interface():
     xlrange = NamedValue("a range", "the value")
     assert dict(xlrange) == {'name':"a range"}
+
+
+def test_range_scope():
+    xlrange = NamedValue("Pi", 3.14)
+    xlrange.scope = 1
+    assert dict(xlrange) == {'name': 'Pi', 'localSheetId': 1}
+
+
+def test_destinations_string():
+    ws = DummyWS('Sheet1')
+    xlrange = NamedRange("TRAP_2", [
+        (ws, '$C$5:$C$7'),
+        (ws, '$C$9:$C$11'),
+        (ws, '$E$5:$E$7'),
+        (ws, '$E$9:$E$11'),
+        (ws, '$D$8')
+                               ])
+    assert xlrange.value == "'Sheet1'!$C$5:$C$7,'Sheet1'!$C$9:$C$11,'Sheet1'!$E$5:$E$7,'Sheet1'!$E$9:$E$11,'Sheet1'!$D$8"
 
 
 def test_split_no_quotes():
