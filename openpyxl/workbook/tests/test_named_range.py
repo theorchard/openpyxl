@@ -5,6 +5,8 @@ from __future__ import absolute_import
 
 import pytest
 
+from openpyxl.compat import zip
+
 # package imports
 from ..named_range import split_named_range, NamedRange, NamedValue
 from openpyxl.reader.workbook import read_named_ranges
@@ -136,6 +138,24 @@ def test_read_named_ranges_missing_sheet(datadir):
         content = src.read()
         named_ranges = read_named_ranges(content, DummyWB(ws))
         assert list(named_ranges) == []
+
+
+def test_read_external_ranges(datadir):
+    datadir.chdir()
+    ws = DummyWS("Sheet1")
+    wb = DummyWB(ws)
+    with open("workbook_external_range.xml") as src:
+        xml = src.read()
+    named_ranges = list(read_named_ranges(xml, wb))
+    assert len(named_ranges) == 4
+    expected = [
+        ("B1namedrange", "'Sheet1'!$A$1"),
+        ("references_external_workbook", "[1]Sheet1!$A$1"),
+        ("references_nr_in_ext_wb", "[1]!B2range"),
+        ("references_other_named_range", "B1namedrange"),
+    ]
+    for xlr, target in zip(named_ranges, expected):
+        assert xlr.name, xlr.value == target
 
 
 ranges_counts = (

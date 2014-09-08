@@ -29,7 +29,8 @@ from openpyxl.workbook.named_range import (
     NamedRange,
     NamedValue,
     split_named_range,
-    refers_to_range
+    refers_to_range,
+    external_range,
     )
 
 import datetime
@@ -136,7 +137,11 @@ def read_named_ranges(xml_source, workbook):
 
         node_text = name_node.text
 
-        if refers_to_range(node_text):
+        if external_range(node_text):
+            # treat names referring to external workbooks as values
+            named_range = NamedValue(range_name, node_text)
+
+        elif refers_to_range(node_text):
             destinations = split_named_range(node_text)
             # it can happen that a valid named range references
             # a missing worksheet, when Excel didn't properly maintain
