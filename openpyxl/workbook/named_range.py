@@ -82,9 +82,10 @@ class NamedRange(NamedValue):
     @property
     def value(self):
         dest_cells = []
-        dest_cells.append("'%s'!%s" % (worksheet.title.replace("'", "''"),
-                                       absolute_coordinate(range_name)))
-        return dest_cells
+        for ws, xlrange in self.destinations:
+            dest_cells.append("'%s'!%s" % (ws.title.replace("'", "''"),
+                                       absolute_coordinate(xlrange)))
+        return ",".join(dest_cells)
 
     def __str__(self):
         return  ','.join([self.str_format % (sheet, name) for sheet, name in self.destinations])

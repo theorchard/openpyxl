@@ -307,7 +307,7 @@ def write_workbook(workbook):
     return tostring(root)
 
 
-def _defined_names(root):
+def _write_defined_names(workbook, root):
     defined_names = SubElement(root, '{%s}definedNames' % SHEET_MAIN_NS)
 
     # Defined names -> named ranges
