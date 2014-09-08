@@ -4,11 +4,10 @@ from __future__ import absolute_import
 #stdlib
 from io import BytesIO
 import os
-from lxml.etree import tounicode
 
 # test
 import pytest
-from openpyxl.tests.helper import compare_xml
+from openpyxl.tests.helper import compare_xml, get_xml
 
 # package
 from openpyxl import Workbook, load_workbook
@@ -111,7 +110,7 @@ def test_write_named_range():
     wb._named_ranges.append(xlrange)
     root = Element("root")
     _write_defined_names(wb, root)
-    xml = tounicode(root)
+    xml = get_xml(root)
     expected = """
     <root>
      <s:definedName xmlns:s="http://schemas.openxmlformats.org/spreadsheetml/2006/main" name="test_range">'Sheet'!$A$1:$B$5</s:definedName>
