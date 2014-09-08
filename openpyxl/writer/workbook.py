@@ -312,23 +312,10 @@ def _write_defined_names(workbook, root):
 
     # Defined names -> named ranges
     for named_range in workbook.get_named_ranges():
-        name = SubElement(defined_names, '{%s}definedName' % SHEET_MAIN_NS,
-                          {'name': named_range.name})
-        if named_range.scope:
-            name.set('localSheetId', '%s' % workbook.get_index(named_range.scope))
-
-        if isinstance(named_range, NamedRange):
-            # as there can be many cells in one range, generate the list of ranges
-            dest_cells = []
-            for worksheet, range_name in named_range.destinations:
-                dest_cells.append("'%s'!%s" % (worksheet.title.replace("'", "''"),
-                                               absolute_coordinate(range_name)))
-
-            # finally write the cells list
-            name.text = ','.join(dest_cells)
-        else:
-            assert isinstance(named_range, NamedValue)
-            name.text = named_range.value
+        attrs = dict(named_range)
+        name = Element('{%s}definedName' % SHEET_MAIN_NS, attrs)
+        name.text = named_range.value
+        defined_names.append(name)
 
 
 RelationElement = partial(Element, '{%s}Relationship' % PKG_REL_NS)
