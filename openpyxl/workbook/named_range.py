@@ -56,8 +56,9 @@ class NamedValue(object):
     def __iter__(self):
         for attr in ('name', 'localSheetId'):
             value = getattr(self, attr, None)
-            if attr is not None:
+            if value is not None:
                 yield attr, value
+
 
 #backwards compatibility
 NamedRangeContainingValue = NamedValue

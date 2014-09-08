@@ -6,7 +6,7 @@ from __future__ import absolute_import
 import pytest
 
 # package imports
-from ..named_range import split_named_range, NamedRange
+from ..named_range import split_named_range, NamedRange, NamedValue
 from openpyxl.reader.workbook import read_named_ranges
 from openpyxl.exceptions import NamedRangeException
 from openpyxl.reader.excel import load_workbook
@@ -65,6 +65,11 @@ def test_split(range_string, result):
 def test_external_range(range_string, external):
     from .. named_range import EXTERNAL_RE
     assert EXTERNAL_RE.match(range_string).group('external') == external
+
+
+def test_dict_interface():
+    xlrange = NamedValue("a range", "the value")
+    assert dict(xlrange) == {'name':"a range"}
 
 
 def test_split_no_quotes():
