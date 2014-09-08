@@ -40,8 +40,8 @@ class DummyWB:
                              "[1]!B2range",
                          ])
 def test_check_range(range_string):
-    from .. named_range import NAMED_RANGE_RE
-    assert NAMED_RANGE_RE.match(range_string) is not None
+    from .. named_range import refers_to_range
+    assert refers_to_range(range_string) is True
 
 
 @pytest.mark.parametrize("range_string, result",
@@ -64,14 +64,14 @@ def test_split(range_string, result):
 
 @pytest.mark.parametrize("range_string, external",
                          [
-                             ("'My Sheet'!$D$8", None),
-                             ("Sheet1!$A$1", None),
-                             ("[1]Sheet1!$A$1", "[1]"),
-                             ("[1]!B2range", "[1]"),
+                             ("'My Sheet'!$D$8", False),
+                             ("Sheet1!$A$1", False),
+                             ("[1]Sheet1!$A$1", True),
+                             ("[1]!B2range", True),
                          ])
 def test_external_range(range_string, external):
-    from .. named_range import EXTERNAL_RE
-    assert EXTERNAL_RE.match(range_string).group('external') == external
+    from .. named_range import external_range
+    assert external_range(range_string) is external
 
 
 def test_dict_interface():

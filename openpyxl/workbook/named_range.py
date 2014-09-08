@@ -111,4 +111,11 @@ def split_named_range(range_string):
 
 
 def refers_to_range(range_string):
-    return range_string and bool(NAMED_RANGE_RE.match(range_string))
+    if range_string:
+        return NAMED_RANGE_RE.match(range_string) is not None
+
+
+def external_range(range_string):
+    m = EXTERNAL_RE.match(range_string)
+    if m is not None:
+        return m.group('external') is not None
