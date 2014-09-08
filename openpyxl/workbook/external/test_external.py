@@ -13,8 +13,6 @@ from openpyxl.xml.constants import (
     PKG_REL_NS,
     REL_NS,
 )
-from openpyxl.xml.functions import tostring
-
 
 def test_read_external_ref(datadir):
     datadir.chdir()
@@ -89,7 +87,7 @@ def test_write_external_book_rel():
     from openpyxl.workbook.external.writer import write_external_book_rel
     book = ExternalBook("rId1", "book2.xlsx")
     rel = write_external_book_rel(book)
-    xml = tostring(rel)
+    xml = get_xml(rel)
     expected = """
 <Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships">
   <Relationship Id="rId1" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/externalLinkPath" Target="book2.xlsx" TargetMode="External"/>
