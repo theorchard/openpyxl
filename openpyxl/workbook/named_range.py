@@ -28,6 +28,7 @@ from __future__ import absolute_import
 import re
 
 # package imports
+from openpyxl.cell import absolute_coordinate
 from openpyxl.compat import unicode
 from openpyxl.exceptions import NamedRangeException
 
@@ -39,7 +40,30 @@ SPLIT_NAMED_RANGE_RE = re.compile(r"((?:[^,']|'(?:[^']|'')*')+)")
 EXTERNAL_RE = re.compile(r"(?P<external>\[\d+\])?(?P<range_string>.*)")
 
 
-class NamedRange(object):
+class NamedValue(object):
+    """A named value"""
+    __slots__ = ('name', 'value', 'scope')
+
+    def __init__(self, name, value):
+        self.name = name
+        self.value = value
+        self.scope = None
+
+    @property
+    def localSheetId(self):
+        return self.scope
+
+    def __iter__(self):
+        for attr in ('name', 'localSheetId'):
+            value = getattr(self, attr, None)
+            if attr is not None:
+                yield attr, value
+
+#backwards compatibility
+NamedRangeContainingValue = NamedValue
+
+
+class NamedRange(NamedValue):
     """A named group of cells
 
     Scope is a worksheet object or None for workbook scope names (the default)
@@ -54,21 +78,18 @@ class NamedRange(object):
         self.destinations = destinations
         self.scope = scope
 
+    @property
+    def value(self):
+        dest_cells = []
+        dest_cells.append("'%s'!%s" % (worksheet.title.replace("'", "''"),
+                                       absolute_coordinate(range_name)))
+        return dest_cells
+
     def __str__(self):
         return  ','.join([self.str_format % (sheet, name) for sheet, name in self.destinations])
 
     def __repr__(self):
         return  self.repr_format % (self.__class__.__name__, str(self))
-
-
-class NamedRangeContainingValue(object):
-    """A named value"""
-    __slots__ = ('name', 'value', 'scope')
-
-    def __init__(self, name, value):
-        self.name = name
-        self.value = value
-        self.scope = None
 
 
 def split_named_range(range_string):

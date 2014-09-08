@@ -58,7 +58,7 @@ from openpyxl.xml.constants import (
 from openpyxl.xml.functions import tostring, fromstring
 from openpyxl.date_time import datetime_to_W3CDTF
 from openpyxl.worksheet import Worksheet
-from openpyxl.workbook.named_range import NamedRange, NamedRangeContainingValue
+from openpyxl.workbook.named_range import NamedRange, NamedValue
 
 
 def write_properties_core(properties):
@@ -287,7 +287,7 @@ def write_workbook(workbook):
             # finally write the cells list
             name.text = ','.join(dest_cells)
         else:
-            assert isinstance(named_range, NamedRangeContainingValue)
+            assert isinstance(named_range, NamedValue)
             name.text = named_range.value
 
     # Defined names -> autoFilter
@@ -305,6 +305,30 @@ def write_workbook(workbook):
     SubElement(root, '{%s}calcPr' % SHEET_MAIN_NS,
                {'calcId': '124519', 'calcMode': 'auto', 'fullCalcOnLoad': '1'})
     return tostring(root)
+
+
+def _defined_names(root):
+    defined_names = SubElement(root, '{%s}definedNames' % SHEET_MAIN_NS)
+
+    # Defined names -> named ranges
+    for named_range in workbook.get_named_ranges():
+        name = SubElement(defined_names, '{%s}definedName' % SHEET_MAIN_NS,
+                          {'name': named_range.name})
+        if named_range.scope:
+            name.set('localSheetId', '%s' % workbook.get_index(named_range.scope))
+
+        if isinstance(named_range, NamedRange):
+            # as there can be many cells in one range, generate the list of ranges
+            dest_cells = []
+            for worksheet, range_name in named_range.destinations:
+                dest_cells.append("'%s'!%s" % (worksheet.title.replace("'", "''"),
+                                               absolute_coordinate(range_name)))
+
+            # finally write the cells list
+            name.text = ','.join(dest_cells)
+        else:
+            assert isinstance(named_range, NamedValue)
+            name.text = named_range.value
 
 
 RelationElement = partial(Element, '{%s}Relationship' % PKG_REL_NS)

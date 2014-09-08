@@ -27,7 +27,7 @@ from openpyxl.date_time import (
     )
 from openpyxl.workbook.named_range import (
     NamedRange,
-    NamedRangeContainingValue,
+    NamedValue,
     split_named_range,
     refers_to_range
     )
@@ -147,7 +147,7 @@ def read_named_ranges(xml_source, workbook):
                 continue
             named_range = NamedRange(range_name, destinations)
         else:
-            named_range = NamedRangeContainingValue(range_name, node_text)
+            named_range = NamedValue(range_name, node_text)
 
 
         location_id = name_node.get("localSheetId")

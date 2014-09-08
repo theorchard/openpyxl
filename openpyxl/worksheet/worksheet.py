@@ -41,7 +41,7 @@ from openpyxl.units import (
 )
 from openpyxl.styles import DEFAULTS as DEFAULTS_STYLE
 from openpyxl.formatting import ConditionalFormatting
-from openpyxl.workbook.named_range import NamedRangeContainingValue
+from openpyxl.workbook.named_range import NamedRange
 
 from .header_footer import HeaderFooter
 from .relationship import Relationship
@@ -424,7 +424,7 @@ class Worksheet(object):
         if named_range is None:
             msg = '%s is not a valid range name' % range_string
             raise NamedRangeException(msg)
-        if isinstance(named_range, NamedRangeContainingValue):
+        if not isinstance(named_range, NamedRange):
             msg = '%s refers to a value, not a range' % range_string
             raise NamedRangeException(msg)
 
