@@ -114,9 +114,7 @@ def test_write_named_range():
     xml = tounicode(root)
     expected = """
     <root>
-    <s:definedNames xmlns:s="http://schemas.openxmlformats.org/spreadsheetml/2006/main">
-     <s:definedName name="test_range">'Sheet'!$A$1:$B$5</s:definedName>
-    </s:definedNames>
+     <s:definedName xmlns:s="http://schemas.openxmlformats.org/spreadsheetml/2006/main" name="test_range">'Sheet'!$A$1:$B$5</s:definedName>
     </root>
     """
     diff = compare_xml(xml, expected)
