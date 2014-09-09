@@ -166,11 +166,11 @@ class SharedStylesParser(object):
             return
 
         builtin_formats = numbers.BUILTIN_FORMATS
-        cell_xfs_nodes = safe_iterator(cell_xfs, '{%s}xf' % SHEET_MAIN_NS)
-        for index, cell_xfs_node in enumerate(cell_xfs_nodes):
+        xfs = safe_iterator(cell_xfs, '{%s}xf' % SHEET_MAIN_NS)
+        for index, xf in enumerate(xfs):
             _style = {}
 
-            num_fmt = cell_xfs_node.get('numFmtId')
+            num_fmt = xf.get('numFmtId')
             if num_fmt is not None:
                 num_fmt = int(num_fmt)
                 if num_fmt < 164:
@@ -183,25 +183,25 @@ class SharedStylesParser(object):
                         raise MissingNumberFormat('%s' % num_fmt)
                 _style['number_format'] = format_code
 
-            if bool(cell_xfs_node.get('applyAlignment')):
+            if bool_attrib(xf, 'applyAlignment'):
                 alignment = {}
-                al = cell_xfs_node.find('{%s}alignment' % SHEET_MAIN_NS)
+                al = xf.find('{%s}alignment' % SHEET_MAIN_NS)
                 if al is not None:
                     alignment = al.attrib
                 _style['alignment'] = Alignment(**alignment)
 
-            if bool(cell_xfs_node.get('applyFont')):
-                _style['font'] = self.font_list[int(cell_xfs_node.get('fontId'))].copy()
+            if bool_attrib(xf, 'applyFont'):
+                _style['font'] = self.font_list[int(xf.get('fontId'))].copy()
 
-            if bool(cell_xfs_node.get('applyFill')):
-                _style['fill'] = self.fill_list[int(cell_xfs_node.get('fillId'))].copy()
+            if bool_attrib(xf, 'applyFill'):
+                _style['fill'] = self.fill_list[int(xf.get('fillId'))].copy()
 
-            if bool(cell_xfs_node.get('applyBorder')):
-                _style['border'] = self.border_list[int(cell_xfs_node.get('borderId'))].copy()
+            if bool_attrib(xf, 'applyBorder'):
+                _style['border'] = self.border_list[int(xf.get('borderId'))].copy()
 
-            if bool(cell_xfs_node.get('applyProtection')):
+            if bool_attrib(xf, 'applyProtection'):
                 protection = {}
-                prot = cell_xfs_node.find('{%s}protection' % SHEET_MAIN_NS)
+                prot = xf.find('{%s}protection' % SHEET_MAIN_NS)
                 if prot is not None:
                     protection.update(prot.attrib)
                 _style['protection'] = Protection(**protection)
@@ -214,3 +214,14 @@ def read_style_table(xml_source):
     p = SharedStylesParser(xml_source)
     p.parse()
     return p.shared_styles, p.color_index, p.cond_styles
+
+
+def bool_attrib(element, attr):
+    """
+    Cast an XML attribute that should be a boolean to a Python equivalent
+    None, 'f', '0' and 'false' all cast to False, everything else to true
+    """
+    value = element.get(attr)
+    if not value or value in ("false", "f", "0"):
+        return False
+    return True
