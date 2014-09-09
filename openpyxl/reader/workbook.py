@@ -1,26 +1,5 @@
 from __future__ import absolute_import
 # Copyright (c) 2010-2014 openpyxl
-#
-# Permission is hereby granted, free of charge, to any person obtaining a copy
-# of this software and associated documentation files (the "Software"), to deal
-# in the Software without restriction, including without limitation the rights
-# to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-# copies of the Software, and to permit persons to whom the Software is
-# furnished to do so, subject to the following conditions:
-#
-# The above copyright notice and this permission notice shall be included in
-# all copies or substantial portions of the Software.
-#
-# THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-# IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-# FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-# AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-# LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-# OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
-# THE SOFTWARE.
-#
-# @license: http://www.opensource.org/licenses/mit-license.php
-# @author: see AUTHORS file
 
 """Read in global settings to be maintained by the workbook object."""
 
@@ -37,6 +16,8 @@ from openpyxl.xml.constants import (
     ARC_CONTENT_TYPES,
     ARC_WORKBOOK,
     ARC_WORKBOOK_RELS,
+    WORKSHEET,
+    EXTERNAL_LINK,
 )
 from openpyxl.workbook import DocumentProperties
 from openpyxl.date_time import (
@@ -44,11 +25,12 @@ from openpyxl.date_time import (
     CALENDAR_WINDOWS_1900,
     CALENDAR_MAC_1904
     )
-from openpyxl.workbook.named_range import (
+from openpyxl.workbook.names.named_range import (
     NamedRange,
-    NamedRangeContainingValue,
+    NamedValue,
     split_named_range,
-    refers_to_range
+    refers_to_range,
+    external_range,
     )
 
 import datetime
@@ -57,7 +39,7 @@ import re
 # constants
 BUGGY_NAMED_RANGES = re.compile("|".join(['NA()', '#REF!']))
 DISCARDED_RANGES = re.compile("|".join(['Excel_BuiltIn', 'Print_Area']))
-VALID_WORKSHEET = "application/vnd.openxmlformats-officedocument.spreadsheetml.worksheet+xml"
+VALID_WORKSHEET = WORKSHEET
 
 
 def read_properties_core(xml_source):
@@ -96,7 +78,7 @@ def read_content_types(archive):
     root = fromstring(xml_source)
     contents_root = root.findall('{%s}Override' % CONTYPES_NS)
     for type in contents_root:
-        yield type.get('PartName'), type.get('ContentType')
+        yield type.get('ContentType'), type.get('PartName')
 
 
 def read_rels(archive):
@@ -106,12 +88,13 @@ def read_rels(archive):
     for element in safe_iterator(tree, '{%s}Relationship' % PKG_REL_NS):
         rId = element.get('Id')
         pth = element.get("Target")
+        typ = element.get('Type')
         # normalise path
         if pth.startswith("/xl"):
             pth = pth.replace("/xl", "xl")
         elif not pth.startswith("xl") and not pth.startswith(".."):
             pth = "xl/" + pth
-        yield rId, {'path':pth}
+        yield rId, {'path':pth, 'type':typ}
 
 
 def read_sheets(archive):
@@ -130,7 +113,7 @@ def detect_worksheets(archive):
     # workbook_rels has a list of relIds and paths but no titles
     # rels = {'id':{'title':'', 'path':''} }
     content_types = read_content_types(archive)
-    valid_sheets = dict((path, ct) for path, ct in content_types if ct == VALID_WORKSHEET)
+    valid_sheets = dict((path, ct) for ct, path in content_types if ct == VALID_WORKSHEET)
     rels = dict(read_rels(archive))
     for rId, title, state in read_sheets(archive):
         rel = rels[rId]
@@ -154,7 +137,11 @@ def read_named_ranges(xml_source, workbook):
 
         node_text = name_node.text
 
-        if refers_to_range(node_text):
+        if external_range(node_text):
+            # treat names referring to external workbooks as values
+            named_range = NamedValue(range_name, node_text)
+
+        elif refers_to_range(node_text):
             destinations = split_named_range(node_text)
             # it can happen that a valid named range references
             # a missing worksheet, when Excel didn't properly maintain
@@ -165,7 +152,7 @@ def read_named_ranges(xml_source, workbook):
                 continue
             named_range = NamedRange(range_name, destinations)
         else:
-            named_range = NamedRangeContainingValue(range_name, node_text)
+            named_range = NamedValue(range_name, node_text)
 
 
         location_id = name_node.get("localSheetId")
@@ -173,3 +160,10 @@ def read_named_ranges(xml_source, workbook):
             named_range.scope = workbook.worksheets[int(location_id)]
 
         yield named_range
+
+
+def detect_external_links(archive):
+    rels = read_rels(archive)
+    for rId, d in rels:
+        if d['type'] == EXTERNAL_LINK:
+            pth = d['path']

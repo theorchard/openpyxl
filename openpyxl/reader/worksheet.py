@@ -68,6 +68,7 @@ class WorkSheetParser(object):
             '{%s}conditionalFormatting' % SHEET_MAIN_NS: self.parser_conditional_formatting,
             '{%s}autoFilter' % SHEET_MAIN_NS: self.parse_auto_filter,
             '{%s}sheetProtection' % SHEET_MAIN_NS: self.parse_sheet_protection,
+            '{%s}dataValidations' % SHEET_MAIN_NS: self.parse_data_validation,
                       }
         tags = dispatcher.keys()
         stream = _get_xml_iter(self.source)
@@ -270,6 +271,12 @@ class WorkSheetParser(object):
         password = values.get("password")
         if password is not None:
             self.ws.protection.set_password(password, True)
+
+    def parse_data_validation(self, element):
+        from openpyxl.worksheet.datavalidation import parser
+        for tag in safe_iterator(element, "{%s}dataValidation" % SHEET_MAIN_NS):
+            dv = parser(tag)
+            self.ws._data_validations.append(dv)
 
 
 def fast_parse(ws, xml_source, shared_strings, style_table, color_index=None):

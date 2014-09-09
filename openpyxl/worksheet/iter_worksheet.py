@@ -1,26 +1,5 @@
 from __future__ import absolute_import
 # Copyright (c) 2010-2014 openpyxl
-#
-# Permission is hereby granted, free of charge, to any person obtaining a copy
-# of this software and associated documentation files (the "Software"), to deal
-# in the Software without restriction, including without limitation the rights
-# to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-# copies of the Software, and to permit persons to whom the Software is
-# furnished to do so, subject to the following conditions:
-#
-# The above copyright notice and this permission notice shall be included in
-# all copies or substantial portions of the Software.
-#
-# THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-# IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-# FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-# AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-# LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-# OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
-# THE SOFTWARE.
-#
-# @license: http://www.opensource.org/licenses/mit-license.php
-# @author: see AUTHORS file
 
 """ Iterators-based worksheet reader
 *Still very raw*
@@ -36,6 +15,7 @@ from openpyxl.xml.functions import iterparse
 # package
 from openpyxl.worksheet import Worksheet
 from openpyxl.cell import (
+    ABSOLUTE_RE,
     coordinate_from_string,
     column_index_from_string,
     get_column_letter,
@@ -46,25 +26,6 @@ from openpyxl.xml.functions import safe_iterator
 from openpyxl.xml.constants import SHEET_MAIN_NS
 
 
-def get_range_boundaries(range_string, row_offset=0, column_offset=1):
-
-    if ':' in range_string:
-        min_range, max_range = range_string.split(':')
-        min_col, min_row = coordinate_from_string(min_range)
-        max_col, max_row = coordinate_from_string(max_range)
-
-        min_col = column_index_from_string(min_col)
-        max_col = column_index_from_string(max_col) + 1
-
-    else:
-        min_col, min_row = coordinate_from_string(range_string)
-        min_col = column_index_from_string(min_col)
-        max_col = min_col + column_offset
-        max_row = min_row + row_offset
-
-    return (min_col, min_row, max_col, max_row)
-
-
 def read_dimension(source):
     min_row = min_col =  max_row = max_col = None
     DIMENSION_TAG = '{%s}dimension' % SHEET_MAIN_NS
@@ -73,13 +34,16 @@ def read_dimension(source):
     for _event, element in it:
         if element.tag == DIMENSION_TAG:
             dim = element.get("ref")
-            if ':' in dim:
-                start, stop = dim.split(':')
+            m = ABSOLUTE_RE.match(dim.upper())
+            min_col, min_row, sep, max_col, max_row = m.groups()
+            min_row = int(min_row)
+            if max_col is None or max_row is None:
+                max_col = min_col
+                max_row = min_row
             else:
-                start = stop = dim
-            min_col, min_row = coordinate_from_string(start)
-            max_col, max_row = coordinate_from_string(stop)
+                max_row = int(max_row)
             return min_col, min_row, max_col, max_row
+
         elif element.tag == DATA_TAG:
             # Dimensions missing
             break
@@ -131,33 +95,6 @@ class IterableWorksheet(Worksheet):
             return self.iter_rows(key)
         return self.cell(key)
 
-    def iter_rows(self, range_string='', row_offset=0, column_offset=1):
-        """ Returns a squared range based on the `range_string` parameter,
-        using generators.
-
-        :param range_string: range of cells (e.g. 'A1:C4')
-        :type range_string: string
-
-        :param row_offset: additional rows (e.g. 4)
-        :type row: int
-
-        :param column_offset: additonal columns (e.g. 3)
-        :type column: int
-
-        :rtype: generator
-
-        """
-        if range_string:
-            min_col, min_row, max_col, max_row = get_range_boundaries(range_string, row_offset, column_offset)
-        else:
-            min_col = column_index_from_string(self.min_col)
-            max_col = self.max_col
-            if max_col is not None:
-                max_col = column_index_from_string(self.max_col) + 1
-            min_row = self.min_row
-            max_row = self.max_row
-
-        return self.get_squared_range(min_col, min_row, max_col, max_row)
 
     def get_squared_range(self, min_col, min_row, max_col, max_row):
         """
@@ -165,7 +102,7 @@ class IterableWorksheet(Worksheet):
         Missing cells will be created.
         """
         if max_col is not None:
-            expected_columns = [get_column_letter(ci) for ci in range(min_col, max_col)]
+            expected_columns = [get_column_letter(ci) for ci in range(min_col, max_col + 1)]
         else:
             expected_columns = []
         row_counter = min_row
@@ -231,10 +168,6 @@ class IterableWorksheet(Worksheet):
         result = list(self.iter_rows(coordinate))
         if result:
             return result[0][0]
-
-    def range(self, *args, **kwargs):
-        # TODO return a range of cells, basically get_squared_range with same interface as Worksheet
-        raise NotImplementedError("use 'iter_rows()' instead")
 
     @property
     def rows(self):

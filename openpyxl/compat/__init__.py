@@ -34,11 +34,10 @@ from .strings import (
 from .numbers import long, NUMERIC_TYPES
 from .itertools import (
     range,
-    ifilter,
     iteritems,
     iterkeys,
     itervalues,
-    izip
+    zip,
 )
 try:
     from functools import lru_cache

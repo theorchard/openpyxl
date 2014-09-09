@@ -5,6 +5,7 @@ from __future__ import absolute_import
 
 
 # Python stdlib imports
+from itertools import islice, chain
 import re
 from inspect import isgenerator
 
@@ -22,6 +23,7 @@ import openpyxl.cell
 from openpyxl.cell import (
     coordinate_from_string,
     COORD_RE,
+    ABSOLUTE_RE,
     column_index_from_string,
     get_column_letter,
     Cell
@@ -39,7 +41,7 @@ from openpyxl.units import (
 )
 from openpyxl.styles import DEFAULTS as DEFAULTS_STYLE
 from openpyxl.formatting import ConditionalFormatting
-from openpyxl.workbook.named_range import NamedRangeContainingValue
+from openpyxl.workbook.names.named_range import NamedRange
 
 from .header_footer import HeaderFooter
 from .relationship import Relationship
@@ -59,6 +61,38 @@ def flatten(results):
 class SheetView(object):
     """Information about the visible portions of this sheet."""
     pass
+
+
+def range_boundaries(range_string):
+    """
+    Convert a range string into a tuple of boundaries:
+    (min_col, min_row, max_col, max_row)
+    Cell coordinates will be converted into a range with the cell at both end
+    """
+    m = ABSOLUTE_RE.match(range_string)
+    min_col, min_row, sep, max_col, max_row = m.groups()
+    min_col = column_index_from_string(min_col)
+    min_row = int(min_row)
+
+    if max_col is None or max_row is None:
+        max_col = min_col
+        max_row = min_row
+    else:
+        max_col = column_index_from_string(max_col)
+        max_row = int(max_row)
+
+    return min_col, min_row, max_col, max_row
+
+
+def cells_from_range(range_string):
+    """
+    Get individual addresses for every cell in a range.
+    Yields one row at a time.
+    """
+    min_col, min_row, max_col, max_row = range_boundaries(range_string)
+    for row in range(min_row, max_row+1):
+        yield tuple('%s%d' % (get_column_letter(col), row)
+                    for col in range(min_col, max_col+1))
 
 
 class Worksheet(object):
@@ -295,7 +329,7 @@ class Worksheet(object):
     def __getitem__(self, key):
         """Convenience access by Excel style address"""
         if isinstance(key, slice):
-            return self.range("{0}:{1}".format(key.start, key.stop))
+            return self.iter_rows("{0}:{1}".format(key.start, key.stop))
         return self._get_cell(key)
 
     def __setitem__(self, key, value):
@@ -335,6 +369,95 @@ class Worksheet(object):
 
         return 'A1:%s%d' % (get_column_letter(self.max_column or 1), self.max_row or 1)
 
+
+    def iter_rows(self, range_string=None, row_offset=0, column_offset=0):
+        """
+        Returns a squared range based on the `range_string` parameter,
+        using generators.
+        If no range is passed, will iterate over all cells in the worksheet
+
+        :param range_string: range of cells (e.g. 'A1:C4')
+        :type range_string: string
+
+        :param row_offset: additional rows (e.g. 4)
+        :type row: int
+
+        :param column_offset: additonal columns (e.g. 3)
+        :type column: int
+
+        :rtype: generator
+        """
+        if range_string is not None:
+            min_col, min_row, max_col, max_row = range_boundaries(range_string.upper())
+        else:
+            min_col, min_row, max_col, max_row = (1, 1, self.max_column, self.max_row)
+        return self.get_squared_range(min_col + column_offset,
+                                      min_row + row_offset,
+                                      max_col + column_offset,
+                                      max_row + row_offset)
+
+
+    def get_squared_range(self, min_col, min_row, max_col, max_row):
+        """Returns a 2D array of cells
+
+        :param min_col: smallest column index (1-based index)
+        :type min_col: int
+
+        :param min_row: smallest row index (1-based index)
+        :type min_row: int
+
+        :param max_col: largest column index (1-based index)
+        :type max_col: int
+
+        :param max_row: smallest row index (1-based index)
+        :type max_row: int
+
+        :rtype: generator
+        """
+        # Column name cache is very important in large files.
+        cache = dict((col, get_column_letter(col)) for col in range(min_col, max_col+1))
+        rows = []
+        for row in range(min_row, max_row+1):
+            yield tuple(self._get_cell('%s%d' % (cache[col], row))
+                        for col in range(min_col, max_col+1))
+
+
+    def get_named_range(self, range_string):
+        """
+        Returns a 2D array of cells, with optional row and column offsets.
+
+        :param range_string: `named range` name
+        :type range_string: string
+
+        :rtype: tuples of tuples of :class:`openpyxl.cell.Cell
+        """
+        named_range = self._parent.get_named_range(range_string)
+        if named_range is None:
+            msg = '%s is not a valid range name' % range_string
+            raise NamedRangeException(msg)
+        if not isinstance(named_range, NamedRange):
+            msg = '%s refers to a value, not a range' % range_string
+            raise NamedRangeException(msg)
+
+        result = []
+        for destination in named_range.destinations:
+            worksheet, cells_range = destination
+
+            if worksheet is not self:
+                msg = 'Range %s is not defined on worksheet %s' % \
+                    (cells_range, self.title)
+                raise NamedRangeException(msg)
+
+            for row in self.iter_rows(cells_range):
+                result.extend(row)
+
+        return tuple(result)
+
+
+    @deprecated("""
+    Use .iter_rows() working with coordinates 'A1:D4',
+    and .get_squared_range() when working with indices (1, 1, 4, 4)
+    and .get_named_range() for named ranges""")
     def range(self, range_string, row=0, column=0):
         """Returns a 2D array of cells, with optional row and column offsets.
 
@@ -350,53 +473,15 @@ class Worksheet(object):
         :rtype: tuples of tuples of :class:`openpyxl.cell.Cell`
 
         """
-        if ':' in range_string:
-            # R1C1 range
-            result = []
-            cells = self._cells_from_range(range_string, row_offset=row,
-                                          column_offset=column)
-            for row in cells:
-                result.append(tuple(self[col] for col in row))
-            return tuple(result)
-
+        _rs = range_string.upper()
+        m = ABSOLUTE_RE.match(_rs)
+         # R1C1 range
+        if m is not None:
+            rows = self.iter_rows(_rs, row_offset=row, column_offset=column)
+            return tuple(row for row in rows)
         else:
-            try:
-                return self.cell(coordinate=range_string, row=row,
-                                 column=column)
-            except CellCoordinatesException:
-                pass
+            return self.get_named_range(range_string)
 
-            # named range
-            named_range = self._parent.get_named_range(range_string)
-            if named_range is None:
-                msg = '%s is not a valid range name' % range_string
-                raise NamedRangeException(msg)
-            if isinstance(named_range, NamedRangeContainingValue):
-                msg = '%s refers to a value, not a range' % range_string
-                raise NamedRangeException(msg)
-
-            result = []
-            for destination in named_range.destinations:
-
-                worksheet, cells_range = destination
-
-                if worksheet is not self:
-                    msg = 'Range %s is not defined on worksheet %s' % \
-                        (cells_range, self.title)
-                    raise NamedRangeException(msg)
-
-                content = self.range(cells_range)
-
-                if isinstance(content, tuple):
-                    for cells in content:
-                        result.extend(cells)
-                else:
-                    result.append(content)
-
-            if len(result) == 1:
-                return result[0]
-            else:
-                return tuple(result)
 
     @deprecated("Access styles directly from cells, columns or rows")
     def get_style(self, coordinate):
@@ -495,23 +580,28 @@ class Worksheet(object):
         if range_string not in self._merged_cells:
             self._merged_cells.append(range_string)
 
-        cells = self._cells_from_range(range_string)
+        cells = cells_from_range(range_string)
         # only the top-left cell is preserved
-        from itertools import islice, chain
         for c in islice(chain.from_iterable(cells), 1, None):
             if c in self._cells:
                 del self._cells[c]
 
-    def _cells_from_range(self, range_string, row_offset=0, column_offset=0):
-        """
-        Get individual addresses for every cell in a range
-        """
-        min_col, min_row = coordinate_from_string(range_string.split(':')[0])
-        max_col, max_row = coordinate_from_string(range_string.split(':')[1])
-        min_col = column_index_from_string(min_col)
-        max_col = column_index_from_string(max_col)
-        for row in range(min_row+row_offset, max_row+1 + row_offset):
-            yield ('%s%d' % (get_column_letter(col), row) for col in range(min_col + column_offset, max_col+1 + column_offset))
+
+    @property
+    def merged_cells(self):
+        """Utility for checking whether a cell has been merged or not"""
+        cells = set()
+        for _range in self._merged_cells:
+            for row in cells_from_range(_range):
+                cells = cells.union(set(row))
+        return cells
+
+
+    @property
+    def merged_cell_ranges(self):
+        """Public attribute for which cells have been merged"""
+        return self._merged_cells
+
 
     def unmerge_cells(self, range_string=None, start_row=None, start_column=None, end_row=None, end_column=None):
         """ Remove merge on a cell range.  Range is a cell range (e.g. A1:E1) """
@@ -581,17 +671,19 @@ class Worksheet(object):
 
     @property
     def rows(self):
-        return self.range(self.calculate_dimension())
+        """Iterate over all rows in the worksheet"""
+        return tuple(row for row in self.iter_rows())
 
     @property
     def columns(self):
-        max_row = self.get_highest_row()
+        """Iterate over all columns in the worksheet"""
+        max_row = self.max_row
+        min_row = 1
         cols = []
-        for col_idx in range(self.get_highest_column()):
-            col = get_column_letter(col_idx + 1)
-            res = self.range('%s1:%s%d' % (col, col, max_row))
-            cols.append(tuple([x[0] for x in res]))
-
+        for col_idx in range(self.max_column):
+            cells = self.get_squared_range(col_idx + 1, min_row, col_idx + 1, max_row)
+            col = chain.from_iterable(cells)
+            cols.append(tuple(col))
         return tuple(cols)
 
     def point_pos(self, left=0, top=0):

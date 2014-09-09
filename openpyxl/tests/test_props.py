@@ -71,4 +71,4 @@ def test_write_properties_app(datadir):
     content = write_properties_app(wb)
     with open('app.xml') as expected:
         diff = compare_xml(content, expected.read())
-        assert diff is None
+        assert diff is None, diff

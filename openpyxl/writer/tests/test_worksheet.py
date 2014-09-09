@@ -12,7 +12,7 @@ from openpyxl import Workbook
 
 from .. worksheet import write_worksheet
 
-from openpyxl.tests.helper import compare_xml
+from openpyxl.tests.helper import compare_xml, get_xml
 
 
 class DummyWorksheet:
@@ -370,6 +370,39 @@ def test_freeze_panes_both(out, doc, worksheet, write_worksheet_sheetviews):
     assert diff is None, diff
 
 
+def test_show_gridlines_false(out, doc, worksheet, write_worksheet_sheetviews):
+    ws = worksheet
+    ws.show_gridlines = False
+
+    write_worksheet_sheetviews(doc, ws)
+    xml = out.getvalue()
+    expected = """
+    <sheetViews>
+      <sheetView showGridLines="0" workbookViewId="0">
+        <selection activeCell="A1" sqref="A1"></selection>
+      </sheetView>
+    </sheetViews>
+    """
+    diff = compare_xml(xml,expected)
+    assert diff is None, diff
+
+
+def test_show_gridlines_true(out, doc, worksheet, write_worksheet_sheetviews):
+    ws = worksheet
+    ws.show_gridlines = True
+
+    write_worksheet_sheetviews(doc, ws)
+    xml = out.getvalue()
+    expected = """
+    <sheetViews>
+      <sheetView workbookViewId="0">
+        <selection activeCell="A1" sqref="A1"></selection>
+      </sheetView>
+    </sheetViews>
+    """
+    diff = compare_xml(xml,expected)
+    assert diff is None, diff
+
 
 @pytest.mark.parametrize("value, expected",
                          [
@@ -609,22 +642,21 @@ def test_write_pagebreaks(out, doc, worksheet):
     assert out.getvalue() == b""
 
 
-def test_data_validation(out, doc, worksheet):
-    from .. worksheet import write_worksheet_datavalidations
-    from openpyxl.datavalidation import DataValidation, ValidationType
+def test_data_validation(worksheet):
+    from .. worksheet import write_datavalidation
+    from openpyxl.worksheet.datavalidation import DataValidation, ValidationType
 
     ws = worksheet
     dv = DataValidation(ValidationType.LIST, formula1='"Dog,Cat,Fish"')
     dv.add_cell(ws['A1'])
     ws.add_data_validation(dv)
 
-    write_worksheet_datavalidations(doc, worksheet)
-    xml = out.getvalue()
+    xml = write_datavalidation(worksheet)
+    xml = get_xml(xml)
     expected = """
-    <dataValidations count="1">
+    <dataValidations xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main" count="1">
     <dataValidation allowBlank="0" showErrorMessage="1" showInputMessage="1" sqref="A1" type="list">
       <formula1>&quot;Dog,Cat,Fish&quot;</formula1>
-      <formula2>None</formula2>
     </dataValidation>
     </dataValidations>
     """

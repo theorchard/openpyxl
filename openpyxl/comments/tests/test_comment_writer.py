@@ -21,6 +21,7 @@
 # @license: http://www.opensource.org/licenses/mit-license.php
 # @author: see AUTHORS file
 
+from openpyxl.compat import zip
 from openpyxl.workbook import Workbook
 from openpyxl.worksheet import Worksheet
 from openpyxl.writer.comments import CommentWriter

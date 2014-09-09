@@ -1,11 +1,14 @@
+from __future__ import absolute_import
 # Copyright (c) 2010-2014 openpyxl
 
 # Python stdlib imports
 
 import pytest
 
+from openpyxl.compat import zip
+
 # package imports
-from ..named_range import split_named_range, NamedRange
+from .. named_range import split_named_range, NamedRange, NamedValue
 from openpyxl.reader.workbook import read_named_ranges
 from openpyxl.exceptions import NamedRangeException
 from openpyxl.reader.excel import load_workbook
@@ -31,8 +34,69 @@ class DummyWB:
             return self.ws
 
 
-def test_split():
-    assert [('My Sheet', '$D$8'), ] == list(split_named_range("'My Sheet'!$D$8"))
+@pytest.mark.parametrize("range_string",
+                         [
+                             "'My Sheet'!$D$8",
+                             "Sheet1!$A$1",
+                             "[1]Sheet1!$A$1",
+                             "[1]!B2range",
+                         ])
+def test_check_range(range_string):
+    from .. named_range import refers_to_range
+    assert refers_to_range(range_string) is True
+
+
+@pytest.mark.parametrize("range_string, result",
+                         [
+                             ("'My Sheet'!$D$8", [('My Sheet', '$D$8'), ]),
+                             ("Sheet1!$A$1", [('Sheet1', '$A$1')]),
+                             ("[1]Sheet1!$A$1", [('[1]Sheet1', '$A$1')]),
+                             ("[1]!B2range", [('[1]', '')]),
+                             ("Sheet1!$C$5:$C$7,Sheet1!$C$9:$C$11,Sheet1!$E$5:$E$7,Sheet1!$E$9:$E$11,Sheet1!$D$8",
+                              [('Sheet1', '$C$5:$C$7'),
+                               ('Sheet1', '$C$9:$C$11'),
+                               ('Sheet1', '$E$5:$E$7'),
+                               ('Sheet1', '$E$9:$E$11'),
+                               ('Sheet1', '$D$8')
+                               ]),
+                         ])
+def test_split(range_string, result):
+    assert list(split_named_range(range_string)) == result
+
+
+@pytest.mark.parametrize("range_string, external",
+                         [
+                             ("'My Sheet'!$D$8", False),
+                             ("Sheet1!$A$1", False),
+                             ("[1]Sheet1!$A$1", True),
+                             ("[1]!B2range", True),
+                         ])
+def test_external_range(range_string, external):
+    from .. named_range import external_range
+    assert external_range(range_string) is external
+
+
+def test_dict_interface():
+    xlrange = NamedValue("a range", "the value")
+    assert dict(xlrange) == {'name':"a range"}
+
+
+def test_range_scope():
+    xlrange = NamedValue("Pi", 3.14)
+    xlrange.scope = 1
+    assert dict(xlrange) == {'name': 'Pi', 'localSheetId': 1}
+
+
+def test_destinations_string():
+    ws = DummyWS('Sheet1')
+    xlrange = NamedRange("TRAP_2", [
+        (ws, '$C$5:$C$7'),
+        (ws, '$C$9:$C$11'),
+        (ws, '$E$5:$E$7'),
+        (ws, '$E$9:$E$11'),
+        (ws, '$D$8')
+                               ])
+    assert xlrange.value == "'Sheet1'!$C$5:$C$7,'Sheet1'!$C$9:$C$11,'Sheet1'!$E$5:$E$7,'Sheet1'!$E$9:$E$11,'Sheet1'!$D$8"
 
 
 def test_split_no_quotes():
@@ -76,6 +140,24 @@ def test_read_named_ranges_missing_sheet(datadir):
         assert list(named_ranges) == []
 
 
+def test_read_external_ranges(datadir):
+    datadir.chdir()
+    ws = DummyWS("Sheet1")
+    wb = DummyWB(ws)
+    with open("workbook_external_range.xml") as src:
+        xml = src.read()
+    named_ranges = list(read_named_ranges(xml, wb))
+    assert len(named_ranges) == 4
+    expected = [
+        ("B1namedrange", "'Sheet1'!$A$1"),
+        ("references_external_workbook", "[1]Sheet1!$A$1"),
+        ("references_nr_in_ext_wb", "[1]!B2range"),
+        ("references_other_named_range", "B1namedrange"),
+    ]
+    for xlr, target in zip(named_ranges, expected):
+        assert xlr.name, xlr.value == target
+
+
 ranges_counts = (
     (4, 'TEST_RANGE'),
     (3, 'TRAP_1'),
@@ -87,7 +169,7 @@ def test_oddly_shaped_named_ranges(datadir, count, range_name):
     datadir.chdir()
     wb = load_workbook('merge_range.xlsx')
     ws = wb.worksheets[0]
-    assert len(ws.range(range_name)) == count
+    assert len(ws.get_named_range(range_name)) == count
 
 
 def test_merged_cells_named_range(datadir):
@@ -95,7 +177,7 @@ def test_merged_cells_named_range(datadir):
 
     wb = load_workbook('merge_range.xlsx')
     ws = wb.worksheets[0]
-    cell = ws.range('TRAP_3')
+    cell = ws.get_named_range('TRAP_3')[0]
     assert 'B15' == cell.coordinate
     assert 10 == cell.value
 
@@ -145,13 +227,13 @@ class TestNameRefersToValue:
 
 
     def test_worksheet_range(self):
-        range = self.ws.range("MyRef")
+        range = self.ws.get_named_range("MyRef")
         assert range.coordinate == "A1"
 
 
     def test_worksheet_range_error_on_value_range(self):
         with pytest.raises(NamedRangeException):
-            self.ws.range("MyValue")
+            self.ws.get_named_range("MyValue")
 
 
     def test_handles_scope(self):

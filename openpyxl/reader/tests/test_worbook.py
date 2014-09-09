@@ -8,7 +8,8 @@ import pytest
 from openpyxl.xml.constants import (
     ARC_WORKBOOK,
     ARC_CONTENT_TYPES,
-    ARC_WORKBOOK_RELS
+    ARC_WORKBOOK_RELS,
+    REL_NS,
 )
 
 
@@ -36,17 +37,17 @@ def test_hidden_sheets(datadir, DummyArchive):
 
 @pytest.mark.parametrize("excel_file, expected", [
     ("bug137.xlsx", [
-        {'path': 'xl/worksheets/sheet1.xml', 'title': 'Sheet1'}
+        {'path': 'xl/worksheets/sheet1.xml', 'title': 'Sheet1', 'type':'%s/worksheet' % REL_NS}
         ]
      ),
     ("contains_chartsheets.xlsx", [
-        {'path': 'xl/worksheets/sheet1.xml', 'title': 'data'},
-        {'path': 'xl/worksheets/sheet2.xml', 'title': 'moredata'},
+        {'path': 'xl/worksheets/sheet1.xml', 'title': 'data', 'type':'%s/worksheet' % REL_NS},
+        {'path': 'xl/worksheets/sheet2.xml', 'title': 'moredata', 'type':'%s/worksheet' % REL_NS},
         ]),
     ("bug304.xlsx", [
-    {'path': 'xl/worksheets/sheet3.xml', 'title': 'Sheet1'},
-    {'path': 'xl/worksheets/sheet2.xml', 'title': 'Sheet2'},
-    {'path': 'xl/worksheets/sheet.xml', 'title': 'Sheet3'},
+    {'path': 'xl/worksheets/sheet3.xml', 'title': 'Sheet1', 'type':'%s/worksheet' % REL_NS},
+    {'path': 'xl/worksheets/sheet2.xml', 'title': 'Sheet2', 'type':'%s/worksheet' % REL_NS},
+    {'path': 'xl/worksheets/sheet.xml', 'title': 'Sheet3', 'type':'%s/worksheet' % REL_NS},
     ])
 ]
                          )
@@ -60,21 +61,21 @@ def test_detect_worksheets(datadir, excel_file, expected):
 
 @pytest.mark.parametrize("excel_file, expected", [
     ("bug137.xlsx", {
-        "rId1": {'path': 'xl/chartsheets/sheet1.xml'},
-        "rId2": {'path': 'xl/worksheets/sheet1.xml'},
-        "rId3": {'path': 'xl/theme/theme1.xml'},
-        "rId4": {'path': 'xl/styles.xml'},
-        "rId5": {'path': 'xl/sharedStrings.xml'}
+        "rId1": {'path': 'xl/chartsheets/sheet1.xml', 'type':'%s/chartsheet' % REL_NS},
+        "rId2": {'path': 'xl/worksheets/sheet1.xml', 'type':'%s/worksheet' % REL_NS},
+        "rId3": {'path': 'xl/theme/theme1.xml', 'type':'%s/theme' % REL_NS},
+        "rId4": {'path': 'xl/styles.xml', 'type':'%s/styles' % REL_NS},
+        "rId5": {'path': 'xl/sharedStrings.xml', 'type':'%s/sharedStrings' % REL_NS}
     }),
     ("bug304.xlsx", {
-        'rId1': {'path': 'xl/worksheets/sheet3.xml'},
-        'rId2': {'path': 'xl/worksheets/sheet2.xml'},
-        'rId3': {'path': 'xl/worksheets/sheet.xml'},
-        'rId4': {'path': 'xl/theme/theme.xml'},
-        'rId5': {'path': 'xl/styles.xml'},
-        'rId6': {'path': '../customXml/item1.xml'},
-        'rId7': {'path': '../customXml/item2.xml'},
-        'rId8': {'path': '../customXml/item3.xml'}
+        'rId1': {'path': 'xl/worksheets/sheet3.xml', 'type':'%s/worksheet' % REL_NS},
+        'rId2': {'path': 'xl/worksheets/sheet2.xml', 'type':'%s/worksheet' % REL_NS},
+        'rId3': {'path': 'xl/worksheets/sheet.xml', 'type':'%s/worksheet' % REL_NS},
+        'rId4': {'path': 'xl/theme/theme.xml', 'type':'%s/theme' % REL_NS},
+        'rId5': {'path': 'xl/styles.xml', 'type':'%s/styles' % REL_NS},
+        'rId6': {'path': '../customXml/item1.xml', 'type':'%s/customXml' % REL_NS},
+        'rId7': {'path': '../customXml/item2.xml', 'type':'%s/customXml' % REL_NS},
+        'rId8': {'path': '../customXml/item3.xml', 'type':'%s/customXml' % REL_NS}
     }),
 ]
                          )
@@ -121,20 +122,20 @@ def test_read_content_types(datadir, DummyArchive):
         archive.writestr(ARC_CONTENT_TYPES, src.read())
 
     assert list(read_content_types(archive)) == [
-    ('/xl/workbook.xml', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet.main+xml'),
-    ('/xl/worksheets/sheet1.xml', 'application/vnd.openxmlformats-officedocument.spreadsheetml.worksheet+xml'),
-    ('/xl/chartsheets/sheet1.xml', 'application/vnd.openxmlformats-officedocument.spreadsheetml.chartsheet+xml'),
-    ('/xl/worksheets/sheet2.xml', 'application/vnd.openxmlformats-officedocument.spreadsheetml.worksheet+xml'),
-    ('/xl/theme/theme1.xml', 'application/vnd.openxmlformats-officedocument.theme+xml'),
-    ('/xl/styles.xml', 'application/vnd.openxmlformats-officedocument.spreadsheetml.styles+xml'),
-    ('/xl/sharedStrings.xml', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sharedStrings+xml'),
-    ('/xl/drawings/drawing1.xml', 'application/vnd.openxmlformats-officedocument.drawing+xml'),
-    ('/xl/charts/chart1.xml', 'application/vnd.openxmlformats-officedocument.drawingml.chart+xml'),
-    ('/xl/drawings/drawing2.xml', 'application/vnd.openxmlformats-officedocument.drawing+xml'),
-    ('/xl/charts/chart2.xml', 'application/vnd.openxmlformats-officedocument.drawingml.chart+xml'),
-    ('/xl/calcChain.xml', 'application/vnd.openxmlformats-officedocument.spreadsheetml.calcChain+xml'),
-    ('/docProps/core.xml', 'application/vnd.openxmlformats-package.core-properties+xml'),
-    ('/docProps/app.xml', 'application/vnd.openxmlformats-officedocument.extended-properties+xml')
+    ('application/vnd.openxmlformats-officedocument.spreadsheetml.sheet.main+xml', '/xl/workbook.xml'),
+    ('application/vnd.openxmlformats-officedocument.spreadsheetml.worksheet+xml', '/xl/worksheets/sheet1.xml'),
+    ('application/vnd.openxmlformats-officedocument.spreadsheetml.chartsheet+xml', '/xl/chartsheets/sheet1.xml'),
+    ('application/vnd.openxmlformats-officedocument.spreadsheetml.worksheet+xml', '/xl/worksheets/sheet2.xml',),
+    ('application/vnd.openxmlformats-officedocument.theme+xml', '/xl/theme/theme1.xml'),
+    ('application/vnd.openxmlformats-officedocument.spreadsheetml.styles+xml', '/xl/styles.xml'),
+    ('application/vnd.openxmlformats-officedocument.spreadsheetml.sharedStrings+xml', '/xl/sharedStrings.xml'),
+    ('application/vnd.openxmlformats-officedocument.drawing+xml', '/xl/drawings/drawing1.xml'),
+    ('application/vnd.openxmlformats-officedocument.drawingml.chart+xml','/xl/charts/chart1.xml'),
+    ('application/vnd.openxmlformats-officedocument.drawing+xml', '/xl/drawings/drawing2.xml'),
+    ('application/vnd.openxmlformats-officedocument.drawingml.chart+xml', '/xl/charts/chart2.xml'),
+    ('application/vnd.openxmlformats-officedocument.spreadsheetml.calcChain+xml', '/xl/calcChain.xml'),
+    ('application/vnd.openxmlformats-package.core-properties+xml', '/docProps/core.xml'),
+    ('application/vnd.openxmlformats-officedocument.extended-properties+xml', '/docProps/app.xml')
     ]
 
 
@@ -150,4 +151,4 @@ def test_missing_content_type(datadir, DummyArchive):
     with open("bug181_workbook.xml.rels") as src:
         archive.writestr(ARC_WORKBOOK_RELS, src.read())
     sheets = list(detect_worksheets(archive))
-    assert sheets == [{'path': 'xl/worksheets/sheet1.xml', 'title': 'Sheet 1'}]
+    assert sheets == [{'path': 'xl/worksheets/sheet1.xml', 'title': 'Sheet 1', 'type':'%s/worksheet' % REL_NS}]

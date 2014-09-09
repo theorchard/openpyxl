@@ -14,7 +14,7 @@ import threading
 from openpyxl.collections import IndexedList
 from openpyxl.worksheet import Worksheet
 from openpyxl.writer.dump_worksheet import DumpWorksheet, save_dump
-from .named_range import NamedRange
+from . names.named_range import NamedRange
 from openpyxl.styles import Style
 from openpyxl.writer.excel import save_workbook
 from openpyxl.exceptions import ReadOnlyWorkbookException
@@ -71,6 +71,7 @@ class Workbook(object):
         self.worksheets = []
         self._active_sheet_index = 0
         self._named_ranges = []
+        self._external_links = []
         self.properties = DocumentProperties()
         self.style = Style()
         self.security = DocumentSecurity()

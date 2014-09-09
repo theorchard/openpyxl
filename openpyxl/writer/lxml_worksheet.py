@@ -21,8 +21,13 @@ from openpyxl.xml.constants import (
 )
 
 from openpyxl.formatting import ConditionalFormatting
+from openpyxl.worksheet.datavalidation import writer
 
-from .worksheet import row_sort, get_rows_to_write
+from .worksheet import (
+    row_sort,
+    get_rows_to_write,
+    write_datavalidation,
+)
 
 
 def write_worksheet(worksheet, shared_strings):
@@ -242,7 +247,10 @@ def write_autofilter(worksheet):
 
 def write_sheetviews(worksheet):
     views = Element('sheetViews')
-    view = SubElement(views, 'sheetView', {'workbookViewId': '0'})
+    sheetviewAttrs = {'workbookViewId': '0'}
+    if not worksheet.show_gridlines:
+        sheetviewAttrs['showGridLines'] = '0'
+    view = SubElement(views, 'sheetView', sheetviewAttrs)
     selectionAttrs = {}
     topLeftCell = worksheet.freeze_panes
     if topLeftCell:
@@ -295,25 +303,6 @@ def write_mergecells(worksheet):
         attrs = {'ref': range_string}
         SubElement(merge, 'mergeCell', attrs)
     return merge
-
-
-def write_datavalidation(worksheet):
-    """ Write data validation(s) to xml."""
-    # Filter out "empty" data-validation objects (i.e. with 0 cells)
-    required_dvs = [x for x in worksheet._data_validations
-                    if len(x.cells) or len(x.ranges)]
-    if not required_dvs:
-        return
-
-    dvs = Element('dataValidations', {'count': str(len(required_dvs))})
-    for data_validation in required_dvs:
-        dv = SubElement(dvs, 'dataValidation',
-                        data_validation.generate_attributes_map())
-        if data_validation.formula1:
-            SubElement(dv, 'formula1').text = data_validation.formula1
-        if data_validation.formula2:
-            SubElement(dv, 'formula2').text = data_validation.formula2
-    return dvs
 
 
 def write_header_footer(worksheet):

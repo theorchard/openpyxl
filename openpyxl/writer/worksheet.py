@@ -1,26 +1,5 @@
 from __future__ import absolute_import
 # Copyright (c) 2010-2014 openpyxl
-#
-# Permission is hereby granted, free of charge, to any person obtaining a copy
-# of this software and associated documentation files (the "Software"), to deal
-# in the Software without restriction, including without limitation the rights
-# to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-# copies of the Software, and to permit persons to whom the Software is
-# furnished to do so, subject to the following conditions:
-#
-# The above copyright notice and this permission notice shall be included in
-# all copies or substantial portions of the Software.
-#
-# THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-# IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-# FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-# AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-# LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-# OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
-# THE SOFTWARE.
-#
-# @license: http://www.opensource.org/licenses/mit-license.php
-# @author: see AUTHORS file
 
 """Write worksheets to xml representations."""
 
@@ -43,6 +22,7 @@ from openpyxl.xml.functions import (
     end_tag,
     tag,
     fromstring,
+    Element
 )
 from openpyxl.xml.constants import (
     SHEET_MAIN_NS,
@@ -50,6 +30,7 @@ from openpyxl.xml.constants import (
 )
 from openpyxl.compat.itertools import iteritems, iterkeys
 from openpyxl.formatting import ConditionalFormatting
+from openpyxl.worksheet.datavalidation import writer
 
 
 def row_sort(cell):
@@ -93,7 +74,9 @@ def write_worksheet(worksheet, shared_strings):
     write_worksheet_autofilter(doc, worksheet)
     write_worksheet_mergecells(doc, worksheet)
     write_worksheet_conditional_formatting(doc, worksheet)
-    write_worksheet_datavalidations(doc, worksheet)
+    dvs = write_datavalidation(worksheet)
+    if dvs:
+        xml_file.write(dvs)
     write_worksheet_hyperlinks(doc, worksheet)
 
     options = worksheet.page_setup.options
@@ -134,7 +117,10 @@ def write_worksheet(worksheet, shared_strings):
 
 def write_worksheet_sheetviews(doc, worksheet):
     start_tag(doc, 'sheetViews')
-    start_tag(doc, 'sheetView', {'workbookViewId': '0'})
+    sheetviewAttrs = {'workbookViewId': '0'}
+    if not worksheet.show_gridlines:
+        sheetviewAttrs['showGridLines'] = '0'
+    start_tag(doc, 'sheetView', sheetviewAttrs)
     selectionAttrs = {}
     topLeftCell = worksheet.freeze_panes
     if topLeftCell:
@@ -361,24 +347,20 @@ def write_worksheet_mergecells(doc, worksheet):
             tag(doc, 'mergeCell', attrs)
         end_tag(doc, 'mergeCells')
 
-def write_worksheet_datavalidations(doc, worksheet):
+def write_datavalidation(worksheet):
     """ Write data validation(s) to xml."""
     # Filter out "empty" data-validation objects (i.e. with 0 cells)
     required_dvs = [x for x in worksheet._data_validations
                     if len(x.cells) or len(x.ranges)]
-    count = len(required_dvs)
-    if count == 0:
+    if not required_dvs:
         return
 
-    start_tag(doc, 'dataValidations', {'count': str(count)})
-    for data_validation in required_dvs:
-        start_tag(doc, 'dataValidation', data_validation.generate_attributes_map())
-        if data_validation.formula1:
-            tag(doc, 'formula1', body=data_validation.formula1)
-        if data_validation.formula2:
-            tag(doc, 'formula2', body=data_validation.formula2)
-        end_tag(doc, 'dataValidation')
-    end_tag(doc, 'dataValidations')
+    dvs = Element("{%s}dataValidations" % SHEET_MAIN_NS,
+                  count=str(len(required_dvs)))
+    for dv in required_dvs:
+        dvs.append(writer(dv))
+
+    return dvs
 
 def write_worksheet_hyperlinks(doc, worksheet):
     """Write worksheet hyperlinks to xml."""

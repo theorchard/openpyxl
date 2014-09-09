@@ -1,26 +1,5 @@
 from __future__ import absolute_import
 # Copyright (c) 2010-2014 openpyxl
-#
-# Permission is hereby granted, free of charge, to any person obtaining a copy
-# of this software and associated documentation files (the "Software"), to deal
-# in the Software without restriction, including without limitation the rights
-# to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-# copies of the Software, and to permit persons to whom the Software is
-# furnished to do so, subject to the following conditions:
-#
-# The above copyright notice and this permission notice shall be included in
-# all copies or substantial portions of the Software.
-#
-# THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-# IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-# FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-# AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-# LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-# OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
-# THE SOFTWARE.
-#
-# @license: http://www.opensource.org/licenses/mit-license.php
-# @author: see AUTHORS file
 
 """Read an xlsx file into Python"""
 
@@ -49,16 +28,21 @@ from openpyxl.xml.constants import (
     ARC_WORKBOOK,
     ARC_STYLE,
     ARC_THEME,
+    SHARED_STRINGS,
+    EXTERNAL_LINK,
 )
 
 from openpyxl.workbook import Workbook, DocumentProperties
+from openpyxl.workbook.names.external import detect_external_links
 from openpyxl.reader.strings import read_string_table
 from openpyxl.reader.style import read_style_table
 from openpyxl.reader.workbook import (
+    read_content_types,
     read_named_ranges,
     read_properties_core,
     read_excel_base_date,
-    detect_worksheets
+    detect_worksheets,
+    read_rels,
 )
 from openpyxl.reader.worksheet import read_worksheet
 from openpyxl.reader.comments import read_comments, get_comments_file
@@ -201,9 +185,16 @@ def _load_workbook(wb, archive, filename, read_only, keep_vba):
         wb.properties = DocumentProperties()
     wb._read_workbook_settings(archive.read(ARC_WORKBOOK))
 
-    try:
-        shared_strings = read_string_table(archive.read(ARC_SHARED_STRINGS))
-    except KeyError:
+    # what content types do we have?
+    cts = dict(read_content_types(archive))
+    rels = dict
+
+    strings_path = cts.get(SHARED_STRINGS)
+    if strings_path is not None:
+        if strings_path.startswith("/"):
+            strings_path = strings_path[1:]
+        shared_strings = read_string_table(archive.read(strings_path))
+    else:
         shared_strings = []
 
     try:
@@ -247,3 +238,7 @@ def _load_workbook(wb, archive, filename, read_only, keep_vba):
                 read_comments(new_ws, archive.read(comments_file))
 
     wb._named_ranges = list(read_named_ranges(archive.read(ARC_WORKBOOK), wb))
+
+    if EXTERNAL_LINK in cts:
+        rels = read_rels(archive)
+        wb._external_links = list(detect_external_links(rels, archive))

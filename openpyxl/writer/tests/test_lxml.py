@@ -397,6 +397,40 @@ def test_freeze_panes_both(worksheet, write_sheetviews):
     assert diff is None, diff
 
 
+def test_show_gridlines_false(worksheet, write_sheetviews):
+    ws = worksheet
+    ws.show_gridlines = False
+
+    views = write_sheetviews(ws)
+    xml = tostring(views, encoding='unicode')
+    expected = """
+    <sheetViews>
+      <sheetView showGridLines="0" workbookViewId="0">
+        <selection activeCell="A1" sqref="A1"></selection>
+      </sheetView>
+    </sheetViews>
+    """
+    diff = compare_xml(xml,expected)
+    assert diff is None, diff
+
+
+def test_show_gridlines_true(worksheet, write_sheetviews):
+    ws = worksheet
+    ws.show_gridlines = True
+
+    views = write_sheetviews(ws)
+    xml = tostring(views, encoding='unicode')
+    expected = """
+    <sheetViews>
+      <sheetView workbookViewId="0">
+        <selection activeCell="A1" sqref="A1"></selection>
+      </sheetView>
+    </sheetViews>
+    """
+    diff = compare_xml(xml,expected)
+    assert diff is None, diff
+
+
 @pytest.fixture
 def write_worksheet():
     from .. lxml_worksheet import write_worksheet
@@ -478,28 +512,6 @@ def test_no_pagebreaks(worksheet):
 
     pb = write_pagebreaks(worksheet)
     assert pb is None
-
-def test_data_validation(worksheet):
-    from .. lxml_worksheet import write_datavalidation
-    from openpyxl.datavalidation import DataValidation, ValidationType
-
-    ws = worksheet
-    dv = DataValidation(ValidationType.LIST, formula1='"Dog,Cat,Fish"')
-    dv.add_cell(ws['A1'])
-    ws.add_data_validation(dv)
-
-    dv = write_datavalidation(worksheet)
-    xml = tostring(dv, encoding="unicode")
-    expected = """
-    <dataValidations count="1">
-    <dataValidation allowBlank="0" showErrorMessage="1" showInputMessage="1" sqref="A1" type="list">
-      <formula1>&quot;Dog,Cat,Fish&quot;</formula1>
-      <formula2>None</formula2>
-    </dataValidation>
-    </dataValidations>
-    """
-    diff = compare_xml(xml, expected)
-    assert diff is None, diff
 
 
 def test_hyperlink(worksheet):

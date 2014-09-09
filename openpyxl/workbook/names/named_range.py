@@ -28,6 +28,7 @@ from __future__ import absolute_import
 import re
 
 # package imports
+from openpyxl.cell import absolute_coordinate
 from openpyxl.compat import unicode
 from openpyxl.exceptions import NamedRangeException
 
@@ -36,9 +37,37 @@ NAMED_RANGE_RE = re.compile("""
 ^(('(?P<quoted>([^']|'')*)')|(?P<notquoted>[^']*))
 !(?P<range>(\$([A-Za-z]+))?(\$([0-9]+))?(:(\$([A-Za-z]+))?(\$([0-9]+))?)?)""", re.VERBOSE)
 SPLIT_NAMED_RANGE_RE = re.compile(r"((?:[^,']|'(?:[^']|'')*')+)")
+EXTERNAL_RE = re.compile(r"(?P<external>\[\d+\])?(?P<range_string>.*)")
 
 
-class NamedRange(object):
+class NamedValue(object):
+    """A named value"""
+    __slots__ = ('name', 'value', 'scope')
+
+    def __init__(self, name, value):
+        self.name = name
+        self.value = value
+        self.scope = None
+
+    @property
+    def localSheetId(self):
+        return self.scope
+
+    def __repr__(self):
+        return u'<{0} "{1}">'.format(self.__class__.__name__, self.value)
+
+    def __iter__(self):
+        for attr in ('name', 'localSheetId'):
+            value = getattr(self, attr, None)
+            if value is not None:
+                yield attr, value
+
+
+#backwards compatibility
+NamedRangeContainingValue = NamedValue
+
+
+class NamedRange(NamedValue):
     """A named group of cells
 
     Scope is a worksheet object or None for workbook scope names (the default)
@@ -53,21 +82,19 @@ class NamedRange(object):
         self.destinations = destinations
         self.scope = scope
 
+    @property
+    def value(self):
+        dest_cells = []
+        for ws, xlrange in self.destinations:
+            dest_cells.append("'%s'!%s" % (ws.title.replace("'", "''"),
+                                       absolute_coordinate(xlrange)))
+        return ",".join(dest_cells)
+
     def __str__(self):
         return  ','.join([self.str_format % (sheet, name) for sheet, name in self.destinations])
 
     def __repr__(self):
         return  self.repr_format % (self.__class__.__name__, str(self))
-
-
-class NamedRangeContainingValue(object):
-    """A named value"""
-    __slots__ = ('name', 'value', 'scope')
-
-    def __init__(self, name, value):
-        self.name = name
-        self.value = value
-        self.scope = None
 
 
 def split_named_range(range_string):
@@ -87,4 +114,11 @@ def split_named_range(range_string):
 
 
 def refers_to_range(range_string):
-    return range_string and bool(NAMED_RANGE_RE.match(range_string))
+    if range_string:
+        return NAMED_RANGE_RE.match(range_string) is not None
+
+
+def external_range(range_string):
+    m = EXTERNAL_RE.match(range_string)
+    if m is not None:
+        return m.group('external') is not None

@@ -1,25 +1,4 @@
 # Copyright (c) 2010-2014 openpyxl
-#
-# Permission is hereby granted, free of charge, to any person obtaining a copy
-# of this software and associated documentation files (the "Software"), to deal
-# in the Software without restriction, including without limitation the rights
-# to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-# copies of the Software, and to permit persons to whom the Software is
-# furnished to do so, subject to the following conditions:
-#
-# The above copyright notice and this permission notice shall be included in
-# all copies or substantial portions of the Software.
-#
-# THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-# IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-# FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-# AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-# LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-# OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
-# THE SOFTWARE.
-#
-# @license: http://www.opensource.org/licenses/mit-license.php
-# @author: see AUTHORS file
 
 import datetime
 import os.path
@@ -27,9 +6,9 @@ import os.path
 import pytest
 
 from openpyxl.tests.helper import DATADIR
-from openpyxl.worksheet.iter_worksheet import get_range_boundaries, read_dimension
+from openpyxl.worksheet.iter_worksheet import read_dimension
 from openpyxl.reader.excel import load_workbook
-from openpyxl.compat import range, izip
+from openpyxl.compat import range, zip
 
 
 def test_open_many_sheets(datadir):
@@ -115,13 +94,6 @@ class TestDims(TestWorksheet):
         assert ws.get_highest_column() == col
 
 
-def test_get_boundaries_range():
-    assert get_range_boundaries('C1:C4') == (3, 1, 4, 4)
-
-def test_get_boundaries_one():
-    assert get_range_boundaries('C1') == (3, 1, 4, 1)
-
-
 class TestText(TestWorksheet):
     sheet_name = 'Sheet1 - Text'
     expected = [['This is cell A1 in Sheet 1', None, None, None, None, None, None],
@@ -132,7 +104,7 @@ class TestText(TestWorksheet):
     def test_read_fast_integrated(self):
         wb = self._open_wb()
         ws = wb.get_sheet_by_name(name = self.sheet_name)
-        for row, expected_row in izip(ws.iter_rows(), self.expected):
+        for row, expected_row in zip(ws.iter_rows(), self.expected):
             row_values = [x.value for x in row]
             assert row_values == expected_row
 
@@ -150,7 +122,7 @@ class TestIntegers(TestWorksheet):
     def test_read_fast_integrated(self):
         wb = self._open_wb()
         ws = wb.get_sheet_by_name(name = self.sheet_name)
-        for row, expected_row in izip(ws.iter_rows(self.query_range), self.expected):
+        for row, expected_row in zip(ws.iter_rows(self.query_range), self.expected):
             row_values = [x.value for x in row]
             assert row_values == expected_row
 
@@ -164,7 +136,7 @@ class TestFloats(TestWorksheet):
     def test_read_fast_integrated(self):
         wb = self._open_wb()
         ws = wb.get_sheet_by_name(name = self.sheet_name)
-        for row, expected_row in izip(ws.iter_rows(self.query_range), self.expected):
+        for row, expected_row in zip(ws.iter_rows(self.query_range), self.expected):
             row_values = [x.value for x in row]
             assert row_values == expected_row
 

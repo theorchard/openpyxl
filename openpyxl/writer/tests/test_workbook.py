@@ -5,19 +5,22 @@ from __future__ import absolute_import
 from io import BytesIO
 import os
 
-# package
-from openpyxl import Workbook, load_workbook
-
 # test
 import pytest
-from openpyxl.tests.helper import compare_xml
+from openpyxl.tests.helper import compare_xml, get_xml
 
-from openpyxl.writer.excel import (
+# package
+from openpyxl import Workbook, load_workbook
+from openpyxl.workbook.names.named_range import NamedRange
+from openpyxl.xml.functions import Element
+from .. excel import (
     save_workbook,
     save_virtual_workbook,
     )
-
-from .. workbook import write_workbook, write_workbook_rels
+from .. workbook import (
+    write_workbook,
+    write_workbook_rels,
+)
 
 
 def test_write_auto_filter(datadir):
@@ -97,3 +100,21 @@ def test_write_workbook(datadir):
     with open('workbook.xml') as expected:
         diff = compare_xml(content, expected.read())
         assert diff is None, diff
+
+
+def test_write_named_range():
+    from openpyxl.writer.workbook import _write_defined_names
+    wb = Workbook()
+    ws = wb.active
+    xlrange = NamedRange('test_range', [(ws, "A1:B5")])
+    wb._named_ranges.append(xlrange)
+    root = Element("root")
+    _write_defined_names(wb, root)
+    xml = get_xml(root)
+    expected = """
+    <root>
+     <s:definedName xmlns:s="http://schemas.openxmlformats.org/spreadsheetml/2006/main" name="test_range">'Sheet'!$A$1:$B$5</s:definedName>
+    </root>
+    """
+    diff = compare_xml(xml, expected)
+    assert diff is None, diff

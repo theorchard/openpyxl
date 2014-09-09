@@ -10,7 +10,7 @@ Examples
 .. :: doctest
 
 >>> from openpyxl import Workbook
->>> from openpyxl.datavalidation import DataValidation, ValidationType
+>>> from openpyxl.worksheet.datavalidation import DataValidation, ValidationType
 >>>
 >>> # Create the workbook and worksheet we'll be working with
 >>> wb = Workbook()
