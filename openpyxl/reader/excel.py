@@ -33,7 +33,7 @@ from openpyxl.xml.constants import (
 )
 
 from openpyxl.workbook import Workbook, DocumentProperties
-from openpyxl.workbook.external import detect_external_links
+from openpyxl.workbook.names.external import detect_external_links
 from openpyxl.reader.strings import read_string_table
 from openpyxl.reader.style import read_style_table
 from openpyxl.reader.workbook import (

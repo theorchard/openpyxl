@@ -28,7 +28,7 @@ def test_read_external_ref(datadir):
 
 
 def test_read_external_link(datadir):
-    from openpyxl.workbook.external import parse_books
+    from .. external import parse_books
     datadir.chdir()
     with open("externalLink1.xml.rels") as src:
         xml = src.read()
@@ -37,7 +37,7 @@ def test_read_external_link(datadir):
 
 
 def test_read_external_ranges(datadir):
-    from openpyxl.workbook.external import parse_ranges
+    from .. external import parse_ranges
     datadir.chdir()
     with open("externalLink1.xml") as src:
         xml = src.read()
@@ -47,7 +47,7 @@ def test_read_external_ranges(datadir):
 
 
 def test_dict_external_book():
-    from openpyxl.workbook.external import ExternalBook
+    from .. external import ExternalBook
     book = ExternalBook('rId1', "book1.xlsx")
     assert dict(book) == {'Id':'rId1', 'Target':'book1.xlsx',
                           'TargetMode':'External',
@@ -55,14 +55,14 @@ def test_dict_external_book():
 
 
 def test_dict_external_range():
-    from openpyxl.workbook.external import ExternalRange
+    from .. external import ExternalRange
     rng = ExternalRange("something_special", "='Sheet1'!$A$1:$B$2")
     assert dict(rng) == {'name':'something_special', 'refersTo':"='Sheet1'!$A$1:$B$2"}
 
 
 def test_write_external_link():
-    from openpyxl.workbook.external import ExternalRange
-    from openpyxl.workbook.external.writer import write_external_link
+    from .. external import ExternalRange
+    from .. external import write_external_link
     link1 = ExternalRange('r1', 'over_there!$A$1:$B$2')
     link2 = ExternalRange('r2', 'somewhere_else!$C$10:$D$12')
     links = [link1, link2]
@@ -83,8 +83,8 @@ def test_write_external_link():
 
 
 def test_write_external_book_rel():
-    from openpyxl.workbook.external import ExternalBook
-    from openpyxl.workbook.external.writer import write_external_book_rel
+    from .. external import ExternalBook
+    from .. external import write_external_book_rel
     book = ExternalBook("rId1", "book2.xlsx")
     rel = write_external_book_rel(book)
     xml = get_xml(rel)
@@ -100,7 +100,7 @@ def test_write_external_book_rel():
 
 def test_read_archive(datadir):
     from openpyxl.reader.workbook import read_rels
-    from openpyxl.workbook.external import detect_external_links
+    from .. external import detect_external_links
     datadir.chdir()
     archive = ZipFile("book1.xlsx")
     rels = read_rels(archive)

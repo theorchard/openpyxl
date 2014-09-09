@@ -25,7 +25,7 @@ from openpyxl.date_time import (
     CALENDAR_WINDOWS_1900,
     CALENDAR_MAC_1904
     )
-from openpyxl.workbook.named_range import (
+from openpyxl.workbook.names.named_range import (
     NamedRange,
     NamedValue,
     split_named_range,

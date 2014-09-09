@@ -1,7 +1,7 @@
 from __future__ import absolute_import
 # Copyright (c) 2010-2014 openpyxl
 
-import os.path
+import os
 
 from openpyxl.descriptors import String, Strict
 from openpyxl.xml.constants import (
@@ -10,7 +10,15 @@ from openpyxl.xml.constants import (
     PKG_REL_NS,
     EXTERNAL_LINK_NS,
 )
-from openpyxl.xml.functions import fromstring, safe_iterator
+from openpyxl.xml.functions import (
+    fromstring,
+    safe_iterator,
+    Element,
+    SubElement,
+)
+
+from openpyxl.writer.workbook import RelationElement
+
 
 """Manage links to external Workbooks"""
 
@@ -90,3 +98,22 @@ def detect_external_links(rels, archive):
             range_xml = archive.read(d['path'])
             Book.links = list(parse_ranges(range_xml))
             yield Book
+
+
+def write_external_link(links):
+    """Serialise links to ranges in a single external worbook"""
+    root = Element("{%s}externalLink" % SHEET_MAIN_NS)
+    book =  SubElement(root, "{%s}externalBook" % SHEET_MAIN_NS, {'{%s}id' % REL_NS:'rId1'})
+    external_ranges = SubElement(book, "{%s}definedNames" % SHEET_MAIN_NS)
+    for l in links:
+        external_ranges.append(Element("{%s}definedName" % SHEET_MAIN_NS, dict(l)))
+    return root
+
+
+def write_external_book_rel(book):
+    """Serialise link to external file"""
+    root = Element("{%s}Relationships" % PKG_REL_NS)
+    attrs = {"Id":"rId1", "Target":book.Target, "TargetMode":book.TargetMode,
+             "Type":book.Type}
+    root.append(RelationElement(attrs))
+    return root

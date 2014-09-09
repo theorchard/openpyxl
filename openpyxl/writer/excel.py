@@ -61,7 +61,7 @@ from openpyxl.writer.drawings import DrawingWriter, ShapeWriter
 from openpyxl.writer.charts import ChartWriter
 from .relations import write_rels
 from openpyxl.writer.worksheet import write_worksheet
-from openpyxl.workbook.external.writer import (
+from openpyxl.workbook.names.external import (
     write_external_link,
     write_external_book_rel
 )

@@ -41,7 +41,7 @@ from openpyxl.units import (
 )
 from openpyxl.styles import DEFAULTS as DEFAULTS_STYLE
 from openpyxl.formatting import ConditionalFormatting
-from openpyxl.workbook.named_range import NamedRange
+from openpyxl.workbook.names.named_range import NamedRange
 
 from .header_footer import HeaderFooter
 from .relationship import Relationship

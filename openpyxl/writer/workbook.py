@@ -58,7 +58,7 @@ from openpyxl.xml.constants import (
 from openpyxl.xml.functions import tostring, fromstring
 from openpyxl.date_time import datetime_to_W3CDTF
 from openpyxl.worksheet import Worksheet
-from openpyxl.workbook.named_range import NamedRange, NamedValue
+from openpyxl.workbook.names.named_range import NamedRange, NamedValue
 
 
 def write_properties_core(properties):
