@@ -26,8 +26,8 @@ from openpyxl.worksheet.datavalidation import writer
 from .worksheet import (
     row_sort,
     get_rows_to_write,
-    )
-from . worksheet import write_worksheet_datavalidations as write_datavalidation
+    write_datavalidation,
+)
 
 
 def write_worksheet(worksheet, shared_strings):

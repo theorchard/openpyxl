@@ -643,7 +643,7 @@ def test_write_pagebreaks(out, doc, worksheet):
 
 
 def test_data_validation(worksheet):
-    from .. worksheet import write_worksheet_datavalidations
+    from .. worksheet import write_datavalidation
     from openpyxl.worksheet.datavalidation import DataValidation, ValidationType
 
     ws = worksheet
@@ -651,7 +651,7 @@ def test_data_validation(worksheet):
     dv.add_cell(ws['A1'])
     ws.add_data_validation(dv)
 
-    xml = write_worksheet_datavalidations(worksheet)
+    xml = write_datavalidation(worksheet)
     xml = get_xml(xml)
     expected = """
     <dataValidations count="1">

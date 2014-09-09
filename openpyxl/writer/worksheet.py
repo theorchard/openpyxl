@@ -74,7 +74,7 @@ def write_worksheet(worksheet, shared_strings):
     write_worksheet_autofilter(doc, worksheet)
     write_worksheet_mergecells(doc, worksheet)
     write_worksheet_conditional_formatting(doc, worksheet)
-    dvs = write_worksheet_datavalidations(worksheet)
+    dvs = write_datavalidation(worksheet)
     if dvs:
         xml_file.write(dvs)
     write_worksheet_hyperlinks(doc, worksheet)
@@ -347,7 +347,7 @@ def write_worksheet_mergecells(doc, worksheet):
             tag(doc, 'mergeCell', attrs)
         end_tag(doc, 'mergeCells')
 
-def write_worksheet_datavalidations(worksheet):
+def write_datavalidation(worksheet):
     """ Write data validation(s) to xml."""
     # Filter out "empty" data-validation objects (i.e. with 0 cells)
     required_dvs = [x for x in worksheet._data_validations
