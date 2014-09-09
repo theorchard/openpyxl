@@ -3,7 +3,7 @@ from __future__ import absolute_import
 
 from itertools import groupby
 
-from openpyxl.compat import OrderedDict
+from openpyxl.compat import OrderedDict, safe_string
 from openpyxl.cell import coordinate_from_string
 
 from openpyxl.xml.functions import Element
@@ -133,6 +133,11 @@ default_attr_map = {
 
 
 class DataValidation(object):
+
+
+    showInputMessage = True
+    showErrorMessage = True
+
     def __init__(self,
                  validation_type,
                  operator=None,
@@ -180,6 +185,25 @@ class DataValidation(object):
 
         return self.attr_map
 
+    @property
+    def sqref(self):
+        return collapse_cell_addresses(self.cells, self.ranges)
+
+    @property
+    def type(self):
+        return self.validation_type
+
+    @property
+    def allowBlank(self):
+        return self.allow_blank
+
+    def __iter__(self):
+        for attr in ('type', 'allowBlank', 'operator', 'sqref',
+                     'showInputMessage', 'showErrorMessage'):
+            value = getattr(self, attr)
+            if value is not None:
+                yield attr, safe_string(value)
+
 
 class ValidationType(object):
     NONE = "none"
@@ -210,7 +234,7 @@ class ValidationErrorStyle(object):
 
 
 def writer(data_validation):
-    attrs = data_validation.generate_attributes_map()
+    attrs = dict(data_validation)
     el = Element("dataValidation", attrs)
     if data_validation.formula1:
         f1 = Element("formula1")
