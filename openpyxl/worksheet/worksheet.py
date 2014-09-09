@@ -63,6 +63,38 @@ class SheetView(object):
     pass
 
 
+def range_boundaries(range_string):
+    """
+    Convert a range string into a tuple of boundaries:
+    (min_col, min_row, max_col, max_row)
+    Cell coordinates will be converted into a range with the cell at both end
+    """
+    m = ABSOLUTE_RE.match(range_string)
+    min_col, min_row, sep, max_col, max_row = m.groups()
+    min_col = column_index_from_string(min_col)
+    min_row = int(min_row)
+
+    if max_col is None or max_row is None:
+        max_col = min_col
+        max_row = min_row
+    else:
+        max_col = column_index_from_string(max_col)
+        max_row = int(max_row)
+
+    return min_col, min_row, max_col, max_row
+
+
+def cells_from_range(range_string):
+    """
+    Get individual addresses for every cell in a range.
+    Yields one row at a time.
+    """
+    min_col, min_row, max_col, max_row = range_boundaries(range_string)
+    for row in range(min_row, max_row+1):
+        yield tuple('%s%d' % (get_column_letter(col), row)
+                    for col in range(min_col, max_col+1))
+
+
 class Worksheet(object):
     """Represents a worksheet.
 
@@ -338,27 +370,6 @@ class Worksheet(object):
         return 'A1:%s%d' % (get_column_letter(self.max_column or 1), self.max_row or 1)
 
 
-    def _range_boundaries(self, range_string):
-        """
-        Convert a range string into a tuple of boundaries:
-        (min_col, min_row, max_col, max_row)
-        Cell coordinates will be converted into a range with the cell at both end
-        """
-        m = ABSOLUTE_RE.match(range_string)
-        min_col, min_row, sep, max_col, max_row = m.groups()
-        min_col = column_index_from_string(min_col)
-        min_row = int(min_row)
-
-        if max_col is None or max_row is None:
-            max_col = min_col
-            max_row = min_row
-        else:
-            max_col = column_index_from_string(max_col)
-            max_row = int(max_row)
-
-        return min_col, min_row, max_col, max_row
-
-
     def iter_rows(self, range_string=None, row_offset=0, column_offset=0):
         """
         Returns a squared range based on the `range_string` parameter,
@@ -377,7 +388,7 @@ class Worksheet(object):
         :rtype: generator
         """
         if range_string is not None:
-            min_col, min_row, max_col, max_row = self._range_boundaries(range_string.upper())
+            min_col, min_row, max_col, max_row = range_boundaries(range_string.upper())
         else:
             min_col, min_row, max_col, max_row = (1, 1, self.max_column, self.max_row)
         return self.get_squared_range(min_col + column_offset,
@@ -543,18 +554,6 @@ class Worksheet(object):
         """Drawings and hyperlinks create relationships"""
         self._parent.relationships.append(obj)
 
-
-    def _cells_from_range(self, range_string):
-        """
-        Get individual addresses for every cell in a range.
-        Yields one row at a time.
-        """
-        min_col, min_row, max_col, max_row = self._range_boundaries(range_string)
-        for row in range(min_row, max_row+1):
-            yield tuple('%s%d' % (get_column_letter(col), row)
-                        for col in range(min_col, max_col+1))
-
-
     def merge_cells(self, range_string=None, start_row=None, start_column=None, end_row=None, end_column=None):
         """ Set merge on a cell range.  Range is a cell range (e.g. A1:E1) """
         if not range_string:
@@ -581,7 +580,7 @@ class Worksheet(object):
         if range_string not in self._merged_cells:
             self._merged_cells.append(range_string)
 
-        cells = self._cells_from_range(range_string)
+        cells = cells_from_range(range_string)
         # only the top-left cell is preserved
         for c in islice(chain.from_iterable(cells), 1, None):
             if c in self._cells:
@@ -593,7 +592,7 @@ class Worksheet(object):
         """Utility for checking whether a cell has been merged or not"""
         cells = set()
         for _range in self._merged_cells:
-            for row in self._cells_from_range(_range):
+            for row in cells_from_range(_range):
                 cells = cells.union(set(row))
         return cells
 

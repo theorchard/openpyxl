@@ -19,6 +19,28 @@ from openpyxl.exceptions import (
     )
 
 
+@pytest.mark.parametrize('range_string, coords',
+                         [
+                             ('C1:C4', (3, 1, 3, 4)),
+                             ('C1', (3, 1, 3, 1)),
+                         ])
+def test_bounds(range_string, coords):
+    from .. worksheet import range_boundaries
+    assert range_boundaries(range_string) == coords
+
+
+def test_cells_from_range():
+    from .. worksheet import cells_from_range
+    cells = cells_from_range("A1:D4")
+    cells = [list(row) for row in cells]
+    assert cells == [
+       ['A1', 'B1', 'C1', 'D1'],
+       ['A2', 'B2', 'C2', 'D2'],
+       ['A3', 'B3', 'C3', 'D3'],
+       ['A4', 'B4', 'C4', 'D4'],
+                           ]
+
+
 class TestWorksheet(object):
 
     @classmethod
@@ -65,16 +87,6 @@ class TestWorksheet(object):
         assert 'A1:A1' == ws.calculate_dimension()
         ws.cell('B12').value = 'AAA'
         assert 'A1:B12' == ws.calculate_dimension()
-
-
-    @pytest.mark.parametrize('range_string, coords',
-                             [
-                                 ('C1:C4', (3, 1, 3, 4)),
-                                 ('C1', (3, 1, 3, 1)),
-                             ])
-    def test_bounds(self, range_string, coords):
-        ws = Worksheet(self.wb)
-        assert ws._range_boundaries(range_string) == coords
 
 
     def test_squared_range(self):
@@ -378,16 +390,6 @@ class TestWorksheet(object):
         ws.freeze_panes = ws.cell('A1')
         assert ws.freeze_panes is None
 
-    def test_cells_from_range(self):
-        ws = Worksheet(self.wb)
-        cells = ws._cells_from_range("A1:D4")
-        cells = [list(row) for row in cells]
-        assert cells == [
-           ['A1', 'B1', 'C1', 'D1'],
-           ['A2', 'B2', 'C2', 'D2'],
-           ['A3', 'B3', 'C3', 'D3'],
-           ['A4', 'B4', 'C4', 'D4'],
-                               ]
 
     def test_merged_cells_lookup(self):
         ws = Worksheet(self.wb)
