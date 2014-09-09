@@ -6,6 +6,8 @@ from itertools import groupby
 from openpyxl.compat import OrderedDict
 from openpyxl.cell import coordinate_from_string
 
+from openpyxl.xml.functions import Element
+
 
 def collapse_cell_addresses(cells, input_ranges=()):
     """ Collapse a collection of cell co-ordinates down into an optimal
@@ -205,3 +207,17 @@ class ValidationErrorStyle(object):
     STOP = "stop"
     WARNING = "warning"
     INFORMATION = "information"
+
+
+def writer(data_validation):
+    attrs = data_validation.generate_attributes_map()
+    el = Element("dataValidation", attrs)
+    if data_validation.formula1:
+        f1 = Element("formula1")
+        f1.text = data_validation.formula1
+        el.append(f1)
+    if data_validation.formula2:
+        f2 = Element("formula2")
+        f2.text = data_validation.formula2
+        el.append(f2)
+    return el

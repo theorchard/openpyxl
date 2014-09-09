@@ -1,15 +1,18 @@
 from __future__ import absolute_import
 # Copyright (c) 2010-2014 openpyxl
 
+from io import BytesIO
+
 import pytest
 
 # package imports
 from .. datavalidation import (
-    collapse_cell_addresses,
     DataValidation,
     ValidationType
     )
 
+from openpyxl.workbook import Workbook
+from openpyxl.tests.helper import get_xml, compare_xml
 
 # There are already unit-tests in test_cell.py that test out the
 # coordinate_from_string method.  This should be the only way the
@@ -24,6 +27,7 @@ COLLAPSE_TEST_DATA = [
 @pytest.mark.parametrize("cells, expected",
                          COLLAPSE_TEST_DATA)
 def test_collapse_cell_addresses(cells, expected):
+    from .. datavalidation import collapse_cell_addresses
     assert collapse_cell_addresses(cells) == expected
 
 
@@ -48,3 +52,21 @@ def test_prompt_message():
     dv.set_prompt_message('Please enter a value')
     assert dv.generate_attributes_map()['promptTitle'] == 'Validation Prompt'
     assert dv.generate_attributes_map()['prompt'] == 'Please enter a value'
+
+
+def test_writer_validation():
+    from .. datavalidation import writer
+    wb = Workbook()
+    ws = wb.active
+    dv = DataValidation(ValidationType.LIST, formula1='"Dog,Cat,Fish"')
+    dv.add_cell(ws['A1'])
+
+    xml = get_xml(writer(dv))
+    expected = """
+    <dataValidation allowBlank="0" showErrorMessage="1" showInputMessage="1" sqref="A1" type="list">
+      <formula1>&quot;Dog,Cat,Fish&quot;</formula1>
+      <formula2>None</formula2>
+    </dataValidation>
+    """
+    diff = compare_xml(xml, expected)
+    assert diff is None, diff
