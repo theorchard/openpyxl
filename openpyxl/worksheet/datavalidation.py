@@ -126,17 +126,15 @@ def collapse_cell_addresses(cells, input_ranges=()):
 """
 
 
-default_attr_map = {
-    "showInputMessage": "1",
-    "showErrorMessage": "1",
-}
-
-
 class DataValidation(object):
 
 
     showInputMessage = True
     showErrorMessage = True
+    error = None
+    errorTitle = None
+    prompt = None
+    promptTitle = None
 
     def __init__(self,
                  validation_type,
@@ -151,12 +149,8 @@ class DataValidation(object):
         self.formula1 = str(formula1)
         self.formula2 = str(formula2)
         self.allow_blank = allow_blank
-        self.attr_map = attr_map or {}
         self.cells = []
         self.ranges = []
-
-        if not attr_map:
-            self.attr_map.update(default_attr_map)
 
     def add_cell(self, cell):
         """Adds a openpyxl.cell to this validator"""
@@ -165,25 +159,13 @@ class DataValidation(object):
     def set_error_message(self, error, error_title="Validation Error"):
         """Creates a custom error message, displayed when a user changes a cell
            to an invalid value"""
-        self.attr_map['errorTitle'] = error_title
-        self.attr_map['error'] = error
+        self.errorTitle = error_title
+        self.error = error
 
     def set_prompt_message(self, prompt, prompt_title="Validation Prompt"):
         """Creates a custom prompt message"""
-        self.attr_map['promptTitle'] = prompt_title
-        self.attr_map['prompt'] = prompt
-
-    def generate_attributes_map(self):
-        self.attr_map['type'] = self.validation_type
-        self.attr_map['allowBlank'] = '1' if self.allow_blank else '0'
-
-        if self.operator:
-            self.attr_map['operator'] = self.operator
-
-        # Update the sqref to ensure it points at all cells we're interested in
-        self.attr_map['sqref'] = collapse_cell_addresses(self.cells, self.ranges)
-
-        return self.attr_map
+        self.promptTitle = prompt_title
+        self.prompt = prompt
 
     @property
     def sqref(self):
@@ -199,7 +181,8 @@ class DataValidation(object):
 
     def __iter__(self):
         for attr in ('type', 'allowBlank', 'operator', 'sqref',
-                     'showInputMessage', 'showErrorMessage'):
+                     'showInputMessage', 'showErrorMessage', 'errorTitle', 'error',
+                     'promptTitle', 'prompt'):
             value = getattr(self, attr)
             if value is not None:
                 yield attr, safe_string(value)

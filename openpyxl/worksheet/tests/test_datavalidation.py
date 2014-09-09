@@ -34,24 +34,27 @@ def test_collapse_cell_addresses(cells, expected):
 def test_list_validation():
     dv = DataValidation(ValidationType.LIST, formula1='"Dog,Cat,Fish"')
     assert dv.formula1, '"Dog,Cat == Fish"'
-    assert dv.generate_attributes_map()['type'] == 'list'
-    assert dv.generate_attributes_map()['allowBlank'] == '0'
-    assert dv.generate_attributes_map()['showErrorMessage'] == '1'
-    assert dv.generate_attributes_map()['showInputMessage'] == '1'
+    dv_dict = dict(dv)
+    assert dv_dict['type'] == 'list'
+    assert dv_dict['allowBlank'] == '0'
+    assert dv_dict['showErrorMessage'] == '1'
+    assert dv_dict['showInputMessage'] == '1'
 
 
 def test_error_message():
     dv = DataValidation(ValidationType.LIST, formula1='"Dog,Cat,Fish"')
     dv.set_error_message('You done bad')
-    assert dv.generate_attributes_map()['errorTitle'] == 'Validation Error'
-    assert dv.generate_attributes_map()['error'] == 'You done bad'
+    dv_dict = dict(dv)
+    assert dv_dict['errorTitle'] == 'Validation Error'
+    assert dv_dict['error'] == 'You done bad'
 
 
 def test_prompt_message():
     dv = DataValidation(ValidationType.LIST, formula1='"Dog,Cat,Fish"')
     dv.set_prompt_message('Please enter a value')
-    assert dv.generate_attributes_map()['promptTitle'] == 'Validation Prompt'
-    assert dv.generate_attributes_map()['prompt'] == 'Please enter a value'
+    dv_dict = dict(dv)
+    assert dv_dict['promptTitle'] == 'Validation Prompt'
+    assert dv_dict['prompt'] == 'Please enter a value'
 
 
 def test_writer_validation():
