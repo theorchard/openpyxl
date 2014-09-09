@@ -513,28 +513,6 @@ def test_no_pagebreaks(worksheet):
     pb = write_pagebreaks(worksheet)
     assert pb is None
 
-def test_data_validation(worksheet):
-    from .. lxml_worksheet import write_datavalidation
-    from openpyxl.worksheet.datavalidation import DataValidation, ValidationType
-
-    ws = worksheet
-    dv = DataValidation(ValidationType.LIST, formula1='"Dog,Cat,Fish"')
-    dv.add_cell(ws['A1'])
-    ws.add_data_validation(dv)
-
-    dv = write_datavalidation(worksheet)
-    xml = tostring(dv, encoding="unicode")
-    expected = """
-    <dataValidations count="1">
-    <dataValidation allowBlank="0" showErrorMessage="1" showInputMessage="1" sqref="A1" type="list">
-      <formula1>&quot;Dog,Cat,Fish&quot;</formula1>
-      <formula2>None</formula2>
-    </dataValidation>
-    </dataValidations>
-    """
-    diff = compare_xml(xml, expected)
-    assert diff is None, diff
-
 
 def test_hyperlink(worksheet):
     from .. lxml_worksheet import write_hyperlinks

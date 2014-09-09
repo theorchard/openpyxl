@@ -23,7 +23,11 @@ from openpyxl.xml.constants import (
 from openpyxl.formatting import ConditionalFormatting
 from openpyxl.worksheet.datavalidation import writer
 
-from .worksheet import row_sort, get_rows_to_write
+from .worksheet import (
+    row_sort,
+    get_rows_to_write,
+    )
+from . worksheet import write_worksheet_datavalidations as write_datavalidation
 
 
 def write_worksheet(worksheet, shared_strings):
@@ -299,20 +303,6 @@ def write_mergecells(worksheet):
         attrs = {'ref': range_string}
         SubElement(merge, 'mergeCell', attrs)
     return merge
-
-
-def write_datavalidation(worksheet):
-    """ Write data validation(s) to xml."""
-    # Filter out "empty" data-validation objects (i.e. with 0 cells)
-    required_dvs = [x for x in worksheet._data_validations
-                    if len(x.cells) or len(x.ranges)]
-    if not required_dvs:
-        return
-
-    dvs = Element('dataValidations', count=str(len(required_dvs)))
-    for dv in required_dvs:
-        dvs.append(writer(dv))
-    return dvs
 
 
 def write_header_footer(worksheet):
