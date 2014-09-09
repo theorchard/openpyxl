@@ -644,7 +644,7 @@ def test_write_pagebreaks(out, doc, worksheet):
 
 def test_data_validation(out, doc, worksheet):
     from .. worksheet import write_worksheet_datavalidations
-    from openpyxl.datavalidation import DataValidation, ValidationType
+    from openpyxl.worksheet.datavalidation import DataValidation, ValidationType
 
     ws = worksheet
     dv = DataValidation(ValidationType.LIST, formula1='"Dog,Cat,Fish"')
