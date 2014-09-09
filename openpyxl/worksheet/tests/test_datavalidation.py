@@ -73,3 +73,9 @@ def test_writer_validation():
     """
     diff = compare_xml(xml, expected)
     assert diff is None, diff
+
+
+def test_expand_cell_ranges():
+    from .. datavalidation import expand_cell_ranges
+    rs = "A1:A3 B1:B3"
+    assert expand_cell_ranges(rs) == ["A1", "A2", "A3", "B1", "B2", "B3"]

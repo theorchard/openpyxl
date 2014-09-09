@@ -1,11 +1,11 @@
 from __future__ import absolute_import
 # Copyright (c) 2010-2014 openpyxl
 
-from itertools import groupby
+from itertools import groupby, chain
 
 from openpyxl.compat import OrderedDict, safe_string
 from openpyxl.cell import coordinate_from_string
-
+from openpyxl.worksheet import cells_from_range
 from openpyxl.xml.functions import Element
 
 
@@ -44,6 +44,18 @@ def collapse_cell_addresses(cells, input_ranges=()):
                 ranges.append("%s%d:%s%d" % (column, rows[0], column, rows[-1]))
 
     return " ".join(ranges)
+
+
+def expand_cell_ranges(range_string):
+    """
+    Expand cell ranges to a sequence of addresses.
+    Reverse of collapse_cell_addresses
+    Eg. converts "A1:A2 B1:B2" to (A1, A2, B1, B2)
+    """
+    cells = []
+    for rs in range_string.split():
+        cells.extend(cells_from_range(rs))
+    return list(chain.from_iterable(cells))
 
 
 """
