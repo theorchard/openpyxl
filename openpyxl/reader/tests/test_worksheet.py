@@ -39,6 +39,7 @@ def Worksheet(Workbook):
             self.row_dimensions = {}
             self._styles = {}
             self.cell = None
+            self._data_validations = []
 
         def __getitem__(self, value):
             if self.cell is None:
@@ -286,3 +287,12 @@ def test_data_validation(Worksheet, WorkSheetParser, datadir):
     ws = Worksheet
     parser = WorkSheetParser
     datadir.chdir()
+
+    with open("worksheet_data_validation.xml") as src:
+        sheet = fromstring(src.read())
+
+    element = sheet.find("{%s}dataValidations" % SHEET_MAIN_NS)
+    parser.parse_data_validation(element)
+    dvs = ws._data_validations
+    assert len(dvs) == 1
+
