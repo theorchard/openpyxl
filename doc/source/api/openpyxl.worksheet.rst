@@ -4,6 +4,14 @@ openpyxl.worksheet package
 Submodules
 ----------
 
+openpyxl.worksheet.datavalidation module
+----------------------------------------
+
+.. automodule:: openpyxl.worksheet.datavalidation
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
 openpyxl.worksheet.dimensions module
 ------------------------------------
 

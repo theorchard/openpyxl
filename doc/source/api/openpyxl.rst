@@ -24,14 +24,6 @@ Subpackages
 Submodules
 ----------
 
-openpyxl.datavalidation module
-------------------------------
-
-.. automodule:: openpyxl.datavalidation
-    :members:
-    :undoc-members:
-    :show-inheritance:
-
 openpyxl.exceptions module
 --------------------------
 
