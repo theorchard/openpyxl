@@ -242,11 +242,11 @@ def writer(data_validation):
     Serialse a data validation
     """
     attrs = dict(data_validation)
-    el = Element("dataValidation", attrs)
+    el = Element("{%s}dataValidation" % SHEET_MAIN_NS, attrs)
     for attr in ("formula1", "formula2"):
         value = getattr(data_validation, attr, None)
         if value is not None:
-            f = Element(attr)
+            f = Element("{%s}%s" % (SHEET_MAIN_NS, attr))
             f.text = value
             el.append(f)
     return el
@@ -258,6 +258,6 @@ def parser(element):
     """
     dv = DataValidation(**element.attrib)
     for attr in ("formula1", "formula2"):
-        for f in safe_iterator(element, attr):
+        for f in safe_iterator(element, "{%s}%s" % (SHEET_MAIN_NS, attr)):
             setattr(dv, attr, f.text)
     return dv

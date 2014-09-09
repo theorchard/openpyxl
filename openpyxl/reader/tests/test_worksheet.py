@@ -280,3 +280,9 @@ def test_inline_string(Worksheet, WorkSheetParser, datadir):
     parser.parse_cell(element)
     assert ws['A1'].data_type == 's'
     assert ws['A1'].value == "ID"
+
+
+def test_data_validation(Worksheet, WorkSheetParser, datadir):
+    ws = Worksheet
+    parser = WorkSheetParser
+    datadir.chdir()
