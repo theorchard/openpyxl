@@ -30,16 +30,18 @@ Bug fixes
 322 1-indexing for merged cells
 339 Correctly handle removal of cell protection
 341 Cells with formulae do not round-trip
+347 Read DataValidations
 353 Support Defined Named Ranges to external workbooks
 
 
-2.0.5 (unreleased)
+2.0.5 (2014-08-08)
 ==================
 
 
 Bug fixes
 ---------
 348 incorrect casting of boolean strings
+349 roundtripping cells with formulae
 
 
 2.0.4 (2014-06-25)
