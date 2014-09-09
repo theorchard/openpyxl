@@ -6,7 +6,8 @@ from itertools import groupby, chain
 from openpyxl.compat import OrderedDict, safe_string
 from openpyxl.cell import coordinate_from_string
 from openpyxl.worksheet import cells_from_range
-from openpyxl.xml.functions import Element
+from openpyxl.xml.constants import SHEET_MAIN_NS
+from openpyxl.xml.functions import Element, safe_iterator
 
 
 def collapse_cell_addresses(cells, input_ranges=()):
@@ -141,28 +142,40 @@ def expand_cell_ranges(range_string):
 class DataValidation(object):
 
 
-    showInputMessage = True
-    showErrorMessage = True
     error = None
     errorTitle = None
     prompt = None
     promptTitle = None
 
     def __init__(self,
-                 validation_type,
+                 validation_type=None, # remove in future
                  operator=None,
                  formula1=None,
                  formula2=None,
                  allow_blank=False,
-                 attr_map=None):
+                 showErrorMessage=True,
+                 showInputMessage=True,
+                 allowBlank=None,
+                 type=None,
+                 sqref=None):
 
-        self.validation_type = validation_type
+        self.type = validation_type
         self.operator = operator
-        self.formula1 = str(formula1)
-        self.formula2 = str(formula2)
-        self.allow_blank = allow_blank
+        if formula1 is not None:
+            self.formula1 = str(formula1)
+        if formula2 is not None:
+            self.formula2 = str(formula2)
+        self.allowBlank = allow_blank
+        if allowBlank is not None:
+            self.allowBlank = allowBlank
+        self.showErrorMessage = showErrorMessage
+        self.showInputMessage = showInputMessage
+        if type is not None:
+            self.type = type
         self.cells = []
         self.ranges = []
+        if sqref is not None:
+            self.sqref = sqref
 
     def add_cell(self, cell):
         """Adds a openpyxl.cell to this validator"""
@@ -183,13 +196,9 @@ class DataValidation(object):
     def sqref(self):
         return collapse_cell_addresses(self.cells, self.ranges)
 
-    @property
-    def type(self):
-        return self.validation_type
-
-    @property
-    def allowBlank(self):
-        return self.allow_blank
+    @sqref.setter
+    def sqref(self, range_string):
+        self.cells = expand_cell_ranges(range_string)
 
     def __iter__(self):
         for attr in ('type', 'allowBlank', 'operator', 'sqref',
@@ -229,14 +238,26 @@ class ValidationErrorStyle(object):
 
 
 def writer(data_validation):
+    """
+    Serialse a data validation
+    """
     attrs = dict(data_validation)
     el = Element("dataValidation", attrs)
-    if data_validation.formula1:
-        f1 = Element("formula1")
-        f1.text = data_validation.formula1
-        el.append(f1)
-    if data_validation.formula2:
-        f2 = Element("formula2")
-        f2.text = data_validation.formula2
-        el.append(f2)
+    for attr in ("formula1", "formula2"):
+        value = getattr(data_validation, attr, None)
+        if value is not None:
+            f = Element(attr)
+            f.text = value
+            el.append(f)
     return el
+
+
+def parser(element):
+    """
+    Parse dataValidation tag
+    """
+    dv = DataValidation(**element.attrib)
+    for attr in ("formula1", "formula2"):
+        for f in safe_iterator(element, attr):
+            setattr(dv, attr, f.text)
+    return dv

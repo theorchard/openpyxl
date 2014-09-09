@@ -657,7 +657,6 @@ def test_data_validation(worksheet):
     <dataValidations count="1">
     <dataValidation allowBlank="0" showErrorMessage="1" showInputMessage="1" sqref="A1" type="list">
       <formula1>&quot;Dog,Cat,Fish&quot;</formula1>
-      <formula2>None</formula2>
     </dataValidation>
     </dataValidations>
     """
