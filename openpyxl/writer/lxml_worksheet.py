@@ -21,6 +21,7 @@ from openpyxl.xml.constants import (
 )
 
 from openpyxl.formatting import ConditionalFormatting
+from openpyxl.worksheet.datavalidation import writer
 
 from .worksheet import row_sort, get_rows_to_write
 
@@ -308,14 +309,9 @@ def write_datavalidation(worksheet):
     if not required_dvs:
         return
 
-    dvs = Element('dataValidations', {'count': str(len(required_dvs))})
-    for data_validation in required_dvs:
-        dv = SubElement(dvs, 'dataValidation',
-                        data_validation.generate_attributes_map())
-        if data_validation.formula1:
-            SubElement(dv, 'formula1').text = data_validation.formula1
-        if data_validation.formula2:
-            SubElement(dv, 'formula2').text = data_validation.formula2
+    dvs = Element('dataValidations', count=str(len(required_dvs)))
+    for dv in required_dvs:
+        dvs.append(writer(dv))
     return dvs
 
 

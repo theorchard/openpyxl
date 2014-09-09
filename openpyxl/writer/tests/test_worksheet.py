@@ -12,7 +12,7 @@ from openpyxl import Workbook
 
 from .. worksheet import write_worksheet
 
-from openpyxl.tests.helper import compare_xml
+from openpyxl.tests.helper import compare_xml, get_xml
 
 
 class DummyWorksheet:
@@ -642,7 +642,7 @@ def test_write_pagebreaks(out, doc, worksheet):
     assert out.getvalue() == b""
 
 
-def test_data_validation(out, doc, worksheet):
+def test_data_validation(worksheet):
     from .. worksheet import write_worksheet_datavalidations
     from openpyxl.worksheet.datavalidation import DataValidation, ValidationType
 
@@ -651,8 +651,8 @@ def test_data_validation(out, doc, worksheet):
     dv.add_cell(ws['A1'])
     ws.add_data_validation(dv)
 
-    write_worksheet_datavalidations(doc, worksheet)
-    xml = out.getvalue()
+    xml = write_worksheet_datavalidations(worksheet)
+    xml = get_xml(xml)
     expected = """
     <dataValidations count="1">
     <dataValidation allowBlank="0" showErrorMessage="1" showInputMessage="1" sqref="A1" type="list">

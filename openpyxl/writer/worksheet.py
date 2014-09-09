@@ -22,6 +22,7 @@ from openpyxl.xml.functions import (
     end_tag,
     tag,
     fromstring,
+    Element
 )
 from openpyxl.xml.constants import (
     SHEET_MAIN_NS,
@@ -29,6 +30,7 @@ from openpyxl.xml.constants import (
 )
 from openpyxl.compat.itertools import iteritems, iterkeys
 from openpyxl.formatting import ConditionalFormatting
+from openpyxl.worksheet.datavalidation import writer
 
 
 def row_sort(cell):
@@ -72,7 +74,9 @@ def write_worksheet(worksheet, shared_strings):
     write_worksheet_autofilter(doc, worksheet)
     write_worksheet_mergecells(doc, worksheet)
     write_worksheet_conditional_formatting(doc, worksheet)
-    write_worksheet_datavalidations(doc, worksheet)
+    dvs = write_worksheet_datavalidations(worksheet)
+    if dvs:
+        xml_file.write(dvs)
     write_worksheet_hyperlinks(doc, worksheet)
 
     options = worksheet.page_setup.options
@@ -343,24 +347,19 @@ def write_worksheet_mergecells(doc, worksheet):
             tag(doc, 'mergeCell', attrs)
         end_tag(doc, 'mergeCells')
 
-def write_worksheet_datavalidations(doc, worksheet):
+def write_worksheet_datavalidations(worksheet):
     """ Write data validation(s) to xml."""
     # Filter out "empty" data-validation objects (i.e. with 0 cells)
     required_dvs = [x for x in worksheet._data_validations
                     if len(x.cells) or len(x.ranges)]
-    count = len(required_dvs)
-    if count == 0:
+    if not required_dvs:
         return
 
-    start_tag(doc, 'dataValidations', {'count': str(count)})
-    for data_validation in required_dvs:
-        start_tag(doc, 'dataValidation', data_validation.generate_attributes_map())
-        if data_validation.formula1:
-            tag(doc, 'formula1', body=data_validation.formula1)
-        if data_validation.formula2:
-            tag(doc, 'formula2', body=data_validation.formula2)
-        end_tag(doc, 'dataValidation')
-    end_tag(doc, 'dataValidations')
+    dvs = Element("dataValidations", count=str(len(required_dvs)))
+    for dv in required_dvs:
+        dvs.append(writer(dv))
+
+    return dvs
 
 def write_worksheet_hyperlinks(doc, worksheet):
     """Write worksheet hyperlinks to xml."""
