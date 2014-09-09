@@ -355,7 +355,8 @@ def write_datavalidation(worksheet):
     if not required_dvs:
         return
 
-    dvs = Element("dataValidations", count=str(len(required_dvs)))
+    dvs = Element("{%s}dataValidations" % SHEET_MAIN_NS,
+                  count=str(len(required_dvs)))
     for dv in required_dvs:
         dvs.append(writer(dv))
 

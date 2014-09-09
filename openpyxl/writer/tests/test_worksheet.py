@@ -654,7 +654,7 @@ def test_data_validation(worksheet):
     xml = write_datavalidation(worksheet)
     xml = get_xml(xml)
     expected = """
-    <dataValidations count="1">
+    <dataValidations xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main" count="1">
     <dataValidation allowBlank="0" showErrorMessage="1" showInputMessage="1" sqref="A1" type="list">
       <formula1>&quot;Dog,Cat,Fish&quot;</formula1>
     </dataValidation>
