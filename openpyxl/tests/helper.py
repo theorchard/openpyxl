@@ -56,5 +56,5 @@ def compare_xml(generated, expected):
 
     check = checker.check_output(expected, generated, PARSE_XML)
     if check is False:
-        diff = checker.output_difference(expected, ob, PARSE_XML)
+        diff = checker.output_difference(ob, expected, PARSE_XML)
         return diff
