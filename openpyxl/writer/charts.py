@@ -226,7 +226,10 @@ class BaseChartWriter(object):
         SubElement(data, '{%s}ptCount' % CHART_NS, {'val':str(len(values))})
         for j, val in enumerate(values):
             point = SubElement(data, '{%s}pt' % CHART_NS, {'idx':str(j)})
-            val = safe_string(val)
+            if val is not None:
+                val = safe_string(val)
+            else:
+                val = ''
             SubElement(point, '{%s}v' % CHART_NS).text = val
 
     def _write_error_bar(self, node, serie):
