@@ -191,12 +191,6 @@ def test_read_style_iter(tmpdir):
     xlsx_file = "read_only_styles.xlsx"
     wb.save(xlsx_file)
 
-    wb_regular = load_workbook(xlsx_file)
-    ws_regular = wb_regular.worksheets[0]
-    cell_style_regular = ws_regular.cell('A1').style
-    assert cell_style_regular.font.name == FONT_NAME
-    assert cell_style_regular.font.size == FONT_SIZE
-
     wb_iter = load_workbook(xlsx_file, read_only=True)
     ws_iter = wb_iter.worksheets[0]
     cell = ws_iter['A1']
