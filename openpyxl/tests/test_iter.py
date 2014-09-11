@@ -30,28 +30,26 @@ def test_read_dimension(datadir, filename, expected):
     assert dimension == expected
 
 
-def test_calculate_dimension(datadir):
-    datadir.join("genuine").chdir()
-    wb = load_workbook("empty.xlsx", use_iterators=True)
-    sheet2 = wb.get_sheet_by_name('Sheet2 - Numbers')
-    dimensions = sheet2.calculate_dimension()
-    assert '%s%s:%s%s' % ('D', 1, 'AA', 30) == dimensions
-
-
-def test_get_highest_row(datadir):
-    datadir.join("genuine").chdir()
-    wb = load_workbook("empty.xlsx", use_iterators=True)
-    sheet2 = wb.get_sheet_by_name('Sheet2 - Numbers')
-    max_row = sheet2.get_highest_row()
-    assert 30 == max_row
-
-
 @pytest.fixture
 def sample_workbook(datadir):
     datadir.join("genuine").chdir()
     wb = load_workbook(filename="empty.xlsx", use_iterators=True,
                        data_only=True)
     return wb
+
+
+def test_calculate_dimension(sample_workbook):
+    wb = sample_workbook
+    sheet2 = wb['Sheet2 - Numbers']
+    dimensions = sheet2.calculate_dimension()
+    assert '%s%s:%s%s' % ('D', 1, 'AA', 30) == dimensions
+
+
+def test_get_highest_row(sample_workbook):
+    wb = sample_workbook
+    sheet2 = wb['Sheet2 - Numbers']
+    max_row = sheet2.get_highest_row()
+    assert 30 == max_row
 
 
 def test_getitem(sample_workbook):
@@ -97,7 +95,7 @@ expected = [['This is cell A1 in Sheet 1', None, None, None, None, None, None],
             [None, None, None, None, None, None, 'This is cell G5'], ]
 def test_read_fast_integrated(sample_workbook):
     wb = sample_workbook
-    ws = wb.get_sheet_by_name('Sheet1 - Text')
+    ws = wb['Sheet1 - Text']
     for row, expected_row in zip(ws.iter_rows(), self.expected):
         row_values = [x.value for x in row]
         assert row_values == expected_row
@@ -105,16 +103,15 @@ def test_read_fast_integrated(sample_workbook):
 
 def test_read_single_cell_range(sample_workbook):
     wb = sample_workbook
-    ws = wb.get_sheet_by_name('Sheet1 - Text')
+    ws = wb['Sheet1 - Text']
     assert 'This is cell A1 in Sheet 1' == list(ws.iter_rows('A1'))[0][0].value
 
 
 def test_read_fast_integrated(sample_workbook):
     wb = sample_workbook
-    sheet_name = 'Sheet2 - Numbers'
     expected = [[x + 1] for x in range(30)]
     query_range = 'D1:D30'
-    ws = wb.get_sheet_by_name(name = sheet_name)
+    ws = wb['Sheet2 - Numbers']
     for row, expected_row in zip(ws.iter_rows(query_range), expected):
         row_values = [x.value for x in row]
         assert row_values == expected_row
@@ -122,10 +119,9 @@ def test_read_fast_integrated(sample_workbook):
 
 def test_read_fast_integrated(sample_workbook):
     wb = sample_workbook
-    sheet_name = 'Sheet2 - Numbers'
     query_range = 'K1:K30'
     expected = expected = [[(x + 1) / 100.0] for x in range(30)]
-    ws = wb.get_sheet_by_name(name = sheet_name)
+    ws = wb['Sheet2 - Numbers']
     for row, expected_row in zip(ws.iter_rows(query_range), expected):
         row_values = [x.value for x in row]
         assert row_values == expected_row
@@ -139,7 +135,7 @@ def test_read_fast_integrated(sample_workbook):
     )
 def test_read_single_cell_date(sample_workbook, cell, value):
     wb = sample_workbook
-    ws = wb.get_sheet_by_name('Sheet4 - Dates')
+    ws = wb['Sheet4 - Dates']
     rows = ws.iter_rows(cell)
     cell = list(rows)[0][0]
     assert cell.value == value
@@ -154,7 +150,7 @@ def test_read_single_cell_date(sample_workbook, cell, value):
 def test_read_single_cell_formula(datadir, data_only, expected):
     datadir.join("genuine").chdir()
     wb = load_workbook("empty.xlsx", read_only=True, data_only=data_only)
-    ws = wb.get_sheet_by_name("Sheet3 - Formulas")
+    ws = wb["Sheet3 - Formulas"]
     rows = ws.iter_rows("D2")
     cell = list(rows)[0][0]
     assert ws.parent.data_only == data_only
