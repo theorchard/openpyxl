@@ -31,10 +31,9 @@ def test_read_dimension(datadir, filename, expected):
 
 
 @pytest.fixture
-def sample_workbook(datadir):
+def sample_workbook(request, datadir):
     datadir.join("genuine").chdir()
-    wb = load_workbook(filename="empty.xlsx", use_iterators=True,
-                       data_only=True)
+    wb = load_workbook(filename="empty.xlsx", read_only=True, data_only=True)
     return wb
 
 
