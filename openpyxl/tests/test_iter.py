@@ -182,11 +182,12 @@ def test_read_style_iter(tmpdir):
 
     FONT_NAME = "Times New Roman"
     FONT_SIZE = 15
+    ft = Font(name=FONT_NAME, size=FONT_SIZE)
 
     wb = Workbook()
     ws = wb.worksheets[0]
     cell = ws.cell('A1')
-    cell.style = Style(font=Font(name=FONT_NAME, size=FONT_SIZE))
+    cell.style = Style(font=ft)
 
     xlsx_file = "read_only_styles.xlsx"
     wb.save(xlsx_file)
@@ -195,5 +196,4 @@ def test_read_style_iter(tmpdir):
     ws_iter = wb_iter.worksheets[0]
     cell = ws_iter['A1']
 
-    assert cell.style.font.name == FONT_NAME
-    assert cell.style.font.size == FONT_SIZE
+    assert cell.style.font == ft
