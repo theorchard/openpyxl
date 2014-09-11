@@ -172,11 +172,11 @@ def test_read_boolean(sample_workbook, cell, expected):
     assert row[0][0].value == expected
 
 
-def test_read_style_iter():
+def test_read_style_iter(tmpdir):
     '''
     Test if cell styles are read properly in iter mode.
     '''
-    import tempfile
+    tmpdir.chdir()
     from openpyxl import Workbook
     from openpyxl.styles import Style, Font
 
@@ -188,21 +188,16 @@ def test_read_style_iter():
     cell = ws.cell('A1')
     cell.style = Style(font=Font(name=FONT_NAME, size=FONT_SIZE))
 
-    xlsx_file = tempfile.NamedTemporaryFile()
+    xlsx_file = "read_only_styles.xlsx"
     wb.save(xlsx_file)
 
-    # Passes as of 1.6.1
     wb_regular = load_workbook(xlsx_file)
     ws_regular = wb_regular.worksheets[0]
     cell_style_regular = ws_regular.cell('A1').style
     assert cell_style_regular.font.name == FONT_NAME
     assert cell_style_regular.font.size == FONT_SIZE
 
-    # Fails as of 1.6.1
-    # perhaps not correct
-    # but would work if style_table was not ignored and styles
-    # would still be present in ws_iter._styles
-    wb_iter = load_workbook(xlsx_file, use_iterators=True)
+    wb_iter = load_workbook(xlsx_file, read_only=True)
     ws_iter = wb_iter.worksheets[0]
     cell = ws_iter['A1']
 
