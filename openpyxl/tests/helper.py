@@ -52,9 +52,9 @@ def compare_xml(generated, expected):
         pass
 
     ob = DummyDocTest()
-    ob.want = generated
+    ob.want = expected
 
     check = checker.check_output(expected, generated, PARSE_XML)
     if check is False:
-        diff = checker.output_difference(ob, expected, PARSE_XML)
+        diff = checker.output_difference(ob, generated, PARSE_XML)
         return diff

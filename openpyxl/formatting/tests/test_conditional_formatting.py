@@ -12,7 +12,7 @@ from openpyxl.formatting.rules import ColorScaleRule, CellIsRule, FormulaRule
 from openpyxl.reader.excel import load_workbook
 from openpyxl.reader.style import read_style_table
 from openpyxl.xml.constants import ARC_STYLE
-from openpyxl.xml.functions import XMLGenerator
+from openpyxl.xml.functions import XMLGenerator, tostring
 from openpyxl.writer.worksheet import write_worksheet_conditional_formatting
 from openpyxl.writer.styles import StyleWriter
 from openpyxl.styles import Color, PatternFill, Font, Border, Side
@@ -21,7 +21,7 @@ from openpyxl.styles import borders, fills, colors
 # test imports
 import pytest
 from zipfile import ZIP_DEFLATED, ZipFile
-from openpyxl.tests.helper import get_xml, compare_xml
+from openpyxl.tests.helper import compare_xml
 from openpyxl.collections import IndexedList
 
 
@@ -207,7 +207,7 @@ class TestConditionalFormatting(object):
         # Second, verify conditional formatting dxf styles
         w = StyleWriter(self.workbook)
         w._write_dxfs()
-        xml = get_xml(w._root)
+        xml = tostring(w._root)
         diff = compare_xml(xml, """
         <styleSheet xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main">
           <dxfs count="1">
@@ -745,7 +745,7 @@ def test_parse_dxfs(datadir):
     # Verify that the dxf styles stay the same when they're written and read back in.
     w = StyleWriter(wb)
     w._write_dxfs()
-    write_xml = get_xml(w._root)
+    write_xml = tostring(w._root)
     read_style_prop = read_style_table(write_xml)
     assert len(read_style_prop[2]) == len(wb.style_properties['dxf_list'])
     for i, dxf in enumerate(read_style_prop[2]):

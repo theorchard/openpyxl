@@ -4,9 +4,9 @@ from __future__ import absolute_import
 import pytest
 
 from openpyxl.xml.constants import CHART_DRAWING_NS, SHEET_DRAWING_NS
-from openpyxl.xml.functions import Element, fromstring
+from openpyxl.xml.functions import Element, fromstring, tostring
 
-from openpyxl.tests.helper import compare_xml, get_xml
+from openpyxl.tests.helper import compare_xml
 from openpyxl.tests.schema import drawing_schema, chart_schema
 
 def test_bounding_box():
@@ -266,7 +266,7 @@ class TestDrawingWriter(object):
         chart.drawing = drawing
         self.dw._write_chart(root, chart, 1)
         drawing_schema.assertValid(root)
-        xml = get_xml(root)
+        xml = tostring(root)
         expected = """<xdr:wsDr xmlns:a="http://schemas.openxmlformats.org/drawingml/2006/main" xmlns:xdr="http://schemas.openxmlformats.org/drawingml/2006/spreadsheetDrawing" xmlns:r="http://schemas.openxmlformats.org/officeDocument/2006/relationships"
         xmlns:c="http://schemas.openxmlformats.org/drawingml/2006/chart">
   <xdr:absoluteAnchor>
@@ -300,7 +300,7 @@ class TestDrawingWriter(object):
         root = Element("{%s}wsDr" % SHEET_DRAWING_NS)
         self.dw._write_image(root, ImageFile, 1)
         drawing_schema.assertValid(root)
-        xml = get_xml(root)
+        xml = tostring(root)
         expected = """<xdr:wsDr xmlns:a="http://schemas.openxmlformats.org/drawingml/2006/main" xmlns:xdr="http://schemas.openxmlformats.org/drawingml/2006/spreadsheetDrawing">
   <xdr:absoluteAnchor>
     <xdr:pos x="0" y="0"/>
@@ -350,7 +350,7 @@ class TestDrawingWriter(object):
         drawing = ImageFile.drawing
         root = Element("test")
         self.dw._write_anchor(root, drawing)
-        xml = get_xml(root)
+        xml = tostring(root)
         expected = """<test><xdr:absoluteAnchor xmlns:xdr="http://schemas.openxmlformats.org/drawingml/2006/spreadsheetDrawing"><xdr:pos x="0" y="0"/><xdr:ext cx="1123950" cy="1123950"/></xdr:absoluteAnchor></test>"""
         diff = compare_xml(xml, expected)
         assert diff is None, diff
@@ -364,7 +364,7 @@ class TestDrawingWriter(object):
         drawing.anchorrow = 0
         root = Element("test")
         self.dw._write_anchor(root, drawing)
-        xml = get_xml(root)
+        xml = tostring(root)
         expected = """<test><xdr:oneCellAnchor xmlns:xdr="http://schemas.openxmlformats.org/drawingml/2006/spreadsheetDrawing"><xdr:from><xdr:col>0</xdr:col><xdr:colOff>0</xdr:colOff><xdr:row>0</xdr:row><xdr:rowOff>0</xdr:rowOff></xdr:from><xdr:ext cx="1123950" cy="1123950"/></xdr:oneCellAnchor></test>"""
         diff = compare_xml(xml, expected)
         assert diff is None, diff
@@ -469,7 +469,7 @@ class TestShapeWriter(object):
     def test_write_text(self):
         root = Element("{%s}test" % CHART_DRAWING_NS)
         self.sw._write_text(root, self.shape)
-        xml = get_xml(root)
+        xml = tostring(root)
         expected = """<cdr:test xmlns:cdr="http://schemas.openxmlformats.org/drawingml/2006/chartDrawing"><cdr:txBody><a:bodyPr vertOverflow="clip" xmlns:a="http://schemas.openxmlformats.org/drawingml/2006/main" /><a:lstStyle xmlns:a="http://schemas.openxmlformats.org/drawingml/2006/main" /><a:p xmlns:a="http://schemas.openxmlformats.org/drawingml/2006/main"><a:r><a:rPr lang="en-US"><a:solidFill><a:srgbClr val="000000" /></a:solidFill></a:rPr><a:t>My first chart</a:t></a:r></a:p></cdr:txBody></cdr:test>"""
         diff = compare_xml(xml, expected)
         assert diff is None, diff
@@ -478,7 +478,7 @@ class TestShapeWriter(object):
     def test_write_style(self):
         root = Element("{%s}test" % CHART_DRAWING_NS)
         self.sw._write_style(root)
-        xml = get_xml(root)
+        xml = tostring(root)
         expected = """<cdr:test xmlns:cdr="http://schemas.openxmlformats.org/drawingml/2006/chartDrawing"><cdr:style><a:lnRef idx="2" xmlns:a="http://schemas.openxmlformats.org/drawingml/2006/main"><a:schemeClr val="accent1"><a:shade val="50000" /></a:schemeClr></a:lnRef><a:fillRef idx="1" xmlns:a="http://schemas.openxmlformats.org/drawingml/2006/main"><a:schemeClr val="accent1" /></a:fillRef><a:effectRef idx="0" xmlns:a="http://schemas.openxmlformats.org/drawingml/2006/main"><a:schemeClr val="accent1" /></a:effectRef><a:fontRef idx="minor" xmlns:a="http://schemas.openxmlformats.org/drawingml/2006/main"><a:schemeClr val="lt1" /></a:fontRef></cdr:style></cdr:test>"""
         diff = compare_xml(xml, expected)
         assert diff is None, diff

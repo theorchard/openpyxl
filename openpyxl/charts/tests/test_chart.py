@@ -1,5 +1,6 @@
 import pytest
 
+from openpyxl.xml.functions import tostring
 
 class TestChart:
 
@@ -75,9 +76,9 @@ def bar_chart(ten_row_sheet, BarChart, Series, Reference):
 
 from openpyxl.writer.charts import BarChartWriter, BaseChartWriter
 from openpyxl.xml.constants import CHART_NS
-from openpyxl.xml.functions import Element
+from openpyxl.xml.functions import Element, tostring
 
-from openpyxl.tests.helper import get_xml, compare_xml
+from openpyxl.tests.helper import compare_xml
 from openpyxl.tests.schema import chart_schema
 
 
@@ -91,7 +92,7 @@ def test_write_serial(ten_row_sheet, LineChart, Series, Reference, root_xml):
     chart.add_serie(series)
     cw = BaseChartWriter(chart)
     cw._write_serial(cw.root, ref)
-    xml = get_xml(cw.root)
+    xml = tostring(cw.root)
     expected = """ <c:chartSpace xmlns:c="http://schemas.openxmlformats.org/drawingml/2006/chart"><c:strRef><c:f>'data'!$A$1:$A$10</c:f><c:strCache><c:ptCount val="10"/><c:pt idx="0"><c:v>A</c:v></c:pt><c:pt idx="1"><c:v>B</c:v></c:pt><c:pt idx="2"><c:v>C</c:v></c:pt><c:pt idx="3"><c:v>D</c:v></c:pt><c:pt idx="4"><c:v>E</c:v></c:pt><c:pt idx="5"><c:v>F</c:v></c:pt><c:pt idx="6"><c:v>6</c:v></c:pt><c:pt idx="7"><c:v>7</c:v></c:pt><c:pt idx="8"><c:v>8</c:v></c:pt><c:pt idx="9"><c:v>9</c:v></c:pt></c:strCache></c:strRef></c:chartSpace>"""
     diff = compare_xml(xml, expected)
     assert diff is None, diff
@@ -103,7 +104,7 @@ class TestChartWriter(object):
         cw = BarChartWriter(bar_chart)
         cw._write_title(root_xml)
         expected = """<?xml version='1.0' ?><test xmlns:a="http://schemas.openxmlformats.org/drawingml/2006/main" xmlns:c="http://schemas.openxmlformats.org/drawingml/2006/chart"><c:title><c:tx><c:rich><a:bodyPr /><a:lstStyle /><a:p><a:pPr><a:defRPr /></a:pPr><a:r><a:rPr lang="en-GB" /><a:t>TITLE</a:t></a:r></a:p></c:rich></c:tx><c:layout /></c:title></test>"""
-        xml = get_xml(root_xml)
+        xml = tostring(root_xml)
         diff = compare_xml(xml, expected)
         assert diff is None, diff
 
@@ -111,7 +112,7 @@ class TestChartWriter(object):
         cw = BarChartWriter(bar_chart)
         cw._write_axis(root_xml, bar_chart.x_axis, '{%s}catAx' % CHART_NS)
         expected = """<?xml version='1.0' ?><test xmlns:c="http://schemas.openxmlformats.org/drawingml/2006/chart"><c:catAx><c:axId val="60871424" /><c:scaling><c:orientation val="minMax" /></c:scaling><c:axPos val="b" /><c:tickLblPos val="nextTo" /><c:crossAx val="60873344" /><c:crosses val="autoZero" /><c:auto val="1" /><c:lblAlgn val="ctr" /><c:lblOffset val="100" /></c:catAx></test>"""
-        xml = get_xml(root_xml)
+        xml = tostring(root_xml)
         diff = compare_xml(xml, expected)
         assert diff is None, diff
 
@@ -119,7 +120,7 @@ class TestChartWriter(object):
         cw = BarChartWriter(bar_chart)
         cw._write_axis(root_xml, bar_chart.y_axis, '{%s}valAx' % CHART_NS)
         expected = """<?xml version='1.0' ?><test xmlns:c="http://schemas.openxmlformats.org/drawingml/2006/chart"><c:valAx><c:axId val="60873344" /><c:scaling><c:orientation val="minMax" /><c:max val="10.0" /><c:min val="0.0" /></c:scaling><c:axPos val="l" /><c:majorGridlines /><c:numFmt formatCode="General" sourceLinked="1" /><c:tickLblPos val="nextTo" /><c:crossAx val="60871424" /><c:crosses val="autoZero" /><c:crossBetween val="between" /><c:majorUnit val="2.0" /></c:valAx></test>"""
-        xml = get_xml(root_xml)
+        xml = tostring(root_xml)
         diff = compare_xml(xml, expected)
         assert diff is None, diff
 
@@ -127,7 +128,7 @@ class TestChartWriter(object):
         cw = BarChartWriter(bar_chart)
         cw._write_series(root_xml)
         expected = """<?xml version='1.0' ?><test xmlns:a="http://schemas.openxmlformats.org/drawingml/2006/main" xmlns:c="http://schemas.openxmlformats.org/drawingml/2006/chart"><c:ser><c:idx val="0" /><c:order val="0" /><c:spPr><a:solidFill><a:srgbClr val="00FF00" /></a:solidFill><a:ln><a:solidFill><a:srgbClr val="00FF00" /></a:solidFill></a:ln></c:spPr><c:val><c:numRef><c:f>\'data\'!$A$1:$A$11</c:f><c:numCache><c:formatCode>General</c:formatCode><c:ptCount val="11" /><c:pt idx="0"><c:v>0</c:v></c:pt><c:pt idx="1"><c:v>1</c:v></c:pt><c:pt idx="2"><c:v>2</c:v></c:pt><c:pt idx="3"><c:v>3</c:v></c:pt><c:pt idx="4"><c:v>4</c:v></c:pt><c:pt idx="5"><c:v>5</c:v></c:pt><c:pt idx="6"><c:v>6</c:v></c:pt><c:pt idx="7"><c:v>7</c:v></c:pt><c:pt idx="8"><c:v>8</c:v></c:pt><c:pt idx="9"><c:v>9</c:v></c:pt><c:pt idx="10"><c:v></c:v></c:pt></c:numCache></c:numRef></c:val></c:ser></test>"""
-        xml = get_xml(root_xml)
+        xml = tostring(root_xml)
         diff = compare_xml(xml, expected)
         assert diff is None, diff
 
@@ -135,7 +136,7 @@ class TestChartWriter(object):
         cw = BarChartWriter(bar_chart)
         cw._write_legend(root_xml)
         expected = """<?xml version='1.0' ?><test xmlns:c="http://schemas.openxmlformats.org/drawingml/2006/chart"><c:legend><c:legendPos val="r" /><c:layout /></c:legend></test>"""
-        xml = get_xml(root_xml)
+        xml = tostring(root_xml)
         diff = compare_xml(xml, expected)
         assert diff is None, diff
 
@@ -172,7 +173,7 @@ class TestChartWriter(object):
 
         expected = """<c:chartSpace xmlns:a="http://schemas.openxmlformats.org/drawingml/2006/main" xmlns:c="http://schemas.openxmlformats.org/drawingml/2006/chart"><c:chart><c:title><c:tx><c:rich><a:bodyPr /><a:lstStyle /><a:p><a:pPr><a:defRPr /></a:pPr><a:r><a:rPr lang="en-GB" /><a:t>TITLE</a:t></a:r></a:p></c:rich></c:tx><c:layout /></c:title><c:plotArea><c:layout><c:manualLayout><c:layoutTarget val="inner" /><c:xMode val="edge" /><c:yMode val="edge" /><c:x val="0.03375" /><c:y val="0.31" /><c:w val="0.6" /><c:h val="0.6" /></c:manualLayout></c:layout><c:barChart><c:barDir val="col" /><c:grouping val="clustered" /><c:ser><c:idx val="0" /><c:order val="0" /><c:spPr><a:solidFill><a:srgbClr val="00FF00" /></a:solidFill><a:ln><a:solidFill><a:srgbClr val="00FF00" /></a:solidFill></a:ln></c:spPr><c:val><c:numRef><c:f>'data'!$A$1:$A$11</c:f><c:numCache><c:formatCode>General</c:formatCode><c:ptCount val="11" /><c:pt idx="0"><c:v>0</c:v></c:pt><c:pt idx="1"><c:v>1</c:v></c:pt><c:pt idx="2"><c:v>2</c:v></c:pt><c:pt idx="3"><c:v>3</c:v></c:pt><c:pt idx="4"><c:v>4</c:v></c:pt><c:pt idx="5"><c:v>5</c:v></c:pt><c:pt idx="6"><c:v>6</c:v></c:pt><c:pt idx="7"><c:v>7</c:v></c:pt><c:pt idx="8"><c:v>8</c:v></c:pt><c:pt idx="9"><c:v>9</c:v></c:pt><c:pt idx="10"><c:v></c:v></c:pt></c:numCache></c:numRef></c:val></c:ser><c:axId val="60871424" /><c:axId val="60873344" /></c:barChart><c:catAx><c:axId val="60871424" /><c:scaling><c:orientation val="minMax" /></c:scaling><c:axPos val="b" /><c:tickLblPos val="nextTo" /><c:crossAx val="60873344" /><c:crosses val="autoZero" /><c:auto val="1" /><c:lblAlgn val="ctr" /><c:lblOffset val="100" /></c:catAx><c:valAx><c:axId val="60873344" /><c:scaling><c:orientation val="minMax" /><c:max val="10.0" /><c:min val="0.0" /></c:scaling><c:axPos val="l" /><c:majorGridlines /><c:numFmt formatCode="General" sourceLinked="1" /><c:tickLblPos val="nextTo" /><c:crossAx val="60871424" /><c:crosses val="autoZero" /><c:crossBetween val="between" /><c:majorUnit val="2.0" /></c:valAx></c:plotArea><c:legend><c:legendPos val="r" /><c:layout /></c:legend><c:plotVisOnly val="1" /></c:chart></c:chartSpace>"""
 
-        xml = get_xml(cw.root)
+        xml = tostring(cw.root)
         diff = compare_xml(xml, expected)
         assert diff is None, diff
 
@@ -193,7 +194,7 @@ class TestChartWriter(object):
         c.add_serie(serie)
         cw = BaseChartWriter(c)
         cw._write_series(root_xml)
-        xml = get_xml(root_xml)
+        xml = tostring(root_xml)
         expected = """<test><c:ser xmlns:c="http://schemas.openxmlformats.org/drawingml/2006/chart"><c:idx val="0"/><c:order val="0"/><c:val><c:numRef><c:f>'data'!$A$1:$J$1</c:f><c:numCache><c:formatCode>General</c:formatCode><c:ptCount val="10"/><c:pt idx="0"><c:v>0</c:v></c:pt><c:pt idx="1"><c:v></c:v></c:pt><c:pt idx="2"><c:v></c:v></c:pt><c:pt idx="3"><c:v></c:v></c:pt><c:pt idx="4"><c:v></c:v></c:pt><c:pt idx="5"><c:v></c:v></c:pt><c:pt idx="6"><c:v></c:v></c:pt><c:pt idx="7"><c:v></c:v></c:pt><c:pt idx="8"><c:v></c:v></c:pt><c:pt idx="9"><c:v></c:v></c:pt></c:numCache></c:numRef></c:val></c:ser></test>"""
         diff = compare_xml(xml, expected)
         assert diff is None, diff
@@ -210,7 +211,7 @@ class TestChartWriter(object):
         cw = BarChartWriter(c)
         cw._write_serial(root_xml, c.series[0].labels)
         expected = """<test xmlns:c="http://schemas.openxmlformats.org/drawingml/2006/chart"><c:numRef><c:f>'data'!$A$1:$J$1</c:f><c:numCache><c:formatCode>General</c:formatCode><c:ptCount val="10" /><c:pt idx="0"><c:v>0</c:v></c:pt><c:pt idx="1"><c:v>1</c:v></c:pt><c:pt idx="2"><c:v>2</c:v></c:pt><c:pt idx="3"><c:v>3</c:v></c:pt><c:pt idx="4"><c:v>4</c:v></c:pt><c:pt idx="5"><c:v>5</c:v></c:pt><c:pt idx="6"><c:v>6</c:v></c:pt><c:pt idx="7"><c:v>7</c:v></c:pt><c:pt idx="8"><c:v>8</c:v></c:pt><c:pt idx="9"><c:v>9</c:v></c:pt></c:numCache></c:numRef></test>"""
-        xml = get_xml(root_xml)
+        xml = tostring(root_xml)
         diff = compare_xml(xml, expected)
         assert diff is None, diff
 
@@ -228,6 +229,6 @@ class TestChartWriter(object):
 
         expected = """<test xmlns:c="http://schemas.openxmlformats.org/drawingml/2006/chart"><c:numRef><c:f>'data'!$A$1:$J$1</c:f><c:numCache><c:formatCode>d-mmm</c:formatCode><c:ptCount val="10" /><c:pt idx="0"><c:v>0</c:v></c:pt><c:pt idx="1"><c:v>1</c:v></c:pt><c:pt idx="2"><c:v>2</c:v></c:pt><c:pt idx="3"><c:v>3</c:v></c:pt><c:pt idx="4"><c:v>4</c:v></c:pt><c:pt idx="5"><c:v>5</c:v></c:pt><c:pt idx="6"><c:v>6</c:v></c:pt><c:pt idx="7"><c:v>7</c:v></c:pt><c:pt idx="8"><c:v>8</c:v></c:pt><c:pt idx="9"><c:v>9</c:v></c:pt></c:numCache></c:numRef></test>"""
 
-        xml = get_xml(root)
+        xml = tostring(root)
         diff = compare_xml(xml, expected)
         assert diff is None, diff

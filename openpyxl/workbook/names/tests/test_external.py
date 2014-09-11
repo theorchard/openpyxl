@@ -4,7 +4,7 @@ from io import BytesIO
 from zipfile import ZipFile
 
 import pytest
-from openpyxl.tests.helper import compare_xml, get_xml
+from openpyxl.tests.helper import compare_xml
 
 from openpyxl.reader.workbook import read_rels
 from openpyxl.xml.constants import (
@@ -13,6 +13,7 @@ from openpyxl.xml.constants import (
     PKG_REL_NS,
     REL_NS,
 )
+from openpyxl.xml.functions import tostring
 
 def test_read_external_ref(datadir):
     datadir.chdir()
@@ -67,7 +68,7 @@ def test_write_external_link():
     link2 = ExternalRange('r2', 'somewhere_else!$C$10:$D$12')
     links = [link1, link2]
     el = write_external_link(links)
-    xml = get_xml(el)
+    xml = tostring(el)
     expected = """
     <externalLink xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main">
       <externalBook xmlns:r="http://schemas.openxmlformats.org/officeDocument/2006/relationships" r:id="rId1">
@@ -87,7 +88,7 @@ def test_write_external_book_rel():
     from .. external import write_external_book_rel
     book = ExternalBook("rId1", "book2.xlsx")
     rel = write_external_book_rel(book)
-    xml = get_xml(rel)
+    xml = tostring(rel)
     expected = """
 <Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships">
   <Relationship Id="rId1" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/externalLinkPath" Target="book2.xlsx" TargetMode="External"/>

@@ -7,12 +7,12 @@ from io import BytesIO
 
 import pytest
 
-from openpyxl.xml.functions import XMLGenerator
+from openpyxl.xml.functions import XMLGenerator, tostring
 from openpyxl import Workbook
 
 from .. worksheet import write_worksheet
 
-from openpyxl.tests.helper import compare_xml, get_xml
+from openpyxl.tests.helper import compare_xml
 
 
 class DummyWorksheet:
@@ -652,7 +652,7 @@ def test_data_validation(worksheet):
     ws.add_data_validation(dv)
 
     xml = write_datavalidation(worksheet)
-    xml = get_xml(xml)
+    xml = tostring(xml)
     expected = """
     <dataValidations xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main" count="1">
     <dataValidation allowBlank="0" showErrorMessage="1" showInputMessage="1" sqref="A1" type="list">
