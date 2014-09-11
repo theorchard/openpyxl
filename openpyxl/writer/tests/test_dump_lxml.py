@@ -5,7 +5,7 @@ from __future__ import absolute_import
 import datetime
 import decimal
 from io import BytesIO
-from lxml.etree import tounicode, xmlfile
+from lxml.etree import tostring, xmlfile
 
 from openpyxl.tests.helper import compare_xml
 
@@ -65,7 +65,7 @@ def test_write_cell(LXMLWorksheet, value, expected):
     ws = LXMLWorksheet
     c = Cell(ws, 'A', 1, value)
     el = write_cell(ws, c)
-    xml = tounicode(el)
+    xml = tostring(el)
     diff = compare_xml(xml, expected)
     assert diff is None, diff
 
