@@ -5,11 +5,11 @@ import pytest
 
 from openpyxl.xml.functions import start_tag, end_tag, tag, XMLGenerator
 
-@pytest.fixture(scope="class")
+@pytest.fixture
 def doc():
     return BytesIO()
 
-@pytest.fixture(scope="class")
+@pytest.fixture
 def root(doc):
     return XMLGenerator(doc)
 
@@ -23,7 +23,7 @@ class TestSimpleTag:
     def test_end_tag(self, doc, root):
         """"""
         end_tag(root, "blah")
-        assert doc.getvalue() == b"<start></blah>"
+        assert doc.getvalue() == b"</blah>"
 
 
 class TestTagBody:
@@ -34,7 +34,7 @@ class TestTagBody:
 
     def test_end_tag(self, doc, root):
         end_tag(root, "end")
-        assert doc.getvalue() == b"<start>just words</end>"
+        assert doc.getvalue() == b"</end>"
 
 
 def test_start_tag_attrs(doc, root):
