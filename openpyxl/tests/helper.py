@@ -3,32 +3,14 @@ from __future__ import absolute_import
 
 # Python stdlib imports
 from io import BytesIO
-import os
 import os.path
-import shutil
-from tempfile import gettempdir
 from sys import version_info
 from lxml.doctestcompare import LXMLOutputChecker, PARSE_XML
 
 # package imports
-from openpyxl.xml.functions import ElementTree
 
 # constants
 DATADIR = os.path.abspath(os.path.join(os.path.dirname(__file__), 'data'))
-TMPDIR = os.path.join(gettempdir(), 'openpyxl_test_temp')
-
-
-def make_tmpdir():
-    try:
-        os.makedirs(TMPDIR)
-    except OSError:
-        pass
-
-
-def clean_tmpdir():
-    if os.path.isdir(TMPDIR):
-        shutil.rmtree(TMPDIR, ignore_errors = True)
-
 
 def get_xml(xml_node):
 
