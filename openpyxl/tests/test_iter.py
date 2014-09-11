@@ -30,25 +30,30 @@ def test_read_dimension(datadir, filename, expected):
     assert dimension == expected
 
 
-@pytest.fixture
-def sample_workbook(request, datadir):
+def test_calculate_dimension(datadir):
+    """
+    Behaviour differs between implementations
+    """
     datadir.join("genuine").chdir()
-    wb = load_workbook(filename="empty.xlsx", read_only=True, data_only=True)
-    return wb
-
-
-def test_calculate_dimension(sample_workbook):
-    wb = sample_workbook
+    wb = load_workbook(filename="empty.xlsx", read_only=True)
     sheet2 = wb['Sheet2 - Numbers']
-    dimensions = sheet2.calculate_dimension()
-    assert '%s%s:%s%s' % ('D', 1, 'AA', 30) == dimensions
+    assert sheet2.calculate_dimension() == 'D1:AA30'
 
 
-def test_get_highest_row(sample_workbook):
-    wb = sample_workbook
-    sheet2 = wb['Sheet2 - Numbers']
-    max_row = sheet2.get_highest_row()
-    assert 30 == max_row
+@pytest.mark.parametrize("read_only",
+                         [
+                             False,
+                             True
+                         ]
+                         )
+def test_get_missing_cell(read_only, datadir):
+    """
+    Behaviour differs between implementations
+    """
+    datadir.join("genuine").chdir()
+    wb = load_workbook(filename="empty.xlsx", read_only=read_only)
+    ws = wb['Sheet2 - Numbers']
+    assert (ws['A1'] is None) is read_only
 
 
 def test_getitem(sample_workbook):
@@ -58,21 +63,20 @@ def test_getitem(sample_workbook):
     assert list(ws.iter_rows("A1:D30")) == list(ws["A1:D30"])
     assert list(ws.iter_rows("A1:D30")) == list(ws["A1":"D30"])
 
-    ws = wb['Sheet2 - Numbers']
-    assert ws['A1'] is None
+
+@pytest.fixture(params=[False, True])
+def sample_workbook(request, datadir):
+    """Standard and read-only workbook"""
+    datadir.join("genuine").chdir()
+    wb = load_workbook(filename="empty.xlsx", read_only=request.param, data_only=True)
+    return wb
 
 
-expected = [
-    ("Sheet1 - Text", 'A1:G5'),
-    ("Sheet2 - Numbers", 'D1:AA30'),
-    ("Sheet3 - Formulas", 'D2:D2'),
-    ("Sheet4 - Dates", 'A1:C1')
-                 ]
-@pytest.mark.parametrize("sheetname, dims", expected)
-def test_get_dimensions(sample_workbook, sheetname, dims):
+def test_max_row(sample_workbook):
     wb = sample_workbook
-    ws = wb[sheetname]
-    assert ws.dimensions == dims
+    sheet2 = wb['Sheet2 - Numbers']
+    assert sheet2.max_row == 30
+
 
 expected = [
     ("Sheet1 - Text", 7),
@@ -81,10 +85,10 @@ expected = [
     ("Sheet4 - Dates", 3)
              ]
 @pytest.mark.parametrize("sheetname, col", expected)
-def test_get_highest_column_iter(sample_workbook, sheetname, col):
+def test_max_column(sample_workbook, sheetname, col):
     wb = sample_workbook
     ws = wb[sheetname]
-    assert ws.get_highest_column() == col
+    assert ws.max_column == col
 
 
 expected = [['This is cell A1 in Sheet 1', None, None, None, None, None, None],
