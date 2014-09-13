@@ -22,6 +22,7 @@ from openpyxl.xml.functions import (
     end_tag,
     tag,
     fromstring,
+    tostring,
     Element
 )
 from openpyxl.xml.constants import (
@@ -76,7 +77,7 @@ def write_worksheet(worksheet, shared_strings):
     write_worksheet_conditional_formatting(doc, worksheet)
     dvs = write_datavalidation(worksheet)
     if dvs:
-        xml_file.write(dvs)
+        xml_file.write(tostring(dvs))
     write_worksheet_hyperlinks(doc, worksheet)
 
     options = worksheet.page_setup.options
