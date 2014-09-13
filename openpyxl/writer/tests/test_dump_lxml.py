@@ -18,6 +18,7 @@ def LXMLWorksheet():
     return LXMLWorksheet(DummyWorkbook(), title="TestWorksheet")
 
 
+@pytest.mark.lxml_required
 def test_write_header(LXMLWorksheet):
     ws = LXMLWorksheet
     doc = ws._write_header()
@@ -122,6 +123,7 @@ def test_invalid_append(LXMLWorksheet, row):
         ws.append(row)
 
 
+@pytest.mark.lxml_required
 def test_cell_comment(LXMLWorksheet):
     ws = LXMLWorksheet
     from openpyxl.comments import Comment
@@ -133,6 +135,7 @@ def test_cell_comment(LXMLWorksheet):
     assert ws._comments == [comment]
 
 
+@pytest.mark.lxml_required
 def test_cannot_save_twice(LXMLWorksheet):
     from .. dump_worksheet import WorkbookAlreadySaved
 
@@ -144,6 +147,7 @@ def test_cannot_save_twice(LXMLWorksheet):
         ws.append([1])
 
 
+@pytest.mark.lxml_required
 def test_close(LXMLWorksheet):
     ws = LXMLWorksheet
     ws.close()

@@ -167,6 +167,7 @@ def write_worksheet():
     return write_worksheet
 
 
+@pytest.mark.lxml_required
 def test_empty_worksheet(worksheet, write_worksheet):
     xml = write_worksheet(worksheet, None)
     expected = """
@@ -189,6 +190,7 @@ def test_empty_worksheet(worksheet, write_worksheet):
     assert diff is None, diff
 
 
+@pytest.mark.lxml_required
 def test_printer_settings(worksheet, write_worksheet):
     ws = worksheet
     ws.page_setup.orientation = ws.ORIENTATION_LANDSCAPE
@@ -222,6 +224,7 @@ def test_printer_settings(worksheet, write_worksheet):
     assert diff is None, diff
 
 
+@pytest.mark.lxml_required
 def test_page_margins(worksheet, write_worksheet):
     ws = worksheet
     ws.page_margins.left = 2.0
@@ -251,6 +254,7 @@ def test_page_margins(worksheet, write_worksheet):
     assert diff is None, diff
 
 
+@pytest.mark.lxml_required
 def test_vba(worksheet, write_worksheet):
     ws = worksheet
     ws.xml_source = """
@@ -284,7 +288,7 @@ def test_vba(worksheet, write_worksheet):
     assert diff is None, diff
 
 
-
+@pytest.mark.lxml_required
 def test_protection(worksheet, write_worksheet):
     ws = worksheet
     ws.protection.enable()
@@ -310,6 +314,7 @@ def test_protection(worksheet, write_worksheet):
     assert diff is None, diff
 
 
+@pytest.mark.lxml_required
 def test_write_comments(worksheet, write_worksheet):
     ws = worksheet
     worksheet._comment_count = 1
