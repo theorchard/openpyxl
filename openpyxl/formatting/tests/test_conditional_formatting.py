@@ -13,7 +13,7 @@ from openpyxl.reader.excel import load_workbook
 from openpyxl.reader.style import read_style_table
 from openpyxl.xml.constants import ARC_STYLE
 from openpyxl.xml.functions import XMLGenerator, tostring
-from openpyxl.writer.worksheet import write_worksheet_conditional_formatting
+from openpyxl.writer.worksheet import write_conditional_formatting
 from openpyxl.writer.styles import StyleWriter
 from openpyxl.styles import Color, PatternFill, Font, Border, Side
 from openpyxl.styles import borders, fills, colors
@@ -110,12 +110,10 @@ class TestConditionalFormatting(object):
         worksheet.conditional_formatting.add('C1:C10', {'type': 'expression', 'formula': ['ISBLANK(C1)'],
                                                         'stopIfTrue': '1', 'dxf': {}})
         worksheet.conditional_formatting.setDxfStyles(self.workbook)
-        temp_buffer = BytesIO()
-        doc = XMLGenerator(out=temp_buffer)
-        write_worksheet_conditional_formatting(doc, worksheet)
-        doc.endDocument()
-        xml = temp_buffer.getvalue()
-        temp_buffer.close()
+        cfs = write_conditional_formatting(worksheet)
+        xml = b""
+        for cf in cfs:
+            xml += tostring(cf)
 
         diff = compare_xml(xml, """
         <conditionalFormatting sqref="C1:C10">
@@ -153,12 +151,11 @@ class TestConditionalFormatting(object):
                                            [Color('FFFF7128'), Color('FFFFEF9C')]}}]}
         worksheet.conditional_formatting.update(rules)
 
-        temp_buffer = BytesIO()
-        doc = XMLGenerator(out=temp_buffer)
-        write_worksheet_conditional_formatting(doc, worksheet)
-        doc.endDocument()
-        xml = temp_buffer.getvalue()
-        temp_buffer.close()
+        cfs = write_conditional_formatting(worksheet)
+        xml = b""
+        for cf in cfs:
+            xml += tostring(cf)
+
         diff = compare_xml(xml, """
         <conditionalFormatting sqref="A1:A4">
           <cfRule type="colorScale" priority="1">
@@ -189,12 +186,11 @@ class TestConditionalFormatting(object):
         worksheet.conditional_formatting.setDxfStyles(self.workbook)
 
         # First, verify conditional formatting xml
-        temp_buffer = BytesIO()
-        doc = XMLGenerator(out=temp_buffer)
-        write_worksheet_conditional_formatting(doc, worksheet)
-        doc.endDocument()
-        xml = temp_buffer.getvalue()
-        temp_buffer.close()
+        cfs = write_conditional_formatting(worksheet)
+        xml = b""
+        for cf in cfs:
+            xml += tostring(cf)
+
         diff = compare_xml(xml, """
         <conditionalFormatting sqref="A1:A3">
           <cfRule dxfId="0" operator="equal" priority="1" type="cellIs">
@@ -495,12 +491,11 @@ class TestFormulaRule(object):
         worksheet = WS()
         worksheet.conditional_formatting.add('C1:C10', FormulaRule(formula=['ISBLANK(C1)'], stopIfTrue=True))
         worksheet.conditional_formatting.setDxfStyles(self.workbook)
-        temp_buffer = BytesIO()
-        doc = XMLGenerator(out=temp_buffer)
-        write_worksheet_conditional_formatting(doc, worksheet)
-        doc.endDocument()
-        xml = temp_buffer.getvalue()
-        temp_buffer.close()
+
+        cfs = write_conditional_formatting(worksheet)
+        xml = b""
+        for cf in cfs:
+            xml += tostring(cf)
 
         diff = compare_xml(xml, """
         <conditionalFormatting sqref="C1:C10">

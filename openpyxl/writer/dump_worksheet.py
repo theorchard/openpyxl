@@ -27,8 +27,8 @@ from openpyxl.writer.comments import CommentWriter
 from .relations import write_rels
 from .worksheet import (
     write_cell,
-    write_worksheet_cols,
-    write_worksheet_format
+    write_cols,
+    write_format
 )
 from openpyxl.xml.constants import PACKAGE_WORKSHEETS
 
@@ -143,8 +143,11 @@ class DumpWorksheet(Worksheet):
                 'sqref': 'A1'})
         end_tag(doc, 'sheetView')
         end_tag(doc, 'sheetViews')
-        write_worksheet_format(doc, self)
-        write_worksheet_cols(doc, self)
+        fmt = write_format(self)
+        fobj.write(tostring(fmt, encoding="unicode"))
+        cols = write_cols(self)
+        if cols is not None:
+            fobj.write(tostring(cols, encoding=unicode))
 
         return doc
 
