@@ -60,7 +60,7 @@ def test_filename(DumpWorksheet):
 def test_get_temporary_file(DumpWorksheet):
     ws = DumpWorksheet
     fobj = ws.get_temporary_file(ws.filename)
-    assert fobj.mode == "r+"
+    assert fobj.mode == "rb+"
 
 
 def test_get_content_generator(DumpWorksheet):
@@ -81,7 +81,7 @@ def test_write_header(DumpWorksheet):
     header = ws.get_temporary_file(ws._fileobj_header_name)
     header.seek(0)
     xml = header.read()
-    xml += "</worksheet>"
+    xml += b"</worksheet>"
     expected = """<worksheet xmlns:r="http://schemas.openxmlformats.org/officeDocument/2006/relationships" xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main">
     <sheetPr>
       <outlinePr summaryRight="1" summaryBelow="1"/>
@@ -156,7 +156,7 @@ def test_close(DumpWorksheet):
     ws = DumpWorksheet
     ws.write_header()
     header = ws.get_temporary_file(ws._fileobj_header_name)
-    header.write("<sheetData>") # well-formed XML needed
+    header.write(b"<sheetData>") # well-formed XML needed
     ws.close()
     with open(ws.filename) as content:
         xml = content.read()

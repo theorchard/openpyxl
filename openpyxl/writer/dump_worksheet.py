@@ -91,7 +91,7 @@ class DumpWorksheet(Worksheet):
             del self._descriptors_cache[filename]
             self._descriptors_cache[filename] = fobj
         else:
-            fobj = open(filename, 'r+')
+            fobj = open(filename, 'rb+')
             self._descriptors_cache[filename] = fobj
             if len(self._descriptors_cache) > DESCRIPTORS_CACHE_SIZE:
                 filename, fileobj = self._descriptors_cache.popitem(last=False)
@@ -144,10 +144,10 @@ class DumpWorksheet(Worksheet):
         end_tag(doc, 'sheetView')
         end_tag(doc, 'sheetViews')
         fmt = write_format(self)
-        fobj.write(tostring(fmt, encoding="unicode"))
+        fobj.write(tostring(fmt))
         cols = write_cols(self)
         if cols is not None:
-            fobj.write(tostring(cols, encoding=unicode))
+            fobj.write(tostring(cols))
 
         return doc
 
@@ -157,7 +157,7 @@ class DumpWorksheet(Worksheet):
         for f in files:
             self.get_temporary_file(f).close()
         output = self.get_temporary_file(self.filename)
-        for line in FileInput(files):
+        for line in FileInput(files, mode="rb"):
             output.write(line)
         output.close()
 
