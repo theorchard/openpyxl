@@ -76,7 +76,7 @@ def test_col_widths(write_cols, ColumnDimension, DummyWorksheet):
     ws = DummyWorksheet
     ws.column_dimensions['A'] = ColumnDimension(width=4)
     cols = write_cols(ws)
-    xml = tostring(cols, encoding="unicode")
+    xml = tostring(cols)
     expected = """<cols><col width="4" min="1" max="1" customWidth="1"></col></cols>"""
     diff = compare_xml(xml, expected)
     assert diff is None, diff
@@ -88,7 +88,7 @@ def test_col_style(write_cols, ColumnDimension, DummyWorksheet):
     ws.column_dimensions['A'] = cd
     cd._style = 1
     cols = write_cols(ws)
-    xml = tostring(cols, encoding="unicode")
+    xml = tostring(cols)
     expected = """<cols><col max="1" min="1" style="1"></col></cols>"""
     diff = compare_xml(xml, expected)
     assert diff is None, diff
@@ -103,7 +103,7 @@ def test_lots_cols(write_cols, ColumnDimension, DummyWorksheet):
         cd._style = i
         ws.column_dimensions[label] = cd
     cols = write_cols(ws)
-    xml = tostring(cols, encoding="unicode")
+    xml = tostring(cols)
     expected = """<cols>
    <col max="1" min="1" style="1"></col>
    <col max="2" min="2" style="2"></col>
@@ -133,7 +133,7 @@ def write_format():
 
 def test_sheet_format(write_format, ColumnDimension, DummyWorksheet):
     fmt = write_format(DummyWorksheet)
-    xml = tostring(fmt, encoding="unicode")
+    xml = tostring(fmt)
     expected = """<sheetFormatPr defaultRowHeight="15" baseColWidth="10"/>"""
     diff = compare_xml(expected, xml)
     assert diff is None, diff
@@ -143,7 +143,7 @@ def test_outline_format(write_format, ColumnDimension, DummyWorksheet):
     worksheet = DummyWorksheet
     worksheet.column_dimensions['A'] = ColumnDimension(outline_level=1)
     fmt = write_format(worksheet)
-    xml = tostring(fmt, encoding="unicode")
+    xml = tostring(fmt)
     expected = """<sheetFormatPr defaultRowHeight="15" baseColWidth="10" outlineLevelCol="1" />"""
     diff = compare_xml(expected, xml)
     assert diff is None, diff
@@ -153,7 +153,7 @@ def test_outline_cols(write_cols, ColumnDimension, DummyWorksheet):
     worksheet = DummyWorksheet
     worksheet.column_dimensions['A'] = ColumnDimension(outline_level=1)
     cols = write_cols(worksheet)
-    xml = tostring(cols, encoding="unicode")
+    xml = tostring(cols)
     expected = """<cols><col max="1" min="1" outlineLevel="1"/></cols>"""
     diff = compare_xml(expected, xml)
     assert diff is None, diff
@@ -266,7 +266,7 @@ def test_auto_filter(worksheet, write_autofilter):
     ws = worksheet
     ws.auto_filter.ref = 'A1:F1'
     af = write_autofilter(ws)
-    xml = tostring(af, encoding="unicode")
+    xml = tostring(af)
     expected = """<autoFilter ref="A1:F1"></autoFilter>"""
     diff = compare_xml(xml, expected)
     assert diff is None, diff
@@ -278,7 +278,7 @@ def test_auto_filter_filter_column(worksheet, write_autofilter):
     ws.auto_filter.add_filter_column(0, ["0"], blank=True)
 
     af = write_autofilter(ws)
-    xml = tostring(af, encoding="unicode")
+    xml = tostring(af)
     expected = """
     <autoFilter ref="A1:F1">
       <filterColumn colId="0">
@@ -301,7 +301,7 @@ def test_auto_filter_sort_condition(worksheet, write_autofilter):
     ws.auto_filter.add_sort_condition('A2:A3', descending=True)
 
     af = write_autofilter(ws)
-    xml = tostring(af, encoding="unicode")
+    xml = tostring(af)
     expected = """
     <autoFilter ref="A2:A3">
     <sortState ref="A2:A3">
@@ -324,7 +324,7 @@ def test_freeze_panes_horiz(worksheet, write_sheetviews):
     ws.freeze_panes = 'A4'
 
     views = write_sheetviews(ws)
-    xml = tostring(views, encoding="unicode")
+    xml = tostring(views)
     expected = """
     <sheetViews>
     <sheetView workbookViewId="0">
@@ -342,7 +342,7 @@ def test_freeze_panes_vert(worksheet, write_sheetviews):
     ws.freeze_panes = 'D1'
 
     views = write_sheetviews(ws)
-    xml = tostring(views, encoding="unicode")
+    xml = tostring(views)
     expected = """
     <sheetViews>
       <sheetView workbookViewId="0">
@@ -360,7 +360,7 @@ def test_freeze_panes_both(worksheet, write_sheetviews):
     ws.freeze_panes = 'D4'
 
     views = write_sheetviews(ws)
-    xml = tostring(views, encoding="unicode")
+    xml = tostring(views)
     expected = """
     <sheetViews>
       <sheetView workbookViewId="0">
@@ -380,7 +380,7 @@ def test_show_gridlines_false(worksheet, write_sheetviews):
     ws.show_gridlines = False
 
     views = write_sheetviews(ws)
-    xml = tostring(views, encoding='unicode')
+    xml = tostring(views)
     expected = """
     <sheetViews>
       <sheetView showGridLines="0" workbookViewId="0">
@@ -397,7 +397,7 @@ def test_show_gridlines_true(worksheet, write_sheetviews):
     ws.show_gridlines = True
 
     views = write_sheetviews(ws)
-    xml = tostring(views, encoding='unicode')
+    xml = tostring(views)
     expected = """
     <sheetViews>
       <sheetView workbookViewId="0">
@@ -418,7 +418,7 @@ def test_merge(worksheet):
 
     ws.merge_cells('A1:B1')
     merge = write_mergecells(ws)
-    xml = tostring(merge, encoding="unicode")
+    xml = tostring(merge)
     expected = """
       <mergeCells count="1">
         <mergeCell ref="A1:B1"/>
@@ -461,7 +461,7 @@ def test_header_footer(worksheet):
 
     from .. lxml_worksheet import write_header_footer
     hf = write_header_footer(ws)
-    xml = tostring(hf, encoding="unicode")
+    xml = tostring(hf)
     expected = """
     <headerFooter>
       <oddHeader>&amp;L&amp;"Calibri,Regular"&amp;K000000Left Header Text&amp;C&amp;"Arial,Regular"&amp;6&amp;K445566Center Header Text&amp;R&amp;"Arial,Bold"&amp;8&amp;K112233Right Header Text</oddHeader>
@@ -487,7 +487,7 @@ def test_hyperlink(worksheet):
     ws.cell('A1').hyperlink = "http://test.com"
 
     hyper = write_hyperlinks(ws)
-    xml = tostring(hyper, encoding="unicode")
+    xml = tostring(hyper)
     expected = """
     <hyperlinks xmlns:r="http://schemas.openxmlformats.org/officeDocument/2006/relationships">
       <hyperlink display="http://test.com" r:id="rId1" ref="A1"/>
