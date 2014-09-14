@@ -253,22 +253,27 @@ def write_pagebreaks(worksheet):
         return tag
 
 
+def extract_vba(worksheet):
+    vba_attrs = {}
+    drawing = None
+    if worksheet.xml_source:
+        root = fromstring(worksheet.xml_source)
+        code = root.find("{%s}sheetPr" % SHEET_MAIN_NS)
+        if code is not None:
+            vba_attrs['codeName'] = code.get("codeName", worksheet.title)
+        drawing = root.find('{%s}legacyDrawing' % SHEET_MAIN_NS)
+    return vba_attrs, drawing
+
+
 def write_worksheet(worksheet, shared_strings):
     """Write a worksheet to an xml file."""
-    if worksheet.xml_source:
-        vba_root = fromstring(worksheet.xml_source)
-    else:
-        vba_root = None
+
     xml_file = BytesIO()
     doc = XMLGenerator(out=xml_file)
     start_tag(doc, 'worksheet',
               {'xmlns': SHEET_MAIN_NS,
                'xmlns:r': REL_NS})
-    vba_attrs = {}
-    if vba_root is not None:
-        el = vba_root.find('{%s}sheetPr' % SHEET_MAIN_NS)
-        if el is not None:
-            vba_attrs['codeName'] = el.get('codeName', worksheet.title)
+    vba_attrs, vba_controls = extract_vba(worksheet)
 
     props = write_properties(worksheet, vba_attrs)
     xml_file.write(tostring(props))
@@ -329,13 +334,8 @@ def write_worksheet(worksheet, shared_strings):
     if worksheet._charts or worksheet._images:
         tag(doc, 'drawing', {'r:id': 'rId1'})
 
-    # If vba is being preserved then add a legacyDrawing element so
-    # that any controls can be drawn.
-    if vba_root is not None:
-        el = vba_root.find('{%s}legacyDrawing' % SHEET_MAIN_NS)
-        if el is not None:
-            rId = el.get('{%s}id' % REL_NS)
-            tag(doc, 'legacyDrawing', {'r:id': rId})
+    if vba_controls is not None:
+        xml_file.write(tostring(vba_controls))
 
     breaks = write_pagebreaks(worksheet)
     if breaks is not None:

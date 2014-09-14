@@ -37,21 +37,17 @@ from .worksheet import (
     write_header_footer,
     write_hyperlinks,
     write_pagebreaks,
+    extract_vba,
 )
 
 
 def write_worksheet(worksheet, shared_strings):
     """Write a worksheet to an xml file."""
-    vba_attrs = {}
-    vba_root = None
-    if worksheet.xml_source:
-        vba_root = fromstring(worksheet.xml_source)
-        el = vba_root.find('{%s}sheetPr' % SHEET_MAIN_NS)
-        if el is not None:
-            vba_attrs['codeName'] = el.get('codeName', worksheet.title)
+    vba_attrs, vba_controls = extract_vba(worksheet)
 
     out = BytesIO()
     NSMAP = {None : SHEET_MAIN_NS}
+
     with xmlfile(out) as xf:
         with xf.element('worksheet', nsmap=NSMAP):
 
@@ -119,12 +115,8 @@ def write_worksheet(worksheet, shared_strings):
 
             # If vba is being preserved then add a legacyDrawing element so
             # that any controls can be drawn.
-            if vba_root is not None:
-                el = vba_root.find('{%s}legacyDrawing' % SHEET_MAIN_NS)
-                if el is not None:
-                    rId = el.get('{%s}id' % REL_NS)
-                    legacy = Element('legacyDrawing', {'{%s}id' % REL_NS: rId})
-                    xf.write(legacy)
+            if vba_controls is not None:
+                xf.write(vba_controls)
 
             pb = write_pagebreaks(worksheet)
             if pb is not None:
