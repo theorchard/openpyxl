@@ -46,6 +46,8 @@ class WorkSheetParser(object):
     VALUE_TAG = '{%s}v' % SHEET_MAIN_NS
     FORMULA_TAG = '{%s}f' % SHEET_MAIN_NS
     MERGE_TAG = '{%s}mergeCell' % SHEET_MAIN_NS
+    INLINE_STRING = "{%s}is/{%s}t" % (SHEET_MAIN_NS, SHEET_MAIN_NS)
+    INLINE_RICHTEXT = "{%s}is/{%s}r/{%s}t" % (SHEET_MAIN_NS, SHEET_MAIN_NS, SHEET_MAIN_NS)
 
     def __init__(self, ws, xml_source, shared_strings, style_table, color_index=None):
         self.ws = ws
@@ -127,7 +129,11 @@ class WorkSheetParser(object):
         else:
             if data_type == 'inlineStr':
                 data_type = 's'
-                value = element.findtext("{%s}is/{%s}t" % (SHEET_MAIN_NS, SHEET_MAIN_NS))
+                child = element.find(self.INLINE_STRING)
+                if child is None:
+                    child = element.find(self.INLINE_RICHTEXT)
+                if child is not None:
+                    value = child.text
 
         if self.guess_types or value is None:
             cell.value = value
