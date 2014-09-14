@@ -287,7 +287,7 @@ def test_inline_richtext(Worksheet, WorkSheetParser, datadir):
     ws = Worksheet
     parser = WorkSheetParser
     datadir.chdir()
-    with open("jasper_sheet.xml") as src:
+    with open("jasper_sheet.xml", "rb") as src:
         sheet = fromstring(src.read())
 
     element = sheet.find("{%s}sheetData/{%s}row[2]/{%s}c[18]" % (SHEET_MAIN_NS, SHEET_MAIN_NS, SHEET_MAIN_NS))
