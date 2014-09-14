@@ -224,7 +224,7 @@ def write_header_footer(worksheet):
         tag = Element('headerFooter')
         if header:
             SubElement(tag, 'oddHeader').text = header
-        if worksheet.header_footer.hasFooter():
+        if footer:
             SubElement(tag, 'oddFooter').text = footer
         return tag
 
