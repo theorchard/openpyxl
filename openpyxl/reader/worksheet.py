@@ -69,6 +69,8 @@ class WorkSheetParser(object):
             '{%s}autoFilter' % SHEET_MAIN_NS: self.parse_auto_filter,
             '{%s}sheetProtection' % SHEET_MAIN_NS: self.parse_sheet_protection,
             '{%s}dataValidations' % SHEET_MAIN_NS: self.parse_data_validation,
+            '{%s}sheetPr' % SHEET_MAIN_NS: self.parse_properties,
+            '{%s}legacyDrawing' % SHEET_MAIN_NS: self.parse_legacy_drawing,
                       }
         tags = dispatcher.keys()
         stream = _get_xml_iter(self.source)
@@ -279,6 +281,14 @@ class WorkSheetParser(object):
             self.ws._data_validations.append(dv)
 
 
+    def parse_properties(self, element):
+        self.ws.vba_code = element.attrib
+
+
+    def parse_legacy_drawing(self, element):
+        self.ws.vba_controls = element.get("r:id")
+
+
 def fast_parse(ws, xml_source, shared_strings, style_table, color_index=None):
     parser = WorkSheetParser(ws, xml_source, shared_strings, style_table, color_index)
     parser.parse()
@@ -294,6 +304,4 @@ def read_worksheet(xml_source, parent, preset_title, shared_strings,
     else:
         ws = Worksheet(parent, preset_title)
         fast_parse(ws, xml_source, shared_strings, style_table, color_index)
-    if keep_vba:
-        ws.xml_source = xml_source
     return ws

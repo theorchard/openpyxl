@@ -169,6 +169,8 @@ class Worksheet(object):
         self.orientation = None
         self.xml_source = None
         self.conditional_formatting = ConditionalFormatting()
+        self.vba_code = {}
+        self.vba_controls = None
 
     def __repr__(self):
         return self.repr_format % self.title

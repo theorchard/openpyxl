@@ -253,18 +253,6 @@ def write_pagebreaks(worksheet):
         return tag
 
 
-def extract_vba(worksheet):
-    vba_attrs = {}
-    drawing = None
-    if worksheet.xml_source:
-        root = fromstring(worksheet.xml_source)
-        code = root.find("{%s}sheetPr" % SHEET_MAIN_NS)
-        if code is not None:
-            vba_attrs['codeName'] = code.get("codeName", worksheet.title)
-        drawing = root.find('{%s}legacyDrawing' % SHEET_MAIN_NS)
-    return vba_attrs, drawing
-
-
 def write_worksheet(worksheet, shared_strings):
     """Write a worksheet to an xml file."""
 
@@ -273,9 +261,8 @@ def write_worksheet(worksheet, shared_strings):
     start_tag(doc, 'worksheet',
               {'xmlns': SHEET_MAIN_NS,
                'xmlns:r': REL_NS})
-    vba_attrs, vba_controls = extract_vba(worksheet)
 
-    props = write_properties(worksheet, vba_attrs)
+    props = write_properties(worksheet, worksheet.vba_code)
     xml_file.write(tostring(props))
 
     dim = Element('dimension', {'ref': '%s' % worksheet.calculate_dimension()})
@@ -334,8 +321,10 @@ def write_worksheet(worksheet, shared_strings):
     if worksheet._charts or worksheet._images:
         tag(doc, 'drawing', {'r:id': 'rId1'})
 
-    if vba_controls is not None:
-        xml_file.write(tostring(vba_controls))
+    if worksheet.vba_controls is not None:
+        xml = Element("{%s}legacyDrawing" % SHEET_MAIN_NS,
+                      {"{%s}id" % REL_NS : worksheet.vba_controls})
+        xml_file.write(tostring(xml))
 
     breaks = write_pagebreaks(worksheet)
     if breaks is not None:

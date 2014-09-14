@@ -770,15 +770,10 @@ def test_data_validation(worksheet):
 
 
 def test_vba(worksheet):
+    from openpyxl.xml.functions import fromstring
     ws = worksheet
-    ws.xml_source = """
-    <worksheet xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main"
-    xmlns:r="http://schemas.openxmlformats.org/officeDocument/2006/relationships">
-        <sheetPr codeName="Sheet1"/>
-        <legacyDrawing r:id="rId2"/>
-    </worksheet>
-    """
-
+    ws.vba_code = {"codeName":"Sheet1"}
+    ws.vba_controls = "rId2"
     xml = write_worksheet(ws, None)
     expected = """
     <worksheet xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main"
