@@ -169,6 +169,8 @@ class Worksheet(object):
         self.orientation = None
         self.xml_source = None
         self.conditional_formatting = ConditionalFormatting()
+        self.vba_code = {}
+        self.vba_controls = None
 
     def __repr__(self):
         return self.repr_format % self.title
@@ -330,6 +332,8 @@ class Worksheet(object):
         """Convenience access by Excel style address"""
         if isinstance(key, slice):
             return self.iter_rows("{0}:{1}".format(key.start, key.stop))
+        if ":" in key:
+            return self.iter_rows(key)
         return self._get_cell(key)
 
     def __setitem__(self, key, value):
@@ -344,6 +348,13 @@ class Worksheet(object):
             return max(self.row_dimensions)
         else:
             return 0
+
+    @property
+    def min_row(self):
+        if self.row_dimensions:
+            return min(self.row_dimensions)
+        else:
+            return 1
 
     @property
     def max_row(self):
@@ -361,13 +372,29 @@ class Worksheet(object):
             return 1
 
     @property
+    def min_col(self):
+        if self.column_dimensions:
+            return max([column_index_from_string(column_index)
+                        for column_index in self.column_dimensions])
+        else:
+            return 1
+
+    @property
     def max_column(self):
         return self.get_highest_column()
 
     def calculate_dimension(self):
         """Return the minimum bounding range for all cells containing data."""
+        return '%s%d:%s%d' % (
+            get_column_letter(1),
+            self.min_row,
+            get_column_letter(self.max_column or 1),
+            self.max_row or 1)
 
-        return 'A1:%s%d' % (get_column_letter(self.max_column or 1), self.max_row or 1)
+
+    @property
+    def dimensions(self):
+        return self.calculate_dimension()
 
 
     def iter_rows(self, range_string=None, row_offset=0, column_offset=0):

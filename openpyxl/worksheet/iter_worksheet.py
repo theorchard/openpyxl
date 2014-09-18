@@ -82,19 +82,6 @@ class IterableWorksheet(Worksheet):
         """Base class is always supplied XML source, IteratableWorksheet obtains it on demand."""
         pass
 
-    @property
-    def dimensions(self):
-        if not all([self.max_col, self.max_row]):
-            raise ValueError("Worksheet is unsized, cannot calculate dimensions")
-        return '%s%s:%s%s' % (self.min_col, self.min_row, self.max_col, self.max_row)
-
-    def __getitem__(self, key):
-        if isinstance(key, slice):
-            key = "{0}:{1}".format(key.start, key.stop)
-        if ":" in key:
-            return self.iter_rows(key)
-        return self.cell(key)
-
 
     def get_squared_range(self, min_col, min_row, max_col, max_row):
         """
@@ -174,7 +161,9 @@ class IterableWorksheet(Worksheet):
         return self.iter_rows()
 
     def calculate_dimension(self):
-        return self.dimensions
+        if not all([self.max_col, self.max_row]):
+            raise ValueError("Worksheet is unsized, cannot calculate dimensions")
+        return '%s%s:%s%s' % (self.min_col, self.min_row, self.max_col, self.max_row)
 
     def get_highest_column(self):
         if self.max_col is not None:

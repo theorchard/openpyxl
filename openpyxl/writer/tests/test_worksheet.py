@@ -7,12 +7,12 @@ from io import BytesIO
 
 import pytest
 
-from openpyxl.xml.functions import XMLGenerator
+from openpyxl.xml.functions import XMLGenerator, tostring
 from openpyxl import Workbook
 
 from .. worksheet import write_worksheet
 
-from openpyxl.tests.helper import compare_xml, get_xml
+from openpyxl.tests.helper import compare_xml
 
 
 class DummyWorksheet:
@@ -42,15 +42,22 @@ def doc(out):
 
 
 @pytest.fixture
-def write_cols():
-    from .. worksheet import write_worksheet_cols
-    return write_worksheet_cols
+def DummyWorksheet():
+
+    class DummyWorksheet:
+
+        def __init__(self):
+            self._styles = {}
+            self.column_dimensions = {}
+            self.parent = Workbook()
+
+    return DummyWorksheet()
 
 
 @pytest.fixture
-def write_sheet_format():
-    from .. worksheet import write_worksheet_format
-    return write_worksheet_format
+def write_cols():
+    from .. worksheet import write_cols
+    return write_cols
 
 
 @pytest.fixture
@@ -59,47 +66,44 @@ def ColumnDimension():
     return ColumnDimension
 
 
-def test_write_no_cols(out, doc, write_cols):
-    write_cols(doc, DummyWorksheet())
-    doc.endDocument()
-    assert out.getvalue() == b""
+def test_no_cols(write_cols, DummyWorksheet):
+
+    cols = write_cols(DummyWorksheet)
+    assert cols is None
 
 
-def test_write_col_widths(out, doc, write_cols, ColumnDimension):
-    worksheet = DummyWorksheet()
-    worksheet.column_dimensions['A'] = ColumnDimension(width=4)
-    write_cols(doc, worksheet)
-    doc.endDocument()
-    xml = out.getvalue()
+def test_col_widths(write_cols, ColumnDimension, DummyWorksheet):
+    ws = DummyWorksheet
+    ws.column_dimensions['A'] = ColumnDimension(width=4)
+    cols = write_cols(ws)
+    xml = tostring(cols)
     expected = """<cols><col width="4" min="1" max="1" customWidth="1"></col></cols>"""
     diff = compare_xml(xml, expected)
     assert diff is None, diff
 
 
-def test_write_cols_style(out, doc, write_cols, ColumnDimension):
-    worksheet = DummyWorksheet()
+def test_col_style(write_cols, ColumnDimension, DummyWorksheet):
+    ws = DummyWorksheet
     cd = ColumnDimension()
-    worksheet.column_dimensions['A'] = cd
+    ws.column_dimensions['A'] = cd
     cd._style = 1
-    write_cols(doc, worksheet)
-    doc.endDocument()
-    xml = out.getvalue()
+    cols = write_cols(ws)
+    xml = tostring(cols)
     expected = """<cols><col max="1" min="1" style="1"></col></cols>"""
     diff = compare_xml(xml, expected)
     assert diff is None, diff
 
 
-def test_write_lots_cols(out, doc, write_cols, ColumnDimension):
-    worksheet = DummyWorksheet()
+def test_lots_cols(write_cols, ColumnDimension, DummyWorksheet):
+    ws = DummyWorksheet
     from openpyxl.cell import get_column_letter
     for i in range(1, 15):
         label = get_column_letter(i)
         cd = ColumnDimension()
         cd._style = i
-        worksheet.column_dimensions[label] = cd
-    write_cols(doc, worksheet)
-    doc.endDocument()
-    xml = out.getvalue()
+        ws.column_dimensions[label] = cd
+    cols = write_cols(ws)
+    xml = tostring(cols)
     expected = """<cols>
    <col max="1" min="1" style="1"></col>
    <col max="2" min="2" style="2"></col>
@@ -118,6 +122,40 @@ def test_write_lots_cols(out, doc, write_cols, ColumnDimension):
  </cols>
 """
     diff = compare_xml(xml, expected)
+    assert diff is None, diff
+
+
+@pytest.fixture
+def write_format():
+    from .. worksheet import write_format
+    return write_format
+
+
+def test_sheet_format(write_format, ColumnDimension, DummyWorksheet):
+    fmt = write_format(DummyWorksheet)
+    xml = tostring(fmt)
+    expected = """<sheetFormatPr defaultRowHeight="15" baseColWidth="10"/>"""
+    diff = compare_xml(expected, xml)
+    assert diff is None, diff
+
+
+def test_outline_format(write_format, ColumnDimension, DummyWorksheet):
+    worksheet = DummyWorksheet
+    worksheet.column_dimensions['A'] = ColumnDimension(outline_level=1)
+    fmt = write_format(worksheet)
+    xml = tostring(fmt)
+    expected = """<sheetFormatPr defaultRowHeight="15" baseColWidth="10" outlineLevelCol="1" />"""
+    diff = compare_xml(expected, xml)
+    assert diff is None, diff
+
+
+def test_outline_cols(write_cols, ColumnDimension, DummyWorksheet):
+    worksheet = DummyWorksheet
+    worksheet.column_dimensions['A'] = ColumnDimension(outline_level=1)
+    cols = write_cols(worksheet)
+    xml = tostring(cols)
+    expected = """<cols><col max="1" min="1" outlineLevel="1"/></cols>"""
+    diff = compare_xml(expected, xml)
     assert diff is None, diff
 
 
@@ -218,15 +256,238 @@ def test_get_rows_to_write(worksheet):
     assert len(cells_by_row[2]) == 0
 
 
-def test_write_hyperlink(out, doc, worksheet):
-    from .. worksheet import write_worksheet_hyperlinks
+@pytest.fixture
+def write_autofilter():
+    from .. lxml_worksheet import write_autofilter
+    return write_autofilter
+
+
+def test_auto_filter(worksheet, write_autofilter):
+    ws = worksheet
+    ws.auto_filter.ref = 'A1:F1'
+    af = write_autofilter(ws)
+    xml = tostring(af)
+    expected = """<autoFilter ref="A1:F1"></autoFilter>"""
+    diff = compare_xml(xml, expected)
+    assert diff is None, diff
+
+
+def test_auto_filter_filter_column(worksheet, write_autofilter):
+    ws = worksheet
+    ws.auto_filter.ref = 'A1:F1'
+    ws.auto_filter.add_filter_column(0, ["0"], blank=True)
+
+    af = write_autofilter(ws)
+    xml = tostring(af)
+    expected = """
+    <autoFilter ref="A1:F1">
+      <filterColumn colId="0">
+        <filters blank="1">
+          <filter val="0"></filter>
+        </filters>
+      </filterColumn>
+    </autoFilter>
+    """
+    diff = compare_xml(xml, expected)
+    assert diff is None, diff
+
+
+def test_auto_filter_sort_condition(worksheet, write_autofilter):
+    ws = worksheet
+    ws.cell('A1').value = 'header'
+    ws.cell('A2').value = 1
+    ws.cell('A3').value = 0
+    ws.auto_filter.ref = 'A2:A3'
+    ws.auto_filter.add_sort_condition('A2:A3', descending=True)
+
+    af = write_autofilter(ws)
+    xml = tostring(af)
+    expected = """
+    <autoFilter ref="A2:A3">
+    <sortState ref="A2:A3">
+      <sortCondtion descending="1" ref="A2:A3"></sortCondtion>
+    </sortState>
+    </autoFilter>
+    """
+    diff = compare_xml(xml, expected)
+    assert diff is None, diff
+
+
+@pytest.fixture
+def write_sheetviews():
+    from .. worksheet import write_sheetviews
+    return write_sheetviews
+
+
+def test_freeze_panes_horiz(worksheet, write_sheetviews):
+    ws = worksheet
+    ws.freeze_panes = 'A4'
+
+    views = write_sheetviews(ws)
+    xml = tostring(views)
+    expected = """
+    <sheetViews>
+    <sheetView workbookViewId="0">
+      <pane topLeftCell="A4" ySplit="3" state="frozen" activePane="bottomLeft"/>
+      <selection activeCell="A1" pane="bottomLeft" sqref="A1"/>
+    </sheetView>
+    </sheetViews>
+    """
+    diff = compare_xml(xml, expected)
+    assert diff is None, diff
+
+
+def test_freeze_panes_vert(worksheet, write_sheetviews):
+    ws = worksheet
+    ws.freeze_panes = 'D1'
+
+    views = write_sheetviews(ws)
+    xml = tostring(views)
+    expected = """
+    <sheetViews>
+      <sheetView workbookViewId="0">
+        <pane xSplit="3" topLeftCell="D1" activePane="topRight" state="frozen"/>
+        <selection pane="topRight" activeCell="A1" sqref="A1"/>
+      </sheetView>
+    </sheetViews>
+    """
+    diff = compare_xml(xml, expected)
+    assert diff is None, diff
+
+
+def test_freeze_panes_both(worksheet, write_sheetviews):
+    ws = worksheet
+    ws.freeze_panes = 'D4'
+
+    views = write_sheetviews(ws)
+    xml = tostring(views)
+    expected = """
+    <sheetViews>
+      <sheetView workbookViewId="0">
+        <pane xSplit="3" ySplit="3" topLeftCell="D4" activePane="bottomRight" state="frozen"/>
+        <selection pane="topRight"/>
+        <selection pane="bottomLeft"/>
+        <selection pane="bottomRight" activeCell="A1" sqref="A1"/>
+      </sheetView>
+    </sheetViews>
+    """
+    diff = compare_xml(xml, expected)
+    assert diff is None, diff
+
+
+def test_show_gridlines_false(worksheet, write_sheetviews):
+    ws = worksheet
+    ws.show_gridlines = False
+
+    views = write_sheetviews(ws)
+    xml = tostring(views)
+    expected = """
+    <sheetViews>
+      <sheetView showGridLines="0" workbookViewId="0">
+        <selection activeCell="A1" sqref="A1"></selection>
+      </sheetView>
+    </sheetViews>
+    """
+    diff = compare_xml(xml,expected)
+    assert diff is None, diff
+
+
+def test_show_gridlines_true(worksheet, write_sheetviews):
+    ws = worksheet
+    ws.show_gridlines = True
+
+    views = write_sheetviews(ws)
+    xml = tostring(views)
+    expected = """
+    <sheetViews>
+      <sheetView workbookViewId="0">
+        <selection activeCell="A1" sqref="A1"></selection>
+      </sheetView>
+    </sheetViews>
+    """
+    diff = compare_xml(xml,expected)
+    assert diff is None, diff
+
+
+def test_merge(worksheet):
+    from .. worksheet import write_mergecells
+
+    ws = worksheet
+    ws.cell('A1').value = 'Cell A1'
+    ws.cell('B1').value = 'Cell B1'
+
+    ws.merge_cells('A1:B1')
+    merge = write_mergecells(ws)
+    xml = tostring(merge)
+    expected = """
+      <mergeCells count="1">
+        <mergeCell ref="A1:B1"/>
+      </mergeCells>
+    """
+    diff = compare_xml(xml, expected)
+    assert diff is None, diff
+
+
+def test_no_merge(worksheet):
+    from .. worksheet import write_mergecells
+
+    merge = write_mergecells(worksheet)
+    assert merge is None
+
+
+def test_header_footer(worksheet):
+    ws = worksheet
+    ws.header_footer.left_header.text = "Left Header Text"
+    ws.header_footer.center_header.text = "Center Header Text"
+    ws.header_footer.center_header.font_name = "Arial,Regular"
+    ws.header_footer.center_header.font_size = 6
+    ws.header_footer.center_header.font_color = "445566"
+    ws.header_footer.right_header.text = "Right Header Text"
+    ws.header_footer.right_header.font_name = "Arial,Bold"
+    ws.header_footer.right_header.font_size = 8
+    ws.header_footer.right_header.font_color = "112233"
+    ws.header_footer.left_footer.text = "Left Footer Text\nAnd &[Date] and &[Time]"
+    ws.header_footer.left_footer.font_name = "Times New Roman,Regular"
+    ws.header_footer.left_footer.font_size = 10
+    ws.header_footer.left_footer.font_color = "445566"
+    ws.header_footer.center_footer.text = "Center Footer Text &[Path]&[File] on &[Tab]"
+    ws.header_footer.center_footer.font_name = "Times New Roman,Bold"
+    ws.header_footer.center_footer.font_size = 12
+    ws.header_footer.center_footer.font_color = "778899"
+    ws.header_footer.right_footer.text = "Right Footer Text &[Page] of &[Pages]"
+    ws.header_footer.right_footer.font_name = "Times New Roman,Italic"
+    ws.header_footer.right_footer.font_size = 14
+    ws.header_footer.right_footer.font_color = "AABBCC"
+
+    from .. lxml_worksheet import write_header_footer
+    hf = write_header_footer(ws)
+    xml = tostring(hf)
+    expected = """
+    <headerFooter>
+      <oddHeader>&amp;L&amp;"Calibri,Regular"&amp;K000000Left Header Text&amp;C&amp;"Arial,Regular"&amp;6&amp;K445566Center Header Text&amp;R&amp;"Arial,Bold"&amp;8&amp;K112233Right Header Text</oddHeader>
+      <oddFooter>&amp;L&amp;"Times New Roman,Regular"&amp;10&amp;K445566Left Footer Text_x000D_And &amp;D and &amp;T&amp;C&amp;"Times New Roman,Bold"&amp;12&amp;K778899Center Footer Text &amp;Z&amp;F on &amp;A&amp;R&amp;"Times New Roman,Italic"&amp;14&amp;KAABBCCRight Footer Text &amp;P of &amp;N</oddFooter>
+    </headerFooter>
+    """
+    diff = compare_xml(xml, expected)
+    assert diff is None, diff
+
+
+def test_no_header(worksheet):
+    from .. lxml_worksheet import write_header_footer
+
+    hf = write_header_footer(worksheet)
+    assert hf is None
+
+
+def test_hyperlink(worksheet):
+    from .. lxml_worksheet import write_hyperlinks
 
     ws = worksheet
     ws.cell('A1').value = "test"
     ws.cell('A1').hyperlink = "http://test.com"
 
-    write_worksheet_hyperlinks(doc, ws)
-    xml = out.getvalue()
+    hyper = write_hyperlinks(ws)
+    xml = tostring(hyper)
     expected = """
     <hyperlinks xmlns:r="http://schemas.openxmlformats.org/officeDocument/2006/relationships">
       <hyperlink display="http://test.com" r:id="rId1" ref="A1"/>
@@ -234,6 +495,13 @@ def test_write_hyperlink(out, doc, worksheet):
     """
     diff = compare_xml(xml, expected)
     assert diff is None, diff
+
+
+def test_no_hyperlink(worksheet):
+    from .. lxml_worksheet import write_hyperlinks
+
+    l = write_hyperlinks(worksheet)
+    assert l is None
 
 
 @pytest.mark.xfail
@@ -250,157 +518,103 @@ def test_write_hyperlink_image_rels(Workbook, Image, datadir):
     # TODO write integration test with duplicate relation ids then fix
 
 
-@pytest.fixture
-def write_worksheet_autofilter():
-    from .. worksheet import write_worksheet_autofilter
-    return write_worksheet_autofilter
+def test_no_pagebreaks(worksheet):
+    from .. worksheet import write_pagebreaks
 
-
-def test_write_auto_filter(out, doc, worksheet, write_worksheet_autofilter):
-    ws = worksheet
-    ws.auto_filter.ref = 'A1:F1'
-
-    write_worksheet_autofilter(doc, ws)
-    xml = out.getvalue()
-    expected = """<autoFilter ref="A1:F1"></autoFilter>"""
-    diff = compare_xml(xml, expected)
-    assert diff is None, diff
-
-
-def test_write_auto_filter_filter_column(out, doc, worksheet, write_worksheet_autofilter):
-    ws = worksheet
-    ws.auto_filter.ref = 'A1:F1'
-    ws.auto_filter.add_filter_column(0, ["0"], blank=True)
-
-    write_worksheet_autofilter(doc, ws)
-    xml = out.getvalue()
-    expected = """
-    <autoFilter ref="A1:F1">
-      <filterColumn colId="0">
-        <filters blank="1">
-          <filter val="0"></filter>
-        </filters>
-      </filterColumn>
-    </autoFilter>
-    """
-    diff = compare_xml(xml, expected)
-    assert diff is None, diff
-
-
-def test_write_auto_filter_sort_condition(out, doc, worksheet, write_worksheet_autofilter):
-    ws = worksheet
-    ws.cell('A1').value = 'header'
-    ws.cell('A2').value = 1
-    ws.cell('A3').value = 0
-    ws.auto_filter.ref = 'A2:A3'
-    ws.auto_filter.add_sort_condition('A2:A3', descending=True)
-
-    write_worksheet_autofilter(doc, ws)
-    xml = out.getvalue()
-    expected = """
-    <autoFilter ref="A2:A3">
-    <sortState ref="A2:A3">
-      <sortCondtion descending="1" ref="A2:A3"></sortCondtion>
-    </sortState>
-    </autoFilter>
-    """
-    diff = compare_xml(xml, expected)
-    assert diff is None, diff
+    pb = write_pagebreaks(worksheet)
+    assert pb is None
 
 
 @pytest.fixture
-def write_worksheet_sheetviews():
-    from .. worksheet import write_worksheet_sheetviews
-    return write_worksheet_sheetviews
+def worksheet_with_cf(worksheet):
+    from openpyxl.formatting import ConditionalFormatting
+    worksheet.conditional_formating = ConditionalFormatting()
+    return worksheet
 
 
-def test_freeze_panes_horiz(out, doc, worksheet, write_worksheet_sheetviews):
-    ws = worksheet
-    ws.freeze_panes = 'A4'
+@pytest.fixture
+def write_conditional_formatting():
+    from .. lxml_worksheet import write_conditional_formatting
+    return write_conditional_formatting
 
-    write_worksheet_sheetviews(doc, ws)
-    xml = out.getvalue()
-    expected = """
-    <sheetViews>
-    <sheetView workbookViewId="0">
-      <pane topLeftCell="A4" ySplit="3" state="frozen" activePane="bottomLeft"/>
-      <selection activeCell="A1" pane="bottomLeft" sqref="A1"/>
-    </sheetView>
-    </sheetViews>
-    """
-    diff = compare_xml(xml, expected)
+
+def test_conditional_formatting_customRule(worksheet_with_cf, write_conditional_formatting):
+    from .. lxml_worksheet import write_conditional_formatting
+
+    ws = worksheet_with_cf
+
+    ws.conditional_formatting.add('C1:C10', {'type': 'expression', 'formula': ['ISBLANK(C1)'],
+                                                    'stopIfTrue': '1', 'dxf': {}})
+    cfs = write_conditional_formatting(ws)
+    xml = b""
+    for cf in cfs:
+        xml += tostring(cf)
+
+    diff = compare_xml(xml, """
+    <conditionalFormatting sqref="C1:C10">
+      <cfRule type="expression" stopIfTrue="1" priority="1">
+        <formula>ISBLANK(C1)</formula>
+      </cfRule>
+    </conditionalFormatting>
+    """)
     assert diff is None, diff
 
 
-def test_freeze_panes_vert(out, doc, worksheet, write_worksheet_sheetviews):
-    ws = worksheet
-    ws.freeze_panes = 'D1'
+def test_conditional_font(worksheet_with_cf, write_conditional_formatting):
+    """Test to verify font style written correctly."""
 
-    write_worksheet_sheetviews(doc, ws)
-    xml = out.getvalue()
-    expected = """
-    <sheetViews>
-      <sheetView workbookViewId="0">
-        <pane xSplit="3" topLeftCell="D1" activePane="topRight" state="frozen"/>
-        <selection pane="topRight" activeCell="A1" sqref="A1"/>
-      </sheetView>
-    </sheetViews>
-    """
-    diff = compare_xml(xml, expected)
+    # Create cf rule
+    from openpyxl.styles import PatternFill, Font, Color
+    from openpyxl.formatting import CellIsRule
+
+    redFill = PatternFill(start_color=Color('FFEE1111'),
+                   end_color=Color('FFEE1111'),
+                   patternType='solid')
+    whiteFont = Font(color=Color("FFFFFFFF"))
+
+    ws = worksheet_with_cf
+    ws.conditional_formatting.add('A1:A3',
+                                  CellIsRule(operator='equal',
+                                             formula=['"Fail"'],
+                                             stopIfTrue=False,
+                                             font=whiteFont,
+                                             fill=redFill))
+
+    cfs = write_conditional_formatting(ws)
+    xml = b""
+    for cf in cfs:
+        xml += tostring(cf)
+    diff = compare_xml(xml, """
+    <conditionalFormatting sqref="A1:A3">
+      <cfRule operator="equal" priority="1" type="cellIs">
+        <formula>"Fail"</formula>
+      </cfRule>
+    </conditionalFormatting>
+    """)
     assert diff is None, diff
 
 
-def test_freeze_panes_both(out, doc, worksheet, write_worksheet_sheetviews):
-    ws = worksheet
-    ws.freeze_panes = 'D4'
+def test_formula_rule(worksheet_with_cf, write_conditional_formatting):
+    from openpyxl.formatting import FormulaRule
 
-    write_worksheet_sheetviews(doc, ws)
-    xml = out.getvalue()
-    expected = """
-    <sheetViews>
-      <sheetView workbookViewId="0">
-        <pane xSplit="3" ySplit="3" topLeftCell="D4" activePane="bottomRight" state="frozen"/>
-        <selection pane="topRight"/>
-        <selection pane="bottomLeft"/>
-        <selection pane="bottomRight" activeCell="A1" sqref="A1"/>
-      </sheetView>
-    </sheetViews>
-    """
-    diff = compare_xml(xml, expected)
-    assert diff is None, diff
+    ws = worksheet_with_cf
+    ws.conditional_formatting.add('C1:C10',
+                                  FormulaRule(
+                                      formula=['ISBLANK(C1)'],
+                                      stopIfTrue=True)
+                                  )
+    cfs = write_conditional_formatting(ws)
+    xml = b""
+    for cf in cfs:
+        xml += tostring(cf)
 
-
-def test_show_gridlines_false(out, doc, worksheet, write_worksheet_sheetviews):
-    ws = worksheet
-    ws.show_gridlines = False
-
-    write_worksheet_sheetviews(doc, ws)
-    xml = out.getvalue()
-    expected = """
-    <sheetViews>
-      <sheetView showGridLines="0" workbookViewId="0">
-        <selection activeCell="A1" sqref="A1"></selection>
-      </sheetView>
-    </sheetViews>
-    """
-    diff = compare_xml(xml,expected)
-    assert diff is None, diff
-
-
-def test_show_gridlines_true(out, doc, worksheet, write_worksheet_sheetviews):
-    ws = worksheet
-    ws.show_gridlines = True
-
-    write_worksheet_sheetviews(doc, ws)
-    xml = out.getvalue()
-    expected = """
-    <sheetViews>
-      <sheetView workbookViewId="0">
-        <selection activeCell="A1" sqref="A1"></selection>
-      </sheetView>
-    </sheetViews>
-    """
-    diff = compare_xml(xml,expected)
+    diff = compare_xml(xml, """
+    <conditionalFormatting sqref="C1:C10">
+      <cfRule type="expression" stopIfTrue="1" priority="1">
+        <formula>ISBLANK(C1)</formula>
+      </cfRule>
+    </conditionalFormatting>
+    """)
     assert diff is None, diff
 
 
@@ -445,38 +659,6 @@ def test_write_sheetdata(out, doc, worksheet):
     xml = out.getvalue()
     expected = """<sheetData><row r="1" spans="1:1"><c t="n" r="A1"><v>10</v></c></row></sheetData>"""
     diff = compare_xml(xml, expected)
-    assert diff is None, diff
-
-
-def test_write_sheet_format(out, doc, write_sheet_format, ColumnDimension):
-    worksheet = DummyWorksheet()
-    write_sheet_format(doc, worksheet)
-    doc.endDocument()
-    xml = out.getvalue()
-    expected = """<sheetFormatPr defaultRowHeight="15" baseColWidth="10"/>"""
-    diff = compare_xml(expected, xml)
-    assert diff is None, diff
-
-
-def test_outline_format(out, doc, write_sheet_format, ColumnDimension):
-    worksheet = DummyWorksheet()
-    worksheet.column_dimensions['A'] = ColumnDimension(outline_level=1)
-    write_sheet_format(doc, worksheet)
-    doc.endDocument()
-    xml = out.getvalue()
-    expected = """<sheetFormatPr defaultRowHeight="15" baseColWidth="10" outlineLevelCol="1" />"""
-    diff = compare_xml(expected, xml)
-    assert diff is None, diff
-
-
-def test_outline_cols(out, doc, write_cols, ColumnDimension):
-    worksheet = DummyWorksheet()
-    worksheet.column_dimensions['A'] = ColumnDimension(outline_level=1)
-    write_cols(doc, worksheet)
-    doc.endDocument()
-    xml = out.getvalue()
-    expected = """<cols><col max="1" min="1" outlineLevel="1"/></cols>"""
-    diff = compare_xml(expected, xml)
     assert diff is None, diff
 
 
@@ -532,31 +714,6 @@ def test_page_margins(worksheet):
     assert diff is None, diff
 
 
-def test_merge(out, doc, worksheet):
-    from .. worksheet import write_worksheet_mergecells
-
-    ws = worksheet
-    ws.cell('A1').value = 'Cell A1'
-    ws.cell('B1').value = 'Cell B1'
-
-    ws.merge_cells('A1:B1')
-    write_worksheet_mergecells(doc, ws)
-    xml = out.getvalue()
-    expected = """
-      <mergeCells count="1">
-        <mergeCell ref="A1:B1"/>
-      </mergeCells>
-    """
-    diff = compare_xml(xml, expected)
-    assert diff is None, diff
-
-    out.truncate(0) # reset
-    ws.unmerge_cells('A1:B1')
-    write_worksheet_mergecells(doc, ws)
-    xml = out.getvalue()
-    assert xml == b""
-
-
 def test_printer_settings(worksheet):
     ws = worksheet
     ws.page_setup.orientation = ws.ORIENTATION_LANDSCAPE
@@ -590,58 +747,6 @@ def test_printer_settings(worksheet):
     assert diff is None, diff
 
 
-def test_header_footer(out, doc, worksheet):
-    ws = worksheet
-    ws.header_footer.left_header.text = "Left Header Text"
-    ws.header_footer.center_header.text = "Center Header Text"
-    ws.header_footer.center_header.font_name = "Arial,Regular"
-    ws.header_footer.center_header.font_size = 6
-    ws.header_footer.center_header.font_color = "445566"
-    ws.header_footer.right_header.text = "Right Header Text"
-    ws.header_footer.right_header.font_name = "Arial,Bold"
-    ws.header_footer.right_header.font_size = 8
-    ws.header_footer.right_header.font_color = "112233"
-    ws.header_footer.left_footer.text = "Left Footer Text\nAnd &[Date] and &[Time]"
-    ws.header_footer.left_footer.font_name = "Times New Roman,Regular"
-    ws.header_footer.left_footer.font_size = 10
-    ws.header_footer.left_footer.font_color = "445566"
-    ws.header_footer.center_footer.text = "Center Footer Text &[Path]&[File] on &[Tab]"
-    ws.header_footer.center_footer.font_name = "Times New Roman,Bold"
-    ws.header_footer.center_footer.font_size = 12
-    ws.header_footer.center_footer.font_color = "778899"
-    ws.header_footer.right_footer.text = "Right Footer Text &[Page] of &[Pages]"
-    ws.header_footer.right_footer.font_name = "Times New Roman,Italic"
-    ws.header_footer.right_footer.font_size = 14
-    ws.header_footer.right_footer.font_color = "AABBCC"
-
-    from .. worksheet import write_header_footer
-    write_header_footer(doc, ws)
-    xml = out.getvalue()
-    expected = """
-    <headerFooter>
-      <oddHeader>&amp;L&amp;"Calibri,Regular"&amp;K000000Left Header Text&amp;C&amp;"Arial,Regular"&amp;6&amp;K445566Center Header Text&amp;R&amp;"Arial,Bold"&amp;8&amp;K112233Right Header Text</oddHeader>
-      <oddFooter>&amp;L&amp;"Times New Roman,Regular"&amp;10&amp;K445566Left Footer Text_x000D_And &amp;D and &amp;T&amp;C&amp;"Times New Roman,Bold"&amp;12&amp;K778899Center Footer Text &amp;Z&amp;F on &amp;A&amp;R&amp;"Times New Roman,Italic"&amp;14&amp;KAABBCCRight Footer Text &amp;P of &amp;N</oddFooter>
-    </headerFooter>
-    """
-    diff = compare_xml(xml, expected)
-    assert diff is None, diff
-
-
-def test_write_no_header(out, doc, worksheet):
-    from .. worksheet import write_header_footer
-    ws = worksheet
-
-    write_header_footer(doc, ws)
-    assert out.getvalue() == b""
-
-
-def test_write_pagebreaks(out, doc, worksheet):
-    from .. worksheet import write_pagebreaks
-
-    write_pagebreaks(doc, worksheet)
-    assert out.getvalue() == b""
-
-
 def test_data_validation(worksheet):
     from .. worksheet import write_datavalidation
     from openpyxl.worksheet.datavalidation import DataValidation, ValidationType
@@ -652,7 +757,7 @@ def test_data_validation(worksheet):
     ws.add_data_validation(dv)
 
     xml = write_datavalidation(worksheet)
-    xml = get_xml(xml)
+    xml = tostring(xml)
     expected = """
     <dataValidations xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main" count="1">
     <dataValidation allowBlank="0" showErrorMessage="1" showInputMessage="1" sqref="A1" type="list">
@@ -665,15 +770,10 @@ def test_data_validation(worksheet):
 
 
 def test_vba(worksheet):
+    from openpyxl.xml.functions import fromstring
     ws = worksheet
-    ws.xml_source = """
-    <worksheet xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main"
-    xmlns:r="http://schemas.openxmlformats.org/officeDocument/2006/relationships">
-        <sheetPr codeName="Sheet1"/>
-        <legacyDrawing r:id="rId2"/>
-    </worksheet>
-    """
-
+    ws.vba_code = {"codeName":"Sheet1"}
+    ws.vba_controls = "rId2"
     xml = write_worksheet(ws, None)
     expected = """
     <worksheet xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main"

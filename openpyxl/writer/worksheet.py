@@ -22,7 +22,9 @@ from openpyxl.xml.functions import (
     end_tag,
     tag,
     fromstring,
-    Element
+    tostring,
+    Element,
+    SubElement,
 )
 from openpyxl.xml.constants import (
     SHEET_MAIN_NS,
@@ -38,89 +40,23 @@ def row_sort(cell):
     return column_index_from_string(cell.column)
 
 
-
-def write_worksheet(worksheet, shared_strings):
-    """Write a worksheet to an xml file."""
-    if worksheet.xml_source:
-        vba_root = fromstring(worksheet.xml_source)
-    else:
-        vba_root = None
-    xml_file = BytesIO()
-    doc = XMLGenerator(out=xml_file)
-    start_tag(doc, 'worksheet',
-              {'xmlns': SHEET_MAIN_NS,
-               'xmlns:r': REL_NS})
-    vba_attrs = {}
-    if vba_root is not None:
-        el = vba_root.find('{%s}sheetPr' % SHEET_MAIN_NS)
-        if el is not None:
-            vba_attrs['codeName'] = el.get('codeName', worksheet.title)
-
-    start_tag(doc, 'sheetPr', vba_attrs)
-    tag(doc, 'outlinePr',
-        {'summaryBelow': '%d' % (worksheet.show_summary_below),
-         'summaryRight': '%d' % (worksheet.show_summary_right)})
+def write_properties(worksheet, vba_attrs):
+    pr = Element('sheetPr', vba_attrs)
+    summary = Element('outlinePr',
+                      summaryBelow='%d' % worksheet.show_summary_below,
+                      summaryRight= '%d' % worksheet.show_summary_right)
+    pr.append(summary)
     if worksheet.page_setup.fitToPage:
-        tag(doc, 'pageSetUpPr', {'fitToPage': '1'})
-    end_tag(doc, 'sheetPr')
-
-    tag(doc, 'dimension', {'ref': '%s' % worksheet.calculate_dimension()})
-    write_worksheet_sheetviews(doc, worksheet)
-    write_worksheet_format(doc, worksheet)
-    write_worksheet_cols(doc, worksheet)
-    write_worksheet_data(doc, worksheet)
-    if worksheet.protection.sheet:
-        tag(doc, 'sheetProtection', dict(worksheet.protection))
-    write_worksheet_autofilter(doc, worksheet)
-    write_worksheet_mergecells(doc, worksheet)
-    write_worksheet_conditional_formatting(doc, worksheet)
-    dvs = write_datavalidation(worksheet)
-    if dvs:
-        xml_file.write(dvs)
-    write_worksheet_hyperlinks(doc, worksheet)
-
-    options = worksheet.page_setup.options
-    if options:
-        tag(doc, 'printOptions', options)
-
-    tag(doc, 'pageMargins', dict(worksheet.page_margins))
-
-    setup = worksheet.page_setup.setup
-    if setup:
-        tag(doc, 'pageSetup', setup)
-
-    write_header_footer(doc, worksheet)
-
-    if worksheet._charts or worksheet._images:
-        tag(doc, 'drawing', {'r:id': 'rId1'})
-
-    # If vba is being preserved then add a legacyDrawing element so
-    # that any controls can be drawn.
-    if vba_root is not None:
-        el = vba_root.find('{%s}legacyDrawing' % SHEET_MAIN_NS)
-        if el is not None:
-            rId = el.get('{%s}id' % REL_NS)
-            tag(doc, 'legacyDrawing', {'r:id': rId})
-
-    write_pagebreaks(doc, worksheet)
-
-    # add a legacyDrawing so that excel can draw comments
-    if worksheet._comment_count > 0:
-        tag(doc, 'legacyDrawing', {'r:id': 'commentsvml'})
-
-    end_tag(doc, 'worksheet')
-    doc.endDocument()
-    xml_string = xml_file.getvalue()
-    xml_file.close()
-    return xml_string
+        pr.append(Element('pageSetUpPr', fitToPage='1'))
+    return pr
 
 
-def write_worksheet_sheetviews(doc, worksheet):
-    start_tag(doc, 'sheetViews')
+def write_sheetviews(worksheet):
+    views = Element('sheetViews')
     sheetviewAttrs = {'workbookViewId': '0'}
     if not worksheet.show_gridlines:
         sheetviewAttrs['showGridLines'] = '0'
-    start_tag(doc, 'sheetView', sheetviewAttrs)
+    view = SubElement(views, 'sheetView', sheetviewAttrs)
     selectionAttrs = {}
     topLeftCell = worksheet.freeze_panes
     if topLeftCell:
@@ -138,33 +74,31 @@ def write_worksheet_sheetviews(doc, worksheet):
         paneAttrs.update(dict(topLeftCell=topLeftCell,
                               activePane=pane,
                               state='frozen'))
-        tag(doc, 'pane', paneAttrs)
+        view.append(Element('pane', paneAttrs))
         selectionAttrs['pane'] = pane
         if row > 1 and column > 1:
-            tag(doc, 'selection', {'pane': 'topRight'})
-            tag(doc, 'selection', {'pane': 'bottomLeft'})
+            SubElement(view, 'selection', {'pane': 'topRight'})
+            SubElement(view, 'selection', {'pane': 'bottomLeft'})
 
     selectionAttrs.update({'activeCell': worksheet.active_cell,
                            'sqref': worksheet.selected_cell})
 
-    tag(doc, 'selection', selectionAttrs)
-    end_tag(doc, 'sheetView')
-    end_tag(doc, 'sheetViews')
+    SubElement(view, 'selection', selectionAttrs)
+    return views
 
 
-def write_worksheet_format(doc, worksheet):
-    attrs = {'defaultRowHeight': '15',
-             'baseColWidth': '10'}
+def write_format(worksheet):
+    attrs = {'defaultRowHeight': '15', 'baseColWidth': '10'}
     dimensions_outline = [dim.outline_level
-                          for _, dim in iteritems(worksheet.column_dimensions)]
+                          for dim in itervalues(worksheet.column_dimensions)]
     if dimensions_outline:
         outline_level = max(dimensions_outline)
         if outline_level:
             attrs['outlineLevelCol'] = str(outline_level)
-    tag(doc, 'sheetFormatPr', attrs)
+    return Element('sheetFormatPr', attrs)
 
 
-def write_worksheet_cols(doc, worksheet):
+def write_cols(worksheet):
     """Write worksheet columns to xml.
 
     <cols> may never be empty -
@@ -178,25 +112,66 @@ def write_worksheet_cols(doc, worksheet):
             continue
         idx = column_index_from_string(label)
         cols.append((idx, col_def))
-    if cols == []:
+
+    if not cols:
         return
-    start_tag(doc, 'cols')
+
+    el = Element('cols')
+
     for idx, col_def in sorted(cols):
         v = "%d" % idx
         cmin = col_def.get('min') or v
         cmax = col_def.get('max') or v
         col_def.update({'min': cmin, 'max': cmax})
-        tag(doc, 'col', col_def)
-    end_tag(doc, 'cols')
+        el.append(Element('col', col_def))
+    return el
 
 
-def write_worksheet_conditional_formatting(doc, worksheet):
+def write_autofilter(worksheet):
+    auto_filter = worksheet.auto_filter
+    if auto_filter.ref is None:
+        return
+
+    el = Element('autoFilter', ref=auto_filter.ref)
+    if (auto_filter.filter_columns
+        or auto_filter.sort_conditions):
+        for col_id, filter_column in sorted(auto_filter.filter_columns.items()):
+            fc = SubElement(el, 'filterColumn', colId=str(col_id))
+            attrs = {}
+            if filter_column.blank:
+                attrs = {'blank': '1'}
+            flt = SubElement(fc, 'filters', attrs)
+            for val in filter_column.vals:
+                flt.append(Element('filter', val=val))
+        if auto_filter.sort_conditions:
+            srt = SubElement(el,  'sortState', ref=auto_filter.ref)
+            for sort_condition in auto_filter.sort_conditions:
+                sort_attr = {'ref': sort_condition.ref}
+                if sort_condition.descending:
+                    sort_attr['descending'] = '1'
+                srt.append(Element('sortCondtion', sort_attr))
+    return el
+
+
+def write_mergecells(worksheet):
+    """Write merged cells to xml."""
+    cells = worksheet._merged_cells
+    if not cells:
+        return
+
+    merge = Element('mergeCells', count='%d' % len(cells))
+    for range_string in cells:
+        merge.append(Element('mergeCell', ref=range_string))
+    return merge
+
+
+def write_conditional_formatting(worksheet):
     """Write conditional formatting to xml."""
     for range_string, rules in iteritems(worksheet.conditional_formatting.cf_rules):
         if not len(rules):
             # Skip if there are no rules.  This is possible if a dataBar rule was read in and ignored.
             continue
-        start_tag(doc, 'conditionalFormatting', {'sqref': range_string})
+        cf = Element('conditionalFormatting', {'sqref': range_string})
         for rule in rules:
             if rule['type'] == 'dataBar':
                 # Ignore - uses extLst tag which is currently unsupported.
@@ -205,28 +180,165 @@ def write_worksheet_conditional_formatting(doc, worksheet):
             for rule_attr in ConditionalFormatting.rule_attributes:
                 if rule_attr in rule:
                     attr[rule_attr] = str(rule[rule_attr])
-            start_tag(doc, 'cfRule', attr)
+            cfr = SubElement(cf, 'cfRule', attr)
             if 'formula' in rule:
                 for f in rule['formula']:
-                    tag(doc, 'formula', None, f)
+                    SubElement(cfr, 'formula').text = f
             if 'colorScale' in rule:
-                start_tag(doc, 'colorScale')
+                cs = SubElement(cfr, 'colorScale')
                 for cfvo in rule['colorScale']['cfvo']:
-                    tag(doc, 'cfvo', cfvo)
+                    SubElement(cs, 'cfvo', cfvo)
                 for color in rule['colorScale']['color']:
-                    tag(doc, 'color', dict(color))
-                end_tag(doc, 'colorScale')
+                    SubElement(cs, 'color', dict(color))
             if 'iconSet' in rule:
                 iconAttr = {}
                 for icon_attr in ConditionalFormatting.icon_attributes:
                     if icon_attr in rule['iconSet']:
                         iconAttr[icon_attr] = rule['iconSet'][icon_attr]
-                start_tag(doc, 'iconSet', iconAttr)
+                iconSet = SubElement(cfr, 'iconSet', iconAttr)
                 for cfvo in rule['iconSet']['cfvo']:
-                    tag(doc, 'cfvo', cfvo)
-                end_tag(doc, 'iconSet')
-            end_tag(doc, 'cfRule')
-        end_tag(doc, 'conditionalFormatting')
+                    SubElement(iconSet, 'cfvo', cfvo)
+        yield cf
+
+
+def write_datavalidation(worksheet):
+    """ Write data validation(s) to xml."""
+    # Filter out "empty" data-validation objects (i.e. with 0 cells)
+    required_dvs = [x for x in worksheet._data_validations
+                    if len(x.cells) or len(x.ranges)]
+    if not required_dvs:
+        return
+
+    dvs = Element("{%s}dataValidations" % SHEET_MAIN_NS,
+                  count=str(len(required_dvs)))
+    for dv in required_dvs:
+        dvs.append(writer(dv))
+
+    return dvs
+
+
+def write_header_footer(worksheet):
+    header = worksheet.header_footer.getHeader()
+    footer = worksheet.header_footer.getFooter()
+    if header or footer:
+        tag = Element('headerFooter')
+        if header:
+            SubElement(tag, 'oddHeader').text = header
+        if footer:
+            SubElement(tag, 'oddFooter').text = footer
+        return tag
+
+
+def write_hyperlinks(worksheet):
+    """Write worksheet hyperlinks to xml."""
+    tag = Element('hyperlinks')
+    for cell in worksheet.get_cell_collection():
+        if cell.hyperlink_rel_id is not None:
+            attrs = {'display': cell.hyperlink,
+                     'ref': cell.coordinate,
+                     '{%s}id' % REL_NS: cell.hyperlink_rel_id}
+            tag.append(Element('hyperlink', attrs))
+    if tag.getchildren():
+        return tag
+
+
+def write_pagebreaks(worksheet):
+    breaks = worksheet.page_breaks
+    if breaks:
+        tag = Element( 'rowBreaks', {'count': str(len(breaks)),
+                                     'manualBreakCount': str(len(breaks))})
+        for b in breaks:
+            tag.append(Element('brk', id=str(b), man=true, max='16383',
+                               min='0'))
+        return tag
+
+
+def write_worksheet(worksheet, shared_strings):
+    """Write a worksheet to an xml file."""
+
+    xml_file = BytesIO()
+    doc = XMLGenerator(out=xml_file)
+    start_tag(doc, 'worksheet',
+              {'xmlns': SHEET_MAIN_NS,
+               'xmlns:r': REL_NS})
+
+    props = write_properties(worksheet, worksheet.vba_code)
+    xml_file.write(tostring(props))
+
+    dim = Element('dimension', {'ref': '%s' % worksheet.calculate_dimension()})
+    xml_file.write(tostring(dim))
+
+    views = write_sheetviews(worksheet)
+    xml_file.write(tostring(views))
+
+    fmt = write_format(worksheet)
+    xml_file.write(tostring(fmt))
+
+    cols = write_cols(worksheet)
+    if cols is not None:
+        xml_file.write(tostring(cols))
+
+    write_worksheet_data(doc, worksheet)
+
+    if worksheet.protection.sheet:
+        prot = Element('sheetProtection', dict(worksheet.protection))
+        xml_file.write(tostring(prot))
+
+    af = write_autofilter(worksheet)
+    if af is not None:
+        xml_file.write(tostring(af))
+
+    merge = write_mergecells(worksheet)
+    if merge is not None:
+        xml_file.write(tostring(merge))
+
+    cfs = write_conditional_formatting(worksheet)
+    for cf in cfs:
+        xml_file.write(tostring(cf))
+
+    dvs = write_datavalidation(worksheet)
+    if dvs:
+        xml_file.write(tostring(dvs))
+
+    hyper = write_hyperlinks(worksheet)
+    if hyper is not None:
+        xml_file.write(tostring(hyper))
+
+    options = worksheet.page_setup.options
+    if options:
+        tag(doc, 'printOptions', options)
+
+    tag(doc, 'pageMargins', dict(worksheet.page_margins))
+
+    setup = worksheet.page_setup.setup
+    if setup:
+        tag(doc, 'pageSetup', setup)
+
+    hf = write_header_footer(worksheet)
+    if hf is not None:
+        xml_file.write(tostring(hf))
+
+    if worksheet._charts or worksheet._images:
+        tag(doc, 'drawing', {'r:id': 'rId1'})
+
+    if worksheet.vba_controls is not None:
+        xml = Element("{%s}legacyDrawing" % SHEET_MAIN_NS,
+                      {"{%s}id" % REL_NS : worksheet.vba_controls})
+        xml_file.write(tostring(xml))
+
+    breaks = write_pagebreaks(worksheet)
+    if breaks is not None:
+        xml_file.write(tostring(breaks))
+
+    # add a legacyDrawing so that excel can draw comments
+    if worksheet._comment_count > 0:
+        tag(doc, 'legacyDrawing', {'r:id': 'commentsvml'})
+
+    end_tag(doc, 'worksheet')
+    doc.endDocument()
+    xml_string = xml_file.getvalue()
+    xml_file.close()
+    return xml_string
 
 
 def get_rows_to_write(worksheet):
@@ -311,91 +423,3 @@ def write_cell(doc, worksheet, cell):
             tag(doc, 'v', body=value)
         end_tag(doc, 'c')
 
-
-def write_worksheet_autofilter(doc, worksheet):
-    auto_filter = worksheet.auto_filter
-    if auto_filter.filter_columns or auto_filter.sort_conditions:
-        start_tag(doc, 'autoFilter', {'ref': auto_filter.ref})
-        for col_id, filter_column in sorted(auto_filter.filter_columns.items()):
-            start_tag(doc, 'filterColumn', {'colId': str(col_id)})
-            if filter_column.blank:
-                start_tag(doc, 'filters', {'blank': '1'})
-            else:
-                start_tag(doc, 'filters')
-            for val in filter_column.vals:
-                tag(doc, 'filter', {'val': val})
-            end_tag(doc, 'filters')
-            end_tag(doc, 'filterColumn')
-        if auto_filter.sort_conditions:
-            start_tag(doc, 'sortState', {'ref': auto_filter.ref})
-            for sort_condition in auto_filter.sort_conditions:
-                sort_attr = {'ref': sort_condition.ref}
-                if sort_condition.descending:
-                    sort_attr['descending'] = '1'
-                tag(doc, 'sortCondtion', sort_attr)
-            end_tag(doc, 'sortState')
-        end_tag(doc, 'autoFilter')
-    elif auto_filter.ref:
-        tag(doc, 'autoFilter', {'ref': auto_filter.ref})
-
-def write_worksheet_mergecells(doc, worksheet):
-    """Write merged cells to xml."""
-    if len(worksheet._merged_cells) > 0:
-        start_tag(doc, 'mergeCells', {'count': str(len(worksheet._merged_cells))})
-        for range_string in worksheet._merged_cells:
-            attrs = {'ref': range_string}
-            tag(doc, 'mergeCell', attrs)
-        end_tag(doc, 'mergeCells')
-
-def write_datavalidation(worksheet):
-    """ Write data validation(s) to xml."""
-    # Filter out "empty" data-validation objects (i.e. with 0 cells)
-    required_dvs = [x for x in worksheet._data_validations
-                    if len(x.cells) or len(x.ranges)]
-    if not required_dvs:
-        return
-
-    dvs = Element("{%s}dataValidations" % SHEET_MAIN_NS,
-                  count=str(len(required_dvs)))
-    for dv in required_dvs:
-        dvs.append(writer(dv))
-
-    return dvs
-
-def write_worksheet_hyperlinks(doc, worksheet):
-    """Write worksheet hyperlinks to xml."""
-    write_hyperlinks = False
-    for cell in worksheet.get_cell_collection():
-        if cell.hyperlink_rel_id is not None:
-            write_hyperlinks = True
-            break
-    if write_hyperlinks:
-        start_tag(doc, 'hyperlinks', {'xmlns:r':"http://schemas.openxmlformats.org/officeDocument/2006/relationships"})
-        for cell in worksheet.get_cell_collection():
-            if cell.hyperlink_rel_id is not None:
-                attrs = {'display': cell.hyperlink,
-                         'ref': cell.coordinate,
-                         'r:id': cell.hyperlink_rel_id}
-                tag(doc, 'hyperlink', attrs)
-        end_tag(doc, 'hyperlinks')
-
-
-def write_header_footer(doc, worksheet):
-    if worksheet.header_footer.hasHeader() or worksheet.header_footer.hasFooter():
-        start_tag(doc, 'headerFooter')
-        if worksheet.header_footer.hasHeader():
-            tag(doc, 'oddHeader', None, worksheet.header_footer.getHeader())
-        if worksheet.header_footer.hasFooter():
-            tag(doc, 'oddFooter', None, worksheet.header_footer.getFooter())
-        end_tag(doc, 'headerFooter')
-
-
-def write_pagebreaks(doc, worksheet):
-    breaks = worksheet.page_breaks
-    if breaks:
-        start_tag(doc, 'rowBreaks', {'count': str(len(breaks)),
-                                     'manualBreakCount': str(len(breaks))})
-        for b in breaks:
-            tag(doc, 'brk', {'id': str(b), 'man': 'true', 'max': '16383',
-                             'min': '0'})
-        end_tag(doc, 'rowBreaks')

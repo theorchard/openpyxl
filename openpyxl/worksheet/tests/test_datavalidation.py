@@ -12,8 +12,8 @@ from .. datavalidation import (
     )
 
 from openpyxl.workbook import Workbook
-from openpyxl.xml.functions import fromstring
-from openpyxl.tests.helper import get_xml, compare_xml
+from openpyxl.xml.functions import fromstring, tostring
+from openpyxl.tests.helper import compare_xml
 
 # There are already unit-tests in test_cell.py that test out the
 # coordinate_from_string method.  This should be the only way the
@@ -65,7 +65,7 @@ def test_writer_validation():
     dv = DataValidation(ValidationType.LIST, formula1='"Dog,Cat,Fish"')
     dv.add_cell(ws['A1'])
 
-    xml = get_xml(writer(dv))
+    xml = tostring(writer(dv))
     expected = """
     <dataValidation xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main" allowBlank="0" showErrorMessage="1" showInputMessage="1" sqref="A1" type="list">
       <formula1>&quot;Dog,Cat,Fish&quot;</formula1>

@@ -20,14 +20,6 @@ openpyxl.workbook.names.named_range module
     :undoc-members:
     :show-inheritance:
 
-openpyxl.workbook.names.writer module
--------------------------------------
-
-.. automodule:: openpyxl.workbook.names.writer
-    :members:
-    :undoc-members:
-    :show-inheritance:
-
 
 Module contents
 ---------------

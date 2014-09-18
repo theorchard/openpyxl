@@ -86,7 +86,7 @@ class TestWorksheet(object):
         ws = Worksheet(self.wb)
         assert 'A1:A1' == ws.calculate_dimension()
         ws.cell('B12').value = 'AAA'
-        assert 'A1:B12' == ws.calculate_dimension()
+        assert 'A12:B12' == ws.calculate_dimension()
 
 
     def test_squared_range(self):

@@ -283,6 +283,21 @@ def test_inline_string(Worksheet, WorkSheetParser, datadir):
     assert ws['A1'].value == "ID"
 
 
+def test_inline_richtext(Worksheet, WorkSheetParser, datadir):
+    ws = Worksheet
+    parser = WorkSheetParser
+    datadir.chdir()
+    with open("jasper_sheet.xml", "rb") as src:
+        sheet = fromstring(src.read())
+
+    element = sheet.find("{%s}sheetData/{%s}row[2]/{%s}c[18]" % (SHEET_MAIN_NS, SHEET_MAIN_NS, SHEET_MAIN_NS))
+    assert element.get("r") == 'R2'
+    parser.parse_cell(element)
+    cell = ws['B2'].style = ws.get_style(coordinate='')
+    assert ws['B2'].data_type == 's'
+    assert ws['B2'].value == "11 de September de 2014"
+
+
 def test_data_validation(Worksheet, WorkSheetParser, datadir):
     ws = Worksheet
     parser = WorkSheetParser

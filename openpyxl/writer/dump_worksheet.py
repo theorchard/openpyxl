@@ -27,8 +27,8 @@ from openpyxl.writer.comments import CommentWriter
 from .relations import write_rels
 from .worksheet import (
     write_cell,
-    write_worksheet_cols,
-    write_worksheet_format
+    write_cols,
+    write_format
 )
 from openpyxl.xml.constants import PACKAGE_WORKSHEETS
 
@@ -91,7 +91,7 @@ class DumpWorksheet(Worksheet):
             del self._descriptors_cache[filename]
             self._descriptors_cache[filename] = fobj
         else:
-            fobj = open(filename, 'r+')
+            fobj = open(filename, 'rb+')
             self._descriptors_cache[filename] = fobj
             if len(self._descriptors_cache) > DESCRIPTORS_CACHE_SIZE:
                 filename, fileobj = self._descriptors_cache.popitem(last=False)
@@ -143,8 +143,11 @@ class DumpWorksheet(Worksheet):
                 'sqref': 'A1'})
         end_tag(doc, 'sheetView')
         end_tag(doc, 'sheetViews')
-        write_worksheet_format(doc, self)
-        write_worksheet_cols(doc, self)
+        fmt = write_format(self)
+        fobj.write(tostring(fmt))
+        cols = write_cols(self)
+        if cols is not None:
+            fobj.write(tostring(cols))
 
         return doc
 
@@ -154,7 +157,7 @@ class DumpWorksheet(Worksheet):
         for f in files:
             self.get_temporary_file(f).close()
         output = self.get_temporary_file(self.filename)
-        for line in FileInput(files):
+        for line in FileInput(files, mode="rb"):
             output.write(line)
         output.close()
 

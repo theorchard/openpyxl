@@ -46,6 +46,8 @@ class WorkSheetParser(object):
     VALUE_TAG = '{%s}v' % SHEET_MAIN_NS
     FORMULA_TAG = '{%s}f' % SHEET_MAIN_NS
     MERGE_TAG = '{%s}mergeCell' % SHEET_MAIN_NS
+    INLINE_STRING = "{%s}is/{%s}t" % (SHEET_MAIN_NS, SHEET_MAIN_NS)
+    INLINE_RICHTEXT = "{%s}is/{%s}r/{%s}t" % (SHEET_MAIN_NS, SHEET_MAIN_NS, SHEET_MAIN_NS)
 
     def __init__(self, ws, xml_source, shared_strings, style_table, color_index=None):
         self.ws = ws
@@ -69,6 +71,8 @@ class WorkSheetParser(object):
             '{%s}autoFilter' % SHEET_MAIN_NS: self.parse_auto_filter,
             '{%s}sheetProtection' % SHEET_MAIN_NS: self.parse_sheet_protection,
             '{%s}dataValidations' % SHEET_MAIN_NS: self.parse_data_validation,
+            '{%s}sheetPr' % SHEET_MAIN_NS: self.parse_properties,
+            '{%s}legacyDrawing' % SHEET_MAIN_NS: self.parse_legacy_drawing,
                       }
         tags = dispatcher.keys()
         stream = _get_xml_iter(self.source)
@@ -125,7 +129,11 @@ class WorkSheetParser(object):
         else:
             if data_type == 'inlineStr':
                 data_type = 's'
-                value = element.findtext("{%s}is/{%s}t" % (SHEET_MAIN_NS, SHEET_MAIN_NS))
+                child = element.find(self.INLINE_STRING)
+                if child is None:
+                    child = element.find(self.INLINE_RICHTEXT)
+                if child is not None:
+                    value = child.text
 
         if self.guess_types or value is None:
             cell.value = value
@@ -193,65 +201,61 @@ class WorkSheetParser(object):
             self.ws.header_footer.setFooter(oddFooter.text)
 
     def parser_conditional_formatting(self, element):
-        for cf in safe_iterator(element, '{%s}conditionalFormatting' % SHEET_MAIN_NS):
-            if not cf.get('sqref'):
-                # Potentially flag - this attribute should always be present.
+        range_string = element.get('sqref')
+        cfRules = element.findall('{%s}cfRule' % SHEET_MAIN_NS)
+        if range_string not in self.ws.conditional_formatting.parse_rules:
+            self.ws.conditional_formatting.parse_rules[range_string] = []
+        for cfRule in cfRules:
+            if not cfRule.get('type') or cfRule.get('type') == 'dataBar':
+                # dataBar conditional formatting isn't supported, as it relies on the complex <extLst> tag
                 continue
-            range_string = cf.get('sqref')
-            cfRules = cf.findall('{%s}cfRule' % SHEET_MAIN_NS)
-            if range_string not in self.ws.conditional_formatting.parse_rules:
-                self.ws.conditional_formatting.parse_rules[range_string] = []
-            for cfRule in cfRules:
-                if not cfRule.get('type') or cfRule.get('type') == 'dataBar':
-                    # dataBar conditional formatting isn't supported, as it relies on the complex <extLst> tag
-                    continue
-                rule = {'type': cfRule.get('type')}
-                for attr in ConditionalFormatting.rule_attributes:
-                    if cfRule.get(attr) is not None:
-                        if attr == 'priority':
-                            rule[attr] = int(cfRule.get(attr))
-                        else:
-                            rule[attr] = cfRule.get(attr)
+            rule = {'type': cfRule.get('type')}
+            for attr in ConditionalFormatting.rule_attributes:
+                if cfRule.get(attr) is not None:
+                    if attr == 'priority':
+                        rule[attr] = int(cfRule.get(attr))
+                    else:
+                        rule[attr] = cfRule.get(attr)
 
-                formula = cfRule.findall('{%s}formula' % SHEET_MAIN_NS)
-                for f in formula:
-                    if 'formula' not in rule:
-                        rule['formula'] = []
-                    rule['formula'].append(f.text)
+            formula = cfRule.findall('{%s}formula' % SHEET_MAIN_NS)
+            for f in formula:
+                if 'formula' not in rule:
+                    rule['formula'] = []
+                rule['formula'].append(f.text)
 
-                colorScale = cfRule.find('{%s}colorScale' % SHEET_MAIN_NS)
-                if colorScale is not None:
-                    rule['colorScale'] = {'cfvo': [], 'color': []}
-                    cfvoNodes = colorScale.findall('{%s}cfvo' % SHEET_MAIN_NS)
-                    for node in cfvoNodes:
-                        cfvo = {}
-                        if node.get('type') is not None:
-                            cfvo['type'] = node.get('type')
-                        if node.get('val') is not None:
-                            cfvo['val'] = node.get('val')
-                        rule['colorScale']['cfvo'].append(cfvo)
-                    colorNodes = colorScale.findall('{%s}color' % SHEET_MAIN_NS)
-                    for color in colorNodes:
-                        attrs = dict(color.items())
-                        color = Color(**attrs)
-                        rule['colorScale']['color'].append(color)
+            colorScale = cfRule.find('{%s}colorScale' % SHEET_MAIN_NS)
+            if colorScale is not None:
+                rule['colorScale'] = {'cfvo': [], 'color': []}
+                cfvoNodes = colorScale.findall('{%s}cfvo' % SHEET_MAIN_NS)
+                for node in cfvoNodes:
+                    cfvo = {}
+                    if node.get('type') is not None:
+                        cfvo['type'] = node.get('type')
+                    if node.get('val') is not None:
+                        cfvo['val'] = node.get('val')
+                    rule['colorScale']['cfvo'].append(cfvo)
+                colorNodes = colorScale.findall('{%s}color' % SHEET_MAIN_NS)
+                for color in colorNodes:
+                    attrs = dict(color.items())
+                    color = Color(**attrs)
+                    rule['colorScale']['color'].append(color)
 
-                iconSet = cfRule.find('{%s}iconSet' % SHEET_MAIN_NS)
-                if iconSet is not None:
-                    rule['iconSet'] = {'cfvo': []}
-                    for iconAttr in ConditionalFormatting.icon_attributes:
-                        if iconSet.get(iconAttr) is not None:
-                            rule['iconSet'][iconAttr] = iconSet.get(iconAttr)
-                    cfvoNodes = iconSet.findall('{%s}cfvo' % SHEET_MAIN_NS)
-                    for node in cfvoNodes:
-                        cfvo = {}
-                        if node.get('type') is not None:
-                            cfvo['type'] = node.get('type')
-                        if node.get('val') is not None:
-                            cfvo['val'] = node.get('val')
-                        rule['iconSet']['cfvo'].append(cfvo)
+            iconSet = cfRule.find('{%s}iconSet' % SHEET_MAIN_NS)
+            if iconSet is not None:
+                rule['iconSet'] = {'cfvo': []}
+                for iconAttr in ConditionalFormatting.icon_attributes:
+                    if iconSet.get(iconAttr) is not None:
+                        rule['iconSet'][iconAttr] = iconSet.get(iconAttr)
+                cfvoNodes = iconSet.findall('{%s}cfvo' % SHEET_MAIN_NS)
+                for node in cfvoNodes:
+                    cfvo = {}
+                    if node.get('type') is not None:
+                        cfvo['type'] = node.get('type')
+                    if node.get('val') is not None:
+                        cfvo['val'] = node.get('val')
+                    rule['iconSet']['cfvo'].append(cfvo)
 
-                self.ws.conditional_formatting.parse_rules[range_string].append(rule)
+            self.ws.conditional_formatting.parse_rules[range_string].append(rule)
 
     def parse_auto_filter(self, element):
         self.ws.auto_filter.ref = element.get("ref")
@@ -279,6 +283,14 @@ class WorkSheetParser(object):
             self.ws._data_validations.append(dv)
 
 
+    def parse_properties(self, element):
+        self.ws.vba_code = element.attrib
+
+
+    def parse_legacy_drawing(self, element):
+        self.ws.vba_controls = element.get("r:id")
+
+
 def fast_parse(ws, xml_source, shared_strings, style_table, color_index=None):
     parser = WorkSheetParser(ws, xml_source, shared_strings, style_table, color_index)
     parser.parse()
@@ -294,6 +306,4 @@ def read_worksheet(xml_source, parent, preset_title, shared_strings,
     else:
         ws = Worksheet(parent, preset_title)
         fast_parse(ws, xml_source, shared_strings, style_table, color_index)
-    if keep_vba:
-        ws.xml_source = xml_source
     return ws
