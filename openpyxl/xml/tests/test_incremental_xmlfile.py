@@ -14,6 +14,9 @@ import tempfile, os, sys
 
 from .common_imports import etree, HelperTestCase, skipIf
 
+import pytest
+
+
 class _XmlFileTestCaseBase(HelperTestCase):
     _file = None  # to be set by specific subtypes below
 
@@ -143,6 +146,7 @@ class _XmlFileTestCaseBase(HelperTestCase):
                 xf.write('toast')
         self.assertXml('<test>toast</test>', encoding='utf16')
 
+    @pytest.mark.lxml_buffering
     def test_buffering(self):
         with etree.xmlfile(self._file, buffered=False) as xf:
             with xf.element('test'):
@@ -159,6 +163,7 @@ class _XmlFileTestCaseBase(HelperTestCase):
             self.assertXml("<test>toast<taste>some<more/>toast</taste>end</test>")
         self.assertXml("<test>toast<taste>some<more/>toast</taste>end</test>")
 
+    @pytest.mark.lxml_buffering
     def test_flush(self):
         with etree.xmlfile(self._file, buffered=True) as xf:
             with xf.element('test'):
@@ -251,6 +256,7 @@ class BytesIOXmlFileTestCase(_XmlFileTestCaseBase):
     def setUp(self):
         self._file = BytesIO()
 
+    @pytest.mark.lxml_buffering
     def test_filelike_close(self):
         with etree.xmlfile(self._file, close=True) as xf:
             with xf.element('test'):
@@ -327,6 +333,7 @@ class SimpleFileLikeXmlFileTestCase(_XmlFileTestCaseBase):
                 pass
         self.assertFalse(self._file.closed)
 
+    @pytest.mark.lxml_buffering
     def test_filelike_close(self):
         with etree.xmlfile(self._file, close=True) as xf:
             with xf.element('test'):
