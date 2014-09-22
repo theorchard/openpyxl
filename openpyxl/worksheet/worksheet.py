@@ -699,7 +699,7 @@ class Worksheet(object):
     @property
     def rows(self):
         """Iterate over all rows in the worksheet"""
-        return tuple(row for row in self.iter_rows())
+        return tuple(self.iter_rows())
 
     @property
     def columns(self):
