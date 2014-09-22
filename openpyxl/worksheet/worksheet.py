@@ -443,7 +443,6 @@ class Worksheet(object):
         """
         # Column name cache is very important in large files.
         cache = dict((col, get_column_letter(col)) for col in range(min_col, max_col+1))
-        rows = []
         for row in range(min_row, max_row+1):
             yield tuple(self._get_cell('%s%d' % (cache[col], row))
                         for col in range(min_col, max_col+1))
