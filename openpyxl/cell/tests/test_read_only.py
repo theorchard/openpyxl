@@ -29,7 +29,7 @@ def test_ctor(dummy_sheet):
 def test_empty_cell(dummy_sheet):
     from openpyxl.cell.read_only import EMPTY_CELL
     assert EMPTY_CELL.value is None
-    assert EMPTY_CELL.data_type == 's'
+    assert EMPTY_CELL.data_type == 'n'
 
 
 def test_base_date(dummy_sheet):
