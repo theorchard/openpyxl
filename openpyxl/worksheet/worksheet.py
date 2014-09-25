@@ -230,7 +230,7 @@ class Worksheet(object):
         sheets = self._parent.get_sheet_names()
         if value in sheets:
             sheets = ",".join(sheets)
-            sheet_title_regex = re.compile("(?P<title>%s)(?P<count>\d?),?" % value)
+            sheet_title_regex = re.compile("(?P<title>%s)(?P<count>\d?),?" % re.escape(value))
             matches = sheet_title_regex.findall(sheets)
             if matches:
                 # use name, but append with the next highest integer
