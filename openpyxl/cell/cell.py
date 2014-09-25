@@ -170,7 +170,7 @@ class Cell(object):
     TYPE_FORMULA = 'f'
     TYPE_NUMERIC = 'n'
     TYPE_BOOL = 'b'
-    TYPE_NULL = 's'
+    TYPE_NULL = 'n'
     TYPE_INLINE = 'inlineStr'
     TYPE_ERROR = 'e'
     TYPE_FORMULA_CACHE_STRING = 'str'
@@ -244,10 +244,10 @@ class Cell(object):
         if not isinstance(value, KNOWN_TYPES):
             raise ValueError("Cannot convert {0} to Excel".format(value))
 
-        self.data_type = self.TYPE_STRING
-        if value is None:
-            value = ''
-        elif isinstance(value, bool):
+        self.data_type = self.TYPE_NUMERIC
+        #if value is None:
+            #value = ''
+        if isinstance(value, bool):
             self.data_type = self.TYPE_BOOL
         elif isinstance(value, NUMERIC_TYPES):
             self.data_type = self.TYPE_NUMERIC
@@ -257,6 +257,7 @@ class Cell(object):
             value = self._cast_datetime(value)
 
         elif isinstance(value, basestring):
+            self.data_type = self.TYPE_STRING
             if value.startswith("="):
                 self.data_type = self.TYPE_FORMULA
             elif value in self.ERROR_CODES:
