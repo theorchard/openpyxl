@@ -1,0 +1,225 @@
+<?xml version="1.0"?>
+<styleSheet xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main">
+  <numFmts count="0"/>
+  <fonts count="6">
+    <font>
+      <sz val="11"/>
+      <color theme="1"/>
+      <name val="Calibri"/>
+      <family val="2"/>
+      <scheme val="minor"/>
+    </font>
+    <font>
+      <sz val="12.0"/>
+      <color theme="1"/>
+      <name val="Arial"/>
+      <family val="2"/>
+      <b/>
+    </font>
+    <font>
+      <sz val="10.0"/>
+      <color theme="1"/>
+      <name val="Arial"/>
+      <family val="2"/>
+    </font>
+    <font>
+      <sz val="14.0"/>
+      <color theme="1"/>
+      <name val="Arial"/>
+      <family val="2"/>
+      <i/>
+    </font>
+    <font>
+      <sz val="12.0"/>
+      <color rgb="FF3300FF"/>
+      <name val="Calibri"/>
+      <family val="2"/>
+    </font>
+    <font>
+      <sz val="12.0"/>
+      <color theme="9"/>
+      <name val="Calibri"/>
+      <family val="2"/>
+    </font>
+  </fonts>
+  <fills count="6">
+    <fill>
+      <patternFill patternType="none"/>
+    </fill>
+    <fill>
+      <patternFill patternType="gray125"/>
+    </fill>
+    <fill>
+      <patternFill patternType="solid">
+        <fgColor theme="8"/>
+        <bgColor indexed="64"/>
+      </patternFill>
+    </fill>
+    <fill>
+      <patternFill patternType="solid">
+        <fgColor rgb="FFFFFF66"/>
+        <bgColor indexed="64"/>
+      </patternFill>
+    </fill>
+    <fill>
+      <patternFill patternType="solid">
+        <fgColor rgb="FFCCCCFF"/>
+        <bgColor indexed="64"/>
+      </patternFill>
+    </fill>
+    <fill>
+      <patternFill patternType="solid">
+        <fgColor rgb="FF006600"/>
+        <bgColor indexed="64"/>
+      </patternFill>
+    </fill>
+  </fills>
+  <borders count="7">
+    <border>
+      <left/>
+      <right/>
+      <top/>
+      <bottom/>
+      <diagonal/>
+    </border>
+    <border>
+      <left style="thin">
+        <color rgb="FF006600"/>
+      </left>
+      <right style="thin">
+        <color rgb="FF006600"/>
+      </right>
+      <top style="thin">
+        <color rgb="FF006600"/>
+      </top>
+      <bottom style="thin">
+        <color rgb="FF006600"/>
+      </bottom>
+      <diagonal/>
+    </border>
+    <border>
+      <left style="double">
+        <color theme="7"/>
+      </left>
+      <right style="double">
+        <color theme="7"/>
+      </right>
+      <top style="double">
+        <color theme="7"/>
+      </top>
+      <bottom style="double">
+        <color theme="7"/>
+      </bottom>
+      <diagonal/>
+    </border>
+    <border>
+      <left style="mediumDashed">
+        <color theme="6"/>
+      </left>
+      <right/>
+      <top style="mediumDashed">
+        <color theme="6"/>
+      </top>
+      <bottom/>
+      <diagonal/>
+    </border>
+    <border>
+      <left/>
+      <right style="mediumDashed">
+        <color theme="6"/>
+      </right>
+      <top style="mediumDashed">
+        <color theme="6"/>
+      </top>
+      <bottom/>
+      <diagonal/>
+    </border>
+    <border>
+      <left style="mediumDashed">
+        <color theme="6"/>
+      </left>
+      <right/>
+      <top/>
+      <bottom style="mediumDashed">
+        <color theme="6"/>
+      </bottom>
+      <diagonal/>
+    </border>
+    <border>
+      <left/>
+      <right style="mediumDashed">
+        <color theme="6"/>
+      </right>
+      <top/>
+      <bottom style="mediumDashed">
+        <color theme="6"/>
+      </bottom>
+      <diagonal/>
+    </border>
+  </borders>
+  <cellStyleXfs count="1">
+    <xf borderId="0" fillId="0" fontId="0" numFmtId="0"/>
+  </cellStyleXfs>
+  <cellXfs count="29">
+    <xf borderId="0" fillId="0" fontId="0" numFmtId="0" xfId="0"/>
+    <xf applyFont="1" borderId="0" fillId="0" fontId="1" numFmtId="0" xfId="0"/>
+    <xf applyFont="1" borderId="0" fillId="0" fontId="2" numFmtId="0" xfId="0"/>
+    <xf applyFont="1" borderId="0" fillId="0" fontId="3" numFmtId="0" xfId="0"/>
+    <xf applyFont="1" borderId="0" fillId="0" fontId="4" numFmtId="0" xfId="0"/>
+    <xf applyFont="1" borderId="0" fillId="0" fontId="5" numFmtId="0" xfId="0"/>
+    <xf applyFill="1" borderId="0" fillId="2" fontId="0" numFmtId="0" xfId="0"/>
+    <xf applyFill="1" borderId="0" fillId="3" fontId="0" numFmtId="0" xfId="0"/>
+    <xf applyAlignment="1" borderId="0" fillId="0" fontId="0" numFmtId="0" xfId="0">
+      <alignment horizontal="left"/>
+    </xf>
+    <xf applyAlignment="1" borderId="0" fillId="0" fontId="0" numFmtId="0" xfId="0">
+      <alignment horizontal="right"/>
+    </xf>
+    <xf applyAlignment="1" borderId="0" fillId="0" fontId="0" numFmtId="0" xfId="0">
+      <alignment horizontal="center"/>
+    </xf>
+    <xf applyAlignment="1" borderId="0" fillId="0" fontId="0" numFmtId="0" xfId="0">
+      <alignment vertical="top"/>
+    </xf>
+    <xf applyAlignment="1" borderId="0" fillId="0" fontId="0" numFmtId="0" xfId="0">
+      <alignment vertical="center"/>
+    </xf>
+    <xf borderId="0" fillId="0" fontId="0" numFmtId="0" xfId="0"/>
+    <xf applyNumberFormat="1" borderId="0" fillId="0" fontId="0" numFmtId="2" xfId="0"/>
+    <xf applyNumberFormat="1" borderId="0" fillId="0" fontId="0" numFmtId="14" xfId="0"/>
+    <xf applyNumberFormat="1" borderId="0" fillId="0" fontId="0" numFmtId="10" xfId="0"/>
+    <xf applyAlignment="1" borderId="0" fillId="0" fontId="0" numFmtId="0" xfId="0">
+      <alignment horizontal="center"/>
+    </xf>
+    <xf applyBorder="1" borderId="1" fillId="0" fontId="0" numFmtId="0" xfId="0"/>
+    <xf applyBorder="1" borderId="2" fillId="0" fontId="0" numFmtId="0" xfId="0"/>
+    <xf applyAlignment="1" borderId="0" fillId="0" fontId="0" numFmtId="0" xfId="0">
+      <alignment wrapText="1"/>
+    </xf>
+    <xf applyAlignment="1" borderId="0" fillId="0" fontId="0" numFmtId="0" xfId="0">
+      <alignment shrinkToFit="1"/>
+    </xf>
+    <xf borderId="0" fillId="0" fontId="0" numFmtId="0" xfId="0"/>
+    <xf applyAlignment="1" borderId="0" fillId="0" fontId="0" numFmtId="0" xfId="0">
+      <alignment horizontal="center"/>
+    </xf>
+    <xf applyAlignment="1" applyBorder="1" applyFill="1" borderId="3" fillId="4" fontId="0" numFmtId="0" xfId="0">
+      <alignment horizontal="center" vertical="center"/>
+    </xf>
+    <xf applyAlignment="1" applyBorder="1" applyFill="1" borderId="4" fillId="4" fontId="0" numFmtId="0" xfId="0">
+      <alignment horizontal="center" vertical="center"/>
+    </xf>
+    <xf applyAlignment="1" applyBorder="1" applyFill="1" borderId="5" fillId="4" fontId="0" numFmtId="0" xfId="0">
+      <alignment horizontal="center" vertical="center"/>
+    </xf>
+    <xf applyAlignment="1" applyBorder="1" applyFill="1" borderId="6" fillId="4" fontId="0" numFmtId="0" xfId="0">
+      <alignment horizontal="center" vertical="center"/>
+    </xf>
+    <xf applyFill="1" applyFont="1" borderId="0" fillId="5" fontId="4" numFmtId="0" xfId="0"/>
+  </cellXfs>
+  <cellStyles count="1">
+    <cellStyle builtinId="0" name="Normal" xfId="0"/>
+  </cellStyles>
+  <dxfs count="0"/>
+  <tableStyles count="0" defaultPivotStyle="PivotStyleLight16" defaultTableStyle="TableStyleMedium9"/>
+</styleSheet>
