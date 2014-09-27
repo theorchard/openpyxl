@@ -274,11 +274,13 @@ def test_noneset():
     from . import NoneSet, Strict
     class Dummy(Strict):
 
-        value = NoneSet(values=(1, 2, 3))
+        value = NoneSet(values=[1, 2, 3])
 
     obj = Dummy()
     obj.value = 'none'
     assert obj.value is None
+    with pytest.raises(ValueError):
+        obj.value = 5
 
 
 @pytest.fixture
