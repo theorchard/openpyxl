@@ -100,6 +100,7 @@ class Set(Descriptor):
     def __init__(self, name=None, **kw):
         if not 'values' in kw:
             raise TypeError("missing set of values")
+        kw['values'] = set(kw['values'])
         super(Set, self).__init__(name, **kw)
 
     def __set__(self, instance, value):
@@ -112,12 +113,14 @@ class NoneSet(Set):
 
     """'none' will be treated as None"""
 
-    allow_none = True
+    def __init__(self, name=None, **kw):
+        Set.__init__(self, name, **kw)
+        self.values.add(None)
 
     def __set__(self, instance, value):
         if value == 'none':
             value = None
-        super(Set, self).__set__(instance, value)
+        Set.__set__(self, instance, value)
 
 
 class Integer(Convertible):
