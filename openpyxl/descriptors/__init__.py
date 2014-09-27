@@ -108,6 +108,18 @@ class Set(Descriptor):
         super(Set, self).__set__(instance, value)
 
 
+class NoneSet(Set):
+
+    """'none' will be treated as None"""
+
+    allow_none = True
+
+    def __set__(self, instance, value):
+        if value == 'none':
+            value = None
+        super(Set, self).__set__(instance, value)
+
+
 class Integer(Convertible):
 
     expected_type = int

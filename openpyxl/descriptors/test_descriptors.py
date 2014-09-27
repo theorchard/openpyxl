@@ -270,6 +270,17 @@ class TestValues:
             set.value = 2
 
 
+def test_noneset():
+    from . import NoneSet, Strict
+    class Dummy(Strict):
+
+        value = NoneSet(values=(1, 2, 3))
+
+    obj = Dummy()
+    obj.value = 'none'
+    assert obj.value is None
+
+
 @pytest.fixture
 def ascii():
 
