@@ -2,7 +2,7 @@ from __future__ import absolute_import
 # Copyright (c) 2010-2014 openpyxl
 
 
-from openpyxl.descriptors import Float, Integer, Set, Bool, String, Alias, MinMax
+from openpyxl.descriptors import Float, Integer, Set, Bool, String, Alias, MinMax, NoneSet
 from .hashable import HashableObject
 from .colors import ColorDescriptor, BLACK
 
@@ -12,7 +12,6 @@ class Font(HashableObject):
 
     spec = """18.8.22, p.3930"""
 
-    UNDERLINE_NONE = 'none'
     UNDERLINE_DOUBLE = 'double'
     UNDERLINE_DOUBLE_ACCOUNTING = 'doubleAccounting'
     UNDERLINE_SINGLE = 'single'
@@ -34,13 +33,17 @@ class Font(HashableObject):
     shadow = Bool()
     condense = Bool()
     extend = Bool()
-    u = Set(values=set([None, UNDERLINE_DOUBLE, UNDERLINE_NONE,
-                        UNDERLINE_DOUBLE_ACCOUNTING, UNDERLINE_SINGLE,
-                        UNDERLINE_SINGLE_ACCOUNTING]))
+    u = NoneSet(values=(
+        UNDERLINE_DOUBLE,
+        UNDERLINE_DOUBLE_ACCOUNTING,
+        UNDERLINE_SINGLE,
+        UNDERLINE_SINGLE_ACCOUNTING
+    )
+                )
     underline = Alias("u")
-    vertAlign = Set(values=set(['superscript', 'subscript', 'baseline', None]))
+    vertAlign = NoneSet(values=('superscript', 'subscript', 'baseline'))
     color = ColorDescriptor()
-    scheme = Set(values=(None, "major", "minor"))
+    scheme = NoneSet(values=("major", "minor"))
 
     __fields__ = ('name',
                   'sz',
@@ -60,8 +63,9 @@ class Font(HashableObject):
 
     def __init__(self, name='Calibri', sz=11, b=False, i=False, charset=None,
                  u=None, strike=False, color=BLACK, scheme=None, family=2, size=None,
-                 bold=None, italic=None, strikethrough=None, underline=UNDERLINE_NONE,
-                 vertAlign=None, outline=False, shadow=False, condense=False, extend=False):
+                 bold=None, italic=None, strikethrough=None, underline=None,
+                 vertAlign=None, outline=False, shadow=False, condense=False,
+                 extend=False):
         self.name = name
         self.family = family
         if size is not None:

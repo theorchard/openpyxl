@@ -313,3 +313,13 @@ def test_change_existing_styles(datadir):
     assert ws['A26'].alignment == Alignment(shrink_to_fit=False)
 
     assert ws.column_dimensions['A'].width == 20.0
+
+
+def test_none_values(datadir, StyleReader):
+    datadir.chdir()
+    with open("none_value_styles.xml") as src:
+        reader = StyleReader(src.read())
+    fonts = tuple(reader.parse_fonts())
+    assert fonts[0].scheme is None
+    assert fonts[0].vertAlign is None
+    assert fonts[1].u is None
