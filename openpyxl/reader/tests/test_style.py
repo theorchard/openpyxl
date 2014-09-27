@@ -323,3 +323,12 @@ def test_none_values(datadir, StyleReader):
     assert fonts[0].scheme is None
     assert fonts[0].vertAlign is None
     assert fonts[1].u is None
+
+
+def test_alignment(datadir, StyleReader):
+    datadir.chdir()
+    with open("alignment_styles.xml") as src:
+        reader = StyleReader(src.read())
+    reader.parse_cell_xfs()
+    st1 = reader.shared_styles[2]
+    assert st1.alignment.textRotation == 255
