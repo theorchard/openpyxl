@@ -114,13 +114,13 @@ class NoneSet(Set):
     """'none' will be treated as None"""
 
     def __init__(self, name=None, **kw):
-        Set.__init__(self, name, **kw)
+        super(NoneSet, self).__init__(name, **kw)
         self.values.add(None)
 
     def __set__(self, instance, value):
         if value == 'none':
             value = None
-        Set.__set__(self, instance, value)
+        super(NoneSet, self).__set__(instance, value)
 
 
 class Integer(Convertible):
