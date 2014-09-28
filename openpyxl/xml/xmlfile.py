@@ -27,11 +27,15 @@ from xml.etree import ElementTree
 from xml.etree.ElementTree import Element
 from contextlib import contextmanager  
 
+class LxmlSyntaxError:
+    pass
+
 class _IncrementalFileWriter(object):
     def __init__(self, output_file):
         self._element_stack = []
         self._top_element = None
         self._file = output_file
+        self._have_root = False
     
     @contextmanager
     def element(self, tag, attrib=None, nsmap=None, **_extra):
@@ -39,8 +43,10 @@ class _IncrementalFileWriter(object):
         The elements are written when the top level context is left."""
         
         # __enter__ part
+        self._have_root = True
         self._top_element = Element(tag)
         self._top_element.text = ''
+        self._top_element.tail = ''
         self._element_stack.append(self._top_element)
         
         if attrib is not None:
@@ -54,27 +60,56 @@ class _IncrementalFileWriter(object):
             self._element_stack[-1].append(self._top_element)
             self._top_element = self._element_stack[-1]
         else:
-            self._file.write(ElementTree.tostring(self._top_element))
+            self._write_element(self._top_element)
+            self._top_element = None
         
     def write(self, arg):
-        """Write a string or subelement."""       
+        """Write a string or subelement."""
+                       
         if isinstance(arg, str):
-            self._top_element.text += arg
+            # it is not allowed to write a string outside of an element
+            if self._top_element is None:
+                raise LxmlSyntaxError() 
+                                      
+            if len(self._top_element) == 0:
+                # element has no children: add string to text
+                self._top_element.text += arg
+            else:
+                # element has children: add string to tail of last child
+                self._top_element[-1].tail += arg
+                
         elif isinstance(arg, Element):
-            self._top_element.append(arg)
+            if self._top_element is not None:
+                self._top_element.append(arg)
+            elif not self._have_root:
+                self._write_element(arg)
+            else:
+                raise LxmlSyntaxError()
         else:
-            raise RuntimeError()
+            raise LxmlSyntaxError()
+        
+    def _write_element(self, element):
+        self._file.write(ElementTree.tostring(element))
         
     def __enter__(self):
         pass
     def __exit__(self, type, value, traceback):
-        pass
+        # without root the xml document is incomplete
+        if not self._have_root:
+            raise LxmlSyntaxError()
     
 class xmlfile(object):
-    def __init__(self, output_file, buffered=False):
-        self._file = output_file
+    def __init__(self, output_file, buffered=False, encoding=None, close=False):        
+        if isinstance(output_file, str):
+            self._file = open(output_file, 'w')
+            self._close = True
+        else:
+            self._file = output_file
+            self._close = close            
+            
     def __enter__(self):
         return _IncrementalFileWriter(self._file)
         pass
     def __exit__(self, type, value, traceback):
-        pass
+        if self._close == True:
+            self._file.close()

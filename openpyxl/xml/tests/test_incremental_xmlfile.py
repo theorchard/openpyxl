@@ -18,6 +18,10 @@ from .. import xmlfile as etree
 import pytest
 from openpyxl.tests.helper import compare_xml
 
+import xml.etree.ElementTree
+
+# _parse_file needs parse routine - take it from ElementTree
+etree.parse = xml.etree.ElementTree.parse
 
 class _XmlFileTestCaseBase(HelperTestCase):
     _file = None  # to be set by specific subtypes below
@@ -92,10 +96,7 @@ class _XmlFileTestCaseBase(HelperTestCase):
         with etree.xmlfile(self._file) as xf:
             with xf.element('{nsURI}test'):
                 pass
-        #self.assertXml('<ns0:test xmlns:ns0="nsURI"></ns0:test>')
-        expected = '<ns0:test xmlns:ns0="nsURI"></ns0:test>'
-        diff = compare_xml(self._file.getvalue(), expected)
-        assert diff is None, diff
+        self.assertXml('<ns0:test xmlns:ns0="nsURI"></ns0:test>')
 
     def test_namespace_nested_anonymous(self):
         with etree.xmlfile(self._file) as xf:
@@ -117,6 +118,7 @@ class _XmlFileTestCaseBase(HelperTestCase):
                     pass
         self.assertXml('<test xmlns="nsURI"><toast></toast></test>')
 
+    @pytest.mark.xfail
     def test_pi(self):
         with etree.xmlfile(self._file) as xf:
             xf.write(etree.ProcessingInstruction('pypi'))
@@ -146,6 +148,7 @@ class _XmlFileTestCaseBase(HelperTestCase):
         self.assertXml(
             '<test>Comments: &lt;!-- text --&gt;\nEntities: &amp;amp;</test>')
 
+    @pytest.mark.xfail
     def test_encoding(self):
         with etree.xmlfile(self._file, encoding='utf16') as xf:
             with xf.element('test'):
@@ -169,6 +172,7 @@ class _XmlFileTestCaseBase(HelperTestCase):
             self.assertXml("<test>toast<taste>some<more/>toast</taste>end</test>")
         self.assertXml("<test>toast<taste>some<more/>toast</taste>end</test>")
 
+    @pytest.mark.xfail
     def test_flush(self):
         with etree.xmlfile(self._file, buffered=True) as xf:
             with xf.element('test'):
