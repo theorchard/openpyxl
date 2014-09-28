@@ -29,32 +29,39 @@ from contextlib import contextmanager
 
 class _IncrementalFileWriter(object):
     def __init__(self, output_file):
-        self._element_tree_element = None
+        self._element_stack = []
+        self._top_element = None
         self._file = output_file
     
     @contextmanager
     def element(self, tag, attrib=None, nsmap=None, **_extra):
         """Create a new xml element using a context manager.
-        The element is written when the context is left."""
+        The elements are written when the top level context is left."""
+        
         # __enter__ part
-        self._element_tree_element = Element(tag)
+        self._top_element = Element(tag)
+        self._top_element.text = ''
+        self._element_stack.append(self._top_element)
         
         if attrib is not None:
-            self._element_tree_element.attrib = attrib
+            self._top_element.attrib = attrib
             
-        self._element_text = ''
         yield
+        
         # __exit__ part
-        if self._element_tree_element is not None: 
-            self._file.write(ElementTree.tostring(self._element_tree_element))
+        self._top_element = self._element_stack.pop()        
+        if self._element_stack:     
+            self._element_stack[-1].append(self._top_element)
+            self._top_element = self._element_stack[-1]
+        else:
+            self._file.write(ElementTree.tostring(self._top_element))
         
     def write(self, arg):
         """Write a string or subelement."""       
         if isinstance(arg, str):
-            self._element_text += arg #TODO
-            self._element_tree_element.text = self._element_text
+            self._top_element.text += arg
         elif isinstance(arg, Element):
-            self._element_tree_element.append(arg)
+            self._top_element.append(arg)
         else:
             raise RuntimeError()
         
