@@ -259,7 +259,7 @@ class StyleWriter(object):
                         self._write_color(font_node, d['font'].color)
                     ConditionalElement(font_node, 'b', d['font'].bold, 'val')
                     ConditionalElement(font_node, 'i', d['font'].italic, 'val')
-                    ConditionalElement(font_node, 'u', d['font'].underline != 'none',
+                    ConditionalElement(font_node, 'u', d['font'].underline,
                                        {'val': d['font'].underline})
                     ConditionalElement(font_node, 'strike', d['font'].strikethrough)
 

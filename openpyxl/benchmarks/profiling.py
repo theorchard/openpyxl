@@ -20,7 +20,7 @@ def sax_writer(ws=None):
         ws = make_worksheet()
     out = BytesIO()
     doc = XMLGenerator(out)
-    write_worksheet_data(doc, ws, [], [])
+    write_worksheet_data(doc, ws)
     #with open("sax_writer.xml", "wb") as dump:
         #dump.write(out.getvalue())
 
@@ -32,7 +32,7 @@ def lxml_writer(ws=None):
 
     out = BytesIO()
     with xmlfile(out) as xf:
-        write_rows(xf, ws, [], [])
+        write_rows(xf, ws)
     #with open("lxml_writer.xml", "wb") as dump:
         #dump.write(out.getvalue())
     #ws.parent.save("lxml_writer.xlsx")
@@ -121,12 +121,12 @@ cProfile.run("profiling.lxml_writer(ws)", sort="tottime")
 
 if __name__ == '__main__':
     import cProfile
-    #ws = make_worksheet()
-    wb = read_workbook()
-    cProfile.run("rows(wb)", sort="tottime")
+    ws = make_worksheet()
+    #wb = read_workbook()
+    #cProfile.run("rows(wb)", sort="tottime")
     #cProfile.run("make_worksheet()", sort="tottime")
-    #cProfile.run("sax_writer(ws)", sort="tottime")
-    #cProfile.run("lxml_writer(ws)", sort="tottime")
+    cProfile.run("sax_writer(ws)", sort="tottime")
+    cProfile.run("lxml_writer(ws)", sort="tottime")
     #generate_format_data()
     #cProfile.run("styled_sheet()", sort="tottime")
     #ws = make_dump_worksheet()

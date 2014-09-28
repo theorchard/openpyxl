@@ -28,7 +28,8 @@ class Alignment(HashableObject):
                   )
     horizontal = Set(values=horizontal_alignments)
     vertical = Set(values=vertical_aligments)
-    textRotation = MinMax(min=0, max=180)
+    textRotation = Set(values=range(181))
+    textRotation.values.add(255)
     text_rotation = Alias('textRotation')
     wrapText = Bool()
     wrap_text = Alias('wrapText')
@@ -51,7 +52,8 @@ class Alignment(HashableObject):
         self.readingOrder = readingOrder
         if text_rotation is not None:
             textRotation = text_rotation
-        self.textRotation = textRotation
+        if textRotation is not None:
+            self.textRotation = int(textRotation)
         if wrap_text is not None:
             wrapText = wrap_text
         self.wrapText = wrapText

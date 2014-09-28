@@ -43,7 +43,7 @@ class TestReference:
         assert column_of_letters.values == list("ABCDEFGHIJ")
         assert column_of_letters.data_type == "s"
 
-        assert missing_values.values == ['', '', 1, 2, 3, 4, 5, 6, 7, 8]
+        assert missing_values.values == [None, None, 1, 2, 3, 4, 5, 6, 7, 8]
         missing_values.values
         assert missing_values.data_type == 'n'
 
