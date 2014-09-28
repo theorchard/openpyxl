@@ -1,5 +1,4 @@
 from __future__ import absolute_import
-# -*- coding: utf-8 -*-
 
 """
 Tests for the incremental XML serialisation API.
@@ -22,6 +21,7 @@ import xml.etree.ElementTree
 
 # _parse_file needs parse routine - take it from ElementTree
 etree.parse = xml.etree.ElementTree.parse
+
 
 class _XmlFileTestCaseBase(HelperTestCase):
     _file = None  # to be set by specific subtypes below
