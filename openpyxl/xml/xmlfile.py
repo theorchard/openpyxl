@@ -2,12 +2,16 @@
 
 """Implements the lxml.etree.xmlfile API using the standard library xml.etree"""
 
+
+from contextlib import contextmanager
+
 #from openpyxl.xml.functions import Element, tostring
 from xml.etree.ElementTree import Element, tostring
-from contextlib import contextmanager
+
 
 class LxmlSyntaxError(Exception):
     pass
+
 
 class _FakeIncrementalFileWriter(object):
     """Replacement for _IncrementalFileWriter of lxml.
@@ -73,10 +77,12 @@ class _FakeIncrementalFileWriter(object):
 
     def __enter__(self):
         pass
+
     def __exit__(self, type, value, traceback):
         # without root the xml document is incomplete
         if not self._have_root:
             raise LxmlSyntaxError()
+
 
 class xmlfile(object):
     """Context manager that can replace lxml.etree.xmlfile."""
