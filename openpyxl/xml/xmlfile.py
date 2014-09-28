@@ -88,7 +88,7 @@ class xmlfile(object):
     """Context manager that can replace lxml.etree.xmlfile."""
     def __init__(self, output_file, buffered=False, encoding=None, close=False):
         if isinstance(output_file, str):
-            self._file = open(output_file, 'w')
+            self._file = open(output_file, 'wb')
             self._close = True
         else:
             self._file = output_file
