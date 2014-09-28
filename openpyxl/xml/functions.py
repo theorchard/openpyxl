@@ -160,7 +160,7 @@ def tag(doc, name, attr=None, body=None):
 def safe_iterator(node, tag=None):
     """Return an iterator that is compatible with Python 2.6"""
     if node is None:
-        return
+        return []
     if hasattr(node, "iter"):
         return node.iter(tag)
     else:

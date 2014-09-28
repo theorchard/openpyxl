@@ -31,3 +31,9 @@ def test_dict_attrib(root):
 def test_no_tag(root, condition):
     ConditionalElement(root, "start", condition)
     assert root.find("start") is None
+
+
+def test_safe_iterator_none():
+    from .. functions import safe_iterator
+    seq = safe_iterator(None)
+    assert seq == []
