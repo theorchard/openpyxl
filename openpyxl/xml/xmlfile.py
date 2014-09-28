@@ -27,10 +27,12 @@ from xml.etree import ElementTree
 from xml.etree.ElementTree import Element
 from contextlib import contextmanager  
 
-class LxmlSyntaxError:
+class LxmlSyntaxError(Exception):
     pass
 
-class _IncrementalFileWriter(object):
+class _FakeIncrementalFileWriter(object):
+    """Replacement for _IncrementalFileWriter of lxml.
+       Uses ElementTree to build xml in memory."""
     def __init__(self, output_file):
         self._element_stack = []
         self._top_element = None
@@ -99,6 +101,7 @@ class _IncrementalFileWriter(object):
             raise LxmlSyntaxError()
     
 class xmlfile(object):
+    """Context manager that can replace lxml.etree.xmlfile."""
     def __init__(self, output_file, buffered=False, encoding=None, close=False):        
         if isinstance(output_file, str):
             self._file = open(output_file, 'w')
@@ -108,8 +111,8 @@ class xmlfile(object):
             self._close = close            
             
     def __enter__(self):
-        return _IncrementalFileWriter(self._file)
-        pass
+        return _FakeIncrementalFileWriter(self._file)
+
     def __exit__(self, type, value, traceback):
         if self._close == True:
             self._file.close()
