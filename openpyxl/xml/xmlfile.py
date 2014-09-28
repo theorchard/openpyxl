@@ -29,14 +29,12 @@ class _FakeIncrementalFileWriter(object):
 
         # __enter__ part
         self._have_root = True
-        self._top_element = Element(tag)
+        if attrib is None:
+            attrib = {}
+        self._top_element = Element(tag, attrib)
         self._top_element.text = ''
         self._top_element.tail = ''
         self._element_stack.append(self._top_element)
-
-        if attrib is not None:
-            self._top_element.attrib = attrib
-
         yield
 
         # __exit__ part
