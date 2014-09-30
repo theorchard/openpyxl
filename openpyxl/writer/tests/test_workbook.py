@@ -118,3 +118,16 @@ def test_write_named_range():
     """
     diff = compare_xml(xml, expected)
     assert diff is None, diff
+
+
+def test_write_workbook_code_name(datadir):
+    datadir.join('..', '..', '..', 'tests', 'data', 'genuine').chdir()
+
+    wb = load_workbook('empty.xlsx')
+    wb = load_workbook(BytesIO(save_virtual_workbook(wb)))
+    assert wb.code_name == u'ThisWorkbook'
+
+    # This file contains a macros that should run when you open a workbook
+    wb = load_workbook('empty_wb_russian_code_name.xlsm', keep_vba=True)
+    wb = load_workbook(BytesIO(save_virtual_workbook(wb)), keep_vba=True)
+    assert wb.code_name == u'\u042d\u0442\u0430\u041a\u043d\u0438\u0433\u0430'
