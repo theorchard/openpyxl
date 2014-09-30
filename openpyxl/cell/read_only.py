@@ -85,7 +85,10 @@ class ReadOnlyCell(object):
         if value is None:
             self.data_type = Cell.TYPE_NULL
         elif self.data_type == Cell.TYPE_NUMERIC:
-            value = float(value)
+            try:
+                value = int(value)
+            except ValueError:
+                value = float(value)
         self._value = value
 
     @property
