@@ -29,59 +29,70 @@ from zipfile import ZipFile
 from openpyxl.reader.workbook import read_content_types
 from openpyxl.writer.excel import save_virtual_workbook
 from openpyxl.reader.excel import load_workbook
+from openpyxl.xml.constants import XLTM, XLTX, XLSM, XLSX
 
 
 def check_content_type(workbook_type, archive):
-    cts = {name: ct for ct, name in read_content_types(archive)}
-
-    assert workbook_type in cts['/xl/workbook.xml']
+    assert workbook_type in dict(read_content_types(archive))
 
 
-def check_sheet_content_type(archive):
-    check_content_type('.sheet.', archive)
+def test_workbook_is_template(datadir):
+    datadir.join('..', '..', '..', 'tests', 'data', 'genuine').chdir()
 
+    wb = load_workbook('empty.xlsx')
+    assert not wb.is_template
 
-def check_template_content_type(archive):
-    check_content_type('.template.', archive)
+    wb = load_workbook('empty.xlsm')
+    assert not wb.is_template
+
+    wb = load_workbook('empty.xltx')
+    assert wb.is_template
+
+    wb = load_workbook('empty.xltm')
+    assert wb.is_template
 
 
 def test_xl_content_type(datadir):
-    datadir.join('genuine').chdir()
+    datadir.join('..', '..', '..', 'tests', 'data', 'genuine').chdir()
 
-    check_sheet_content_type(ZipFile('empty.xlsx'))
-    check_sheet_content_type(ZipFile('empty.xlsm'))
+    check_content_type(XLSX, ZipFile('empty.xlsx'))
+    check_content_type(XLSM, ZipFile('empty.xlsm'))
 
-    check_template_content_type(ZipFile('empty.xltx'))
-    check_template_content_type(ZipFile('empty.xltm'))
+    check_content_type(XLTX, ZipFile('empty.xltx'))
+    check_content_type(XLTM, ZipFile('empty.xltm'))
 
 
 def test_save_xl_as_no_template(datadir):
-    datadir.join('genuine').chdir()
+    datadir.join('..', '..', '..', 'tests', 'data', 'genuine').chdir()
 
     wb = save_virtual_workbook(load_workbook('empty.xlsx'), as_template=False)
-    check_sheet_content_type(ZipFile(BytesIO(wb)))
+    check_content_type(XLSX, ZipFile(BytesIO(wb)))
 
-    wb = save_virtual_workbook(load_workbook('empty.xlsm'), as_template=False)
-    check_sheet_content_type(ZipFile(BytesIO(wb)))
+    wb = save_virtual_workbook(load_workbook('empty.xlsm', keep_vba=True),
+                               as_template=False)
+    check_content_type(XLSM, ZipFile(BytesIO(wb)))
 
     wb = save_virtual_workbook(load_workbook('empty.xltx'), as_template=False)
-    check_sheet_content_type(ZipFile(BytesIO(wb)))
+    check_content_type(XLSX, ZipFile(BytesIO(wb)))
 
-    wb = save_virtual_workbook(load_workbook('empty.xltm'), as_template=False)
-    check_sheet_content_type(ZipFile(BytesIO(wb)))
+    wb = save_virtual_workbook(load_workbook('empty.xltm', keep_vba=True),
+                               as_template=False)
+    check_content_type(XLSM, ZipFile(BytesIO(wb)))
 
 
 def test_save_xl_as_template(datadir):
-    datadir.join('genuine').chdir()
+    datadir.join('..', '..', '..', 'tests', 'data', 'genuine').chdir()
 
     wb = save_virtual_workbook(load_workbook('empty.xlsx'), as_template=True)
-    check_template_content_type(ZipFile(BytesIO(wb)))
+    check_content_type(XLTX, ZipFile(BytesIO(wb)))
 
-    wb = save_virtual_workbook(load_workbook('empty.xlsm'), as_template=True)
-    check_template_content_type(ZipFile(BytesIO(wb)))
+    wb = save_virtual_workbook(load_workbook('empty.xlsm', keep_vba=True),
+                               as_template=True)
+    check_content_type(XLTM, ZipFile(BytesIO(wb)))
 
     wb = save_virtual_workbook(load_workbook('empty.xltx'), as_template=True)
-    check_template_content_type(ZipFile(BytesIO(wb)))
+    check_content_type(XLTX, ZipFile(BytesIO(wb)))
 
-    wb = save_virtual_workbook(load_workbook('empty.xltm'), as_template=True)
-    check_template_content_type(ZipFile(BytesIO(wb)))
+    wb = save_virtual_workbook(load_workbook('empty.xltm', keep_vba=True),
+                               as_template=True)
+    check_content_type(XLTM, ZipFile(BytesIO(wb)))

@@ -30,6 +30,8 @@ from openpyxl.xml.constants import (
     ARC_THEME,
     SHARED_STRINGS,
     EXTERNAL_LINK,
+    XLTM,
+    XLTX,
 )
 
 from openpyxl.workbook import Workbook, DocumentProperties
@@ -197,6 +199,8 @@ def _load_workbook(wb, archive, filename, read_only, keep_vba):
     else:
         shared_strings = []
 
+    wb.is_template = XLTX in cts or XLTM in cts
+
     try:
         wb.loaded_theme = archive.read(ARC_THEME)  # some writers don't output a theme, live with it (fixes #160)
     except KeyError:
@@ -204,7 +208,7 @@ def _load_workbook(wb, archive, filename, read_only, keep_vba):
 
     style_table, color_index, cond_styles = read_style_table(archive.read(ARC_STYLE))
     wb.shared_styles = style_table
-    wb.style_properties = {'dxf_list':cond_styles}
+    wb.style_properties = {'dxf_list': cond_styles}
     wb.cond_styles = cond_styles
 
     wb.properties.excel_base_date = read_excel_base_date(xml_source=archive.read(ARC_WORKBOOK))
