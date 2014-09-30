@@ -2,6 +2,16 @@
 ==================
 
 
+2.1.1 (unreleased)
+==================
+
+Bug fixes
+---------
+360 Support value="none" in attributes
+363 Support undocumented value for textRotation
+364 Preserve integers in read-only mode
+
+
 2.1.0 (2014-09-21)
 ==================
 
