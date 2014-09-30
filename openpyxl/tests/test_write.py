@@ -39,4 +39,4 @@ def test_write_workbook_code_name(datadir):
     # This file contains a macros that should run when you open a workbook
     wb = load_workbook('empty_wb_russian_code_name.xlsm', keep_vba=True)
     wb = load_workbook(BytesIO(save_virtual_workbook(wb)), keep_vba=True)
-    assert wb.code_name == u'ЭтаКнига'
+    assert wb.code_name == u'\u042d\u0442\u0430\u041a\u043d\u0438\u0433\u0430'
