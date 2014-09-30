@@ -365,6 +365,17 @@ def test_read_autofilter(datadir):
     assert ws.auto_filter.ref == 'A1:B6'
 
 
+def test_read_workbook_code_name(datadir):
+    datadir.join('genuine').chdir()
+
+    wb = load_workbook('empty.xlsx')
+    assert wb.code_name == u'ThisWorkbook'
+
+    # This file contains a macros that should run when you open a workbook
+    wb = load_workbook('empty_wb_russian_code_name.xlsm', keep_vba=True)
+    assert wb.code_name == u'ЭтаКнига'
+
+
 class TestBadFormats:
 
     def test_xlsb(self):

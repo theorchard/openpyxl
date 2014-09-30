@@ -167,3 +167,14 @@ def detect_external_links(archive):
     for rId, d in rels:
         if d['type'] == EXTERNAL_LINK:
             pth = d['path']
+
+
+def read_workbook_code_name(xml_source):
+    tree = fromstring(xml_source)
+
+    pr = tree.find("{%s}workbookPr" % SHEET_MAIN_NS)
+
+    if pr is None:
+        pr = {}
+
+    return pr.get('codeName', 'ThisWorkbook')

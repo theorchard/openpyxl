@@ -43,6 +43,7 @@ from openpyxl.reader.workbook import (
     read_excel_base_date,
     detect_worksheets,
     read_rels,
+    read_workbook_code_name,
 )
 from openpyxl.reader.worksheet import read_worksheet
 from openpyxl.reader.comments import read_comments, get_comments_file
@@ -238,6 +239,8 @@ def _load_workbook(wb, archive, filename, read_only, keep_vba):
                 read_comments(new_ws, archive.read(comments_file))
 
     wb._named_ranges = list(read_named_ranges(archive.read(ARC_WORKBOOK), wb))
+
+    wb.code_name = read_workbook_code_name(archive.read(ARC_WORKBOOK))
 
     if EXTERNAL_LINK in cts:
         rels = read_rels(archive)
