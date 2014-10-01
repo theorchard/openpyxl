@@ -368,19 +368,6 @@ def test_read_autofilter(datadir):
     assert ws.auto_filter.ref == 'A1:B6'
 
 
-@pytest.mark.parametrize('tmpl, code_name', [
-    ('empty.xlsx', u'ThisWorkbook'),
-
-    # This file contains a macros that should run when you open a workbook
-    ('empty_wb_russian_code_name.xlsm', u'\u042d\u0442\u0430\u041a\u043d\u0438\u0433\u0430')
-])
-def test_read_workbook_code_name(datadir, tmpl, code_name):
-    datadir.join('genuine').chdir()
-
-    archive = ZipFile(tmpl)
-    assert read_workbook_code_name(archive.read(ARC_WORKBOOK)) == code_name
-
-
 class TestBadFormats:
 
     def test_xlsb(self):

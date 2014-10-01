@@ -4,7 +4,6 @@ from __future__ import absolute_import
 #stdlib
 from io import BytesIO
 import os
-from zipfile import ZipFile
 
 # test
 import pytest
@@ -14,7 +13,6 @@ from openpyxl.tests.helper import compare_xml
 from openpyxl import Workbook, load_workbook
 from openpyxl.workbook.names.named_range import NamedRange
 from openpyxl.xml.functions import Element, tostring
-from openpyxl.xml.constants import ARC_WORKBOOK
 from .. excel import (
     save_workbook,
     save_virtual_workbook,
@@ -127,14 +125,14 @@ def test_write_named_range():
     ('workbook.xml', u'ThisWorkbook'),
     ('workbook_russian_code_name.xml', u'\u042d\u0442\u0430\u041a\u043d\u0438\u0433\u0430')
 ])
-def test_write_workbook_code_name(datadir, tmpl, code_name):
+def test_read_workbook_code_name(datadir, tmpl, code_name):
     datadir.chdir()
 
     with open(tmpl) as expected:
         assert read_workbook_code_name(expected.read()) == code_name
 
 
-def test_write_workbook_set_code_name():
+def test_write_workbook_code_name():
     wb = Workbook()
     wb.code_name = u'MyWB'
 
