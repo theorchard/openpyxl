@@ -27,6 +27,7 @@
 from datetime import datetime
 from io import BytesIO
 from tempfile import NamedTemporaryFile
+from zipfile import ZipFile
 
 import pytest
 
@@ -40,8 +41,10 @@ from openpyxl.workbook import Workbook
 from openpyxl.styles import numbers, Style
 from openpyxl.reader.worksheet import read_worksheet
 from openpyxl.reader.excel import load_workbook
+from openpyxl.reader.workbook import read_workbook_code_name
 from openpyxl.exceptions import InvalidFileException
 from openpyxl.date_time import CALENDAR_WINDOWS_1900, CALENDAR_MAC_1904
+from openpyxl.xml.constants import ARC_WORKBOOK
 
 
 def test_read_standalone_worksheet(datadir):
@@ -116,7 +119,7 @@ def test_read_empty_file(datadir):
 def test_read_workbook_with_no_core_properties(datadir):
     from openpyxl.workbook import DocumentProperties
     from openpyxl.reader.excel import _load_workbook
-    from zipfile import ZipFile
+
     datadir.join('genuine').chdir()
     archive = ZipFile('empty_with_no_properties.xlsx')
     wb = Workbook()
@@ -327,6 +330,7 @@ def test_get_xml_iter():
     #4 zipfile
     from openpyxl.reader.worksheet import _get_xml_iter
     from tempfile import TemporaryFile
+
     FUT = _get_xml_iter
     s = b""
     stream = FUT(s)
@@ -341,7 +345,6 @@ def test_get_xml_iter():
     assert stream == f
     f.close()
 
-    from zipfile import ZipFile
     t = TemporaryFile()
     z = ZipFile(t, mode="w")
     z.writestr("test", "whatever")
@@ -365,15 +368,17 @@ def test_read_autofilter(datadir):
     assert ws.auto_filter.ref == 'A1:B6'
 
 
-def test_read_workbook_code_name(datadir):
-    datadir.join('genuine').chdir()
-
-    wb = load_workbook('empty.xlsx')
-    assert wb.code_name == u'ThisWorkbook'
+@pytest.mark.parametrize('tmpl, code_name', [
+    ('empty.xlsx', u'ThisWorkbook'),
 
     # This file contains a macros that should run when you open a workbook
-    wb = load_workbook('empty_wb_russian_code_name.xlsm', keep_vba=True)
-    assert wb.code_name == u'\u042d\u0442\u0430\u041a\u043d\u0438\u0433\u0430'
+    ('empty_wb_russian_code_name.xlsm', u'\u042d\u0442\u0430\u041a\u043d\u0438\u0433\u0430')
+])
+def test_read_workbook_code_name(datadir, tmpl, code_name):
+    datadir.join('genuine').chdir()
+
+    archive = ZipFile(tmpl)
+    assert read_workbook_code_name(archive.read(ARC_WORKBOOK)) == code_name
 
 
 class TestBadFormats:
