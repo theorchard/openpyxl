@@ -123,18 +123,15 @@ def test_write_named_range():
     assert diff is None, diff
 
 
-@pytest.mark.parametrize('tmpl, keep_vba, code_name', [
-    ('empty.xlsx', False, u'ThisWorkbook'),
-
-    # This file contains a macros that should run when you open a workbook
-    ('empty_wb_russian_code_name.xlsm', True, u'\u042d\u0442\u0430\u041a\u043d\u0438\u0433\u0430')
+@pytest.mark.parametrize('tmpl, code_name', [
+    ('workbook.xml', u'ThisWorkbook'),
+    ('workbook_russian_code_name.xml', u'\u042d\u0442\u0430\u041a\u043d\u0438\u0433\u0430')
 ])
-def test_write_workbook_code_name(datadir, tmpl, keep_vba, code_name):
-    datadir.join('..', '..', '..', 'tests', 'data', 'genuine').chdir()
+def test_write_workbook_code_name(datadir, tmpl, code_name):
+    datadir.chdir()
 
-    wb = load_workbook(tmpl, keep_vba=keep_vba)
-    archive = ZipFile(BytesIO(save_virtual_workbook(wb)))
-    assert read_workbook_code_name(archive.read(ARC_WORKBOOK)) == code_name
+    with open(tmpl) as expected:
+        assert read_workbook_code_name(expected.read()) == code_name
 
 
 def test_write_workbook_set_code_name():
