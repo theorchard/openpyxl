@@ -325,7 +325,10 @@ class Cell(object):
 
     def _cast_datetime(self, value):
         """Convert Python datetime to Excel and set formatting"""
-        if isinstance(value, datetime.date):
+        if isinstance(value, datetime.datetime):
+            value = to_excel(value, self.base_date)
+            self.number_format = numbers.FORMAT_DATE_DATETIME
+        elif isinstance(value, datetime.date):
             value = to_excel(value, self.base_date)
             self.number_format = numbers.FORMAT_DATE_YYYYMMDD2
         elif isinstance(value, datetime.time):
