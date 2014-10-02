@@ -59,6 +59,7 @@ DIMENSION_TAG = '{%s}dimension' % SHEET_MAIN_NS
 
 class IterableWorksheet(Worksheet):
 
+    _xml = None
     min_col = 'A'
     min_row = 1
     max_col = max_row = None
@@ -75,12 +76,15 @@ class IterableWorksheet(Worksheet):
 
     @property
     def xml_source(self):
-        return self.parent._archive.open(self.worksheet_path)
+        if self._xml is None:
+            return self.parent._archive.open(self.worksheet_path)
+        return self._xml
+
 
     @xml_source.setter
     def xml_source(self, value):
         """Base class is always supplied XML source, IteratableWorksheet obtains it on demand."""
-        pass
+        self._xml = value
 
 
     def get_squared_range(self, min_col, min_row, max_col, max_row):

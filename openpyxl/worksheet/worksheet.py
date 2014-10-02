@@ -167,7 +167,6 @@ class Worksheet(object):
         self.paper_size = None
         self.formula_attributes = {}
         self.orientation = None
-        self.xml_source = None
         self.conditional_formatting = ConditionalFormatting()
         self.vba_code = {}
         self.vba_controls = None
