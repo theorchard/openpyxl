@@ -233,7 +233,7 @@ def write_workbook(workbook):
     SubElement(root, '{%s}fileVersion' % SHEET_MAIN_NS,
                {'appName': 'xl', 'lastEdited': '4', 'lowestEdited': '4', 'rupBuild': '4505'})
     SubElement(root, '{%s}workbookPr' % SHEET_MAIN_NS,
-               {'defaultThemeVersion': '124226', 'codeName': workbook.code_name})
+               {'codeName': workbook.code_name})
 
     # book views
     book_views = SubElement(root, '{%s}bookViews' % SHEET_MAIN_NS)
@@ -283,7 +283,7 @@ def write_workbook(workbook):
                                  absolute_coordinate(auto_filter))
 
     SubElement(root, '{%s}calcPr' % SHEET_MAIN_NS,
-               {'calcId': '124519', 'calcMode': 'auto', 'fullCalcOnLoad': '1'})
+               {'calcId': '124519', 'fullCalcOnLoad': '1'})
     return tostring(root)
 
 
