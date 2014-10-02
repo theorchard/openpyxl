@@ -30,6 +30,34 @@ def test_read_dimension(datadir, filename, expected):
     assert dimension == expected
 
 
+@pytest.mark.parametrize("filename",
+                         ["sheet2.xml",
+                          "sheet2_no_dimension.xml"
+                         ]
+                         )
+def test_get_max_cell(datadir, filename):
+    datadir.join("reader").chdir()
+
+    class Workbook:
+        excel_base_date = None
+
+        def get_sheet_names(self):
+            return []
+
+    from openpyxl.worksheet.iter_worksheet import IterableWorksheet
+    ws = IterableWorksheet(Workbook(), "Sheet", "", filename, [], [])
+    rows = tuple(ws.rows)
+    assert rows[-1][-1].coordinate == "AA30"
+
+
+@pytest.fixture(params=[False, True])
+def sample_workbook(request, datadir):
+    """Standard and read-only workbook"""
+    datadir.join("genuine").chdir()
+    wb = load_workbook(filename="empty.xlsx", read_only=request.param, data_only=True)
+    return wb
+
+
 def test_calculate_dimension(datadir):
     """
     Behaviour differs between implementations
@@ -62,14 +90,6 @@ def test_getitem(sample_workbook):
     assert list(ws.iter_rows("A1"))[0][0] == ws['A1']
     assert list(ws.iter_rows("A1:D30")) == list(ws["A1:D30"])
     assert list(ws.iter_rows("A1:D30")) == list(ws["A1":"D30"])
-
-
-@pytest.fixture(params=[False, True])
-def sample_workbook(request, datadir):
-    """Standard and read-only workbook"""
-    datadir.join("genuine").chdir()
-    wb = load_workbook(filename="empty.xlsx", read_only=request.param, data_only=True)
-    return wb
 
 
 def test_max_row(sample_workbook):
