@@ -233,7 +233,7 @@ def write_workbook(workbook):
     SubElement(root, '{%s}fileVersion' % SHEET_MAIN_NS,
                {'appName': 'xl', 'lastEdited': '4', 'lowestEdited': '4', 'rupBuild': '4505'})
     SubElement(root, '{%s}workbookPr' % SHEET_MAIN_NS,
-               {'defaultThemeVersion': '124226', 'codeName': 'ThisWorkbook'})
+               {'defaultThemeVersion': '124226', 'codeName': workbook.code_name})
 
     # book views
     book_views = SubElement(root, '{%s}bookViews' % SHEET_MAIN_NS)

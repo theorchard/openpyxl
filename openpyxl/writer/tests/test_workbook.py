@@ -21,6 +21,7 @@ from .. workbook import (
     write_workbook,
     write_workbook_rels,
 )
+from openpyxl.reader.workbook import read_workbook_code_name
 
 
 def test_write_auto_filter(datadir):
@@ -118,3 +119,21 @@ def test_write_named_range():
     """
     diff = compare_xml(xml, expected)
     assert diff is None, diff
+
+
+@pytest.mark.parametrize('tmpl, code_name', [
+    ('workbook.xml', u'ThisWorkbook'),
+    ('workbook_russian_code_name.xml', u'\u042d\u0442\u0430\u041a\u043d\u0438\u0433\u0430')
+])
+def test_read_workbook_code_name(datadir, tmpl, code_name):
+    datadir.chdir()
+
+    with open(tmpl) as expected:
+        assert read_workbook_code_name(expected.read()) == code_name
+
+
+def test_write_workbook_code_name():
+    wb = Workbook()
+    wb.code_name = u'MyWB'
+
+    read_workbook_code_name(write_workbook(wb)) == wb.code_name
