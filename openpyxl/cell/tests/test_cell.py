@@ -208,7 +208,7 @@ class TestCellValueTypes(object):
     def test_insert_datetime(self):
         self.cell.value = datetime.now()
         assert Cell.TYPE_NUMERIC == self.cell.data_type
-        assert self.cell.number_format == "d/m/y h:mm"
+        assert self.cell.number_format == "yyyy-mm-dd h:mm:ss"
 
     def test_internal_date(self):
         dt = datetime(2010, 7, 13, 6, 37, 41)
