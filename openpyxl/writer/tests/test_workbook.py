@@ -128,7 +128,7 @@ def test_write_named_range():
 def test_read_workbook_code_name(datadir, tmpl, code_name):
     datadir.chdir()
 
-    with open(tmpl) as expected:
+    with open(tmpl, "rb") as expected:
         assert read_workbook_code_name(expected.read()) == code_name
 
 
