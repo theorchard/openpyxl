@@ -50,3 +50,7 @@ Roadmap for future versions
 [ ] Make worksheets iterable (by row)
 
 [ ] Implement workbook properties using descriptors and dictionary interface
+
+[ ] Both cell coordinate lookups as dict
+
+[ ] Group utility functions in a single module
