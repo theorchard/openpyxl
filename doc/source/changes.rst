@@ -7,6 +7,7 @@ Bug fixes
 363 Support undocumented value for textRotation
 364 Preserve integers in read-only mode
 --- Support different workbook code names
+367 Iterate over unsized worksheets
 
 
 2.1.0 (2014-09-21)
