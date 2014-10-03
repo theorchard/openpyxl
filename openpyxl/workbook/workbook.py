@@ -89,7 +89,7 @@ class Workbook(object):
         self.data_only = data_only
         self.relationships = []
         self.drawings = []
-        self.code_name = u'ThisWorkbook'
+        self.code_name = None
 
         self.encoding = encoding
 

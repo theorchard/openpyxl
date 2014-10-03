@@ -136,4 +136,20 @@ def test_write_workbook_code_name():
     wb = Workbook()
     wb.code_name = u'MyWB'
 
-    read_workbook_code_name(write_workbook(wb)) == wb.code_name
+    content = write_workbook(wb)
+    expected = """
+    <workbook xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main" xmlns:r="http://schemas.openxmlformats.org/officeDocument/2006/relationships">
+    <fileVersion appName="xl" lastEdited="4" lowestEdited="4" rupBuild="4505"/>
+    <workbookPr codeName="MyWB"/>
+    <bookViews>
+      <workbookView activeTab="0" autoFilterDateGrouping="1" firstSheet="0" minimized="0" showHorizontalScroll="1" showSheetTabs="1" showVerticalScroll="1" tabRatio="600" visibility="visible"/>
+    </bookViews>
+    <sheets>
+      <sheet name="Sheet" sheetId="1" r:id="rId1"/>
+    </sheets>
+    <definedNames/>
+    <calcPr calcId="124519" fullCalcOnLoad="1"/>
+    </workbook>
+    """
+    diff = compare_xml(content, expected)
+    assert diff is None, diff
