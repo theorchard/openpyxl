@@ -217,6 +217,46 @@ The simplest and safest way to save a workbook is by using the
     As OOXML files are basically ZIP files, you can also end the filename
     with .zip and open it with your favourite ZIP archive manager.
 
+You can specify the attribute as_template=True, to save the document
+as a template
+
+    >>> wb = load_workbook('document.xlsx')
+    >>> wb.save('document_template.xltx', as_template=True)
+
+or specify the attribute as_template=False (by default), to save
+the document template (or document) as document.
+
+    >>> wb = load_workbook('document_template.xltx')
+    >>> wb.save('document.xlsx', as_template=False)
+
+    >>> wb = load_workbook('document.xlsx')
+    >>> wb.save('new_document.xlsx', as_template=False)
+
+.. warning::
+
+   You should monitor the data attributes and document extensions
+   for saving documents in the document templates and vice versa,
+   otherwise the result table engine can not open the document.
+
+    Fail:
+
+        >>> wb = load_workbook('document.xlsx')
+        >>> # Need to save with the extension *.xlsx
+        >>> wb.save('new_document.xlsm')  # MS Excel can't open the document
+        >>>
+        >>> # or
+        >>>
+        >>> # Need specify attribute keep_vba=True
+        >>> wb = load_workbook('document.xlsm')
+        >>> wb.save('new_document.xlsm')  # MS Excel can't open the document
+        >>>
+        >>> # or
+        >>>
+        >>> wb = load_workbook('document.xltm', keep_vba=True)
+        >>> # If us need template document, then we need specify extension as *.xltm.
+        >>> # If us need document, then we need specify attribute as_template=False.
+        >>> wb.save('new_document.xlsm', as_template=True)  # MS Excel can't open the document
+
 
 Loading from a file
 ===================
