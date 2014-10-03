@@ -75,7 +75,7 @@ Using number formats
 >>> ws['A1'] = datetime.datetime(2010, 7, 21)
 >>>
 >>> ws['A1'].number_format
-'yyyy-mm-dd'
+'yyyy-mm-dd h:mm:ss'
 >>>
 >>> # set percentage using a string followed by the percent sign
 >>> ws['B1'] = '3.14%'
