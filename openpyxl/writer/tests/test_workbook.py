@@ -44,10 +44,9 @@ def test_write_hidden_worksheet():
     xml = write_workbook(wb)
     expected = """
     <workbook xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main" xmlns:r="http://schemas.openxmlformats.org/officeDocument/2006/relationships">
-    <fileVersion appName="xl" lastEdited="4" lowestEdited="4" rupBuild="4505"/>
     <workbookPr/>
     <bookViews>
-      <workbookView activeTab="0" autoFilterDateGrouping="1" firstSheet="0" minimized="0" showHorizontalScroll="1" showSheetTabs="1" showVerticalScroll="1" tabRatio="600" visibility="visible"/>
+      <workbookView activeTab="0"/>
     </bookViews>
     <sheets>
       <sheet name="Sheet" sheetId="1" state="hidden" r:id="rId1"/>
@@ -139,10 +138,9 @@ def test_write_workbook_code_name():
     content = write_workbook(wb)
     expected = """
     <workbook xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main" xmlns:r="http://schemas.openxmlformats.org/officeDocument/2006/relationships">
-    <fileVersion appName="xl" lastEdited="4" lowestEdited="4" rupBuild="4505"/>
     <workbookPr codeName="MyWB"/>
     <bookViews>
-      <workbookView activeTab="0" autoFilterDateGrouping="1" firstSheet="0" minimized="0" showHorizontalScroll="1" showSheetTabs="1" showVerticalScroll="1" tabRatio="600" visibility="visible"/>
+      <workbookView activeTab="0"/>
     </bookViews>
     <sheets>
       <sheet name="Sheet" sheetId="1" r:id="rId1"/>

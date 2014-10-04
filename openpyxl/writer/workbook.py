@@ -230,8 +230,7 @@ def write_root_rels(workbook):
 def write_workbook(workbook):
     """Write the core workbook xml."""
     root = Element('{%s}workbook' % SHEET_MAIN_NS)
-    SubElement(root, '{%s}fileVersion' % SHEET_MAIN_NS,
-               {'appName': 'xl', 'lastEdited': '4', 'lowestEdited': '4', 'rupBuild': '4505'})
+
     wb_props = {}
     if workbook.code_name is not None:
         wb_props['codeName'] = workbook.code_name
@@ -240,11 +239,8 @@ def write_workbook(workbook):
     # book views
     book_views = SubElement(root, '{%s}bookViews' % SHEET_MAIN_NS)
     SubElement(book_views, '{%s}workbookView' % SHEET_MAIN_NS,
-               {'activeTab': '%d' % workbook.get_index(workbook.get_active_sheet()),
-                'autoFilterDateGrouping': '1', 'firstSheet': '0', 'minimized': '0',
-                'showHorizontalScroll': '1', 'showSheetTabs': '1',
-                'showVerticalScroll': '1', 'tabRatio': '600',
-                'visibility': 'visible'})
+               {'activeTab': '%d' % workbook._active_sheet_index}
+               )
 
     # worksheets
     sheets = SubElement(root, '{%s}sheets' % SHEET_MAIN_NS)
