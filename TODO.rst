@@ -51,6 +51,6 @@ Roadmap for future versions
 
 [ ] Implement workbook properties using descriptors and dictionary interface
 
-[ ] Both cell coordinate lookups as dict
+[x] Both cell coordinate lookups as dict
 
 [ ] Group utility functions in a single module

@@ -92,7 +92,7 @@ def absolute_coordinate(coord_string):
     else:
         return coord_string
 
-def get_column_letter(col_idx):
+def _get_column_letter(col_idx):
     """Convert a column number into a column letter (3 -> 'C')
 
     Right shift the column col_idx by 26 to find column letters in reverse
@@ -118,9 +118,18 @@ def get_column_letter(col_idx):
 _COL_STRING_CACHE = {}
 _STRING_COL_CACHE = {}
 for i in range(1, 18279):
-    col = get_column_letter(i)
+    col = _get_column_letter(i)
     _STRING_COL_CACHE[i] = col
     _COL_STRING_CACHE[col] = i
+
+
+def get_column_letter(idx, cache=_STRING_COL_CACHE):
+    try:
+        return cache[idx]
+    except KeyError:
+        raise ValueError("Invalid column index {0}".format(idx))
+del _STRING_COL_CACHE
+del _get_column_letter
 
 def column_index_from_string(str_col, cache=_COL_STRING_CACHE):
     # we use a function argument to get indexed name lookup
@@ -131,13 +140,7 @@ def column_index_from_string(str_col, cache=_COL_STRING_CACHE):
 del _COL_STRING_CACHE
 
 
-def _get_column_letter(idx, cache=_STRING_COL_CACHE):
-    try:
-        return cache[idx]
-    except KeyError:
-        raise ValueError("Invalid column index {0}".format(idx))
-del _STRING_COL_CACHE
-get_column_letter = _get_column_letter
+
 
 
 PERCENT_REGEX = re.compile(r'^\-?(?P<number>[0-9]*\.?[0-9]*\s?)\%$')
