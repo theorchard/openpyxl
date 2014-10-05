@@ -17,7 +17,7 @@ from openpyxl.compat import (
     iteritems,
     safe_string
     )
-from openpyxl.charts import (
+from .import (
     ErrorBar,
     BarChart,
     LineChart,
