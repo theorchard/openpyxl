@@ -10,7 +10,7 @@ class TestLineChart:
         assert c.y_axis.type == "valAx"
 
 
-from openpyxl.writer.charts import LineChartWriter
+from openpyxl.charts.writer import LineChartWriter
 from openpyxl.xml.functions import safe_iterator, fromstring
 from openpyxl.xml.constants import CHART_NS
 
