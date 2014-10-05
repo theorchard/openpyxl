@@ -21,85 +21,11 @@
           <c:xVal>
             <c:numRef>
               <c:f>'Scatter'!$B$1:$B$11</c:f>
-              <c:numCache>
-                <c:formatCode>General</c:formatCode>
-                <c:ptCount val="11" />
-                <c:pt idx="0">
-                  <c:v>0</c:v>
-                </c:pt>
-                <c:pt idx="1">
-                  <c:v>1</c:v>
-                </c:pt>
-                <c:pt idx="2">
-                  <c:v>2</c:v>
-                </c:pt>
-                <c:pt idx="3">
-                  <c:v>3</c:v>
-                </c:pt>
-                <c:pt idx="4">
-                  <c:v>4</c:v>
-                </c:pt>
-                <c:pt idx="5">
-                  <c:v>5</c:v>
-                </c:pt>
-                <c:pt idx="6">
-                  <c:v>6</c:v>
-                </c:pt>
-                <c:pt idx="7">
-                  <c:v>7</c:v>
-                </c:pt>
-                <c:pt idx="8">
-                  <c:v>8</c:v>
-                </c:pt>
-                <c:pt idx="9">
-                  <c:v>9</c:v>
-                </c:pt>
-                <c:pt idx="10">
-                  <c:v></c:v>
-                </c:pt>
-              </c:numCache>
             </c:numRef>
           </c:xVal>
           <c:yVal>
             <c:numRef>
               <c:f>'Scatter'!$A$1:$A$11</c:f>
-              <c:numCache>
-                <c:formatCode>General</c:formatCode>
-                <c:ptCount val="11" />
-                <c:pt idx="0">
-                  <c:v>0</c:v>
-                </c:pt>
-                <c:pt idx="1">
-                  <c:v>1</c:v>
-                </c:pt>
-                <c:pt idx="2">
-                  <c:v>2</c:v>
-                </c:pt>
-                <c:pt idx="3">
-                  <c:v>3</c:v>
-                </c:pt>
-                <c:pt idx="4">
-                  <c:v>4</c:v>
-                </c:pt>
-                <c:pt idx="5">
-                  <c:v>5</c:v>
-                </c:pt>
-                <c:pt idx="6">
-                  <c:v>6</c:v>
-                </c:pt>
-                <c:pt idx="7">
-                  <c:v>7</c:v>
-                </c:pt>
-                <c:pt idx="8">
-                  <c:v>8</c:v>
-                </c:pt>
-                <c:pt idx="9">
-                  <c:v>9</c:v>
-                </c:pt>
-                <c:pt idx="10">
-                  <c:v></c:v>
-                </c:pt>
-              </c:numCache>
             </c:numRef>
           </c:yVal>
         </c:ser>

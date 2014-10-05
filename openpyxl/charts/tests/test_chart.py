@@ -96,40 +96,7 @@ def test_write_serial(ten_row_sheet, LineChart, Series, Reference, root_xml):
     expected = """
     <c:chartSpace xmlns:c="http://schemas.openxmlformats.org/drawingml/2006/chart">
     <c:strRef>
-    <c:f>'data'!$A$1:$A$10</c:f>
-    <c:strCache>
-      <c:ptCount val="10"/>
-      <c:pt idx="0">
-        <c:v>A</c:v>
-      </c:pt>
-      <c:pt idx="1">
-        <c:v>B</c:v>
-      </c:pt>
-      <c:pt idx="2">
-        <c:v>C</c:v>
-      </c:pt>
-      <c:pt idx="3">
-        <c:v>D</c:v>
-      </c:pt>
-      <c:pt idx="4">
-        <c:v>E</c:v>
-      </c:pt>
-      <c:pt idx="5">
-        <c:v>F</c:v>
-      </c:pt>
-      <c:pt idx="6">
-        <c:v>6</c:v>
-      </c:pt>
-      <c:pt idx="7">
-        <c:v>7</c:v>
-      </c:pt>
-      <c:pt idx="8">
-        <c:v>8</c:v>
-      </c:pt>
-      <c:pt idx="9">
-        <c:v>9</c:v>
-      </c:pt>
-    </c:strCache>
+      <c:f>'data'!$A$1:$A$10</c:f>
     </c:strRef>
     </c:chartSpace>
     """
@@ -239,44 +206,7 @@ class TestChartWriter(object):
             </c:spPr>
             <c:val>
               <c:numRef>
-                <c:f>\'data\'!$A$1:$A$11</c:f>
-                <c:numCache>
-                  <c:formatCode>General</c:formatCode>
-                  <c:ptCount val="11"/>
-                  <c:pt idx="0">
-                    <c:v>0</c:v>
-                  </c:pt>
-                  <c:pt idx="1">
-                    <c:v>1</c:v>
-                  </c:pt>
-                  <c:pt idx="2">
-                    <c:v>2</c:v>
-                  </c:pt>
-                  <c:pt idx="3">
-                    <c:v>3</c:v>
-                  </c:pt>
-                  <c:pt idx="4">
-                    <c:v>4</c:v>
-                  </c:pt>
-                  <c:pt idx="5">
-                    <c:v>5</c:v>
-                  </c:pt>
-                  <c:pt idx="6">
-                    <c:v>6</c:v>
-                  </c:pt>
-                  <c:pt idx="7">
-                    <c:v>7</c:v>
-                  </c:pt>
-                  <c:pt idx="8">
-                    <c:v>8</c:v>
-                  </c:pt>
-                  <c:pt idx="9">
-                    <c:v>9</c:v>
-                  </c:pt>
-                  <c:pt idx="10">
-                    <c:v/>
-                  </c:pt>
-                </c:numCache>
+                <c:f>'data'!$A$1:$A$11</c:f>
               </c:numRef>
             </c:val>
           </c:ser>
@@ -382,43 +312,6 @@ class TestChartWriter(object):
                   <c:val>
                     <c:numRef>
                       <c:f>'data'!$A$1:$A$11</c:f>
-                      <c:numCache>
-                        <c:formatCode>General</c:formatCode>
-                        <c:ptCount val="11"/>
-                        <c:pt idx="0">
-                          <c:v>0</c:v>
-                        </c:pt>
-                        <c:pt idx="1">
-                          <c:v>1</c:v>
-                        </c:pt>
-                        <c:pt idx="2">
-                          <c:v>2</c:v>
-                        </c:pt>
-                        <c:pt idx="3">
-                          <c:v>3</c:v>
-                        </c:pt>
-                        <c:pt idx="4">
-                          <c:v>4</c:v>
-                        </c:pt>
-                        <c:pt idx="5">
-                          <c:v>5</c:v>
-                        </c:pt>
-                        <c:pt idx="6">
-                          <c:v>6</c:v>
-                        </c:pt>
-                        <c:pt idx="7">
-                          <c:v>7</c:v>
-                        </c:pt>
-                        <c:pt idx="8">
-                          <c:v>8</c:v>
-                        </c:pt>
-                        <c:pt idx="9">
-                          <c:v>9</c:v>
-                        </c:pt>
-                        <c:pt idx="10">
-                          <c:v/>
-                        </c:pt>
-                      </c:numCache>
                     </c:numRef>
                   </c:val>
                 </c:ser>
@@ -498,40 +391,6 @@ class TestChartWriter(object):
             <c:val>
               <c:numRef>
                 <c:f>'data'!$A$1:$J$1</c:f>
-                <c:numCache>
-                  <c:formatCode>General</c:formatCode>
-                  <c:ptCount val="10"/>
-                  <c:pt idx="0">
-                    <c:v>0</c:v>
-                  </c:pt>
-                  <c:pt idx="1">
-                    <c:v/>
-                  </c:pt>
-                  <c:pt idx="2">
-                    <c:v/>
-                  </c:pt>
-                  <c:pt idx="3">
-                    <c:v/>
-                  </c:pt>
-                  <c:pt idx="4">
-                    <c:v/>
-                  </c:pt>
-                  <c:pt idx="5">
-                    <c:v/>
-                  </c:pt>
-                  <c:pt idx="6">
-                    <c:v/>
-                  </c:pt>
-                  <c:pt idx="7">
-                    <c:v/>
-                  </c:pt>
-                  <c:pt idx="8">
-                    <c:v/>
-                  </c:pt>
-                  <c:pt idx="9">
-                    <c:v/>
-                  </c:pt>
-                </c:numCache>
               </c:numRef>
             </c:val>
           </c:ser>
@@ -555,40 +414,6 @@ class TestChartWriter(object):
         <test xmlns:c="http://schemas.openxmlformats.org/drawingml/2006/chart">
           <c:numRef>
             <c:f>'data'!$A$1:$J$1</c:f>
-            <c:numCache>
-              <c:formatCode>General</c:formatCode>
-              <c:ptCount val="10"/>
-              <c:pt idx="0">
-                <c:v>0</c:v>
-              </c:pt>
-              <c:pt idx="1">
-                <c:v>1</c:v>
-              </c:pt>
-              <c:pt idx="2">
-                <c:v>2</c:v>
-              </c:pt>
-              <c:pt idx="3">
-                <c:v>3</c:v>
-              </c:pt>
-              <c:pt idx="4">
-                <c:v>4</c:v>
-              </c:pt>
-              <c:pt idx="5">
-                <c:v>5</c:v>
-              </c:pt>
-              <c:pt idx="6">
-                <c:v>6</c:v>
-              </c:pt>
-              <c:pt idx="7">
-                <c:v>7</c:v>
-              </c:pt>
-              <c:pt idx="8">
-                <c:v>8</c:v>
-              </c:pt>
-              <c:pt idx="9">
-                <c:v>9</c:v>
-              </c:pt>
-            </c:numCache>
           </c:numRef>
         </test>
         """
@@ -612,40 +437,6 @@ class TestChartWriter(object):
         <test xmlns:c="http://schemas.openxmlformats.org/drawingml/2006/chart">
           <c:numRef>
             <c:f>'data'!$A$1:$J$1</c:f>
-            <c:numCache>
-              <c:formatCode>d-mmm</c:formatCode>
-              <c:ptCount val="10"/>
-              <c:pt idx="0">
-                <c:v>0</c:v>
-              </c:pt>
-              <c:pt idx="1">
-                <c:v>1</c:v>
-              </c:pt>
-              <c:pt idx="2">
-                <c:v>2</c:v>
-              </c:pt>
-              <c:pt idx="3">
-                <c:v>3</c:v>
-              </c:pt>
-              <c:pt idx="4">
-                <c:v>4</c:v>
-              </c:pt>
-              <c:pt idx="5">
-                <c:v>5</c:v>
-              </c:pt>
-              <c:pt idx="6">
-                <c:v>6</c:v>
-              </c:pt>
-              <c:pt idx="7">
-                <c:v>7</c:v>
-              </c:pt>
-              <c:pt idx="8">
-                <c:v>8</c:v>
-              </c:pt>
-              <c:pt idx="9">
-                <c:v>9</c:v>
-              </c:pt>
-            </c:numCache>
           </c:numRef>
         </test>
         """

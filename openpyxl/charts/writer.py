@@ -189,29 +189,26 @@ class BaseChartWriter(object):
 
         mapping = {'n':{'ref':'numRef', 'cache':'numCache'},
                    's':{'ref':'strRef', 'cache':'strCache'}}
-        #data = None
+        data = None
 
         if is_ref:
             ref = SubElement(node, '{%s}%s' %(CHART_NS, mapping[data_type]['ref']))
             SubElement(ref, '{%s}f' % CHART_NS).text = str(reference)
-            data = SubElement(ref, '{%s}%s' %(CHART_NS, mapping[data_type]['cache']))
-            values = reference.values
         else:
             data = SubElement(node, '{%s}numLit' % CHART_NS)
             values = (1,)
 
-        if data_type == 'n':
-            SubElement(data, '{%s}formatCode' % CHART_NS).text = number_format or 'General'
-
-        #if data is not None:
-        SubElement(data, '{%s}ptCount' % CHART_NS, {'val':str(len(values))})
-        for j, val in enumerate(values):
-            if val is not None:
-                val = safe_string(val)
-            else:
-                val = ''
-            point = SubElement(data, '{%s}pt' % CHART_NS, idx='%d' %j)
-            SubElement(point, '{%s}v' % CHART_NS).text = val
+        if data is not None:
+            if data_type == 'n':
+                SubElement(data, '{%s}formatCode' % CHART_NS).text = number_format or 'General'
+            SubElement(data, '{%s}ptCount' % CHART_NS, {'val':str(len(values))})
+            for j, val in enumerate(values):
+                if val is not None:
+                    val = safe_string(val)
+                else:
+                    val = ''
+                point = SubElement(data, '{%s}pt' % CHART_NS, idx='%d' %j)
+                SubElement(point, '{%s}v' % CHART_NS).text = val
 
     def _write_error_bar(self, node, serie):
 

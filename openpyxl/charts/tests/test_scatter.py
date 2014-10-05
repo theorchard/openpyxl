@@ -140,86 +140,12 @@ class TestScatterChartWriter(object):
             <c:order val="0"/>
             <c:xVal>
               <c:numRef>
-                <c:f>\'Scatter\'!$B$1:$B$11</c:f>
-                <c:numCache>
-                  <c:formatCode>General</c:formatCode>
-                  <c:ptCount val="11"/>
-                  <c:pt idx="0">
-                    <c:v>0</c:v>
-                  </c:pt>
-                  <c:pt idx="1">
-                    <c:v>1</c:v>
-                  </c:pt>
-                  <c:pt idx="2">
-                    <c:v>2</c:v>
-                  </c:pt>
-                  <c:pt idx="3">
-                    <c:v>3</c:v>
-                  </c:pt>
-                  <c:pt idx="4">
-                    <c:v>4</c:v>
-                  </c:pt>
-                  <c:pt idx="5">
-                    <c:v>5</c:v>
-                  </c:pt>
-                  <c:pt idx="6">
-                    <c:v>6</c:v>
-                  </c:pt>
-                  <c:pt idx="7">
-                    <c:v>7</c:v>
-                  </c:pt>
-                  <c:pt idx="8">
-                    <c:v>8</c:v>
-                  </c:pt>
-                  <c:pt idx="9">
-                    <c:v>9</c:v>
-                  </c:pt>
-                  <c:pt idx="10">
-                    <c:v/>
-                  </c:pt>
-                </c:numCache>
+                <c:f>'Scatter'!$B$1:$B$11</c:f>
               </c:numRef>
             </c:xVal>
             <c:yVal>
               <c:numRef>
-                <c:f>\'Scatter\'!$A$1:$A$11</c:f>
-                <c:numCache>
-                  <c:formatCode>General</c:formatCode>
-                  <c:ptCount val="11"/>
-                  <c:pt idx="0">
-                    <c:v>0</c:v>
-                  </c:pt>
-                  <c:pt idx="1">
-                    <c:v>1</c:v>
-                  </c:pt>
-                  <c:pt idx="2">
-                    <c:v>2</c:v>
-                  </c:pt>
-                  <c:pt idx="3">
-                    <c:v>3</c:v>
-                  </c:pt>
-                  <c:pt idx="4">
-                    <c:v>4</c:v>
-                  </c:pt>
-                  <c:pt idx="5">
-                    <c:v>5</c:v>
-                  </c:pt>
-                  <c:pt idx="6">
-                    <c:v>6</c:v>
-                  </c:pt>
-                  <c:pt idx="7">
-                    <c:v>7</c:v>
-                  </c:pt>
-                  <c:pt idx="8">
-                    <c:v>8</c:v>
-                  </c:pt>
-                  <c:pt idx="9">
-                    <c:v>9</c:v>
-                  </c:pt>
-                  <c:pt idx="10">
-                    <c:v/>
-                  </c:pt>
-                </c:numCache>
+                <c:f>'Scatter'!$A$1:$A$11</c:f>
               </c:numRef>
             </c:yVal>
           </c:ser>
@@ -249,7 +175,7 @@ class TestScatterChartWriter(object):
         cw._write_print_settings()
 
         expected = """
-                <c:chartSpace xmlns:c="http://schemas.openxmlformats.org/drawingml/2006/chart">
+        <c:chartSpace xmlns:c="http://schemas.openxmlformats.org/drawingml/2006/chart">
           <c:printSettings>
             <c:headerFooter/>
             <c:pageMargins b="0.75" footer="0.3" header="0.3" l="0.7" r="0.7" t="0.75"/>
@@ -288,85 +214,11 @@ class TestScatterChartWriter(object):
                   <c:xVal>
                     <c:numRef>
                       <c:f>\'Scatter\'!$B$1:$B$11</c:f>
-                      <c:numCache>
-                        <c:formatCode>General</c:formatCode>
-                        <c:ptCount val="11"/>
-                        <c:pt idx="0">
-                          <c:v>0</c:v>
-                        </c:pt>
-                        <c:pt idx="1">
-                          <c:v>1</c:v>
-                        </c:pt>
-                        <c:pt idx="2">
-                          <c:v>2</c:v>
-                        </c:pt>
-                        <c:pt idx="3">
-                          <c:v>3</c:v>
-                        </c:pt>
-                        <c:pt idx="4">
-                          <c:v>4</c:v>
-                        </c:pt>
-                        <c:pt idx="5">
-                          <c:v>5</c:v>
-                        </c:pt>
-                        <c:pt idx="6">
-                          <c:v>6</c:v>
-                        </c:pt>
-                        <c:pt idx="7">
-                          <c:v>7</c:v>
-                        </c:pt>
-                        <c:pt idx="8">
-                          <c:v>8</c:v>
-                        </c:pt>
-                        <c:pt idx="9">
-                          <c:v>9</c:v>
-                        </c:pt>
-                        <c:pt idx="10">
-                          <c:v/>
-                        </c:pt>
-                      </c:numCache>
                     </c:numRef>
                   </c:xVal>
                   <c:yVal>
                     <c:numRef>
                       <c:f>\'Scatter\'!$A$1:$A$11</c:f>
-                      <c:numCache>
-                        <c:formatCode>General</c:formatCode>
-                        <c:ptCount val="11"/>
-                        <c:pt idx="0">
-                          <c:v>0</c:v>
-                        </c:pt>
-                        <c:pt idx="1">
-                          <c:v>1</c:v>
-                        </c:pt>
-                        <c:pt idx="2">
-                          <c:v>2</c:v>
-                        </c:pt>
-                        <c:pt idx="3">
-                          <c:v>3</c:v>
-                        </c:pt>
-                        <c:pt idx="4">
-                          <c:v>4</c:v>
-                        </c:pt>
-                        <c:pt idx="5">
-                          <c:v>5</c:v>
-                        </c:pt>
-                        <c:pt idx="6">
-                          <c:v>6</c:v>
-                        </c:pt>
-                        <c:pt idx="7">
-                          <c:v>7</c:v>
-                        </c:pt>
-                        <c:pt idx="8">
-                          <c:v>8</c:v>
-                        </c:pt>
-                        <c:pt idx="9">
-                          <c:v>9</c:v>
-                        </c:pt>
-                        <c:pt idx="10">
-                          <c:v/>
-                        </c:pt>
-                      </c:numCache>
                     </c:numRef>
                   </c:yVal>
                 </c:ser>
