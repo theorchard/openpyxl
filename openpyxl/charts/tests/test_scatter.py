@@ -48,7 +48,7 @@ class TestScatterChartWriter(object):
             </c:scaling>
             <c:axPos val="b"/>
             <c:majorGridlines/>
-            <c:numFmt formatCode="General" sourceLinked="1"/>
+            <c:numFmt formatCode="General" sourceLinked="0"/>
             <c:title>
               <c:tx>
                 <c:rich>
@@ -234,7 +234,7 @@ class TestScatterChartWriter(object):
                 </c:scaling>
                 <c:axPos val="b"/>
                 <c:majorGridlines/>
-                <c:numFmt formatCode="General" sourceLinked="1"/>
+                <c:numFmt formatCode="General" sourceLinked="0"/>
                 <c:tickLblPos val="nextTo"/>
                 <c:crossAx val="60873344"/>
                 <c:crosses val="autoZero"/>

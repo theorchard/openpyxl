@@ -33,6 +33,7 @@ class Axis(object):
     orientation = ORIENTATION_MIN_MAX
     number_format = numbers.FORMAT_GENERAL
     delete_axis = False
+    sourceLinked = True
 
     def __init__(self, auto_axis=True):
         self.auto_axis = auto_axis
@@ -115,6 +116,7 @@ class CategoryAxis(Axis):
     label_offset = 100
     cross_between = "midCat"
     type = "catAx"
+    sourceLinked = False
 
 
 class ValueAxis(Axis):

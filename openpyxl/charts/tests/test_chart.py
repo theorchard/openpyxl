@@ -146,6 +146,7 @@ class TestChartWriter(object):
             <c:orientation val="minMax"/>
           </c:scaling>
           <c:axPos val="b"/>
+          <c:numFmt formatCode="General" sourceLinked="0"/>
           <c:tickLblPos val="nextTo"/>
           <c:crossAx val="60873344"/>
           <c:crosses val="autoZero"/>

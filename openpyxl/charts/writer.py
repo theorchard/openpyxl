@@ -127,7 +127,11 @@ class BaseChartWriter(object):
         SubElement(ax, '{%s}axPos' % CHART_NS, {'val':axis.position})
         if axis.type == "valAx":
             SubElement(ax, '{%s}majorGridlines' % CHART_NS)
-            SubElement(ax, '{%s}numFmt' % CHART_NS, {'formatCode':"General", 'sourceLinked':'1'})
+        SubElement(ax, '{%s}numFmt' % CHART_NS,
+                   {'formatCode':axis.number_format,
+                    'sourceLinked':safe_string(axis.sourceLinked)
+                    }
+                   )
         self._write_axis_title(axis, ax)
         SubElement(ax, '{%s}tickLblPos' % CHART_NS, {'val':axis.tick_label_position})
         SubElement(ax, '{%s}crossAx' % CHART_NS, {'val':str(axis.cross)})
