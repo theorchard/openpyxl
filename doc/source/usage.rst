@@ -31,8 +31,8 @@ Write a workbook
 >>> wb.save(filename = dest_filename)
 
 
-Write a workbook from *.xltx as *.xlsx
---------------------------------------
+Write a workbook from \*.xltx as \*.xlsx
+----------------------------------------
 .. :: doctest
 
 >>> from openpyxl import load_workbook
@@ -48,8 +48,8 @@ Write a workbook from *.xltx as *.xlsx
 >>> # wb.save('sample_book.xltx')
 
 
-Write a workbook from *.xltm as *.xlsm
---------------------------------------
+Write a workbook from \*.xltm as \*.xlsm
+----------------------------------------
 .. :: doctest
 
 >>> from openpyxl import load_workbook
