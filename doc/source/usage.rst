@@ -1,8 +1,8 @@
 Simple usage
-=======================
+============
 
 Write a workbook
-------------------
+----------------
 .. :: doctest
 
 >>> from openpyxl import Workbook
@@ -29,6 +29,40 @@ Write a workbook
 >>> ws['F5'] = 3.14
 >>>
 >>> wb.save(filename = dest_filename)
+
+
+Write a workbook from \*.xltx as \*.xlsx
+----------------------------------------
+.. :: doctest
+
+>>> from openpyxl import load_workbook
+>>>
+>>>
+>>> wb = load_workbook('sample_book.xltx')
+>>> ws = wb.active
+>>> ws['D2'] = 42
+>>>
+>>> wb.save('sample_book.xlsx')
+>>>
+>>> # or you can overwrite the current document template
+>>> # wb.save('sample_book.xltx')
+
+
+Write a workbook from \*.xltm as \*.xlsm
+----------------------------------------
+.. :: doctest
+
+>>> from openpyxl import load_workbook
+>>>
+>>>
+>>> wb = load_workbook('sample_book.xltm', keep_vba=True)
+>>> ws = wb.active
+>>> ws['D2'] = 42
+>>>
+>>> wb.save('sample_book.xlsm')
+>>>
+>>> # or you can overwrite the current document template
+>>> # wb.save('sample_book.xltm')
 
 
 Read an existing workbook
