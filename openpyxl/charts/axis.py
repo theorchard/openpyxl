@@ -26,7 +26,7 @@ class Axis(object):
     position = None
     tick_label_position = None
     crosses = None
-    auto = None
+    auto = True
     label_align = None
     label_offset = None
     cross_between = None
@@ -35,7 +35,7 @@ class Axis(object):
     delete_axis = False
     sourceLinked = True
 
-    def __init__(self, auto_axis=True):
+    def __init__(self, auto_axis=False):
         self.auto_axis = auto_axis
         self.min = 0
         self.max = 0

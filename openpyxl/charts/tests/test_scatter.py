@@ -43,7 +43,7 @@ class TestScatterChartWriter(object):
             <c:axId val="60871424"/>
             <c:scaling>
               <c:orientation val="minMax"/>
-              <c:max val="10.0"/>
+              <c:max val="0.0"/>
               <c:min val="0.0"/>
             </c:scaling>
             <c:axPos val="b"/>
@@ -74,7 +74,6 @@ class TestScatterChartWriter(object):
             <c:lblAlgn val="ctr"/>
             <c:lblOffset val="100"/>
             <c:crossBetween val="midCat"/>
-            <c:majorUnit val="2.0"/>
           </c:valAx>
         </test>
         """
@@ -93,7 +92,7 @@ class TestScatterChartWriter(object):
             <c:axId val="60873344"/>
             <c:scaling>
               <c:orientation val="minMax"/>
-              <c:max val="10.0"/>
+              <c:max val="0.0"/>
               <c:min val="0.0"/>
             </c:scaling>
             <c:axPos val="l"/>
@@ -121,7 +120,6 @@ class TestScatterChartWriter(object):
             <c:crossAx val="60871424"/>
             <c:crosses val="autoZero"/>
             <c:crossBetween val="midCat"/>
-            <c:majorUnit val="2.0"/>
           </c:valAx>
         </test>
         """
@@ -138,6 +136,9 @@ class TestScatterChartWriter(object):
           <c:ser>
             <c:idx val="0"/>
             <c:order val="0"/>
+            <c:marker>
+               <c:symbol val="none"/>
+            </c:marker>
             <c:xVal>
               <c:numRef>
                 <c:f>'Scatter'!$B$1:$B$11</c:f>
@@ -211,6 +212,9 @@ class TestScatterChartWriter(object):
                 <c:ser>
                   <c:idx val="0"/>
                   <c:order val="0"/>
+                  <c:marker>
+                      <c:symbol val="none"/>
+                  </c:marker>
                   <c:xVal>
                     <c:numRef>
                       <c:f>\'Scatter\'!$B$1:$B$11</c:f>
@@ -229,7 +233,7 @@ class TestScatterChartWriter(object):
                 <c:axId val="60871424"/>
                 <c:scaling>
                   <c:orientation val="minMax"/>
-                  <c:max val="10.0"/>
+                  <c:max val="0.0"/>
                   <c:min val="0.0"/>
                 </c:scaling>
                 <c:axPos val="b"/>
@@ -242,13 +246,12 @@ class TestScatterChartWriter(object):
                 <c:lblAlgn val="ctr"/>
                 <c:lblOffset val="100"/>
                 <c:crossBetween val="midCat"/>
-                <c:majorUnit val="2.0"/>
               </c:valAx>
               <c:valAx>
                 <c:axId val="60873344"/>
                 <c:scaling>
                   <c:orientation val="minMax"/>
-                  <c:max val="10.0"/>
+                  <c:max val="0.0"/>
                   <c:min val="0.0"/>
                 </c:scaling>
                 <c:axPos val="l"/>
@@ -258,7 +261,6 @@ class TestScatterChartWriter(object):
                 <c:crossAx val="60871424"/>
                 <c:crosses val="autoZero"/>
                 <c:crossBetween val="midCat"/>
-                <c:majorUnit val="2.0"/>
               </c:valAx>
             </c:plotArea>
             <c:legend>

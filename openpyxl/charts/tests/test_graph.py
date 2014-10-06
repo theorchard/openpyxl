@@ -17,7 +17,7 @@ class TestGraphChart:
         c = GraphChart()
         c.append(series)
         c.y_axis.max = 10
-        assert c.get_y_units() == 190500
+        assert c.get_y_units() == 228600
 
     def test_get_y_char(self, GraphChart, series):
         c = GraphChart()
@@ -47,10 +47,10 @@ class TestGraphChart:
         c.add_serie(series)
         c.compute_axes()
         assert c.y_axis.min == 0
-        assert c.y_axis.max == 10
+        assert c.y_axis.max == 9
         c.y_axis.min = -1
         c.y_axis.max = 5
-        assert c.y_axis.min == -2
-        assert c.y_axis.max == 6
+        assert c.y_axis.min == -1
+        assert c.y_axis.max == 5
 
 

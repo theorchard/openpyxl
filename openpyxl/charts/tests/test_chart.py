@@ -153,6 +153,7 @@ class TestChartWriter(object):
           <c:auto val="1"/>
           <c:lblAlgn val="ctr"/>
           <c:lblOffset val="100"/>
+          <c:crossBetween val="midCat"/>
         </c:catAx>
         </test>
         """
@@ -169,7 +170,7 @@ class TestChartWriter(object):
             <c:axId val="60873344"/>
             <c:scaling>
               <c:orientation val="minMax"/>
-              <c:max val="10.0"/>
+              <c:max val="0.0"/>
               <c:min val="0.0"/>
             </c:scaling>
             <c:axPos val="l"/>
@@ -179,7 +180,6 @@ class TestChartWriter(object):
             <c:crossAx val="60871424"/>
             <c:crosses val="autoZero"/>
             <c:crossBetween val="between"/>
-            <c:majorUnit val="2.0"/>
           </c:valAx>
         </test>
         """
@@ -195,6 +195,9 @@ class TestChartWriter(object):
           <c:ser>
             <c:idx val="0"/>
             <c:order val="0"/>
+            <c:marker>
+               <c:symbol val="none"/>
+            </c:marker>
             <c:spPr>
               <a:solidFill>
                 <a:srgbClr val="00FF00"/>
@@ -389,6 +392,9 @@ class TestChartWriter(object):
           <c:ser xmlns:c="http://schemas.openxmlformats.org/drawingml/2006/chart">
             <c:idx val="0"/>
             <c:order val="0"/>
+            <c:marker>
+               <c:symbol val="none"/>
+            </c:marker>
             <c:val>
               <c:numRef>
                 <c:f>'data'!$A$1:$J$1</c:f>

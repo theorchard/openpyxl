@@ -5,6 +5,7 @@ from __future__ import absolute_import
 from openpyxl.xml.functions import (
     Element,
     SubElement,
+    ConditionalElement,
     tostring,
     )
 from openpyxl.xml.constants import (
@@ -137,53 +138,58 @@ class BaseChartWriter(object):
         SubElement(ax, '{%s}crossAx' % CHART_NS, {'val':str(axis.cross)})
         SubElement(ax, '{%s}crosses' % CHART_NS, {'val':axis.crosses})
         if axis.auto:
-            SubElement(ax, '{%s}auto' % CHART_NS, {'val':'1'})
+            SubElement(ax, '{%s}auto' % CHART_NS, {'val':safe_string(axis.auto)})
         if axis.label_align:
             SubElement(ax, '{%s}lblAlgn' % CHART_NS, {'val':axis.label_align})
         if axis.label_offset:
             SubElement(ax, '{%s}lblOffset' % CHART_NS, {'val':str(axis.label_offset)})
-        if axis.type == "valAx":
-            SubElement(ax, '{%s}crossBetween' % CHART_NS, {'val':axis.cross_between})
-            SubElement(ax, '{%s}majorUnit' % CHART_NS, {'val':str(float(axis.unit))})
+
+
+        SubElement(ax, '{%s}crossBetween' % CHART_NS, val=axis.cross_between)
+        if axis.unit:
+            SubElement(ax, '{%s}majorUnit' % CHART_NS, val=safe_string(axis.unit))
 
     def _write_series(self, subchart):
 
-        for i, serie in enumerate(self.chart):
+        for i, series in enumerate(self.chart):
             ser = SubElement(subchart, '{%s}ser' % CHART_NS)
             SubElement(ser, '{%s}idx' % CHART_NS, {'val':safe_string(i)})
             SubElement(ser, '{%s}order' % CHART_NS, {'val':safe_string(i)})
 
-            if serie.title:
+            if series.title:
                 tx = SubElement(ser, '{%s}tx' % CHART_NS)
-                SubElement(tx, '{%s}v' % CHART_NS).text = serie.title
+                SubElement(tx, '{%s}v' % CHART_NS).text = series.title
 
-            if serie.color:
+            marker = SubElement(ser, "{%s}marker" % CHART_NS)
+            SubElement(marker, "{%s}symbol" % CHART_NS, val=safe_string(series.marker))
+
+            if series.color:
                 sppr = SubElement(ser, '{%s}spPr' % CHART_NS)
-                self._write_series_color(sppr, serie)
+                self._write_series_color(sppr, series)
 
-            if serie.error_bar:
-                self._write_error_bar(ser, serie)
+            if series.error_bar:
+                self._write_error_bar(ser, series)
 
-            if serie.labels:
-                self._write_series_labels(ser, serie)
+            if series.labels:
+                self._write_series_labels(ser, series)
 
-            if serie.xvalues:
-                self._write_series_xvalues(ser, serie)
+            if series.xvalues:
+                self._write_series_xvalues(ser, series)
 
             val = SubElement(ser, self.series_type)
-            self._write_serial(val, serie.reference)
+            self._write_serial(val, series.reference)
 
-    def _write_series_color(self, node, serie):
+    def _write_series_color(self, node, series):
         # edge color
         ln = SubElement(node, '{%s}ln' % DRAWING_NS)
         fill = SubElement(ln, '{%s}solidFill' % DRAWING_NS)
-        SubElement(fill, '{%s}srgbClr' % DRAWING_NS, {'val':serie.color})
+        SubElement(fill, '{%s}srgbClr' % DRAWING_NS, {'val':series.color})
 
-    def _write_series_labels(self, node, serie):
+    def _write_series_labels(self, node, series):
         cat = SubElement(node, '{%s}cat' % CHART_NS)
-        self._write_serial(cat, serie.labels)
+        self._write_serial(cat, series.labels)
 
-    def _write_series_xvalues(self, node, serie):
+    def _write_series_xvalues(self, node, series):
         raise NotImplemented("""x values not possible for this chart type""")
 
     def _write_serial(self, node, reference, literal=False):
