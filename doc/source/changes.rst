@@ -2,6 +2,12 @@
 ==================
 
 
+Major changes
+-------------
+Charts will no longer try and calculate axes by default
+Support for template file types - PR21
+
+
 Minor changes
 -------------
 Use a 2-way cache for column index lookups
