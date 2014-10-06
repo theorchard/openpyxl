@@ -1,8 +1,8 @@
 Simple usage
-=======================
+============
 
 Write a workbook
-------------------
+----------------
 .. :: doctest
 
 >>> from openpyxl import Workbook

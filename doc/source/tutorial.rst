@@ -218,13 +218,13 @@ The simplest and safest way to save a workbook is by using the
     with .zip and open it with your favourite ZIP archive manager.
 
 You can specify the attribute as_template=True, to save the document
-as a template::
+as a template
 
     >>> wb = load_workbook('document.xlsx')
     >>> wb.save('document_template.xltx', as_template=True)
 
 or specify the attribute as_template=False (by default), to save
-the document template (or document) as document.::
+the document template (or document) as document.
 
     >>> wb = load_workbook('document_template.xltx')
     >>> wb.save('document.xlsx', as_template=False)
@@ -234,12 +234,11 @@ the document template (or document) as document.::
 
 .. warning::
 
-   You should monitor the data attributes and document extensions
-   for saving documents in the document templates and vice versa,
-   otherwise the result table engine can not open the document.::
+    You should monitor the data attributes and document extensions
+    for saving documents in the document templates and vice versa,
+    otherwise the result table engine can not open the document.
 
     Fail:
-
         >>> wb = load_workbook('document.xlsx')
         >>> # Need to save with the extension *.xlsx
         >>> wb.save('new_document.xlsm')  # MS Excel can't open the document
