@@ -58,7 +58,6 @@ from openpyxl.xml.constants import (
 from openpyxl.xml.functions import tostring, fromstring
 from openpyxl.date_time import datetime_to_W3CDTF
 from openpyxl.worksheet import Worksheet
-from openpyxl.workbook.names.named_range import NamedRange, NamedValue
 
 
 def write_properties_core(properties):
@@ -100,7 +99,7 @@ static_content_types_config = [
 ]
 
 
-def write_content_types(workbook):
+def write_content_types(workbook, as_template=False):
     """Write the content-types xml."""
     seen = set()
     if workbook.vba_archive:
@@ -115,6 +114,7 @@ def write_content_types(workbook):
             root = Element('{%s}Types' % CONTYPES_NS, nsmap=NSMAP)
         else:
             root = Element('{%s}Types' % CONTYPES_NS)
+
     for setting_type, name, content_type in static_content_types_config:
         attrib = {'ContentType': content_type}
         if setting_type == 'Override':
@@ -125,8 +125,17 @@ def write_content_types(workbook):
         else:
             if name not in seen:
                 tag = '{%s}Default' % CONTYPES_NS
-                attrib['Extension'] =  name
+                attrib['Extension'] = name
                 SubElement(root, tag, attrib)
+
+    wb_elem = root.find('{%s}Override[@PartName="/xl/workbook.xml"]' % CONTYPES_NS)
+    if wb_elem is not None:
+        ct = wb_elem.attrib['ContentType']
+
+        if as_template:
+            wb_elem.set('ContentType', ct.replace('.sheet.', '.template.'))
+        else:
+            wb_elem.set('ContentType', ct.replace('.template.', '.sheet.'))
 
     drawing_id = 1
     chart_id = 1
@@ -135,37 +144,53 @@ def write_content_types(workbook):
     for sheet_id, sheet in enumerate(workbook.worksheets):
         name = '/xl/worksheets/sheet%d.xml' % (sheet_id + 1)
         if name not in seen:
-            SubElement(root, '{%s}Override' % CONTYPES_NS, {'PartName': name,
-                'ContentType': 'application/vnd.openxmlformats-officedocument.spreadsheetml.worksheet+xml'})
+            SubElement(root, '{%s}Override' % CONTYPES_NS, {
+                'PartName': name,
+                'ContentType': 'application/vnd.openxmlformats-officedocument.spreadsheetml.worksheet+xml'
+            })
+
         if sheet._charts or sheet._images:
             name = '/xl/drawings/drawing%d.xml' % drawing_id
             if name not in seen:
-                SubElement(root, '{%s}Override' % CONTYPES_NS, {'PartName' : name,
-                'ContentType' : 'application/vnd.openxmlformats-officedocument.drawing+xml'})
+                SubElement(root, '{%s}Override' % CONTYPES_NS, {
+                    'PartName': name,
+                    'ContentType': 'application/vnd.openxmlformats-officedocument.drawing+xml'
+                })
+
             drawing_id += 1
 
             for chart in sheet._charts:
                 name = '/xl/charts/chart%d.xml' % chart_id
                 if name not in seen:
-                    SubElement(root, '{%s}Override' % CONTYPES_NS, {'PartName' : name,
-                    'ContentType' : 'application/vnd.openxmlformats-officedocument.drawingml.chart+xml'})
+                    SubElement(root, '{%s}Override' % CONTYPES_NS, {
+                        'PartName': name,
+                        'ContentType': 'application/vnd.openxmlformats-officedocument.drawingml.chart+xml'
+                    })
+
                 chart_id += 1
+
                 if chart._shapes:
                     name = '/xl/drawings/drawing%d.xml' % drawing_id
                     if name not in seen:
-                        SubElement(root, '{%s}Override' % CONTYPES_NS, {'PartName' : name,
-                        'ContentType' : 'application/vnd.openxmlformats-officedocument.drawingml.chartshapes+xml'})
+                        SubElement(root, '{%s}Override' % CONTYPES_NS, {
+                            'PartName': name,
+                            'ContentType': 'application/vnd.openxmlformats-officedocument.drawingml.chartshapes+xml'
+                        })
+
                     drawing_id += 1
+
         if sheet._comment_count > 0:
-            SubElement(root, '{%s}Override' % CONTYPES_NS,
-                {'PartName': '/xl/comments%d.xml' % comments_id,
-                 'ContentType': 'application/vnd.openxmlformats-officedocument.spreadsheetml.comments+xml'})
+            SubElement(root, '{%s}Override' % CONTYPES_NS, {
+                'PartName': '/xl/comments%d.xml' % comments_id,
+                'ContentType': 'application/vnd.openxmlformats-officedocument.spreadsheetml.comments+xml'
+            })
             comments_id += 1
 
     for idx, _ in enumerate(workbook._external_links, 1):
-        el = Element('{%s}Override' % CONTYPES_NS,
-                     {'PartName':'/xl/externalLinks/externalLink{0}.xml'.format(idx),
-                      'ContentType': EXTERNAL_LINK})
+        el = Element('{%s}Override' % CONTYPES_NS, {
+            'PartName': '/xl/externalLinks/externalLink{0}.xml'.format(idx),
+            'ContentType': EXTERNAL_LINK
+        })
         root.append(el)
 
     return tostring(root)
@@ -207,11 +232,11 @@ def write_root_rels(workbook):
     root = Element('{%s}Relationships' % PKG_REL_NS)
     relation_tag = '{%s}Relationship' % PKG_REL_NS
     SubElement(root, relation_tag, {'Id': 'rId1', 'Target': ARC_WORKBOOK,
-            'Type': '%s/officeDocument' % REL_NS})
+                                    'Type': '%s/officeDocument' % REL_NS})
     SubElement(root, relation_tag, {'Id': 'rId2', 'Target': ARC_CORE,
-            'Type': '%s/metadata/core-properties' % PKG_REL_NS})
+                                    'Type': '%s/metadata/core-properties' % PKG_REL_NS})
     SubElement(root, relation_tag, {'Id': 'rId3', 'Target': ARC_APP,
-            'Type': '%s/extended-properties' % REL_NS})
+                                    'Type': '%s/extended-properties' % REL_NS})
     if workbook.vba_archive is not None:
         # See if there was a customUI relation and reuse its id
         arc = fromstring(workbook.vba_archive.read(ARC_ROOT_RELS))
@@ -223,26 +248,24 @@ def write_root_rels(workbook):
                         break
         if rId is not None:
             SubElement(root, relation_tag, {'Id': rId, 'Target': ARC_CUSTOM_UI,
-                'Type': '%s' % CUSTOMUI_NS})
+                                            'Type': '%s' % CUSTOMUI_NS})
     return tostring(root)
 
 
 def write_workbook(workbook):
     """Write the core workbook xml."""
     root = Element('{%s}workbook' % SHEET_MAIN_NS)
-    SubElement(root, '{%s}fileVersion' % SHEET_MAIN_NS,
-               {'appName': 'xl', 'lastEdited': '4', 'lowestEdited': '4', 'rupBuild': '4505'})
-    SubElement(root, '{%s}workbookPr' % SHEET_MAIN_NS,
-               {'defaultThemeVersion': '124226', 'codeName': workbook.code_name})
+
+    wb_props = {}
+    if workbook.code_name is not None:
+        wb_props['codeName'] = workbook.code_name
+    SubElement(root, '{%s}workbookPr' % SHEET_MAIN_NS, wb_props)
 
     # book views
     book_views = SubElement(root, '{%s}bookViews' % SHEET_MAIN_NS)
     SubElement(book_views, '{%s}workbookView' % SHEET_MAIN_NS,
-               {'activeTab': '%d' % workbook.get_index(workbook.get_active_sheet()),
-                'autoFilterDateGrouping': '1', 'firstSheet': '0', 'minimized': '0',
-                'showHorizontalScroll': '1', 'showSheetTabs': '1',
-                'showVerticalScroll': '1', 'tabRatio': '600',
-                'visibility': 'visible'})
+               {'activeTab': '%d' % workbook._active_sheet_index}
+               )
 
     # worksheets
     sheets = SubElement(root, '{%s}sheets' % SHEET_MAIN_NS)
@@ -283,7 +306,7 @@ def write_workbook(workbook):
                                  absolute_coordinate(auto_filter))
 
     SubElement(root, '{%s}calcPr' % SHEET_MAIN_NS,
-               {'calcId': '124519', 'calcMode': 'auto', 'fullCalcOnLoad': '1'})
+               {'calcId': '124519', 'fullCalcOnLoad': '1'})
     return tostring(root)
 
 

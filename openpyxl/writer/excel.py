@@ -58,7 +58,7 @@ from openpyxl.writer.workbook import (
 from openpyxl.writer.theme import write_theme
 from openpyxl.writer.styles import StyleWriter
 from openpyxl.writer.drawings import DrawingWriter, ShapeWriter
-from openpyxl.writer.charts import ChartWriter
+from openpyxl.charts.writer import ChartWriter
 from .relations import write_rels
 from openpyxl.writer.worksheet import write_worksheet
 from openpyxl.workbook.names.external import (
@@ -79,11 +79,12 @@ class ExcelWriter(object):
         self.workbook = workbook
         self.style_writer = StyleWriter(workbook)
 
-    def write_data(self, archive):
+    def write_data(self, archive, as_template=False):
         """Write the various xml files into the zip archive."""
         # cleanup all worksheets
 
-        archive.writestr(ARC_CONTENT_TYPES, write_content_types(self.workbook))
+        archive.writestr(ARC_CONTENT_TYPES, write_content_types(self.workbook,
+                                                                as_template=as_template))
         archive.writestr(ARC_ROOT_RELS, write_root_rels(self.workbook))
         archive.writestr(ARC_WORKBOOK_RELS, write_workbook_rels(self.workbook))
         archive.writestr(ARC_APP, write_properties_app(self.workbook))
@@ -188,14 +189,14 @@ class ExcelWriter(object):
             )
 
 
-    def save(self, filename):
+    def save(self, filename, as_template=False):
         """Write data into the archive."""
         archive = ZipFile(filename, 'w', ZIP_DEFLATED)
-        self.write_data(archive)
+        self.write_data(archive, as_template=as_template)
         archive.close()
 
 
-def save_workbook(workbook, filename):
+def save_workbook(workbook, filename, as_template=False):
     """Save the given workbook on the filesystem under the name filename.
 
     :param workbook: the workbook to save
@@ -208,17 +209,17 @@ def save_workbook(workbook, filename):
 
     """
     writer = ExcelWriter(workbook)
-    writer.save(filename)
+    writer.save(filename, as_template=as_template)
     return True
 
 
-def save_virtual_workbook(workbook):
+def save_virtual_workbook(workbook, as_template=False):
     """Return an in-memory workbook, suitable for a Django response."""
     writer = ExcelWriter(workbook)
     temp_buffer = BytesIO()
     try:
         archive = ZipFile(temp_buffer, 'w', ZIP_DEFLATED)
-        writer.write_data(archive)
+        writer.write_data(archive, as_template=as_template)
     finally:
         archive.close()
     virtual_workbook = temp_buffer.getvalue()

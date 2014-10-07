@@ -99,7 +99,13 @@ NAMESPACES = {
 }
 
 ## Mime types
+WORKBOOK_MACRO = "application/vnd.ms-excel.%s.macroEnabled.main+xml"
+WORKBOOK = "application/vnd.openxmlformats-officedocument.spreadsheetml.%s.main+xml"
 SPREADSHEET = "application/vnd.openxmlformats-officedocument.spreadsheetml.%s+xml"
 SHARED_STRINGS = SPREADSHEET % "sharedStrings"
 EXTERNAL_LINK = SPREADSHEET % "externalLink"
 WORKSHEET = SPREADSHEET % "worksheet"
+XLTM = WORKBOOK_MACRO % 'template'
+XLSM = WORKBOOK_MACRO % 'sheet'
+XLTX = WORKBOOK % 'template'
+XLSX = WORKBOOK % 'sheet'

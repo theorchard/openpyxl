@@ -13,6 +13,7 @@ from openpyxl.tests.helper import compare_xml
 from openpyxl import Workbook, load_workbook
 from openpyxl.workbook.names.named_range import NamedRange
 from openpyxl.xml.functions import Element, tostring
+from openpyxl.xml.constants import XLTX, XLSX, XLSM, XLTM
 from .. excel import (
     save_workbook,
     save_virtual_workbook,
@@ -20,8 +21,8 @@ from .. excel import (
 from .. workbook import (
     write_workbook,
     write_workbook_rels,
+    write_content_types,
 )
-from openpyxl.reader.workbook import read_workbook_code_name
 
 
 def test_write_auto_filter(datadir):
@@ -45,17 +46,16 @@ def test_write_hidden_worksheet():
     xml = write_workbook(wb)
     expected = """
     <workbook xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main" xmlns:r="http://schemas.openxmlformats.org/officeDocument/2006/relationships">
-    <fileVersion appName="xl" lastEdited="4" lowestEdited="4" rupBuild="4505"/>
-    <workbookPr codeName="ThisWorkbook" defaultThemeVersion="124226"/>
+    <workbookPr/>
     <bookViews>
-      <workbookView activeTab="0" autoFilterDateGrouping="1" firstSheet="0" minimized="0" showHorizontalScroll="1" showSheetTabs="1" showVerticalScroll="1" tabRatio="600" visibility="visible"/>
+      <workbookView activeTab="0"/>
     </bookViews>
     <sheets>
       <sheet name="Sheet" sheetId="1" state="hidden" r:id="rId1"/>
       <sheet name="Sheet1" sheetId="2" r:id="rId2"/>
     </sheets>
       <definedNames/>
-      <calcPr calcId="124519" calcMode="auto" fullCalcOnLoad="1"/>
+      <calcPr calcId="124519" fullCalcOnLoad="1"/>
     </workbook>
     """
     diff = compare_xml(xml, expected)
@@ -126,6 +126,7 @@ def test_write_named_range():
     ('workbook_russian_code_name.xml', u'\u042d\u0442\u0430\u041a\u043d\u0438\u0433\u0430')
 ])
 def test_read_workbook_code_name(datadir, tmpl, code_name):
+    from openpyxl.reader.workbook import read_workbook_code_name
     datadir.chdir()
 
     with open(tmpl, "rb") as expected:
@@ -136,4 +137,49 @@ def test_write_workbook_code_name():
     wb = Workbook()
     wb.code_name = u'MyWB'
 
-    read_workbook_code_name(write_workbook(wb)) == wb.code_name
+    content = write_workbook(wb)
+    expected = """
+    <workbook xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main" xmlns:r="http://schemas.openxmlformats.org/officeDocument/2006/relationships">
+    <workbookPr codeName="MyWB"/>
+    <bookViews>
+      <workbookView activeTab="0"/>
+    </bookViews>
+    <sheets>
+      <sheet name="Sheet" sheetId="1" r:id="rId1"/>
+    </sheets>
+    <definedNames/>
+    <calcPr calcId="124519" fullCalcOnLoad="1"/>
+    </workbook>
+    """
+    diff = compare_xml(content, expected)
+    assert diff is None, diff
+
+
+def check_content_type_workbook(wb, wb_type, as_template):
+    assert wb_type in write_content_types(wb, as_template=as_template)
+
+
+@pytest.mark.parametrize('tmpl, keep_vba, wb_type, as_template', [
+    ('empty.xlsx', False, XLTX),
+    ('empty.xlsm', True, XLTM),
+    ('empty.xltx', False, XLTX),
+    ('empty.xltm', True, XLTM)
+])
+def write_content_types_as_template(datadir, tmpl, keep_vba, wb_type):
+    datadir.chdir()
+
+    wb = load_workbook(tmpl, keep_vba=keep_vba)
+    check_content_type_workbook(wb, wb_type, True)
+
+
+@pytest.mark.parametrize('tmpl, keep_vba, wb_type, as_template', [
+    ('empty.xlsx', False, XLSX),
+    ('empty.xlsm', True, XLSM),
+    ('empty.xltx', False, XLSX),
+    ('empty.xltm', True, XLSM)
+])
+def write_content_types_as_no_template(datadir, tmpl, keep_vba, wb_type):
+    datadir.chdir()
+
+    wb = load_workbook(tmpl, keep_vba=keep_vba)
+    check_content_type_workbook(wb, wb_type, False)
