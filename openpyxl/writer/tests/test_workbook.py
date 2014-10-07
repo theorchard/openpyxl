@@ -12,7 +12,7 @@ from openpyxl.tests.helper import compare_xml
 # package
 from openpyxl import Workbook, load_workbook
 from openpyxl.workbook.names.named_range import NamedRange
-from openpyxl.xml.functions import Element, tostring
+from openpyxl.xml.functions import Element, tostring, fromstring
 from openpyxl.xml.constants import XLTX, XLSX, XLSM, XLTM
 from .. excel import (
     save_workbook,
@@ -186,24 +186,17 @@ def test_write_content_types_as_no_template(datadir, tmpl, keep_vba, wb_type):
     check_content_type_workbook(wb, wb_type, False)
 
 
-def test_write_content_types():
+@pytest.mark.parametrize("as_template, content_type",
+                         [
+                             (False, XLSX),
+                             (True, XLTX),
+                          ]
+                         )
+def test_write_content_types(as_template, content_type):
     from .. workbook import write_content_types
+    from openpyxl.xml.constants import CONTYPES_NS
     wb = Workbook()
-    xml = write_content_types(wb, as_template=False)
-    expected = """
-    <Types xmlns="http://schemas.openxmlformats.org/package/2006/content-types">
-      <Override ContentType="application/vnd.openxmlformats-officedocument.theme+xml" PartName="/xl/theme/theme1.xml"/>
-      <Override ContentType="application/vnd.openxmlformats-officedocument.spreadsheetml.styles+xml" PartName="/xl/styles.xml"/>
-      <Default ContentType="application/vnd.openxmlformats-package.relationships+xml" Extension="rels"/>
-      <Default ContentType="application/xml" Extension="xml"/>
-      <Default ContentType="image/png" Extension="png"/>
-      <Default ContentType="application/vnd.openxmlformats-officedocument.vmlDrawing" Extension="vml"/>
-      <Override ContentType="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet.main+xml" PartName="/xl/workbook.xml"/>
-      <Override ContentType="application/vnd.openxmlformats-officedocument.extended-properties+xml" PartName="/docProps/app.xml"/>
-      <Override ContentType="application/vnd.openxmlformats-package.core-properties+xml" PartName="/docProps/core.xml"/>
-      <Override ContentType="application/vnd.openxmlformats-officedocument.spreadsheetml.sharedStrings+xml" PartName="/xl/sharedStrings.xml"/>
-      <Override ContentType="application/vnd.openxmlformats-officedocument.spreadsheetml.worksheet+xml" PartName="/xl/worksheets/sheet1.xml"/>
-    </Types>
-    """
-    diff = compare_xml(xml, expected)
-    assert diff is None, diff
+    xml = write_content_types(wb, as_template=as_template)
+    root = fromstring(xml)
+    node = root.find('{%s}Override[@PartName="/xl/workbook.xml"]'% CONTYPES_NS)
+    assert node.get("ContentType") == content_type

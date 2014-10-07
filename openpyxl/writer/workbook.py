@@ -95,6 +95,7 @@ def write_content_types(workbook, as_template=False):
             root = Element('{%s}Types' % CONTYPES_NS)
 
     for setting_type, name, content_type in static_content_types_config:
+
         attrib = {'ContentType': content_type}
         if setting_type == 'Override':
             if '/' + name not in seen:
@@ -107,8 +108,8 @@ def write_content_types(workbook, as_template=False):
                 attrib['Extension'] = name
                 SubElement(root, tag, attrib)
 
-    wb_elem = root.find('{%s}Override[@PartName="/xl/workbook.xml"]' % CONTYPES_NS)
-    if wb_elem is not None:
+    nodes = root.findall('{%s}Override' % CONTYPES_NS)
+    for wb_elem in nodes:
         ct = wb_elem.attrib['ContentType']
 
         if as_template:
