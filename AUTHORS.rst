@@ -11,6 +11,7 @@ I'd also like to greatly thank all those who participate in the project (in alph
 * Day Barr
 * Stefan Behnel
 * Bernt R. Brenna
+* Sven Burk
 * Anders Chrigstrom
 * ccoacley
 * Charlie Clark

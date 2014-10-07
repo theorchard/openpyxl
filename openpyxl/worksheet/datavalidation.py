@@ -3,6 +3,7 @@ from __future__ import absolute_import
 
 from itertools import groupby, chain
 
+from openpyxl.descriptors import Strict, Bool, NoneSet, Set, String
 from openpyxl.compat import OrderedDict, safe_string
 from openpyxl.cell import coordinate_from_string
 from openpyxl.worksheet import cells_from_range
@@ -59,32 +60,62 @@ def expand_cell_ranges(range_string):
     return list(chain.from_iterable(cells))
 
 
-class DataValidation(object):
-
+class DataValidation(Strict):
 
     error = None
     errorTitle = None
     prompt = None
     promptTitle = None
 
+    showErrorMessage = Bool()
+    showDropDown = Bool(allow_none=True)
+    showInputMessage = Bool()
+    showErrorMessage = Bool()
+    allowBlank = Bool()
+    allow_blank = Bool()
+
+    errorTitle = String(allow_none = True)
+    error = String(allow_none = True)
+    promptTitle = String(allow_none = True)
+    prompt = String(allow_none = True)
+    sqref = String(allow_none = True)
+    formula1 = String(allow_none = True)
+    formula2 = String(allow_none = True)
+
+    type = NoneSet(values=("whole", "decimal", "list", "date", "time",
+                           "textLength", "custom"))
+    errorStyle = NoneSet(values=("stop", "warning", "information"))
+    imeMode = NoneSet(values=("noControl", "off", "on", "disabled",
+                              "hiragana", "fullKatakana", "halfKatakana", "fullAlpha","halfAlpha",
+                              "fullHangul", "halfHangul"))
+    operator = NoneSet(values=("between", "notBetween", "equal", "notEqual",
+                               "lessThan", "lessThanOrEqual", "greaterThan", "greaterThanOrEqual"))
+
     def __init__(self,
                  validation_type=None, # remove in future
-                 operator=None,
                  formula1=None,
                  formula2=None,
                  allow_blank=False,
                  showErrorMessage=True,
                  showInputMessage=True,
+                 showDropDown=None,
                  allowBlank=None,
                  type=None,
-                 sqref=None):
+                 sqref=None,
+                 promptTitle=None,
+                 errorStyle=None,
+                 error=None,
+                 prompt=None,
+                 errorTitle=None,
+                 imeMode=None,
+                 operator=None):
 
+        self.showDropDown = showDropDown
+        self.imeMode = imeMode
         self.type = validation_type
         self.operator = operator
-        if formula1 is not None:
-            self.formula1 = str(formula1)
-        if formula2 is not None:
-            self.formula2 = str(formula2)
+        self.formula1 = formula1
+        self.formula2 = formula2
         self.allowBlank = allow_blank
         if allowBlank is not None:
             self.allowBlank = allowBlank
@@ -96,8 +127,17 @@ class DataValidation(object):
         self.ranges = []
         if sqref is not None:
             self.sqref = sqref
+        self.promptTitle = promptTitle
+        self.errorStyle = errorStyle
+        self.error = error
+        self.prompt = prompt
+        self.errorTitle = errorTitle
 
     def add_cell(self, cell):
+        """Adds a openpyxl.cell to this validator"""
+        self.append(cell)
+
+    def append(self, cell):
         """Adds a openpyxl.cell to this validator"""
         self.cells.append(cell.coordinate)
 
@@ -123,6 +163,7 @@ class DataValidation(object):
     def __iter__(self):
         for attr in ('type', 'allowBlank', 'operator', 'sqref',
                      'showInputMessage', 'showErrorMessage', 'errorTitle', 'error',
+                     'errorStyle',
                      'promptTitle', 'prompt'):
             value = getattr(self, attr)
             if value is not None:

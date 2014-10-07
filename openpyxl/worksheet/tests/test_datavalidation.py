@@ -88,7 +88,17 @@ def test_sqref():
     assert dv.cells == ["A1"]
 
 
-def test_parser():
+def test_ctor():
+    from .. datavalidation import DataValidation
+    dv = DataValidation()
+    assert dict(dv) == {'allowBlank': '0', 'showErrorMessage': '1',
+                        'showInputMessage': '1', 'sqref': ''}
+
+
+def test_append()
+
+
+def test_with_formula():
     from .. datavalidation import parser
     xml = """
     <dataValidation xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main" allowBlank="0" showErrorMessage="1" showInputMessage="1" sqref="A1" type="list">
@@ -99,3 +109,35 @@ def test_parser():
     assert dv.cells == ['A1']
     assert dv.type == "list"
     assert dv.formula1 == '"Dog,Cat,Fish"'
+
+
+def test_extended_parser():
+    from .. datavalidation import parser
+    xml = """
+    <dataValidation xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main" type="list" errorStyle="warning" allowBlank="1" showInputMessage="1" showErrorMessage="1" error="Value must be between 1 and 3!" errorTitle="An Error Message" promptTitle="Multiplier" prompt="for monthly or quartely reports" sqref="H6">
+    </dataValidation>
+"""
+    dv = parser(fromstring(xml))
+    assert dict(dv) == {"error":"Value must be between 1 and 3!",
+                        "errorStyle":"warning",
+                        "errorTitle":"An Error Message",
+                        "prompt":"for monthly or quartely reports",
+                        "promptTitle":"Multiplier",
+                        "type":"list",
+                        "allowBlank":"1",
+                        "sqref":"H6",
+                        "showErrorMessage":"1",
+                        "showInputMessage":"1"}
+
+    from ..datavalidation import writer
+    tag = writer(dv)
+    output = tostring(tag)
+    diff = compare_xml(output, xml)
+    assert diff is None,diff
+
+
+def test_descriptor():
+    from .. datavalidation import DataValidation
+    dv = DataValidation(type="whole")
+
+    assert dv.type == 'whole'
