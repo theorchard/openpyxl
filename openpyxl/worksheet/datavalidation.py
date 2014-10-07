@@ -2,6 +2,7 @@ from __future__ import absolute_import
 # Copyright (c) 2010-2014 openpyxl
 
 from itertools import groupby, chain
+import warnings
 
 from openpyxl.descriptors import Strict, Bool, NoneSet, Set, String
 from openpyxl.compat import OrderedDict, safe_string, deprecated
@@ -62,11 +63,6 @@ def expand_cell_ranges(range_string):
 
 class DataValidation(Strict):
 
-    error = None
-    errorTitle = None
-    prompt = None
-    promptTitle = None
-
     showErrorMessage = Bool()
     showDropDown = Bool(allow_none=True)
     showInputMessage = Bool()
@@ -92,7 +88,7 @@ class DataValidation(Strict):
                                "lessThan", "lessThanOrEqual", "greaterThan", "greaterThanOrEqual"))
 
     def __init__(self,
-                 validation_type=None, # remove in future
+                 type=None,
                  formula1=None,
                  formula2=None,
                  allow_blank=False,
@@ -100,7 +96,6 @@ class DataValidation(Strict):
                  showInputMessage=True,
                  showDropDown=None,
                  allowBlank=None,
-                 type=None,
                  sqref=None,
                  promptTitle=None,
                  errorStyle=None,
@@ -108,7 +103,9 @@ class DataValidation(Strict):
                  prompt=None,
                  errorTitle=None,
                  imeMode=None,
-                 operator=None):
+                 operator=None,
+                 validation_type=None, # remove in future
+                 ):
 
         self.showDropDown = showDropDown
         self.imeMode = imeMode
@@ -121,9 +118,11 @@ class DataValidation(Strict):
         self.showErrorMessage = showErrorMessage
         self.showInputMessage = showInputMessage
         if validation_type is not None:
-            type = validation_type
+            warnings.warn("Use 'DataValidation(type={0})'".format(validation_type))
+            if type is not None:
+                self.type = validation_type
         self.type = type
-        self.cells = []
+        self.cells = set()
         self.ranges = []
         if sqref is not None:
             self.sqref = sqref
@@ -136,11 +135,11 @@ class DataValidation(Strict):
     @deprecated("Use DataValidation.append()")
     def add_cell(self, cell):
         """Adds a openpyxl.cell to this validator"""
-        self.append(cell)
+        self.add(cell)
 
-    def append(self, cell):
+    def add(self, cell):
         """Adds a openpyxl.cell to this validator"""
-        self.cells.append(cell.coordinate)
+        self.cells.add(cell.coordinate)
 
     @deprecated("Set DataValidation.ErrorTitle and DataValidation.error")
     def set_error_message(self, error, error_title="Validation Error"):
