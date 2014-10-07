@@ -156,29 +156,30 @@ def test_write_workbook_code_name():
 
 
 def check_content_type_workbook(wb, wb_type, as_template):
+    wb_type = bytes(wb_type, "utf-8")
     assert wb_type in write_content_types(wb, as_template=as_template)
 
 
-@pytest.mark.parametrize('tmpl, keep_vba, wb_type, as_template', [
+@pytest.mark.parametrize('tmpl, keep_vba, wb_type', [
     ('empty.xlsx', False, XLTX),
     ('empty.xlsm', True, XLTM),
     ('empty.xltx', False, XLTX),
     ('empty.xltm', True, XLTM)
 ])
-def write_content_types_as_template(datadir, tmpl, keep_vba, wb_type):
+def test_write_content_types_as_template(datadir, tmpl, keep_vba, wb_type):
     datadir.chdir()
 
     wb = load_workbook(tmpl, keep_vba=keep_vba)
     check_content_type_workbook(wb, wb_type, True)
 
 
-@pytest.mark.parametrize('tmpl, keep_vba, wb_type, as_template', [
+@pytest.mark.parametrize('tmpl, keep_vba, wb_type', [
     ('empty.xlsx', False, XLSX),
     ('empty.xlsm', True, XLSM),
     ('empty.xltx', False, XLSX),
     ('empty.xltm', True, XLSM)
 ])
-def write_content_types_as_no_template(datadir, tmpl, keep_vba, wb_type):
+def test_write_content_types_as_no_template(datadir, tmpl, keep_vba, wb_type):
     datadir.chdir()
 
     wb = load_workbook(tmpl, keep_vba=keep_vba)
