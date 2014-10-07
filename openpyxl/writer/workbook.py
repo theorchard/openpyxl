@@ -124,12 +124,11 @@ def write_content_types(workbook, as_template=False):
 
     nodes = root.findall('{%s}Override' % CONTYPES_NS)
     for wb_elem in nodes:
-        ct = wb_elem.attrib['ContentType']
-
-        if as_template:
-            wb_elem.set('ContentType', ct.replace('.sheet.', '.template.'))
-        else:
-            wb_elem.set('ContentType', ct.replace('.template.', '.sheet.'))
+        if wb_elem.get("PartName") == "/" + ARC_WORKBOOK:
+            ct = as_template and XLTX or XLSX
+            if workbook.vba_archive:
+                ct = as_template and XLTM or XLSM
+            wb_elem.set("ContentType", ct)
 
     drawing_id = 1
     chart_id = 1
