@@ -184,3 +184,26 @@ def test_write_content_types_as_no_template(datadir, tmpl, keep_vba, wb_type):
 
     wb = load_workbook(tmpl, keep_vba=keep_vba)
     check_content_type_workbook(wb, wb_type, False)
+
+
+def test_write_content_types():
+    from .. workbook import write_content_types
+    wb = Workbook()
+    xml = write_content_types(wb, as_template=False)
+    expected = """
+    <Types xmlns="http://schemas.openxmlformats.org/package/2006/content-types">
+      <Override ContentType="application/vnd.openxmlformats-officedocument.theme+xml" PartName="/xl/theme/theme1.xml"/>
+      <Override ContentType="application/vnd.openxmlformats-officedocument.spreadsheetml.styles+xml" PartName="/xl/styles.xml"/>
+      <Default ContentType="application/vnd.openxmlformats-package.relationships+xml" Extension="rels"/>
+      <Default ContentType="application/xml" Extension="xml"/>
+      <Default ContentType="image/png" Extension="png"/>
+      <Default ContentType="application/vnd.openxmlformats-officedocument.vmlDrawing" Extension="vml"/>
+      <Override ContentType="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet.main+xml" PartName="/xl/workbook.xml"/>
+      <Override ContentType="application/vnd.openxmlformats-officedocument.extended-properties+xml" PartName="/docProps/app.xml"/>
+      <Override ContentType="application/vnd.openxmlformats-package.core-properties+xml" PartName="/docProps/core.xml"/>
+      <Override ContentType="application/vnd.openxmlformats-officedocument.spreadsheetml.sharedStrings+xml" PartName="/xl/sharedStrings.xml"/>
+      <Override ContentType="application/vnd.openxmlformats-officedocument.spreadsheetml.worksheet+xml" PartName="/xl/worksheets/sheet1.xml"/>
+    </Types>
+    """
+    diff = compare_xml(xml, expected)
+    assert diff is None, diff
