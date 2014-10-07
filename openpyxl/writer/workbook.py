@@ -58,28 +58,42 @@ def write_properties_core(properties):
     return tostring(root)
 
 
+from openpyxl.xml.constants import (
+    THEME_TYPE,
+    STYLES_TYPE,
+    XLSX,
+    XLSM,
+    XLTM,
+    XLTX,
+    WORKSHEET_TYPE,
+    COMMENTS_TYPE,
+    SHARED_STRINGS,
+    DRAWING_TYPE,
+    CHART_TYPE,
+    CHARTSHAPE_TYPE
+)
+
 static_content_types_config = [
-    ('Override', ARC_THEME, 'application/vnd.openxmlformats-officedocument.theme+xml'),
-    ('Override', ARC_STYLE, 'application/vnd.openxmlformats-officedocument.spreadsheetml.styles+xml'),
+    ('Override', ARC_THEME, THEME_TYPE),
+    ('Override', ARC_STYLE, STYLES_TYPE),
 
     ('Default', 'rels', 'application/vnd.openxmlformats-package.relationships+xml'),
     ('Default', 'xml', 'application/xml'),
     ('Default', 'png', 'image/png'),
     ('Default', 'vml', 'application/vnd.openxmlformats-officedocument.vmlDrawing'),
 
-    ('Override', ARC_WORKBOOK,
-     'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet.main+xml'),
+    ('Override', ARC_WORKBOOK, XLSX),
     ('Override', ARC_APP,
      'application/vnd.openxmlformats-officedocument.extended-properties+xml'),
     ('Override', ARC_CORE,
      'application/vnd.openxmlformats-package.core-properties+xml'),
-    ('Override', ARC_SHARED_STRINGS,
-     'application/vnd.openxmlformats-officedocument.spreadsheetml.sharedStrings+xml'),
+    ('Override', ARC_SHARED_STRINGS, SHARED_STRINGS),
 ]
 
 
 def write_content_types(workbook, as_template=False):
     """Write the content-types xml."""
+
     seen = set()
     if workbook.vba_archive:
         root = fromstring(workbook.vba_archive.read(ARC_CONTENT_TYPES))
@@ -126,7 +140,7 @@ def write_content_types(workbook, as_template=False):
         if name not in seen:
             SubElement(root, '{%s}Override' % CONTYPES_NS, {
                 'PartName': name,
-                'ContentType': 'application/vnd.openxmlformats-officedocument.spreadsheetml.worksheet+xml'
+                'ContentType': WORKSHEET_TYPE
             })
 
         if sheet._charts or sheet._images:
@@ -134,7 +148,7 @@ def write_content_types(workbook, as_template=False):
             if name not in seen:
                 SubElement(root, '{%s}Override' % CONTYPES_NS, {
                     'PartName': name,
-                    'ContentType': 'application/vnd.openxmlformats-officedocument.drawing+xml'
+                    'ContentType': DRAWING_TYPE
                 })
 
             drawing_id += 1
@@ -144,7 +158,7 @@ def write_content_types(workbook, as_template=False):
                 if name not in seen:
                     SubElement(root, '{%s}Override' % CONTYPES_NS, {
                         'PartName': name,
-                        'ContentType': 'application/vnd.openxmlformats-officedocument.drawingml.chart+xml'
+                        'ContentType': CHART_TYPE
                     })
 
                 chart_id += 1
@@ -154,7 +168,7 @@ def write_content_types(workbook, as_template=False):
                     if name not in seen:
                         SubElement(root, '{%s}Override' % CONTYPES_NS, {
                             'PartName': name,
-                            'ContentType': 'application/vnd.openxmlformats-officedocument.drawingml.chartshapes+xml'
+                            'ContentType': CHARTSHAPE_TYPE
                         })
 
                     drawing_id += 1
@@ -162,7 +176,7 @@ def write_content_types(workbook, as_template=False):
         if sheet._comment_count > 0:
             SubElement(root, '{%s}Override' % CONTYPES_NS, {
                 'PartName': '/xl/comments%d.xml' % comments_id,
-                'ContentType': 'application/vnd.openxmlformats-officedocument.spreadsheetml.comments+xml'
+                'ContentType': COMMENTS_TYPE
             })
             comments_id += 1
 
