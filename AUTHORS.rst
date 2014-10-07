@@ -42,6 +42,7 @@ I'd also like to greatly thank all those who participate in the project (in alph
 * Jun Omae
 * Waldemar Osuch
 * Jonathan Peirce
+* Sergey Pikhovkin
 * Ted Pollari
 * Elias Rabel
 * Rick Rankin
@@ -55,7 +56,6 @@ I'd also like to greatly thank all those who participate in the project (in alph
 * Laurent Vasseur
 * Kay Webber
 * Shibukawa Yoshiki
-* Sergey Pikhovkin
 
 Special thanks for Heikki Junes, for all his work on porting and maintaining the Python3.x fork
 
