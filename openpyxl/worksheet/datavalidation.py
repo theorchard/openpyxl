@@ -132,7 +132,7 @@ class DataValidation(Strict):
         self.prompt = prompt
         self.errorTitle = errorTitle
 
-    @deprecated("Use DataValidation.append()")
+    @deprecated("Use DataValidation.add()")
     def add_cell(self, cell):
         """Adds a openpyxl.cell to this validator"""
         self.add(cell)
