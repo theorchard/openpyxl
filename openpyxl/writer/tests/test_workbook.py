@@ -155,47 +155,27 @@ def test_write_workbook_code_name():
     assert diff is None, diff
 
 
-def check_content_type_workbook(wb, wb_type, as_template):
-    wb_type = wb_type.encode("utf-8")
-    assert wb_type in write_content_types(wb, as_template=as_template)
+from zipfile import ZipFile
+from openpyxl.xml.constants import CONTYPES_NS, ARC_CONTENT_TYPES, ARC_WORKBOOK
 
 
-@pytest.mark.parametrize('tmpl, keep_vba, wb_type', [
-    ('empty.xlsx', False, XLTX),
-    ('empty.xlsm', True, XLTM),
-    ('empty.xltx', False, XLTX),
-    ('empty.xltm', True, XLTM)
-])
-def test_write_content_types_as_template(datadir, tmpl, keep_vba, wb_type):
-    datadir.chdir()
-
-    wb = load_workbook(tmpl, keep_vba=keep_vba)
-    check_content_type_workbook(wb, wb_type, True)
-
-
-@pytest.mark.parametrize('tmpl, keep_vba, wb_type', [
-    ('empty.xlsx', False, XLSX),
-    ('empty.xlsm', True, XLSM),
-    ('empty.xltx', False, XLSX),
-    ('empty.xltm', True, XLSM)
-])
-def test_write_content_types_as_no_template(datadir, tmpl, keep_vba, wb_type):
-    datadir.chdir()
-
-    wb = load_workbook(tmpl, keep_vba=keep_vba)
-    check_content_type_workbook(wb, wb_type, False)
-
-@pytest.mark.lxml_required
-@pytest.mark.parametrize("as_template, content_type",
+@pytest.mark.parametrize("has_vba, as_template, content_type",
                          [
-                             (False, XLSX),
-                             (True, XLTX),
+                             (None, False, XLSX),
+                             (None, True, XLTX),
+                             (True, False, XLSM),
+                             (True, True, XLTM)
                           ]
                          )
-def test_write_content_types(as_template, content_type):
+def test_write_content_types(has_vba, as_template, content_type):
     from .. workbook import write_content_types
-    from openpyxl.xml.constants import CONTYPES_NS
+
     wb = Workbook()
+    if has_vba:
+        archive = ZipFile(BytesIO(), "w")
+        ct = Element("{%s}Override" % CONTYPES_NS, PartName=ARC_WORKBOOK)
+        archive.writestr(ARC_CONTENT_TYPES, tostring(ct))
+        wb.vba_archive = archive
     xml = write_content_types(wb, as_template=as_template)
     root = fromstring(xml)
     node = root.find('{%s}Override[@PartName="/xl/workbook.xml"]'% CONTYPES_NS)
