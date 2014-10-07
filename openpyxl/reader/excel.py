@@ -190,7 +190,6 @@ def _load_workbook(wb, archive, filename, read_only, keep_vba):
 
     # what content types do we have?
     cts = dict(read_content_types(archive))
-    rels = dict
 
     strings_path = cts.get(SHARED_STRINGS)
     if strings_path is not None:
