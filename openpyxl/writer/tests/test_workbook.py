@@ -158,7 +158,7 @@ def test_write_workbook_code_name():
 from zipfile import ZipFile
 from openpyxl.xml.constants import CONTYPES_NS, ARC_CONTENT_TYPES, ARC_WORKBOOK
 
-
+@pytest.mark.lxml_required
 @pytest.mark.parametrize("has_vba, as_template, content_type",
                          [
                              (None, False, XLSX),
