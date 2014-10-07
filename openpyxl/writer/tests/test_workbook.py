@@ -185,7 +185,7 @@ def test_write_content_types_as_no_template(datadir, tmpl, keep_vba, wb_type):
     wb = load_workbook(tmpl, keep_vba=keep_vba)
     check_content_type_workbook(wb, wb_type, False)
 
-
+@pytest.mark.lxml_required
 @pytest.mark.parametrize("as_template, content_type",
                          [
                              (False, XLSX),
