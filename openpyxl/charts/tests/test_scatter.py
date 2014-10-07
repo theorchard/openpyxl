@@ -43,8 +43,6 @@ class TestScatterChartWriter(object):
             <c:axId val="60871424"/>
             <c:scaling>
               <c:orientation val="minMax"/>
-              <c:max val="0.0"/>
-              <c:min val="0.0"/>
             </c:scaling>
             <c:axPos val="b"/>
             <c:majorGridlines/>
@@ -92,8 +90,6 @@ class TestScatterChartWriter(object):
             <c:axId val="60873344"/>
             <c:scaling>
               <c:orientation val="minMax"/>
-              <c:max val="0.0"/>
-              <c:min val="0.0"/>
             </c:scaling>
             <c:axPos val="l"/>
             <c:majorGridlines/>
@@ -136,9 +132,6 @@ class TestScatterChartWriter(object):
           <c:ser>
             <c:idx val="0"/>
             <c:order val="0"/>
-            <c:marker>
-               <c:symbol val="none"/>
-            </c:marker>
             <c:xVal>
               <c:numRef>
                 <c:f>'Scatter'!$B$1:$B$11</c:f>
@@ -212,17 +205,14 @@ class TestScatterChartWriter(object):
                 <c:ser>
                   <c:idx val="0"/>
                   <c:order val="0"/>
-                  <c:marker>
-                      <c:symbol val="none"/>
-                  </c:marker>
                   <c:xVal>
                     <c:numRef>
-                      <c:f>\'Scatter\'!$B$1:$B$11</c:f>
+                      <c:f>'Scatter'!$B$1:$B$11</c:f>
                     </c:numRef>
                   </c:xVal>
                   <c:yVal>
                     <c:numRef>
-                      <c:f>\'Scatter\'!$A$1:$A$11</c:f>
+                      <c:f>'Scatter'!$A$1:$A$11</c:f>
                     </c:numRef>
                   </c:yVal>
                 </c:ser>
@@ -233,8 +223,6 @@ class TestScatterChartWriter(object):
                 <c:axId val="60871424"/>
                 <c:scaling>
                   <c:orientation val="minMax"/>
-                  <c:max val="0.0"/>
-                  <c:min val="0.0"/>
                 </c:scaling>
                 <c:axPos val="b"/>
                 <c:majorGridlines/>
@@ -251,8 +239,6 @@ class TestScatterChartWriter(object):
                 <c:axId val="60873344"/>
                 <c:scaling>
                   <c:orientation val="minMax"/>
-                  <c:max val="0.0"/>
-                  <c:min val="0.0"/>
                 </c:scaling>
                 <c:axPos val="l"/>
                 <c:majorGridlines/>
@@ -282,5 +268,5 @@ class TestScatterChartWriter(object):
         fname = "ScatterChart.xml"
         with open(fname) as expected:
             diff = compare_xml(xml, expected.read())
-            assert diff is None, diff
+        assert diff is None, diff
 

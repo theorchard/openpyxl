@@ -52,4 +52,4 @@ class TestLineChartWriter(object):
         datadir.chdir()
         with open("LineChart.xml") as expected:
             diff = compare_xml(xml, expected.read())
-            assert diff is None, diff
+        assert diff is None, diff

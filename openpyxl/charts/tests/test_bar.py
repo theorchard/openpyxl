@@ -51,4 +51,4 @@ class TestBarChartWriter(object):
         datadir.chdir()
         with open("BarChart.xml") as expected:
             diff = compare_xml(xml, expected.read())
-            assert diff is None, diff
+        assert diff is None, diff
