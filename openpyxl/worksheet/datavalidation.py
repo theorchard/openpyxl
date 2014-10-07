@@ -4,7 +4,7 @@ from __future__ import absolute_import
 from itertools import groupby, chain
 
 from openpyxl.descriptors import Strict, Bool, NoneSet, Set, String
-from openpyxl.compat import OrderedDict, safe_string
+from openpyxl.compat import OrderedDict, safe_string, deprecated
 from openpyxl.cell import coordinate_from_string
 from openpyxl.worksheet import cells_from_range
 from openpyxl.xml.constants import SHEET_MAIN_NS
@@ -112,7 +112,6 @@ class DataValidation(Strict):
 
         self.showDropDown = showDropDown
         self.imeMode = imeMode
-        self.type = validation_type
         self.operator = operator
         self.formula1 = formula1
         self.formula2 = formula2
@@ -121,8 +120,9 @@ class DataValidation(Strict):
             self.allowBlank = allowBlank
         self.showErrorMessage = showErrorMessage
         self.showInputMessage = showInputMessage
-        if type is not None:
-            self.type = type
+        if validation_type is not None:
+            type = validation_type
+        self.type = type
         self.cells = []
         self.ranges = []
         if sqref is not None:
@@ -133,6 +133,7 @@ class DataValidation(Strict):
         self.prompt = prompt
         self.errorTitle = errorTitle
 
+    @deprecated("Use DataValidation.append()")
     def add_cell(self, cell):
         """Adds a openpyxl.cell to this validator"""
         self.append(cell)
@@ -141,12 +142,14 @@ class DataValidation(Strict):
         """Adds a openpyxl.cell to this validator"""
         self.cells.append(cell.coordinate)
 
+    @deprecated("Set DataValidation.ErrorTitle and DataValidation.error")
     def set_error_message(self, error, error_title="Validation Error"):
         """Creates a custom error message, displayed when a user changes a cell
            to an invalid value"""
         self.errorTitle = error_title
         self.error = error
 
+    @deprecated("Set DataValidation.PromptTitle and DataValidation.prompt")
     def set_prompt_message(self, prompt, prompt_title="Validation Prompt"):
         """Creates a custom prompt message"""
         self.promptTitle = prompt_title
@@ -170,6 +173,7 @@ class DataValidation(Strict):
                 yield attr, safe_string(value)
 
 
+@deprecated("Class descriptors check values")
 class ValidationType(object):
     NONE = "none"
     WHOLE = "whole"
@@ -181,6 +185,7 @@ class ValidationType(object):
     CUSTOM = "custom"
 
 
+@deprecated("Class descriptors check values")
 class ValidationOperator(object):
     BETWEEN = "between"
     NOT_BETWEEN = "notBetween"
@@ -192,6 +197,7 @@ class ValidationOperator(object):
     GREATER_THAN_OR_EQUAL = "greaterThanOrEqual"
 
 
+@deprecated("Class descriptors check values")
 class ValidationErrorStyle(object):
     STOP = "stop"
     WARNING = "warning"

@@ -5,11 +5,6 @@ from io import BytesIO
 
 import pytest
 
-# package imports
-from .. datavalidation import (
-    DataValidation,
-    ValidationType
-    )
 
 from openpyxl.workbook import Workbook
 from openpyxl.xml.functions import fromstring, tostring
@@ -32,8 +27,20 @@ def test_collapse_cell_addresses(cells, expected):
     assert collapse_cell_addresses(cells) == expected
 
 
-def test_list_validation():
-    dv = DataValidation(ValidationType.LIST, formula1='"Dog,Cat,Fish"')
+def test_expand_cell_ranges():
+    from .. datavalidation import expand_cell_ranges
+    rs = "A1:A3 B1:B3"
+    assert expand_cell_ranges(rs) == ["A1", "A2", "A3", "B1", "B2", "B3"]
+
+
+@pytest.fixture
+def DataValidation():
+    from .. datavalidation import DataValidation
+    return DataValidation
+
+
+def test_list_validation(DataValidation):
+    dv = DataValidation(type="list", formula1='"Dog,Cat,Fish"')
     assert dv.formula1, '"Dog,Cat == Fish"'
     dv_dict = dict(dv)
     assert dv_dict['type'] == 'list'
@@ -42,27 +49,27 @@ def test_list_validation():
     assert dv_dict['showInputMessage'] == '1'
 
 
-def test_error_message():
-    dv = DataValidation(ValidationType.LIST, formula1='"Dog,Cat,Fish"')
+def test_error_message(DataValidation):
+    dv = DataValidation("list", formula1='"Dog,Cat,Fish"')
     dv.set_error_message('You done bad')
     dv_dict = dict(dv)
     assert dv_dict['errorTitle'] == 'Validation Error'
     assert dv_dict['error'] == 'You done bad'
 
 
-def test_prompt_message():
-    dv = DataValidation(ValidationType.LIST, formula1='"Dog,Cat,Fish"')
+def test_prompt_message(DataValidation):
+    dv = DataValidation(type="list", formula1='"Dog,Cat,Fish"')
     dv.set_prompt_message('Please enter a value')
     dv_dict = dict(dv)
     assert dv_dict['promptTitle'] == 'Validation Prompt'
     assert dv_dict['prompt'] == 'Please enter a value'
 
 
-def test_writer_validation():
+def test_writer_validation(DataValidation):
     from .. datavalidation import writer
     wb = Workbook()
     ws = wb.active
-    dv = DataValidation(ValidationType.LIST, formula1='"Dog,Cat,Fish"')
+    dv = DataValidation(type="list", formula1='"Dog,Cat,Fish"')
     dv.add_cell(ws['A1'])
 
     xml = tostring(writer(dv))
@@ -75,27 +82,18 @@ def test_writer_validation():
     assert diff is None, diff
 
 
-def test_expand_cell_ranges():
-    from .. datavalidation import expand_cell_ranges
-    rs = "A1:A3 B1:B3"
-    assert expand_cell_ranges(rs) == ["A1", "A2", "A3", "B1", "B2", "B3"]
-
-
-def test_sqref():
+def test_sqref(DataValidation):
     from .. datavalidation import DataValidation
     dv = DataValidation()
     dv.sqref = "A1"
     assert dv.cells == ["A1"]
 
 
-def test_ctor():
+def test_ctor(DataValidation):
     from .. datavalidation import DataValidation
     dv = DataValidation()
     assert dict(dv) == {'allowBlank': '0', 'showErrorMessage': '1',
                         'showInputMessage': '1', 'sqref': ''}
-
-
-def test_append()
 
 
 def test_with_formula():
@@ -111,7 +109,7 @@ def test_with_formula():
     assert dv.formula1 == '"Dog,Cat,Fish"'
 
 
-def test_extended_parser():
+def test_parser():
     from .. datavalidation import parser
     xml = """
     <dataValidation xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main" type="list" errorStyle="warning" allowBlank="1" showInputMessage="1" showErrorMessage="1" error="Value must be between 1 and 3!" errorTitle="An Error Message" promptTitle="Multiplier" prompt="for monthly or quartely reports" sqref="H6">
@@ -134,10 +132,3 @@ def test_extended_parser():
     output = tostring(tag)
     diff = compare_xml(output, xml)
     assert diff is None,diff
-
-
-def test_descriptor():
-    from .. datavalidation import DataValidation
-    dv = DataValidation(type="whole")
-
-    assert dv.type == 'whole'
