@@ -156,7 +156,7 @@ def test_write_workbook_code_name():
 
 
 def check_content_type_workbook(wb, wb_type, as_template):
-    wb_type = bytes(wb_type, "utf-8")
+    wb_type = wb_type.encode("utf-8")
     assert wb_type in write_content_types(wb, as_template=as_template)
 
 
