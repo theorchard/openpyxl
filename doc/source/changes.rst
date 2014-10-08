@@ -5,6 +5,7 @@
 Minor changes
 -------------
 PR 20 Support different workbook code names
+Allow auto_axis keyword for ScatterCharts
 
 
 Bug fixes
