@@ -99,7 +99,19 @@ NAMESPACES = {
 }
 
 ## Mime types
+WORKBOOK_MACRO = "application/vnd.ms-excel.%s.macroEnabled.main+xml"
+WORKBOOK = "application/vnd.openxmlformats-officedocument.spreadsheetml.%s.main+xml"
 SPREADSHEET = "application/vnd.openxmlformats-officedocument.spreadsheetml.%s+xml"
 SHARED_STRINGS = SPREADSHEET % "sharedStrings"
 EXTERNAL_LINK = SPREADSHEET % "externalLink"
-WORKSHEET = SPREADSHEET % "worksheet"
+WORKSHEET_TYPE = SPREADSHEET % "worksheet"
+COMMENTS_TYPE = SPREADSHEET % "comments"
+STYLES_TYPE = SPREADSHEET % "styles"
+DRAWING_TYPE = "application/vnd.openxmlformats-officedocument.drawing+xml"
+CHART_TYPE = "application/vnd.openxmlformats-officedocument.drawingml.chart+xml"
+CHARTSHAPE_TYPE = "application/vnd.openxmlformats-officedocument.drawingml.chartshapes+xml"
+THEME_TYPE = "application/vnd.openxmlformats-officedocument.theme+xml"
+XLTM = WORKBOOK_MACRO % 'template'
+XLSM = WORKBOOK_MACRO % 'sheet'
+XLTX = WORKBOOK % 'template'
+XLSX = WORKBOOK % 'sheet'

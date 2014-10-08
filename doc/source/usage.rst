@@ -1,8 +1,8 @@
 Simple usage
-=======================
+============
 
 Write a workbook
-------------------
+----------------
 .. :: doctest
 
 >>> from openpyxl import Workbook
@@ -29,6 +29,40 @@ Write a workbook
 >>> ws['F5'] = 3.14
 >>>
 >>> wb.save(filename = dest_filename)
+
+
+Write a workbook from \*.xltx as \*.xlsx
+----------------------------------------
+.. ::doctest
+
+>>> from openpyxl import load_workbook
+>>>
+>>>
+>>> wb = load_workbook('sample_book.xltx') #doctest: +SKIP
+>>> ws = wb.active #doctest: +SKIP
+>>> ws['D2'] = 42 #doctest: +SKIP
+>>>
+>>> wb.save('sample_book.xlsx') #doctest: +SKIP
+>>>
+>>> # or you can overwrite the current document template
+>>> # wb.save('sample_book.xltx')
+
+
+Write a workbook from \*.xltm as \*.xlsm
+----------------------------------------
+.. ::doctest
+
+>>> from openpyxl import load_workbook
+>>>
+>>>
+>>> wb = load_workbook('sample_book.xltm', keep_vba=True) #doctest: +SKIP
+>>> ws = wb.active #doctest: +SKIP
+>>> ws['D2'] = 42 #doctest: +SKIP
+>>>
+>>> wb.save('sample_book.xlsm') #doctest: +SKIP
+>>>
+>>> # or you can overwrite the current document template
+>>> # wb.save('sample_book.xltm')
 
 
 Read an existing workbook
@@ -75,7 +109,7 @@ Using number formats
 >>> ws['A1'] = datetime.datetime(2010, 7, 21)
 >>>
 >>> ws['A1'].number_format
-'yyyy-mm-dd'
+'yyyy-mm-dd h:mm:ss'
 >>>
 >>> # set percentage using a string followed by the percent sign
 >>> ws['B1'] = '3.14%'
