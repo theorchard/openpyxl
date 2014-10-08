@@ -161,7 +161,7 @@ class BaseChartWriter(object):
             SubElement(ax, '{%s}lblOffset' % CHART_NS, {'val':str(axis.label_offset)})
         if axis.type == "valAx":
             SubElement(ax, '{%s}crossBetween' % CHART_NS, {'val':axis.cross_between})
-            SubElement(ax, '{%s}majorUnit' % CHART_NS, {'val':str(float(axis.unit))})
+            SubElement(ax, '{%s}majorUnit' % CHART_NS, {'val':safe_string(axis.unit)})
 
     def _write_series(self, subchart):
 
