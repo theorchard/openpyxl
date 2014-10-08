@@ -38,7 +38,7 @@
                   <c:v>4</c:v>
                 </c:pt>
                 <c:pt idx="4">
-                  <c:v>None</c:v>
+                  <c:v></c:v>
                 </c:pt>
               </c:numCache>
             </c:numRef>
@@ -74,7 +74,7 @@
         <c:crossAx val="60871424"/>
         <c:crosses val="autoZero"/>
         <c:crossBetween val="between"/>
-        <c:majorUnit val="1.0"/>
+        <c:majorUnit val="1"/>
       </c:valAx>
     </c:plotArea>
     <c:legend>

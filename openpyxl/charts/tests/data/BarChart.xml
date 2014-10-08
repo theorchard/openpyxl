@@ -89,7 +89,7 @@
         <c:crossAx val="60871424" />
         <c:crosses val="autoZero" />
         <c:crossBetween val="between" />
-        <c:majorUnit val="2.0" />
+        <c:majorUnit val="2" />
       </c:valAx>
     </c:plotArea>
     <c:legend>
