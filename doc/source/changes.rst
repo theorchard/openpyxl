@@ -1,3 +1,18 @@
+2.2.0 (unreleased)
+==================
+
+
+Major changes
+-------------
+Charts will no longer try and calculate axes by default
+Support for template file types - PR21
+
+
+Minor changes
+-------------
+Use a 2-way cache for column index lookups
+
+
 2.1.1 (2014-10-08)
 ==================
 
