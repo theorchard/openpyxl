@@ -1,28 +1,7 @@
 from __future__ import absolute_import
 # Copyright (c) 2010-2014 openpyxl
-#
-# Permission is hereby granted, free of charge, to any person obtaining a copy
-# of this software and associated documentation files (the "Software"), to deal
-# in the Software without restriction, including without limitation the rights
-# to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-# copies of the Software, and to permit persons to whom the Software is
-# furnished to do so, subject to the following conditions:
-#
-# The above copyright notice and this permission notice shall be included in
-# all copies or substantial portions of the Software.
-#
-# THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-# IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-# FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-# AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-# LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-# OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
-# THE SOFTWARE.
-#
-# @license: http://www.opensource.org/licenses/mit-license.php
-# @author: see AUTHORS file
 
-from openpyxl.descriptors import Float, Set, Sequence, Alias
+from openpyxl.descriptors import Float, Set, Sequence, Alias, NoneSet
 from openpyxl.compat import safe_string
 
 from .colors import ColorDescriptor, Color
@@ -49,7 +28,7 @@ FILL_PATTERN_LIGHTUP = 'lightUp'
 FILL_PATTERN_LIGHTVERTICAL = 'lightVertical'
 FILL_PATTERN_MEDIUMGRAY = 'mediumGray'
 
-fills = (FILL_NONE, FILL_SOLID, FILL_PATTERN_DARKDOWN, FILL_PATTERN_DARKGRAY,
+fills = (FILL_SOLID, FILL_PATTERN_DARKDOWN, FILL_PATTERN_DARKGRAY,
          FILL_PATTERN_DARKGRID, FILL_PATTERN_DARKHORIZONTAL, FILL_PATTERN_DARKTRELLIS,
          FILL_PATTERN_DARKUP, FILL_PATTERN_DARKVERTICAL, FILL_PATTERN_GRAY0625,
          FILL_PATTERN_GRAY125, FILL_PATTERN_LIGHTDOWN, FILL_PATTERN_LIGHTGRAY,
@@ -76,14 +55,14 @@ class PatternFill(Fill):
                   'fgColor',
                   'bgColor')
 
-    patternType = Set(values=fills)
+    patternType = NoneSet(values=fills)
     fill_type = Alias("patternType")
     fgColor = ColorDescriptor()
     start_color = Alias("fgColor")
     bgColor = ColorDescriptor()
     end_color = Alias("bgColor")
 
-    def __init__(self, patternType=FILL_NONE, fgColor=Color(), bgColor=Color(),
+    def __init__(self, patternType=None, fgColor=Color(), bgColor=Color(),
                  fill_type=None, start_color=None, end_color=None):
         if fill_type is not None:
             patternType = fill_type
