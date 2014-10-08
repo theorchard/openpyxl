@@ -43,7 +43,6 @@ __license__ = 'MIT/Expat'
 __author_email__ = 'eric.gazoni@gmail.com'
 __maintainer_email__ = 'openpyxl-users@googlegroups.com'
 __url__ = 'http://openpyxl.readthedocs.org'
-__downloadUrl__ = "http://bitbucket.org/openpyxl/openpyxl/downloads"
 
 
 def get_version():
