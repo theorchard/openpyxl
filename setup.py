@@ -65,7 +65,6 @@ setup(name='openpyxl',
     author_email=__author_email__,
     url=__url__,
     license=__license__,
-    download_url=__downloadUrl__,
     requires=[
           'python (>=2.6.0)',
           ],
