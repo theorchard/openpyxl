@@ -10,6 +10,7 @@ Allow auto_axis keyword for ScatterCharts
 
 Bug fixes
 ---------
+332 Fills lost in ConditionalFormatting
 360 Support value="none" in attributes
 363 Support undocumented value for textRotation
 364 Preserve integers in read-only mode
