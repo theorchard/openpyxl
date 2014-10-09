@@ -444,6 +444,10 @@ class TestWorksheet(object):
         assert ws.tab_color == "1072BA"
         with pytest.raises(ValueError):
             ws.add_tab_color("")
+        with pytest.raises(ValueError):
+            ws.add_tab_color(12345)
+        ws.add_tab_color(123456)
+        assert ws.tab_color == "123456"
 
 
 class TestPositioning(object):

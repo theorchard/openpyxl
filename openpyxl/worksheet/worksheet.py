@@ -590,7 +590,7 @@ class Worksheet(object):
         hex_color_code is a string with the following acceptable formats:
         #RRGGBB or RRGGBB
         """
-        colorstring = hex_color_code.strip()
+        colorstring = str(hex_color_code).strip()
         if len(colorstring) == 0:
             raise ValueError, "Provided tab color #%s is not in #RRGGBB format" % colorstring
         if colorstring[0] == '#': 
