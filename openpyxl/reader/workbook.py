@@ -102,8 +102,10 @@ def read_sheets(archive):
     xml_source = archive.read(ARC_WORKBOOK)
     tree = fromstring(xml_source)
     for element in safe_iterator(tree, '{%s}sheet' % SHEET_MAIN_NS):
-        rId = element.get("{%s}id" % REL_NS)
-        yield rId, element.get('name'), element.get('state')
+        attrib = element.attrib
+        attrib['id'] = attrib["{%s}id" % REL_NS]
+        del attrib["{%s}id" % REL_NS]
+        yield attrib
 
 
 def detect_worksheets(archive):
@@ -115,9 +117,10 @@ def detect_worksheets(archive):
     content_types = read_content_types(archive)
     valid_sheets = dict((path, ct) for ct, path in content_types if ct == VALID_WORKSHEET)
     rels = dict(read_rels(archive))
-    for rId, title, state in read_sheets(archive):
-        rel = rels[rId]
-        rel['title'] = title
+    for sheet in read_sheets(archive):
+        rel = rels[sheet['id']]
+        rel['title'] = sheet['name']
+        state = sheet.get('state')
         if state is not None:
             rel['state'] = state
         if ("/" + rel['path'] in valid_sheets

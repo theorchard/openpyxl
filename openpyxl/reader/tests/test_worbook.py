@@ -29,9 +29,9 @@ def test_hidden_sheets(datadir, DummyArchive):
         archive.writestr(ARC_WORKBOOK, src.read())
     sheets = read_sheets(archive)
     assert list(sheets) == [
-        ('rId1', 'Blatt1', None),
-        ('rId2', 'Blatt2', 'hidden'),
-        ('rId3', 'Blatt3', 'hidden')
+        {'id': 'rId1', 'name': 'Blatt1', 'sheetId': '1'},
+        {'id': 'rId2', 'sheetId': '2', 'name': 'Blatt2', 'state': 'hidden'},
+        {'id': 'rId3', 'state': 'hidden', 'sheetId': '3', 'name': 'Blatt3'},
                              ]
 
 
@@ -90,15 +90,15 @@ def test_read_rels(datadir, excel_file, expected):
 @pytest.mark.parametrize("workbook_file, expected", [
     ("bug137_workbook.xml",
      [
-         ("rId1", "Chart1", None),
-         ("rId2", "Sheet1", None),
+         {'sheetId': '4', 'id': 'rId1', 'name': 'Chart1'},
+         {'name': 'Sheet1', 'sheetId': '1', 'id': 'rId2'},
      ]
      ),
     ("bug304_workbook.xml",
      [
-         ('rId1', 'Sheet1', None),
-         ('rId2', 'Sheet2', None),
-         ('rId3', 'Sheet3', None),
+         {'id': 'rId1', 'name': 'Sheet1', 'sheetId': '1'},
+         {'name': 'Sheet2', 'id': 'rId2', 'sheetId': '2'},
+         {'id': 'rId3', 'sheetId': '3', 'name': 'Sheet3'},
      ]
      )
 ])
