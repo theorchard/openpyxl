@@ -13,7 +13,7 @@ class GraphChart(Chart):
     x_axis = CategoryAxis
     y_axis = ValueAxis
 
-    def __init__(self, auto_axis=True):
+    def __init__(self, auto_axis=False):
         super(GraphChart, self).__init__()
         self.auto_axis = auto_axis
         self.x_axis = getattr(self, "x_axis")(auto_axis)
