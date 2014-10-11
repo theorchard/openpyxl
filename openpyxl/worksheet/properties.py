@@ -12,6 +12,8 @@ from openpyxl.xml.functions import Element
 
 class WorksheetProperties(Strict):
 
+    tag = "{%s}sheetPr" % SHEET_MAIN_NS
+
     codeName = String(allow_none=True)
     enableFormatConditionsCalculation = Bool(allow_none=True)
     filterMode = Bool(allow_none=True)
@@ -67,32 +69,34 @@ class WorksheetProperties(Strict):
 def parse_sheetPr(node):
     props = WorksheetProperties(**node.attrib)
 
-    outline = node.find("{%s}outlinePr" % SHEET_MAIN_NS)
+    outline = node.find(Outline.tag)
     if outline is not None:
         props.outlinePr = Outline(**outline.attrib)
 
-    page_setup = node.find("{%s}pageSetupPr" % SHEET_MAIN_NS)
+    page_setup = node.find(PageSetup.tag)
     if page_setup is not None:
         props.pageSetUpPr = PageSetup(**page_setup.attrib)
     return props
 
 
 def write_sheetPr(props):
-    el = Element("{%s}" % SHEET_MAIN_NS, dict(props))
+    el = Element(props.tag, dict(props))
 
     outline = props.outlinePr
     if outline:
-        el.append(Element("{%s}outlinePr"), dict(outline))
+        el.append(Element(outline.tag, dict(outline)))
 
     page_setup = props.pageSetup
 
     if page_setup:
-        el.append(Element("{%s}pageSetupPr"), dict(page_setup))
+        el.append(Element(page_setup.tag, dict(page_setup)))
 
     return el
 
 
 class Outline(Strict):
+
+    tag = "{%s}outlinePr" % SHEET_MAIN_NS
 
     applyStyles = Bool(allow_none=True)
     summaryBelow = Bool(allow_none=True)
@@ -120,6 +124,8 @@ class Outline(Strict):
 
 
 class PageSetup(Strict):
+
+    tag = "{%s}pageSetupPr" % SHEET_MAIN_NS
 
     autoPageBreaks = Bool(allow_none=True)
     fitToPage = Bool(allow_none=True)
