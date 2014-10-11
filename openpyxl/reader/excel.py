@@ -212,6 +212,7 @@ def _load_workbook(wb, archive, filename, read_only, keep_vba):
 
     # get worksheets
     wb.worksheets = []  # remove preset worksheet
+    mapping = {} # map new sheets to sheetIds
     for sheet in detect_worksheets(archive):
         sheet_name = sheet['title']
         worksheet_path = sheet['path']
@@ -231,6 +232,7 @@ def _load_workbook(wb, archive, filename, read_only, keep_vba):
 
         new_ws.sheet_state = sheet.get('state') or 'visible'
         wb._add_sheet(new_ws)
+        mapping[sheet['sheet_id']] = new_ws
 
         if not read_only:
         # load comments into the worksheet cells
@@ -238,7 +240,7 @@ def _load_workbook(wb, archive, filename, read_only, keep_vba):
             if comments_file is not None:
                 read_comments(new_ws, archive.read(comments_file))
 
-    wb._named_ranges = list(read_named_ranges(archive.read(ARC_WORKBOOK), wb))
+    wb._named_ranges = list(read_named_ranges(archive.read(ARC_WORKBOOK), wb, mapping))
 
     wb.code_name = read_workbook_code_name(archive.read(ARC_WORKBOOK))
 
