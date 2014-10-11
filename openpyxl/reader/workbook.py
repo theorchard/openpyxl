@@ -120,6 +120,7 @@ def detect_worksheets(archive):
     for sheet in read_sheets(archive):
         rel = rels[sheet['id']]
         rel['title'] = sheet['name']
+        rel['sheet_id'] = sheet['sheetId']
         state = sheet.get('state')
         if state is not None:
             rel['state'] = state

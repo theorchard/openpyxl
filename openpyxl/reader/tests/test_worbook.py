@@ -37,17 +37,17 @@ def test_hidden_sheets(datadir, DummyArchive):
 
 @pytest.mark.parametrize("excel_file, expected", [
     ("bug137.xlsx", [
-        {'path': 'xl/worksheets/sheet1.xml', 'title': 'Sheet1', 'type':'%s/worksheet' % REL_NS}
+        {'path': 'xl/worksheets/sheet1.xml', 'title': 'Sheet1', 'type':'%s/worksheet' % REL_NS, 'sheet_id':'1'}
         ]
      ),
     ("contains_chartsheets.xlsx", [
-        {'path': 'xl/worksheets/sheet1.xml', 'title': 'data', 'type':'%s/worksheet' % REL_NS},
-        {'path': 'xl/worksheets/sheet2.xml', 'title': 'moredata', 'type':'%s/worksheet' % REL_NS},
+        {'path': 'xl/worksheets/sheet1.xml', 'title': 'data', 'type':'%s/worksheet' % REL_NS, 'sheet_id':'1'},
+        {'path': 'xl/worksheets/sheet2.xml', 'title': 'moredata', 'type':'%s/worksheet' % REL_NS, 'sheet_id':'2'},
         ]),
     ("bug304.xlsx", [
-    {'path': 'xl/worksheets/sheet3.xml', 'title': 'Sheet1', 'type':'%s/worksheet' % REL_NS},
-    {'path': 'xl/worksheets/sheet2.xml', 'title': 'Sheet2', 'type':'%s/worksheet' % REL_NS},
-    {'path': 'xl/worksheets/sheet.xml', 'title': 'Sheet3', 'type':'%s/worksheet' % REL_NS},
+    {'path': 'xl/worksheets/sheet3.xml', 'title': 'Sheet1', 'type':'%s/worksheet' % REL_NS, 'sheet_id':'1'},
+    {'path': 'xl/worksheets/sheet2.xml', 'title': 'Sheet2', 'type':'%s/worksheet' % REL_NS, 'sheet_id':'2'},
+    {'path': 'xl/worksheets/sheet.xml', 'title': 'Sheet3', 'type':'%s/worksheet' % REL_NS, 'sheet_id':'3'},
     ])
 ]
                          )
@@ -61,8 +61,8 @@ def test_detect_worksheets(datadir, excel_file, expected):
 
 @pytest.mark.parametrize("excel_file, expected", [
     ("bug137.xlsx", {
-        "rId1": {'path': 'xl/chartsheets/sheet1.xml', 'type':'%s/chartsheet' % REL_NS},
-        "rId2": {'path': 'xl/worksheets/sheet1.xml', 'type':'%s/worksheet' % REL_NS},
+        "rId1": {'path': 'xl/chartsheets/sheet1.xml', 'type':'%s/chartsheet' % REL_NS, },
+        "rId2": {'path': 'xl/worksheets/sheet1.xml', 'type':'%s/worksheet' % REL_NS, },
         "rId3": {'path': 'xl/theme/theme1.xml', 'type':'%s/theme' % REL_NS},
         "rId4": {'path': 'xl/styles.xml', 'type':'%s/styles' % REL_NS},
         "rId5": {'path': 'xl/sharedStrings.xml', 'type':'%s/sharedStrings' % REL_NS}
@@ -151,4 +151,5 @@ def test_missing_content_type(datadir, DummyArchive):
     with open("bug181_workbook.xml.rels") as src:
         archive.writestr(ARC_WORKBOOK_RELS, src.read())
     sheets = list(detect_worksheets(archive))
-    assert sheets == [{'path': 'xl/worksheets/sheet1.xml', 'title': 'Sheet 1', 'type':'%s/worksheet' % REL_NS}]
+    assert sheets == [{'path': 'xl/worksheets/sheet1.xml', 'title': 'Sheet 1', 'sheet_id':'1',
+                       'type':'%s/worksheet' % REL_NS}]
