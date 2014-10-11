@@ -6,7 +6,7 @@ from inspect import isgenerator
 import os
 from lxml.etree import xmlfile, Element, SubElement
 
-from openpyxl.compat import safe_string
+from openpyxl.compat import safe_string, range
 from openpyxl.cell import get_column_letter, Cell
 
 from . dump_worksheet import (
@@ -90,8 +90,9 @@ class LXMLWorksheet(DumpWorksheet):
         :param row: iterable containing values to append
         :type row: iterable
         """
-        if (not isinstance(row, (list, tuple, range))
-            and not isgenerator(row)):
+        if (not isgenerator(row) and
+            not isinstance(row, (list, tuple, range))
+            ):
             self._invalid_row(row)
         cell = WriteOnlyCell(self) # singleton
 
