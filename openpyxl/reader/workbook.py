@@ -129,7 +129,7 @@ def detect_worksheets(archive):
             yield rel
 
 
-def read_named_ranges(xml_source, workbook, mapping):
+def read_named_ranges(xml_source, workbook):
     """Read named ranges, excluding poorly defined ranges."""
     sheetnames = set(sheet.title for sheet in workbook.worksheets)
     root = fromstring(xml_source)
@@ -158,10 +158,7 @@ def read_named_ranges(xml_source, workbook, mapping):
         else:
             named_range = NamedValue(range_name, node_text)
 
-
-        sheet_id = name_node.get("localSheetId")
-        if sheet_id is not None:
-            named_range.scope = mapping[sheet_id]
+        named_range.scope = name_node.get("localSheetId")
 
         yield named_range
 
