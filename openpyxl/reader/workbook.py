@@ -158,9 +158,9 @@ def read_named_ranges(xml_source, workbook):
             named_range = NamedValue(range_name, node_text)
 
 
-        location_id = name_node.get("localSheetId")
-        if location_id is not None:
-            named_range.scope = workbook.worksheets[int(location_id)]
+        sheet_id = name_node.get("localSheetId")
+        if sheet_id is not None:
+            named_range.scope = workbook.worksheets[int(sheet_id)]
 
         yield named_range
 
