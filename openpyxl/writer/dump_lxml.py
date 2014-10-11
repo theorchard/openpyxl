@@ -96,16 +96,12 @@ class LXMLWorksheet(DumpWorksheet):
         cell = WriteOnlyCell(self) # singleton
 
         self._max_row += 1
-        span = len(row)
-        self._max_col = max(self._max_col, span)
         row_idx = self._max_row
         if self.writer is None:
             self.writer = self._write_header()
             next(self.writer)
 
-        attrs = {'r': '%d' % self._max_row,
-                 'spans': '1:%d' % self._max_col}
-        el = Element("row", attrs)
+        el = Element("row", r='%d' % self._max_row)
 
         for col_idx, value in enumerate(row, 1):
             if value is None:
@@ -129,6 +125,8 @@ class LXMLWorksheet(DumpWorksheet):
             el.append(tree)
             if dirty_cell:
                 cell = WriteOnlyCell(self)
+        self._max_col = max(self._max_col, col_idx)
+        el.set('spans', '1:%d' % col_idx)
         try:
             self.writer.send(el)
         except StopIteration:
