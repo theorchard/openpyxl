@@ -121,9 +121,9 @@ class BaseChartWriter(object):
         SubElement(scaling, '{%s}orientation' % CHART_NS, {'val':axis.orientation})
         if axis.delete_axis:
             SubElement(scaling, '{%s}' % CHART_NS, {'val':'1'})
-        if axis.type == "valAx":
-            SubElement(scaling, '{%s}max' % CHART_NS, {'val':str(float(axis.max))})
-            SubElement(scaling, '{%s}min' % CHART_NS, {'val':str(float(axis.min))})
+        if axis.type == "valAx" and axis.auto_axis:
+            SubElement(scaling, '{%s}max' % CHART_NS, {'val':safe_string(axis.max)})
+            SubElement(scaling, '{%s}min' % CHART_NS, {'val':safe_string(axis.min)})
 
         SubElement(ax, '{%s}axPos' % CHART_NS, {'val':axis.position})
         if axis.type == "valAx":
@@ -144,8 +144,8 @@ class BaseChartWriter(object):
         if axis.label_offset:
             SubElement(ax, '{%s}lblOffset' % CHART_NS, {'val':str(axis.label_offset)})
 
-
-        SubElement(ax, '{%s}crossBetween' % CHART_NS, val=axis.cross_between)
+        if axis.type == 'valAx':
+            SubElement(ax, '{%s}crossBetween' % CHART_NS, val=axis.cross_between)
         if axis.unit:
             SubElement(ax, '{%s}majorUnit' % CHART_NS, val=safe_string(axis.unit))
 
@@ -160,8 +160,9 @@ class BaseChartWriter(object):
                 tx = SubElement(ser, '{%s}tx' % CHART_NS)
                 SubElement(tx, '{%s}v' % CHART_NS).text = series.title
 
-            marker = SubElement(ser, "{%s}marker" % CHART_NS)
-            SubElement(marker, "{%s}symbol" % CHART_NS, val=safe_string(series.marker))
+            if isinstance(self, LineChart):
+                marker = SubElement(ser, "{%s}marker" % CHART_NS)
+                SubElement(marker, "{%s}symbol" % CHART_NS, val=safe_string(series.marker))
 
             if series.color:
                 sppr = SubElement(ser, '{%s}spPr' % CHART_NS)

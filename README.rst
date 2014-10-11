@@ -48,4 +48,4 @@ The documentation is at: http://openpyxl.readthedocs.org
 * code examples
 * instructions for contributing
 
-Release notes: http://openpyxl.readthedocs.org/changes.html
+Release notes: http://openpyxl.readthedocs.org/en/latest/changes.html

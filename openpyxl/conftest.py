@@ -40,7 +40,9 @@ def pytest_runtest_setup(item):
         elif item.get_marker("not_py33"):
             pytest.skip("Ordering is not a given in Python 3")
         elif item.get_marker("lxml_required"):
-            pytest.skip("LXML is required for some features such as schema validation")
+            from openpyxl import LXML
+            if not LXML:
+                pytest.skip("LXML is required for some features such as schema validation")
         elif item.get_marker("lxml_buffering"):
             from lxml.etree import LIBXML_VERSION
             if LIBXML_VERSION < (3, 4, 0, 0):

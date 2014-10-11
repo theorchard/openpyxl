@@ -56,4 +56,4 @@ class TestPieChartWriter(object):
         datadir.chdir()
         with open("PieChart.xml") as expected:
             diff = compare_xml(xml, expected.read())
-            assert diff is None, diff
+        assert diff is None, diff
