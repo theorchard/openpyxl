@@ -37,10 +37,25 @@ YELLOW = COLOR_INDEX[5]
 DARKYELLOW = COLOR_INDEX[19]
 
 
+RGB_REGEX = re.compile("^([A-Fa-f0-9]{6})$")
 aRGB_REGEX = re.compile("^([A-Fa-f0-9]{8}|[A-Fa-f0-9]{6})$")
 
 
 class RGB(Descriptor):
+    """Descriptor for standard RGB values"""
+
+    def __set__(self, instance, value):
+        m = RGB_REGEX.match(value)
+        if m is None:
+            raise ValueError("Colors must be valid RGB hex values")
+        super(RGB, self).__set__(instance, value)
+
+
+class ARGB(Descriptor):
+    """
+    Descriptor for aRGB values
+    If not supplied alpha is 00
+    """
 
     def __set__(self, instance, value):
         m = aRGB_REGEX.match(value)
@@ -48,13 +63,13 @@ class RGB(Descriptor):
             raise ValueError("Colors must be aRGB hex values")
         if len(value) == 6:
             value = "00" + value
-        super(RGB, self).__set__(instance, value)
+        super(ARGB, self).__set__(instance, value)
 
 
 class Color(HashableObject):
     """Named colors for use in styles."""
 
-    rgb = RGB()
+    rgb = ARGB()
     indexed = Integer()
     auto = Bool()
     theme = Integer()
