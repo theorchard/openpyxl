@@ -5,7 +5,9 @@ from __future__ import absolute_import
 
 from openpyxl.compat import safe_string
 from openpyxl.descriptors import Strict, String, Bool, Typed
-from openpyxl.styles.colors import ARGB
+from openpyxl.styles.colors import Color
+from openpyxl.xml.constants import SHEET_MAIN_NS
+from openpyxl.xml.functions import Element
 
 
 class WorksheetProperties(Strict):
@@ -19,7 +21,7 @@ class WorksheetProperties(Strict):
     syncVertical = Bool(allow_none=True)
     transitionEvaluation = Bool(allow_none=True)
     transitionEntry = Bool(allow_none=True)
-    tabColor = ARGB(allow_none=True)
+    tabColor = Color(allow_none=True)
     outlinePr = Typed(expected_type=Outline)
     pageSetUpPr = Typed(expected_type=PageSetup)
 
@@ -27,12 +29,67 @@ class WorksheetProperties(Strict):
     def __init__(self,
                  codeName=None,
                  enableFormatConditionsCalculation=None,
+                 filterMode=None,
+                 published=None,
+                 syncHorizontal=None,
+                 syncRef=None,
+                 syncVertical=None,
+                 transitionEvaluation=None,
+                 transitionEntry=None,
+                 tabColor=None,
+                 outlinePr=None,
+                 pageSetUpPr=None,
                  ):
-        pass
+        self.codeName = codeName
+        self.enableFormatConditionsCalculation = enableFormatConditionsCalculation
+        self.filterMode = filterMode
+        self.published = published
+        self.syncHorizontal = syncHorizontal
+        self.syncRef = syncRef
+        self.syncVertical = syncVertical
+        self.transitionEvaluation = transitionEvaluation
+        self.transitionEntry = transitionEntry
+        self.tabColor = tabColor
+        self.outlinePr = outlinePr
+        self.pageSetUpPr = pageSetUpPr
 
 
     def __iter__(self):
-        pass
+        for attr in ("codeName", "enableFormatConditionsCalculation",
+                     "filterMode", "published", "syncHorizontal", "syncRef",
+                     "syncVertical", "transitionEvaluation", "transitionEntry",
+                     "tabColor"):
+            value = getattr(self, attr)
+            if value is not None:
+                yield attr, safe_string(value)
+
+
+def parse_sheetPr(node):
+    props = WorksheetProperties(**node.attrib)
+
+    outline = node.find("{%s}outlinePr" % SHEET_MAIN_NS)
+    if outline is not None:
+        props.outlinePr = Outline(**outline.attrib)
+
+    page_setup = node.find("{%s}pageSetupPr" % SHEET_MAIN_NS)
+    if page_setup is not None:
+        props.pageSetUpPr = PageSetup(**page_setup.attrib)
+    return props
+
+
+def write_sheetPr(props):
+    el = Element("{%s}" % SHEET_MAIN_NS, dict(props))
+
+    outline = props.outlinePr
+    if outline:
+        el.append(Element("{%s}outlinePr"), dict(outline))
+
+    page_setup = props.pageSetup
+
+    if page_setup:
+        el.append(Element("{%s}pageSetupPr"), dict(page_setup))
+
+    return el
 
 
 class Outline(Strict):
