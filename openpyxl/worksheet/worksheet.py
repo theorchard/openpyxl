@@ -42,6 +42,7 @@ from openpyxl.units import (
 from openpyxl.styles import DEFAULTS as DEFAULTS_STYLE
 from openpyxl.formatting import ConditionalFormatting
 from openpyxl.workbook.names.named_range import NamedRange
+from openpyxl.styles.colors import Color
 
 from .header_footer import HeaderFooter
 from .relationship import Relationship
@@ -137,7 +138,7 @@ class Worksheet(object):
             self.title = 'Sheet%d' % (1 + len(self._parent.worksheets))
         else:
             self.title = title
-        self.tab_color = None
+        self._tab_color = None
         self.row_dimensions = {}
         self.column_dimensions = DimensionHolder([])
         self.page_breaks = []
@@ -219,6 +220,24 @@ class Worksheet(object):
             msg = 'Maximum 31 characters allowed in sheet title'
             raise SheetTitleException(msg)
         self._title = value
+        
+    @property
+    def tab_color(self):
+        return self._tab_color
+    
+    @tab_color.setter
+    def tab_color(self, value):
+        """ 
+        Add a color to the tab of the sheet 
+        value is a string with the following acceptable formats: 
+            - 00RRGGBB
+            - RRGGBB
+        """
+        if not isinstance(value, str):
+            raise ValueError, "Provided tab color %s should be a string following '00RRGGBB' format." % value
+        
+        colorstring = Color(rgb=value)
+        self._tab_color = colorstring.value
 
     @deprecated('this method is private and should not be called directly')
     def unique_sheet_name(self, value):
@@ -583,22 +602,6 @@ class Worksheet(object):
     def add_rel(self, obj):
         """Drawings and hyperlinks create relationships"""
         self._parent.relationships.append(obj)
-        
-    def add_tab_color(self, hex_color_code):
-        """ 
-        Add a color to the tab of the sheet 
-        hex_color_code is a string with the following acceptable formats:
-        #RRGGBB or RRGGBB
-        """
-        colorstring = str(hex_color_code).strip()
-        if len(colorstring) == 0:
-            raise ValueError, "Provided tab color #%s is not in #RRGGBB format" % colorstring
-        if colorstring[0] == '#': 
-            colorstring = colorstring[1:]
-        if len(colorstring) != 6:
-            raise ValueError, "Provided tab color #%s is not in #RRGGBB format" % colorstring
-        else:
-            self.tab_color = colorstring
 
     def merge_cells(self, range_string=None, start_row=None, start_column=None, end_row=None, end_column=None):
         """ Set merge on a cell range.  Range is a cell range (e.g. A1:E1) """

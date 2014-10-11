@@ -35,9 +35,9 @@ You can change this name at any time with the `title` property::
     ws.title = "New Title"  
 
 The background color of the tab holding this title is white by default.
-You can change this providing an hexadecimal color code to the add_tab_color method::
+You can change this providing an RRGGBB color code to the tab_color property::
 
-    ws.add_tab_color("#1072BA")
+    ws.tab_color = "1072BA"
 
 Once you gave a worksheet a name, you can get it as a key of the workbook or
 using the :func:`openpyxl.workbook.Workbook.get_sheet_by_name` method ::

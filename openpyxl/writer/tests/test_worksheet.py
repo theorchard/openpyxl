@@ -848,13 +848,13 @@ def test_write_comments(out, worksheet):
 
 def test_write_with_tab_color(worksheet):
     ws = worksheet
-    ws.add_tab_color("#F0F0F0")
+    ws.tab_color = "F0F0F0"
     xml = write_worksheet(ws, None)
     expected = """
     <worksheet xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main" xmlns:r="http://schemas.openxmlformats.org/officeDocument/2006/relationships">
       <sheetPr>
         <outlinePr summaryRight="1" summaryBelow="1"/>
-        <tabColor rgb="F0F0F0"/>
+        <tabColor rgb="00F0F0F0"/>
       </sheetPr>
       <dimension ref="A1:A1"/>
       <sheetViews>
