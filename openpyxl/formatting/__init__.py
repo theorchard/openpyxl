@@ -1,7 +1,7 @@
 from __future__ import absolute_import
 # Copyright (c) 2010-2014 openpyxl
 
-from openpyxl.compat import iteritems, OrderedDict
+from openpyxl.compat import iteritems, OrderedDict, deprecated
 
 from openpyxl.styles import Font, PatternFill, Border
 from .rules import CellIsRule, ColorScaleRule, FormatRule, FormulaRule
@@ -61,7 +61,13 @@ class ConditionalFormatting(object):
                 if 'priority' in rule and priority > self.max_priority:
                     self.max_priority = priority
 
+
+    @deprecated("Conditionl Formats are saved automatically")
     def setDxfStyles(self, wb):
+        self._save_styles(wb)
+
+
+    def _save_styles(self, wb):
         """Formatting for non color scale conditional formatting uses the dxf style list in styles.xml. This scans
         the cf_rules for dxf styles which have not been added - and saves them to the workbook.
 

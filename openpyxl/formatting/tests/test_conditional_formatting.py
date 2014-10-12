@@ -109,7 +109,7 @@ class TestConditionalFormatting(object):
         worksheet = WS()
         worksheet.conditional_formatting.add('C1:C10', {'type': 'expression', 'formula': ['ISBLANK(C1)'],
                                                         'stopIfTrue': '1', 'dxf': {}})
-        worksheet.conditional_formatting.setDxfStyles(self.workbook)
+        worksheet.conditional_formatting._save_styles(self.workbook)
         cfs = write_conditional_formatting(worksheet)
         xml = b""
         for cf in cfs:
@@ -137,7 +137,7 @@ class TestConditionalFormatting(object):
                                         color=Color(colors.BLACK)))
         cf.add('C1:C10', FormulaRule(formula=['ISBLANK(C1)'], font=font, border=border, fill=fill))
         cf.add('D1:D10', FormulaRule(formula=['ISBLANK(D1)'], fill=fill))
-        cf.setDxfStyles(self.workbook)
+        cf._save_styles(self.workbook)
         assert len(self.workbook.style_properties['dxf_list']) == 2
         assert self.workbook.style_properties['dxf_list'][0] == {'font': font, 'border': border, 'fill': fill}
         assert self.workbook.style_properties['dxf_list'][1] == {'fill': fill}
@@ -183,7 +183,7 @@ class TestConditionalFormatting(object):
         whiteFont = Font(color=Color("FFFFFFFF"))
         worksheet.conditional_formatting.add('A1:A3', CellIsRule(operator='equal', formula=['"Fail"'], stopIfTrue=False,
                                                                  font=whiteFont, fill=redFill))
-        worksheet.conditional_formatting.setDxfStyles(self.workbook)
+        worksheet.conditional_formatting._save_styles(self.workbook)
 
         # First, verify conditional formatting xml
         cfs = write_conditional_formatting(worksheet)
@@ -282,7 +282,7 @@ class TestCellIsRule(object):
                        patternType=fills.FILL_SOLID)
         cf.add('U10:U18', CellIsRule(operator='greaterThan', formula=['U$7'], stopIfTrue=True, fill=redFill))
         cf.add('V10:V18', CellIsRule(operator='>', formula=['V$7'], stopIfTrue=True, fill=redFill))
-        cf.setDxfStyles(self.workbook)
+        cf._save_styles(self.workbook)
         rules = cf.cf_rules
         assert 'U10:U18' in rules
         assert len(cf.cf_rules['U10:U18']) == 1
@@ -308,7 +308,7 @@ class TestCellIsRule(object):
                        patternType=fills.FILL_SOLID)
         cf.add('U10:U18', CellIsRule(operator='greaterThanOrEqual', formula=['U$7'], stopIfTrue=True, fill=redFill))
         cf.add('V10:V18', CellIsRule(operator='>=', formula=['V$7'], stopIfTrue=True, fill=redFill))
-        cf.setDxfStyles(self.workbook)
+        cf._save_styles(self.workbook)
         rules = cf.cf_rules
         assert 'U10:U18' in rules
         assert len(cf.cf_rules['U10:U18']) == 1
@@ -334,7 +334,7 @@ class TestCellIsRule(object):
                        patternType=fills.FILL_SOLID)
         cf.add('U10:U18', CellIsRule(operator='lessThan', formula=['U$7'], stopIfTrue=True, fill=redFill))
         cf.add('V10:V18', CellIsRule(operator='<', formula=['V$7'], stopIfTrue=True, fill=redFill))
-        cf.setDxfStyles(self.workbook)
+        cf._save_styles(self.workbook)
         rules = cf.cf_rules
         assert 'U10:U18' in rules
         assert len(cf.cf_rules['U10:U18']) == 1
@@ -360,7 +360,7 @@ class TestCellIsRule(object):
                        patternType=fills.FILL_SOLID)
         cf.add('U10:U18', CellIsRule(operator='lessThanOrEqual', formula=['U$7'], stopIfTrue=True, fill=redFill))
         cf.add('V10:V18', CellIsRule(operator='<=', formula=['V$7'], stopIfTrue=True, fill=redFill))
-        cf.setDxfStyles(self.workbook)
+        cf._save_styles(self.workbook)
         rules = cf.cf_rules
         assert 'U10:U18' in rules
         assert len(cf.cf_rules['U10:U18']) == 1
@@ -387,7 +387,7 @@ class TestCellIsRule(object):
         cf.add('U10:U18', CellIsRule(operator='equal', formula=['U$7'], stopIfTrue=True, fill=redFill))
         cf.add('V10:V18', CellIsRule(operator='=', formula=['V$7'], stopIfTrue=True, fill=redFill))
         cf.add('W10:W18', CellIsRule(operator='==', formula=['W$7'], stopIfTrue=True, fill=redFill))
-        cf.setDxfStyles(self.workbook)
+        cf._save_styles(self.workbook)
         rules = cf.cf_rules
         assert 'U10:U18' in rules
         assert len(cf.cf_rules['U10:U18']) == 1
@@ -421,7 +421,7 @@ class TestCellIsRule(object):
                        patternType=fills.FILL_SOLID)
         cf.add('U10:U18', CellIsRule(operator='notEqual', formula=['U$7'], stopIfTrue=True, fill=redFill))
         cf.add('V10:V18', CellIsRule(operator='!=', formula=['V$7'], stopIfTrue=True, fill=redFill))
-        cf.setDxfStyles(self.workbook)
+        cf._save_styles(self.workbook)
         rules = cf.cf_rules
         assert 'U10:U18' in rules
         assert len(cf.cf_rules['U10:U18']) == 1
@@ -446,7 +446,7 @@ class TestCellIsRule(object):
                        end_color=Color('FFEE1111'),
                        patternType=fills.FILL_SOLID)
         cf.add('U10:U18', CellIsRule(operator='between', formula=['U$7', 'U$8'], stopIfTrue=True, fill=redFill))
-        cf.setDxfStyles(self.workbook)
+        cf._save_styles(self.workbook)
         rules = cf.cf_rules
         assert 'U10:U18' in rules
         assert len(cf.cf_rules['U10:U18']) == 1
@@ -464,7 +464,7 @@ class TestCellIsRule(object):
                        end_color=Color('FFEE1111'),
                        patternType=fills.FILL_SOLID)
         cf.add('U10:U18', CellIsRule(operator='notBetween', formula=['U$7', 'U$8'], stopIfTrue=True, fill=redFill))
-        cf.setDxfStyles(self.workbook)
+        cf._save_styles(self.workbook)
         rules = cf.cf_rules
         assert 'U10:U18' in rules
         assert len(cf.cf_rules['U10:U18']) == 1
@@ -490,7 +490,7 @@ class TestFormulaRule(object):
             conditional_formatting = ConditionalFormatting()
         worksheet = WS()
         worksheet.conditional_formatting.add('C1:C10', FormulaRule(formula=['ISBLANK(C1)'], stopIfTrue=True))
-        worksheet.conditional_formatting.setDxfStyles(self.workbook)
+        worksheet.conditional_formatting.setDxf_save_stylesStyles(self.workbook)
 
         cfs = write_conditional_formatting(worksheet)
         xml = b""
