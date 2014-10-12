@@ -16,7 +16,7 @@ from openpyxl.xml.constants import (
     ARC_CONTENT_TYPES,
     ARC_WORKBOOK,
     ARC_WORKBOOK_RELS,
-    WORKSHEET,
+    WORKSHEET_TYPE,
     EXTERNAL_LINK,
 )
 from openpyxl.workbook import DocumentProperties
@@ -39,7 +39,7 @@ import re
 # constants
 BUGGY_NAMED_RANGES = re.compile("|".join(['NA()', '#REF!']))
 DISCARDED_RANGES = re.compile("|".join(['Excel_BuiltIn', 'Print_Area']))
-VALID_WORKSHEET = WORKSHEET
+VALID_WORKSHEET = WORKSHEET_TYPE
 
 
 def read_properties_core(xml_source):

@@ -30,6 +30,8 @@ from openpyxl.xml.constants import (
     ARC_THEME,
     SHARED_STRINGS,
     EXTERNAL_LINK,
+    XLTM,
+    XLTX,
 )
 
 from openpyxl.workbook import Workbook, DocumentProperties
@@ -51,7 +53,7 @@ from openpyxl.reader.comments import read_comments, get_comments_file
 
 
 CENTRAL_DIRECTORY_SIGNATURE = b'\x50\x4b\x05\x06'
-SUPPORTED_FORMATS = ('.xlsx', '.xlsm')
+SUPPORTED_FORMATS = ('.xlsx', '.xlsm', '.xltx', '.xltm')
 
 
 def repair_central_directory(zipFile, is_file_instance):
@@ -188,7 +190,6 @@ def _load_workbook(wb, archive, filename, read_only, keep_vba):
 
     # what content types do we have?
     cts = dict(read_content_types(archive))
-    rels = dict
 
     strings_path = cts.get(SHARED_STRINGS)
     if strings_path is not None:
@@ -198,6 +199,8 @@ def _load_workbook(wb, archive, filename, read_only, keep_vba):
     else:
         shared_strings = []
 
+    wb.is_template = XLTX in cts or XLTM in cts
+
     try:
         wb.loaded_theme = archive.read(ARC_THEME)  # some writers don't output a theme, live with it (fixes #160)
     except KeyError:
@@ -205,7 +208,7 @@ def _load_workbook(wb, archive, filename, read_only, keep_vba):
 
     style_table, color_index, cond_styles = read_style_table(archive.read(ARC_STYLE))
     wb.shared_styles = style_table
-    wb.style_properties = {'dxf_list':cond_styles}
+    wb.style_properties = {'dxf_list': cond_styles}
     wb.cond_styles = cond_styles
 
     wb.properties.excel_base_date = read_excel_base_date(xml_source=archive.read(ARC_WORKBOOK))
