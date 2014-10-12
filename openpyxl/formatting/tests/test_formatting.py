@@ -4,11 +4,11 @@
 from io import BytesIO
 
 # compatibility imports
-from openpyxl import Workbook
-from openpyxl.formatting import ConditionalFormatting
-from openpyxl.formatting.rules import ColorScaleRule, CellIsRule, FormulaRule
+from openpyxl.compat import iteritems, OrderedDict
 
 # package imports
+from openpyxl import Workbook
+from openpyxl.formatting.rules import ColorScaleRule, CellIsRule, FormulaRule
 from openpyxl.reader.excel import load_workbook
 from openpyxl.reader.style import read_style_table
 from openpyxl.xml.constants import ARC_STYLE
@@ -17,18 +17,13 @@ from openpyxl.writer.worksheet import write_conditional_formatting
 from openpyxl.writer.styles import StyleWriter
 from openpyxl.styles import Color, PatternFill, Font, Border, Side
 from openpyxl.styles import borders, fills, colors
+from openpyxl.formatting import ConditionalFormatting
 
 # test imports
 import pytest
 from zipfile import ZIP_DEFLATED, ZipFile
 from openpyxl.tests.helper import compare_xml
 from openpyxl.collections import IndexedList
-
-
-from collections import OrderedDict
-import pytest
-
-from openpyxl.compat import iteritems
 
 
 @pytest.fixture
