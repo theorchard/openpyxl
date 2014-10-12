@@ -12,7 +12,7 @@ from openpyxl.formatting.rules import ColorScaleRule, CellIsRule, FormulaRule
 from openpyxl.reader.excel import load_workbook
 from openpyxl.reader.style import read_style_table
 from openpyxl.xml.constants import ARC_STYLE
-from openpyxl.xml.functions import XMLGenerator, tostring
+from openpyxl.xml.functions import tostring
 from openpyxl.writer.worksheet import write_conditional_formatting
 from openpyxl.writer.styles import StyleWriter
 from openpyxl.styles import Color, PatternFill, Font, Border, Side
