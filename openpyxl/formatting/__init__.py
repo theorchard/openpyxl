@@ -7,10 +7,17 @@ from openpyxl.styles import Font, PatternFill, Border
 from .rules import CellIsRule, ColorScaleRule, FormatRule, FormulaRule
 
 
+def unpack_rules(cfRules):
+    for key, rules in iteritems(cfRules):
+        for idx,rule in enumerate(rules):
+            yield (key, idx, rule['priority'])
+
+
 class ConditionalFormatting(object):
     """Conditional formatting rules."""
-    rule_attributes = ('aboveAverage', 'bottom', 'dxfId', 'equalAverage', 'operator', 'percent', 'priority', 'rank',
-                       'stdDev', 'stopIfTrue', 'text')
+    rule_attributes = ('aboveAverage', 'bottom', 'dxfId', 'equalAverage',
+                       'operator', 'percent', 'priority', 'rank', 'stdDev', 'stopIfTrue',
+                       'text')
     icon_attributes = ('iconSet', 'showValue', 'reverse')
 
     def __init__(self):
@@ -35,6 +42,15 @@ class ConditionalFormatting(object):
             self.cf_rules[range_string] = []
         self.cf_rules[range_string].append(rule)
 
+
+    def _fix_priorities(self):
+        rules = unpack_rules(self.cf_rules)
+        rules = sorted(rules, key=lambda x: x[2])
+        for idx, (key, rule_no, prio) in enumerate(rules, 1):
+            self.cf_rules[key][rule_no]['priority'] = idx
+        self.max_priority = len(rules)
+
+
     def update(self, cfRules):
         """Set the conditional formatting rules from a dictionary.  Intended for use when loading a document.
         cfRules use the structure: {range_string: [rule1, rule2]}, eg:
@@ -46,20 +62,7 @@ class ConditionalFormatting(object):
                 self.cf_rules[range_string] = rules
             else:
                 self.cf_rules[range_string] += rules
-
-        # Fix any gap in the priority range.
-        self.max_priority = 0
-        priorityMap = []
-        for range_string, rules in iteritems(self.cf_rules):
-            for rule in rules:
-                priorityMap.append(rule['priority'])
-        priorityMap.sort()
-        for range_string, rules in iteritems(self.cf_rules):
-            for rule in rules:
-                priority = priorityMap.index(rule['priority']) + 1
-                rule['priority'] = priority
-                if 'priority' in rule and priority > self.max_priority:
-                    self.max_priority = priority
+        self._fix_priorities()
 
 
     @deprecated("Conditionl Formats are saved automatically")
