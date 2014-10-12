@@ -490,7 +490,7 @@ class TestFormulaRule(object):
             conditional_formatting = ConditionalFormatting()
         worksheet = WS()
         worksheet.conditional_formatting.add('C1:C10', FormulaRule(formula=['ISBLANK(C1)'], stopIfTrue=True))
-        worksheet.conditional_formatting.setDxf_save_stylesStyles(self.workbook)
+        worksheet.conditional_formatting._save_styles(self.workbook)
 
         cfs = write_conditional_formatting(worksheet)
         xml = b""
