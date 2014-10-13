@@ -38,7 +38,6 @@ import datetime
 import re
 
 # constants
-BUGGY_NAMED_RANGES = re.compile("|".join(['NA()', '#REF!']))
 DISCARDED_RANGES = re.compile("^[_xnlm.]")
 VALID_WORKSHEET = WORKSHEET
 
@@ -137,7 +136,7 @@ def read_named_ranges(xml_source, workbook):
     for name_node in safe_iterator(root, '{%s}definedName' %SHEET_MAIN_NS):
 
         range_name = name_node.get('name')
-        if DISCARDED_RANGES.match(range_name) or BUGGY_NAMED_RANGES.search(range_name):
+        if DISCARDED_RANGES.match(range_name):
             warnings.warn("Discarded range with reserved name")
             continue
 

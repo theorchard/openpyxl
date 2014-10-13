@@ -38,6 +38,7 @@ NAMED_RANGE_RE = re.compile("""
 !(?P<range>(\$([A-Za-z]+))?(\$([0-9]+))?(:(\$([A-Za-z]+))?(\$([0-9]+))?)?)""", re.VERBOSE)
 SPLIT_NAMED_RANGE_RE = re.compile(r"((?:[^,']|'(?:[^']|'')*')+)")
 EXTERNAL_RE = re.compile(r"(?P<external>\[\d+\])?(?P<range_string>.*)")
+FORMULA_REGEX = re.compile(r"^[a-zA-Z]+[(]+.*[)]$")
 
 
 class NamedValue(object):
@@ -114,6 +115,8 @@ def split_named_range(range_string):
 
 
 def refers_to_range(range_string):
+    if FORMULA_REGEX.match(range_string):
+        return
     if range_string:
         return NAMED_RANGE_RE.match(range_string) is not None
 
