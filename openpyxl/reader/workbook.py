@@ -4,6 +4,7 @@ from __future__ import absolute_import
 """Read in global settings to be maintained by the workbook object."""
 
 # package imports
+import warnings
 from openpyxl.xml.functions import fromstring, safe_iterator
 from openpyxl.xml.constants import (
     DCORE_NS,
@@ -38,7 +39,7 @@ import re
 
 # constants
 BUGGY_NAMED_RANGES = re.compile("|".join(['NA()', '#REF!']))
-DISCARDED_RANGES = re.compile("|".join(['Excel_BuiltIn', 'Print_Area']))
+DISCARDED_RANGES = re.compile("^[_xnlm.]")
 VALID_WORKSHEET = WORKSHEET
 
 
@@ -136,7 +137,8 @@ def read_named_ranges(xml_source, workbook):
     for name_node in safe_iterator(root, '{%s}definedName' %SHEET_MAIN_NS):
 
         range_name = name_node.get('name')
-        if DISCARDED_RANGES.search(range_name) or BUGGY_NAMED_RANGES.search(range_name):
+        if DISCARDED_RANGES.match(range_name) or BUGGY_NAMED_RANGES.search(range_name):
+            warnings.warn("Discarded range with reserved name")
             continue
 
         node_text = name_node.text
