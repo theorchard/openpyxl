@@ -4,7 +4,6 @@ from __future__ import absolute_import
 """Read in global settings to be maintained by the workbook object."""
 
 # package imports
-import warnings
 from openpyxl.xml.functions import fromstring, safe_iterator
 from openpyxl.xml.constants import (
     DCORE_NS,
@@ -38,7 +37,6 @@ import datetime
 import re
 
 # constants
-DISCARDED_RANGES = re.compile("^[_xnlm.]")
 VALID_WORKSHEET = WORKSHEET
 
 
@@ -127,41 +125,6 @@ def detect_worksheets(archive):
         if ("/" + rel['path'] in valid_sheets
             or "worksheets" in rel['path']): # fallback in case content type is missing
             yield rel
-
-
-def read_named_ranges(xml_source, workbook):
-    """Read named ranges, excluding poorly defined ranges."""
-    sheetnames = set(sheet.title for sheet in workbook.worksheets)
-    root = fromstring(xml_source)
-    for name_node in safe_iterator(root, '{%s}definedName' %SHEET_MAIN_NS):
-
-        range_name = name_node.get('name')
-        if DISCARDED_RANGES.match(range_name):
-            warnings.warn("Discarded range with reserved name")
-            continue
-
-        node_text = name_node.text
-
-        if external_range(node_text):
-            # treat names referring to external workbooks as values
-            named_range = NamedValue(range_name, node_text)
-
-        elif refers_to_range(node_text):
-            destinations = split_named_range(node_text)
-            # it can happen that a valid named range references
-            # a missing worksheet, when Excel didn't properly maintain
-            # the named range list
-            destinations = [(workbook[sheet], cells) for sheet, cells in destinations
-                            if sheet in sheetnames]
-            if not destinations:
-                continue
-            named_range = NamedRange(range_name, destinations)
-        else:
-            named_range = NamedValue(range_name, node_text)
-
-        named_range.scope = name_node.get("localSheetId")
-
-        yield named_range
 
 
 def detect_external_links(archive):

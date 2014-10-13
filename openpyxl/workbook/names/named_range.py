@@ -26,11 +26,14 @@ from __future__ import absolute_import
 
 # Python stdlib imports
 import re
+import warnings
 
 # package imports
 from openpyxl.cell import absolute_coordinate
 from openpyxl.compat import unicode
 from openpyxl.exceptions import NamedRangeException
+from openpyxl.xml.functions import fromstring, safe_iterator
+from openpyxl.xml.constants import SHEET_MAIN_NS
 
 # constants
 NAMED_RANGE_RE = re.compile("""
@@ -39,6 +42,7 @@ NAMED_RANGE_RE = re.compile("""
 SPLIT_NAMED_RANGE_RE = re.compile(r"((?:[^,']|'(?:[^']|'')*')+)")
 EXTERNAL_RE = re.compile(r"(?P<external>\[\d+\])?(?P<range_string>.*)")
 FORMULA_REGEX = re.compile(r"^[a-zA-Z]+[(]+.*[)]$")
+DISCARDED_RANGES = re.compile("^[_xnlm.]")
 
 
 class NamedValue(object):
@@ -125,3 +129,38 @@ def external_range(range_string):
     m = EXTERNAL_RE.match(range_string)
     if m is not None:
         return m.group('external') is not None
+
+
+def read_named_ranges(xml_source, workbook):
+    """Read named ranges, excluding poorly defined ranges."""
+    sheetnames = set(sheet.title for sheet in workbook.worksheets)
+    root = fromstring(xml_source)
+    for name_node in safe_iterator(root, '{%s}definedName' %SHEET_MAIN_NS):
+
+        range_name = name_node.get('name')
+        if DISCARDED_RANGES.match(range_name):
+            warnings.warn("Discarded range with reserved name")
+            continue
+
+        node_text = name_node.text
+
+        if external_range(node_text):
+            # treat names referring to external workbooks as values
+            named_range = NamedValue(range_name, node_text)
+
+        elif refers_to_range(node_text):
+            destinations = split_named_range(node_text)
+            # it can happen that a valid named range references
+            # a missing worksheet, when Excel didn't properly maintain
+            # the named range list
+            destinations = [(workbook[sheet], cells) for sheet, cells in destinations
+                            if sheet in sheetnames]
+            if not destinations:
+                continue
+            named_range = NamedRange(range_name, destinations)
+        else:
+            named_range = NamedValue(range_name, node_text)
+
+        named_range.scope = name_node.get("localSheetId")
+
+        yield named_range
