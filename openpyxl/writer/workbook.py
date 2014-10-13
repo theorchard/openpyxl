@@ -8,8 +8,9 @@ from functools import partial
 # package imports
 
 from openpyxl import LXML
-from openpyxl.xml.functions import Element, SubElement
+from openpyxl.compat import safe_string
 from openpyxl.cell import absolute_coordinate
+from openpyxl.xml.functions import Element, SubElement
 from openpyxl.xml.constants import (
     ARC_CORE,
     ARC_WORKBOOK,
@@ -310,7 +311,7 @@ def _write_defined_names(workbook, names):
     for named_range in workbook.get_named_ranges():
         attrs = dict(named_range)
         if named_range.scope is not None:
-            attrs['localSheetId'] = '%d' % named_range.scope
+            attrs['localSheetId'] = safe_string(named_range.scope)
 
         name = Element('{%s}definedName' % SHEET_MAIN_NS, attrs)
         name.text = named_range.value
