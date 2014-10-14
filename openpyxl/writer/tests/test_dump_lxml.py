@@ -90,6 +90,7 @@ def test_append(LXMLWorksheet):
 
     ws.append([1, "s"])
     ws.append(['2', 3])
+    ws.append(i for i in [1, 2])
     ws.writer.close()
     xml = doc.getvalue()
     expected = """
@@ -108,6 +109,14 @@ def test_append(LXMLWorksheet):
         </c>
         <c r="B2" t="n">
           <v>3</v>
+        </c>
+      </row>
+      <row r="3" spans="1:2">
+        <c r="A3" t="n">
+          <v>1</v>
+        </c>
+        <c r="B3" t="n">
+          <v>2</v>
         </c>
       </row>
     </sheetData>

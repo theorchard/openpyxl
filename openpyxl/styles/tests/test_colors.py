@@ -8,12 +8,6 @@ def test_argb(value):
     assert aRGB_REGEX.match(value) is not None
 
 
-@pytest.mark.parametrize("value", ['121212', 'aA34fe'])
-def test_rgb(value):
-    from .. colors import RGB_REGEX
-    assert RGB_REGEX.match(value) is not None
-
-
 class TestColor:
 
     def test_ctor(self):
