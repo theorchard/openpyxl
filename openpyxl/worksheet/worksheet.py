@@ -42,7 +42,6 @@ from openpyxl.units import (
 from openpyxl.styles import DEFAULTS as DEFAULTS_STYLE
 from openpyxl.formatting import ConditionalFormatting
 from openpyxl.workbook.names.named_range import NamedRange
-from openpyxl.styles.colors import Color
 
 from .header_footer import HeaderFooter
 from .relationship import Relationship
@@ -50,6 +49,7 @@ from .page import PageSetup, PageMargins
 from .dimensions import ColumnDimension, RowDimension, DimensionHolder
 from .protection import SheetProtection
 from .filters import AutoFilter
+from .properties import WorksheetProperties
 
 
 def flatten(results):
@@ -138,7 +138,6 @@ class Worksheet(object):
             self.title = 'Sheet%d' % (1 + len(self._parent.worksheets))
         else:
             self.title = title
-        self._tab_color = None
         self.row_dimensions = {}
         self.column_dimensions = DimensionHolder([])
         self.page_breaks = []
@@ -172,6 +171,7 @@ class Worksheet(object):
         self.conditional_formatting = ConditionalFormatting()
         self.vba_code = {}
         self.vba_controls = None
+        self.sheet_properties = WorksheetProperties()
 
     def __repr__(self):
         return self.repr_format % self.title
@@ -179,7 +179,7 @@ class Worksheet(object):
     @property
     def parent(self):
         return self._parent
-
+    
     @property
     def encoding(self):
         return self._parent.encoding
@@ -220,25 +220,7 @@ class Worksheet(object):
             msg = 'Maximum 31 characters allowed in sheet title'
             raise SheetTitleException(msg)
         self._title = value
-        
-    @property
-    def tab_color(self):
-        return self._tab_color
-    
-    @tab_color.setter
-    def tab_color(self, value):
-        """ 
-        Add a color to the tab of the sheet 
-        value is a string with the following acceptable formats: 
-            - 00RRGGBB
-            - RRGGBB
-        """
-        if not isinstance(value, str):
-            raise ValueError, "Provided tab color %s should be a string following '00RRGGBB' format." % value
-        
-        colorstring = Color(rgb=value)
-        self._tab_color = colorstring.value
-
+                
     @deprecated('this method is private and should not be called directly')
     def unique_sheet_name(self, value):
         return self._unique_sheet_name(value)

@@ -18,6 +18,9 @@ from openpyxl.exceptions import (
     NamedRangeException
     )
 
+from openpyxl.styles.colors import Color
+from ..properties import WorksheetProperties
+
 
 @pytest.mark.parametrize('range_string, coords',
                          [
@@ -430,37 +433,26 @@ class TestWorksheet(object):
         ws = Worksheet(self.wb)
         ws._merged_cells = ["A1:D4"]
         ws.unmerge_cells("A1:D4")
-
+        
 
     def test_unmerge_coordinate(self):
         ws = Worksheet(self.wb)
         ws._merged_cells = ["A1:D4"]
         ws.unmerge_cells(start_row=1, start_column=1, end_row=4, end_column=4)
         
-    def test_tab_color(self):
+    
+    def test_sheet_properties(self):
         ws = Worksheet(self.wb)        
-        assert ws.tab_color == None
-        ws.tab_color = "1072BA"
-        assert ws.tab_color == "001072BA"
-        ws.tab_color = "001072BA"
-        assert ws.tab_color == "001072BA"
-        with pytest.raises(ValueError):
-            ws.tab_color = "01072BA"
-        with pytest.raises(ValueError):
-            ws.tab_color = ""
-        with pytest.raises(ValueError):
-            ws.tab_color = "12345"
-        ws.tab_color = "123456"
-        assert ws.tab_color == "00123456"
-        ws.tab_color = "12345600"
-        assert ws.tab_color == "12345600"
-        with pytest.raises(ValueError):
-            ws.tab_color = "#1234567"
-        with pytest.raises(ValueError):
-            ws.tab_color = "ABCDEFGHI"
-        with pytest.raises(ValueError):
-            ws.tab_color = 123456
-
+        assert isinstance(ws.sheet_properties, WorksheetProperties)
+        assert ws.sheet_properties.tabColor == None
+        ws.sheet_properties.tabColor = "001073AB"
+        ws.sheet_properties.filterMode = True
+        assert ws.sheet_properties.tabColor == Color(rgb='001073AB')
+        assert ws.sheet_properties.filterMode == True
+        ws.sheet_properties.tabColor = "2084FF"
+        assert ws.sheet_properties.tabColor == Color(rgb='002084FF')
+        assert ws.sheet_properties.filterMode == True
+        
 
 class TestPositioning(object):
     def test_point(self):
