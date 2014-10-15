@@ -77,11 +77,9 @@ class Workbook(object):
     def _read_workbook_settings(self, xml_source):
         root = fromstring(xml_source)
         view = root.find('*/' '{%s}workbookView' % SHEET_MAIN_NS)
-        if view is None:
-            return
-
-        if 'activeTab' in view.attrib:
-            self.active = int(view.attrib['activeTab'])
+        if view is not None:
+            if 'activeTab' in view.attrib:
+                self.active = int(view.attrib['activeTab'])
 
     @property
     def _local_data(self):
@@ -157,16 +155,11 @@ class Workbook(object):
     def get_sheet_by_name(self, name):
         """Returns a worksheet by its name.
 
-        Returns None if no worksheet has the name specified.
-
         :param name: the name of the worksheet to look for
         :type name: string
 
         """
-        try:
-            return self[name]
-        except KeyError:
-            return
+        return self[name]
 
     def __contains__(self, key):
         return key in set(self.sheetnames)
