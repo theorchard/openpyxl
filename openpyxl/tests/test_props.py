@@ -61,7 +61,7 @@ def test_write_properties_core(datadir):
     content = write_properties_core(prop)
     with open('core.xml') as expected:
         diff = compare_xml(content, expected.read())
-        assert diff is None
+    assert diff is None, diff
 
 def test_write_properties_app(datadir):
     datadir.join("writer").chdir()
@@ -71,7 +71,7 @@ def test_write_properties_app(datadir):
     content = write_properties_app(wb)
     with open('app.xml') as expected:
         diff = compare_xml(content, expected.read())
-        assert diff is None, diff
+    assert diff is None, diff
 
 
 def test_read_workbook_with_no_core_properties(datadir):
@@ -91,6 +91,5 @@ def test_read_workbook_with_no_core_properties(datadir):
     assert prop.description == default_props.description
     assert prop.category == default_props.category
     assert prop.keywords == default_props.keywords
-    assert prop.company == default_props.company
     assert prop.created.timetuple()[:9] == default_props.created.timetuple()[:9] # might break if tests run on the stoke of midnight
-    assert prop.modified == prop.created
+    assert prop.modified.timetuple()[:9] == prop.created.timetuple()[:9]
