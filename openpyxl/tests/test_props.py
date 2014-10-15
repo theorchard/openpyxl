@@ -51,18 +51,6 @@ def test_read_sheets_titles(datadir, filename):
     assert sheet_titles == ['Sheet1 - Text', 'Sheet2 - Numbers', 'Sheet3 - Formulas', 'Sheet4 - Dates']
 
 
-def test_write_properties_core(datadir):
-    datadir.join("writer").chdir()
-    prop = DocumentProperties()
-    prop.creator = 'TEST_USER'
-    prop.last_modified_by = 'SOMEBODY'
-    prop.created = datetime(2010, 4, 1, 20, 30, 00)
-    prop.modified = datetime(2010, 4, 5, 14, 5, 30)
-    content = write_properties_core(prop)
-    with open('core.xml') as expected:
-        diff = compare_xml(content, expected.read())
-    assert diff is None, diff
-
 def test_write_properties_app(datadir):
     datadir.join("writer").chdir()
     wb = Workbook()

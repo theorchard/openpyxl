@@ -4,8 +4,10 @@ from __future__ import absolute_import
 import datetime
 
 from openpyxl.compat import safe_string
-from openpyxl.date_time import CALENDAR_WINDOWS_1900
+from openpyxl.date_time import CALENDAR_WINDOWS_1900, datetime_to_W3CDTF
 from openpyxl.descriptors import Strict, String, Typed, Sequence, Alias
+from openpyxl.xml.functions import ElementTree, Element, SubElement, tostring
+from openpyxl.xml.constants import COREPROPS_NS, DCORE_NS, XSI_NS, DCTERMS_NS, DCTERMS_PREFIX
 
 
 class DocumentProperties(Strict):
@@ -15,7 +17,7 @@ class DocumentProperties(Strict):
 
     category = String(allow_none=True)
     contentStatus = String(allow_none=True)
-    _keywords = Sequence(allow_none=True)
+    keywords = Sequence(allow_none=True)
     lastModifiedBy = String(allow_none=True)
     lastPrinted = String(allow_none=True)
     revision = String(allow_none=True)
@@ -32,7 +34,7 @@ class DocumentProperties(Strict):
     subject = String(allow_none=True)
     title = String(allow_none=True)
 
-    __fields__ = ("category", "contentStatus", "keywords", "lastModifiedBy",
+    __fields__ = ("category", "contentStatus", "lastModifiedBy",
                 "lastPrinted", "revision", "version", "created", "creator", "description",
                 "identifier", "language", "modified", "subject", "title")
 
@@ -67,24 +69,37 @@ class DocumentProperties(Strict):
         self.description = description
         self.identifier = identifier
         self.language = language
-        self._keywords = keywords
+        self.keywords = keywords
         self.category = category
         self.excel_base_date = CALENDAR_WINDOWS_1900
-
-
-    @property
-    def keywords(self):
-        """Return keywords as string or None if emtpy
-        """
-        if self._keywords:
-            return ", ".join([self._keywords])
-
 
     def __iter__(self):
         for attr in self.__fields__:
             value = getattr(self, attr)
             if value is not None:
                 yield attr, safe_string(value)
+
+
+def write_properties(props):
+    """Write the core properties to xml."""
+    root = Element('{%s}coreProperties' % COREPROPS_NS)
+    SubElement(root, '{%s}creator' % DCORE_NS).text = props.creator
+    SubElement(root, '{%s}lastModifiedBy' % COREPROPS_NS).text = props.lastModifiedBy
+    SubElement(root, '{%s}created' % DCTERMS_NS,
+               {'{%s}type' % XSI_NS: '%s:W3CDTF' % DCTERMS_PREFIX}).text = \
+                   datetime_to_W3CDTF(props.created)
+    SubElement(root, '{%s}modified' % DCTERMS_NS,
+               {'{%s}type' % XSI_NS: '%s:W3CDTF' % DCTERMS_PREFIX}).text = \
+                   datetime_to_W3CDTF(props.modified)
+    SubElement(root, '{%s}title' % DCORE_NS).text = props.title
+    SubElement(root, '{%s}description' % DCORE_NS).text = props.description
+    SubElement(root, '{%s}subject' % DCORE_NS).text = props.subject
+    node = SubElement(root, '{%s}keywords' % COREPROPS_NS)
+    for kw in props.keywords:
+        SubElement(node, "{%s}keyword").text = kw
+    SubElement(root, '{%s}category' % COREPROPS_NS).text = props.category
+    return tostring(root)
+
 
 
 class DocumentSecurity(object):
