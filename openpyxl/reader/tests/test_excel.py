@@ -28,3 +28,15 @@ def test_repair_central_directory():
 
     f = repair_central_directory(BytesIO(data_b), True)
     assert f.read() == data_b
+
+
+    from tempfile import NamedTemporaryFile
+
+
+@pytest.mark.parametrize("extension",
+                         ['.xlsb', '.xls', 'no-format']
+                         )
+def test_invalid_file_extension(extension):
+    tmp = NamedTemporaryFile(suffix=extension)
+    with pytest.raises(InvalidFileException):
+        load_workbook(filename=tmp.name)

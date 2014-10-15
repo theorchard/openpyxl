@@ -361,15 +361,3 @@ def test_read_autofilter(datadir):
     wb = load_workbook("bug275.xlsx")
     ws = wb.active
     assert ws.auto_filter.ref == 'A1:B6'
-
-
-from tempfile import NamedTemporaryFile
-
-
-@pytest.mark.parametrize("extension",
-                         ['.xlsb', '.xls', 'no-format']
-                         )
-def test_invalid_file_extension(extension):
-    tmp = NamedTemporaryFile(suffix=extension)
-    with pytest.raises(InvalidFileException):
-        load_workbook(filename=tmp.name)
