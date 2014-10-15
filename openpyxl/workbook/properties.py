@@ -39,14 +39,14 @@ class DocumentProperties(Strict):
     last_modified_by = Alias("lastModifiedBy")
 
     # Dublin Core Properties
-    created = W3CDateTime(expected_type=datetime.datetime, allow_none=True)
+    subject = String(allow_none=True)
+    title = String(allow_none=True)
     creator = String(allow_none=True)
     description = String(allow_none=True)
     identifier = String(allow_none=True)
     language = String(allow_none=True)
+    created = W3CDateTime(expected_type=datetime.datetime, allow_none=True)
     modified = W3CDateTime(expected_type=datetime.datetime, allow_none=True)
-    subject = String(allow_none=True)
-    title = String(allow_none=True)
 
     __fields__ = ("category", "contentStatus", "lastModifiedBy",
                 "lastPrinted", "revision", "version", "created", "creator", "description",
@@ -96,7 +96,8 @@ class DocumentProperties(Strict):
 def write_properties(props):
     """Write the core properties to xml."""
     root = Element('{%s}coreProperties' % COREPROPS_NS)
-    for attr in ("creator", "title", "description", "subject"):
+    for attr in ("creator", "title", "description", "subject", "identifier",
+                 "language"):
         SubElement(root, '{%s}%s' % (DCORE_NS, attr)).text = getattr(props, attr)
 
     for attr in ("created", "modified"):
@@ -104,7 +105,8 @@ def write_properties(props):
         SubElement(root, '{%s}%s' % (DCTERMS_NS, attr),
                    {'{%s}type' % XSI_NS:'%s:W3CDTF' % DCTERMS_PREFIX}).text = value
 
-    for attr in ("lastModifiedBy", "category"):
+    for attr in ("lastModifiedBy", "category", "contentStatus",
+                 "lastPrinted", "version", "revision"):
         SubElement(root, '{%s}%s' % (COREPROPS_NS, attr)).text = getattr(props, attr)
 
     node = SubElement(root, '{%s}keywords' % COREPROPS_NS)
