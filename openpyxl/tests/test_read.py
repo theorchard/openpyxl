@@ -18,9 +18,7 @@ from openpyxl.workbook import Workbook
 from openpyxl.styles import numbers, Style
 from openpyxl.reader.worksheet import read_worksheet
 from openpyxl.reader.excel import load_workbook
-from openpyxl.reader.workbook import read_workbook_code_name
 from openpyxl.date_time import CALENDAR_WINDOWS_1900, CALENDAR_MAC_1904
-from openpyxl.xml.constants import ARC_WORKBOOK
 
 
 def test_read_standalone_worksheet(datadir):
@@ -86,12 +84,6 @@ def test_read_nostring_workbook(datadir):
     assert isinstance(wb, Workbook)
 
 
-def test_read_empty_file(datadir):
-    datadir.join("reader").chdir()
-    with pytest.raises(InvalidFileException):
-        load_workbook('null_file.xlsx')
-
-
 @pytest.mark.parametrize("cell, number_format",
                     [
                         ('A1', numbers.FORMAT_GENERAL),
@@ -123,20 +115,6 @@ def test_read_win_base_date(datadir, filename, epoch):
     ws = wb["Sheet1"]
     assert ws['A1'].value == datetime(2011, 10, 31)
 
-
-def test_repair_central_directory():
-    from openpyxl.reader.excel import repair_central_directory, CENTRAL_DIRECTORY_SIGNATURE
-
-    data_a = b"foobarbaz" + CENTRAL_DIRECTORY_SIGNATURE
-    data_b = b"bazbarfoo1234567890123456890"
-
-    # The repair_central_directory looks for a magic set of bytes
-    # (CENTRAL_DIRECTORY_SIGNATURE) and strips off everything 18 bytes past the sequence
-    f = repair_central_directory(BytesIO(data_a + data_b), True)
-    assert f.read() == data_a + data_b[:18]
-
-    f = repair_central_directory(BytesIO(data_b), True)
-    assert f.read() == data_b
 
 
 def test_read_no_theme(datadir):
