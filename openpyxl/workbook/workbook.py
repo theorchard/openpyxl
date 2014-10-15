@@ -7,7 +7,6 @@ from __future__ import absolute_import
 __docformat__ = "restructuredtext en"
 
 # Python stdlib imports
-import datetime
 import threading
 
 # package imports
@@ -18,41 +17,14 @@ from . names.named_range import NamedRange
 from openpyxl.styles import Style
 from openpyxl.writer.excel import save_workbook
 from openpyxl.exceptions import ReadOnlyWorkbookException
-from openpyxl.date_time import CALENDAR_WINDOWS_1900
 from openpyxl.xml import LXML
 from openpyxl.xml.functions import fromstring
 from openpyxl.xml.constants import SHEET_MAIN_NS
 from openpyxl.compat import deprecated
+from . properties import DocumentProperties, DocumentSecurity
 
 if LXML:
     from openpyxl.writer.dump_lxml import LXMLWorksheet as DumpWorksheet
-
-
-class DocumentProperties(object):
-    """High-level properties of the document."""
-
-    def __init__(self):
-        self.creator = 'Unknown'
-        self.last_modified_by = self.creator
-        self.modified = self.created = datetime.datetime.now()
-        self.title = 'Untitled'
-        self.subject = ''
-        self.description = ''
-        self.keywords = ''
-        self.category = ''
-        self.company = 'Microsoft Corporation'
-        self.excel_base_date = CALENDAR_WINDOWS_1900
-
-
-class DocumentSecurity(object):
-    """Security information about the document."""
-
-    def __init__(self):
-        self.lock_revision = False
-        self.lock_structure = False
-        self.lock_windows = False
-        self.revision_password = ''
-        self.workbook_password = ''
 
 
 class Workbook(object):

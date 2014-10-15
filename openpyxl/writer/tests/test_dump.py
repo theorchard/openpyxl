@@ -9,7 +9,7 @@ import pytest
 from openpyxl.tests.helper import compare_xml
 
 from openpyxl.collections import IndexedList
-from openpyxl.workbook import CALENDAR_WINDOWS_1900
+from openpyxl.date_time import CALENDAR_WINDOWS_1900
 from openpyxl.styles import Style
 from openpyxl.styles.fonts import Font
 from openpyxl.comments.comments import Comment
