@@ -104,19 +104,19 @@ class DocumentProperties(Strict):
 def write_properties(props):
     """Write the core properties to xml."""
     root = Element('{%s}coreProperties' % COREPROPS_NS)
-    SubElement(root, '{%s}creator' % DCORE_NS).text = props.creator
-    SubElement(root, '{%s}title' % DCORE_NS).text = props.title
-    SubElement(root, '{%s}description' % DCORE_NS).text = props.description
-    SubElement(root, '{%s}subject' % DCORE_NS).text = props.subject
-    SubElement(root, '{%s}created' % DCTERMS_NS, {'{%s}type' % XSI_NS:
-                                                  '%s:W3CDTF' % DCTERMS_PREFIX}).text = props.created
-    SubElement(root, '{%s}modified' % DCTERMS_NS,
-               {'{%s}type' % XSI_NS: '%s:W3CDTF' % DCTERMS_PREFIX}).text = props.modified
-    SubElement(root, '{%s}lastModifiedBy' % COREPROPS_NS).text = props.lastModifiedBy
+    for attr in ("creator", "title", "description", "subject"):
+        SubElement(root, '{%s}%s' % (DCORE_NS, attr)).text = getattr(props, attr)
+
+    for attr in ("created", "modified"):
+        SubElement(root, '{%s}%s' % (DCTERMS_NS, attr),
+                   {'{%s}type' % XSI_NS:'%s:W3CDTF' % DCTERMS_PREFIX}).text = getattr(props, attr)
+
+    for attr in ("lastModifiedBy", "category"):
+        SubElement(root, '{%s}%s' % (COREPROPS_NS, attr)).text = getattr(props, attr)
+
     node = SubElement(root, '{%s}keywords' % COREPROPS_NS)
     for kw in props.keywords:
         SubElement(node, "{%s}keyword").text = kw
-    SubElement(root, '{%s}category' % COREPROPS_NS).text = props.category
     return tostring(root)
 
 
