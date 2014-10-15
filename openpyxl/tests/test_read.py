@@ -70,10 +70,10 @@ def test_read_standalone_worksheet(datadir):
     with open('sheet2.xml') as src:
         ws = read_worksheet(src.read(), DummyWb(), 'Sheet 2', shared_strings,
                             {1: Style()})
-    assert isinstance(ws, Worksheet)
-    assert ws.cell('G5').value == 'hello'
-    assert ws.cell('D30').value == 30
-    assert ws.cell('K9').value == 0.09
+        assert isinstance(ws, Worksheet)
+        assert ws.cell('G5').value == 'hello'
+        assert ws.cell('D30').value == 30
+        assert ws.cell('K9').value == 0.09
 
 
 @pytest.fixture
@@ -155,14 +155,6 @@ class TestReadBaseDateFormat(object):
     def test_read_mac_base_date(self, date_mac_1904):
         wb = date_mac_1904
         assert wb.properties.excel_base_date == CALENDAR_MAC_1904
-
-    def test_read_date_style_mac(self, date_mac_1904):
-        ws = date_mac_1904["Sheet1"]
-        assert ws.cell('A1').style.number_format == numbers.FORMAT_DATE_XLSX14
-
-    def test_read_date_style_win(self, date_std_1900):
-        ws = date_std_1900["Sheet1"]
-        assert ws.cell('A1').style.number_format == numbers.FORMAT_DATE_XLSX14
 
     def test_read_date_value(sel, date_std_1900, date_mac_1904):
         win = date_std_1900["Sheet1"]
