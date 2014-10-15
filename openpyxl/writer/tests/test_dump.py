@@ -34,9 +34,10 @@ class DummyWorkbook:
 
 
 @pytest.fixture
-def DumpWorksheet():
+def DumpWorksheet(request):
     from .. dump_worksheet import DumpWorksheet
-    return DumpWorksheet(DummyWorkbook(), "TestWorkSheet")
+    ws = DumpWorksheet(DummyWorkbook(), "TestWorkSheet")
+    return ws
 
 
 def test_ctor(DumpWorksheet):
@@ -155,7 +156,6 @@ def test_close_content(DumpWorksheet):
     expected = "</sheetData></worksheet>"
     content == expected
 
-
 def test_close(DumpWorksheet):
     ws = DumpWorksheet
     ws.write_header()
@@ -207,20 +207,21 @@ def test_cannot_save_twice(DumpWorksheet):
 from openpyxl import Workbook, load_workbook
 from openpyxl.cell import get_column_letter
 
-def _get_test_filename():
+
+@pytest.fixture
+def temp_file(tmpdir, request):
 
     test_file = NamedTemporaryFile(mode='w', prefix='openpyxl.',
-                                   suffix='.xlsx', delete=False)
+                                   suffix='.xlsx', delete=False, dir=tmpdir.dirname)
     test_file.close()
     return test_file.name
 
-def test_dump_sheet_title():
 
-    test_filename = _get_test_filename()
+def test_dump_sheet_title(temp_file):
     wb = Workbook(optimized_write=True)
     ws = wb.create_sheet(title='Test1')
-    wb.save(test_filename)
-    wb2 = load_workbook(test_filename)
+    wb.save(temp_file)
+    wb2 = load_workbook(temp_file)
     ws = wb2.get_sheet_by_name('Test1')
     assert 'Test1' == ws.title
 
@@ -241,8 +242,7 @@ def test_dump_string_table():
                      ]
 
 
-def test_dump_sheet_with_styles():
-    test_filename = _get_test_filename()
+def test_dump_sheet_with_styles(temp_file):
     wb = Workbook(optimized_write=True)
     ws = wb.create_sheet()
     letters = [get_column_letter(x + 1) for x in range(20)]
@@ -263,28 +263,24 @@ def test_dump_sheet_with_styles():
     for row in expected_rows:
         ws.append(row)
 
-    wb.save(test_filename)
-    wb2 = load_workbook(test_filename)
+    wb.save(temp_file)
+    wb2 = load_workbook(temp_file)
     ws = wb2.worksheets[0]
 
     for ex_row, ws_row in zip(expected_rows[:-20], ws.rows):
         for ex_cell, ws_cell in zip(ex_row, ws_row):
             assert ex_cell == ws_cell.value
-    os.remove(test_filename)
 
 
-def test_open_too_many_files():
-    test_filename = _get_test_filename()
+def test_open_too_many_files(temp_file):
     wb = Workbook(optimized_write=True)
     for i in range(200): # over 200 worksheets should raise an OSError ('too many open files')
         wb.create_sheet()
-    wb.save(test_filename)
-    os.remove(test_filename)
+    wb.save(temp_file)
 
 
-def test_dump_with_font():
+def test_dump_with_font(temp_file):
     from openpyxl.writer.dump_worksheet import WriteOnlyCell
-    test_filename = _get_test_filename()
 
     wb = Workbook(optimized_write=True)
     ws = wb.create_sheet()
@@ -294,16 +290,15 @@ def test_dump_with_font():
 
     ws.append([cell, 3.14, None])
     assert user_style in wb.shared_styles
-    wb.save(test_filename)
+    wb.save(temp_file)
 
-    wb2 = load_workbook(test_filename)
+    wb2 = load_workbook(temp_file)
     ws2 = wb2[ws.title]
     assert ws2['A1'].style == user_style
 
 
-def test_dump_with_comment():
+def test_dump_with_comment(temp_file):
     from openpyxl.writer.dump_worksheet import WriteOnlyCell
-    test_filename = _get_test_filename()
 
     wb = Workbook(optimized_write=True)
     ws = wb.create_sheet()
@@ -313,9 +308,9 @@ def test_dump_with_comment():
 
     ws.append([cell, 3.14, None])
     assert user_comment in ws._comments
-    wb.save(test_filename)
+    wb.save(temp_file)
 
-    wb2 = load_workbook(test_filename)
+    wb2 = load_workbook(temp_file)
     ws2 = wb2[ws.title]
     assert ws2['A1'].comment.text == 'hello world'
 
@@ -336,11 +331,10 @@ def test_illegal_method(method):
     with pytest.raises(NotImplementedError):
         fn()
 
-def test_save_empty_workbook():
-    fn = _get_test_filename()
-
+def test_save_empty_workbook(temp_file):
     wb = Workbook(write_only=True)
-    wb.save(fn)
+    assert len(wb.worksheets) == 0
+    wb.save(temp_file)
 
-    wb = load_workbook(fn)
+    wb = load_workbook(temp_file)
     assert len(wb.worksheets) == 1
