@@ -68,6 +68,12 @@ def test_read_standard_workbook_from_fileobj(datadir):
     assert isinstance(wb, Workbook)
 
 
+def test_read_nostring_workbook(datadir):
+    datadir.join("genuine").chdir()
+    wb = load_workbook('empty-no-string.xlsx')
+    assert isinstance(wb, Workbook)
+
+
 def test_read_worksheet(standard_workbook):
     wb = standard_workbook
     sheet2 = wb['Sheet2 - Numbers']
@@ -76,12 +82,6 @@ def test_read_worksheet(standard_workbook):
     assert 18 == sheet2['D18'].value
     assert sheet2['G9'].value is True
     assert sheet2['G10'].value is False
-
-
-def test_read_nostring_workbook(datadir):
-    datadir.join("genuine").chdir()
-    wb = load_workbook('empty-no-string.xlsx')
-    assert isinstance(wb, Workbook)
 
 
 @pytest.mark.parametrize("cell, number_format",
