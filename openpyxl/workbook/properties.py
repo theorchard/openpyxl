@@ -24,14 +24,6 @@ class W3CDateTime(Typed):
         super(W3CDateTime, self).__set__(instance, value)
 
 
-    def __get__(self, instance, cls):
-        if instance is None:
-            return self
-        value = instance.__dict__[self.name]
-        if value is not None:
-            return datetime_to_W3CDTF(value)
-
-
 class DocumentProperties(Strict):
     """High-level properties of the document.
     Defined in ECMA-376 Par2 Annex D
@@ -108,8 +100,9 @@ def write_properties(props):
         SubElement(root, '{%s}%s' % (DCORE_NS, attr)).text = getattr(props, attr)
 
     for attr in ("created", "modified"):
+        value = datetime_to_W3CDTF(getattr(props, attr))
         SubElement(root, '{%s}%s' % (DCTERMS_NS, attr),
-                   {'{%s}type' % XSI_NS:'%s:W3CDTF' % DCTERMS_PREFIX}).text = getattr(props, attr)
+                   {'{%s}type' % XSI_NS:'%s:W3CDTF' % DCTERMS_PREFIX}).text = value
 
     for attr in ("lastModifiedBy", "category"):
         SubElement(root, '{%s}%s' % (COREPROPS_NS, attr)).text = getattr(props, attr)
