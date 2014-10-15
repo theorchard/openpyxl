@@ -118,16 +118,23 @@ def write_properties(props):
 def read_properties(xml_source):
     properties = DocumentProperties()
     root = fromstring(xml_source)
-    properties.creator = root.findtext('{%s}creator' % DCORE_NS)
-    properties.last_modified_by = root.findtext('{%s}lastModifiedBy' % COREPROPS_NS)
 
-    created_node = root.find('{%s}created' % DCTERMS_NS)
-    if created_node is not None:
-        properties.created = created_node.text
+    for attr in ("creator", "title", "description", "subject", "identifier",
+                 "language"):
+        node =  root.find('{%s}%s' % (DCORE_NS, attr))
+        if node is not None:
+            setattr(properties, attr, node.text)
 
-    modified_node = root.find('{%s}modified' % DCTERMS_NS)
-    if modified_node is not None:
-        properties.modified = modified_node.text
+    for attr in ("created", "modified"):
+        node =  root.find('{%s}%s' % (DCTERMS_NS, attr))
+        if node is not None:
+            setattr(properties, attr, node.text)
+
+    for attr in ("lastModifiedBy", "category", "contentStatus",
+                 "lastPrinted", "version", "revision"):
+        node =  root.find('{%s}%s' % (COREPROPS_NS, attr))
+        if node is not None:
+            setattr(properties, attr, node.text)
 
     return properties
 

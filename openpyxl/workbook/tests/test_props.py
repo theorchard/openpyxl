@@ -33,3 +33,23 @@ def test_write_properties_core(datadir, DocumentProperties):
         diff = compare_xml(content, expected.read())
     assert diff is None, diff
 
+
+def test_read_properties_core(datadir):
+    from .. properties import read_properties
+    datadir.chdir()
+    with open("sample_core_properties.xml") as src:
+        content = src.read()
+    prop = read_properties(content)
+    assert prop.creator == '*.*'
+    assert prop.last_modified_by == 'Charlie Clark'
+    assert prop.created == datetime.datetime(2010, 4, 9, 20, 43, 12)
+    assert prop.modified ==  datetime.datetime(2014, 1, 2, 14, 53, 6)
+
+
+def test_read_properties_libreeoffice(datadir):
+    from .. properties import read_properties
+    datadir.chdir()
+    with open("libre_office_properties.xml") as src:
+        content = src.read()
+    prop = read_properties(content)
+    assert prop.revision == "0"

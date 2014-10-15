@@ -9,33 +9,12 @@ import pytest
 
 # package imports
 from openpyxl.tests.helper import compare_xml
-from openpyxl.workbook.properties import read_properties
 from openpyxl.writer.workbook import (
     write_properties_app
 )
 from openpyxl.xml.constants import ARC_CORE
 from openpyxl.date_time import CALENDAR_WINDOWS_1900
 from openpyxl.workbook import DocumentProperties, Workbook
-
-
-def test_read_properties_core(datadir):
-    datadir.join("genuine").chdir()
-    archive = ZipFile("empty.xlsx")
-    content = archive.read(ARC_CORE)
-    prop = read_properties(content)
-    assert prop.creator == '*.*'
-    assert prop.last_modified_by == 'Charlie Clark'
-    assert prop.created == datetime(2010, 4, 9, 20, 43, 12)
-    assert prop.modified ==  datetime(2014, 1, 2, 14, 53, 6)
-
-
-def test_read_properties_libreeoffice(datadir):
-    datadir.join("genuine").chdir()
-    archive = ZipFile("empty_libre.xlsx")
-    content = archive.read(ARC_CORE)
-    prop = read_properties(content)
-    assert prop.creator is None
-    assert prop.last_modified_by is None
 
 
 @pytest.mark.parametrize("filename", ['empty.xlsx', 'empty_libre.xlsx'])
@@ -70,7 +49,7 @@ def test_read_workbook_with_no_core_properties(datadir):
     _load_workbook(wb, archive, None, False, False)
     prop = wb.properties
     assert prop.creator == default_props.creator
-    assert prop.last_modified_by == default_props.last_modified_by
+    assert prop.lastModifiedBy == default_props.lastModifiedBy
     assert prop.title == default_props.title
     assert prop.subject == default_props.subject
     assert prop.description == default_props.description
