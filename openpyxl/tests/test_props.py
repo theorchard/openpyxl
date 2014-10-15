@@ -11,7 +11,6 @@ import pytest
 from openpyxl.tests.helper import compare_xml
 from openpyxl.reader.workbook import read_properties_core
 from openpyxl.writer.workbook import (
-    write_properties_core,
     write_properties_app
 )
 from openpyxl.xml.constants import ARC_CORE
@@ -25,7 +24,6 @@ def test_read_properties_core(datadir):
     content = archive.read(ARC_CORE)
     prop = read_properties_core(content)
     assert prop.creator == '*.*'
-    assert prop.excel_base_date == CALENDAR_WINDOWS_1900
     assert prop.last_modified_by == 'Charlie Clark'
     assert prop.created == datetime(2010, 4, 9, 20, 43, 12)
     assert prop.modified ==  datetime(2014, 1, 2, 14, 53, 6)
@@ -36,7 +34,6 @@ def test_read_properties_libreeoffice(datadir):
     archive = ZipFile("empty_libre.xlsx")
     content = archive.read(ARC_CORE)
     prop = read_properties_core(content)
-    assert prop.excel_base_date == CALENDAR_WINDOWS_1900
     assert prop.creator == ''
     assert prop.last_modified_by == ''
 

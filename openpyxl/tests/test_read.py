@@ -93,7 +93,7 @@ def test_read_general_style(datadir, cell, number_format):
 def test_read_win_base_date(datadir, filename, epoch):
     datadir.join("reader").chdir()
     wb = load_workbook(filename)
-    assert wb.properties.excel_base_date == epoch
+    assert wb.excel_base_date == epoch
     ws = wb["Sheet1"]
     assert ws['A1'].value == datetime(2011, 10, 31)
 

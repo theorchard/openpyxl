@@ -11,6 +11,7 @@ import threading
 
 # package imports
 from openpyxl.collections import IndexedList
+from openpyxl.date_time import CALENDAR_WINDOWS_1900
 from openpyxl.worksheet import Worksheet
 from openpyxl.writer.dump_worksheet import DumpWorksheet, save_dump
 from . names.named_range import NamedRange
@@ -63,7 +64,7 @@ class Workbook(object):
         self.relationships = []
         self.drawings = []
         self.code_name = None
-
+        self.excel_base_date = CALENDAR_WINDOWS_1900
         self.encoding = encoding
 
         if not self.write_only:
@@ -85,10 +86,6 @@ class Workbook(object):
     @property
     def _local_data(self):
         return self.__thread_local_data
-
-    @property
-    def excel_base_date(self):
-        return self.properties.excel_base_date
 
     @property
     def read_only(self):

@@ -71,7 +71,6 @@ class DocumentProperties(Strict):
         self.language = language
         self.keywords = keywords
         self.category = category
-        self.excel_base_date = CALENDAR_WINDOWS_1900
 
     def __iter__(self):
         for attr in self.__fields__:

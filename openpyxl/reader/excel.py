@@ -211,7 +211,7 @@ def _load_workbook(wb, archive, filename, read_only, keep_vba):
     wb.style_properties = {'dxf_list': cond_styles}
     wb.cond_styles = cond_styles
 
-    wb.properties.excel_base_date = read_excel_base_date(xml_source=archive.read(ARC_WORKBOOK))
+    wb.excel_base_date = read_excel_base_date(xml_source=archive.read(ARC_WORKBOOK))
 
     # get worksheets
     wb.worksheets = []  # remove preset worksheet
