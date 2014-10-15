@@ -1,5 +1,7 @@
 # Copyright (c) 2010-2014 openpyxl
 
+from openpyxl.tests.helper import compare_xml
+
 
 def test_write_string_table(datadir):
     from openpyxl.writer.strings import write_string_table
