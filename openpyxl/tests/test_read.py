@@ -189,9 +189,14 @@ def test_data_only(datadir):
     assert ws['A5'].value == 49380
 
 
-def test_guess_types(datadir):
+@pytest.mark.parametrize("guess_types, dtype",
+                         (
+                             (True, float),
+                             (False, unicode),
+                         )
+                        )
+def test_guess_types(datadir, guess_types, dtype):
     datadir.join("genuine").chdir()
-    for guess, dtype in ((True, float), (False, unicode)):
-        wb = load_workbook('guess_types.xlsx', guess_types=guess)
-        ws = wb.get_active_sheet()
-        assert isinstance(ws.cell('D2').value, dtype), 'wrong dtype (%s) when guess type is: %s (%s instead)' % (dtype, guess, type(ws.cell('A1').value))
+    wb = load_workbook('guess_types.xlsx', guess_types=guess_types)
+    ws = wb.active
+    assert isinstance(ws['D2'].value, dtype)
