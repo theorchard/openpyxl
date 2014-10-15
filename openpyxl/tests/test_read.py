@@ -133,37 +133,19 @@ def test_read_general_style(datadir, cell, number_format):
     assert ws[cell].number_format == number_format
 
 
-@pytest.fixture
-def date_mac_1904(datadir):
+
+@pytest.mark.parametrize("filename, epoch",
+                         [
+                             ("date_1900.xlsx", CALENDAR_WINDOWS_1900),
+                             ("date_1904.xlsx",  CALENDAR_MAC_1904),
+                         ]
+                         )
+def test_read_win_base_date(datadir, filename, epoch):
     datadir.join("reader").chdir()
-    wb = load_workbook('date_1904.xlsx')
-    return wb
-
-@pytest.fixture
-def date_std_1900(datadir):
-    datadir.join("reader").chdir()
-    wb = load_workbook('date_1900.xlsx')
-    return wb
-
-
-class TestReadBaseDateFormat(object):
-
-    def test_read_win_base_date(self, date_std_1900):
-        wb = date_std_1900
-        assert wb.properties.excel_base_date == CALENDAR_WINDOWS_1900
-
-    def test_read_mac_base_date(self, date_mac_1904):
-        wb = date_mac_1904
-        assert wb.properties.excel_base_date == CALENDAR_MAC_1904
-
-    def test_read_date_value(sel, date_std_1900, date_mac_1904):
-        win = date_std_1900["Sheet1"]
-        mac = date_mac_1904["Sheet1"]
-        datetuple = (2011, 10, 31)
-        dt = datetime(datetuple[0], datetuple[1], datetuple[2])
-        assert mac.cell('A1').value == dt
-        assert win.cell('A1').value == dt
-        assert mac.cell('A1').value == win.cell('A1').value
+    wb = load_workbook(filename)
+    assert wb.properties.excel_base_date == epoch
+    ws = wb["Sheet1"]
+    assert ws['A1'].value == datetime(2011, 10, 31)
 
 
 def test_repair_central_directory():
