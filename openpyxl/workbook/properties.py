@@ -6,7 +6,7 @@ import datetime
 from openpyxl.compat import safe_string, unicode
 from openpyxl.date_time import CALENDAR_WINDOWS_1900, datetime_to_W3CDTF, W3CDTF_to_datetime
 from openpyxl.descriptors import Strict, String, Typed, Sequence, Alias
-from openpyxl.xml.functions import ElementTree, Element, SubElement, tostring
+from openpyxl.xml.functions import ElementTree, Element, SubElement, tostring, fromstring
 from openpyxl.xml.constants import COREPROPS_NS, DCORE_NS, XSI_NS, DCTERMS_NS, DCTERMS_PREFIX
 
 
@@ -116,7 +116,21 @@ def write_properties(props):
 
 
 def read_properties(xml_source):
-    pass
+    properties = DocumentProperties()
+    root = fromstring(xml_source)
+    properties.creator = root.findtext('{%s}creator' % DCORE_NS)
+    properties.last_modified_by = root.findtext('{%s}lastModifiedBy' % COREPROPS_NS)
+
+    created_node = root.find('{%s}created' % DCTERMS_NS)
+    if created_node is not None:
+        properties.created = created_node.text
+
+    modified_node = root.find('{%s}modified' % DCTERMS_NS)
+    if modified_node is not None:
+        properties.modified = modified_node.text
+
+    return properties
+
 
 
 class DocumentSecurity(object):

@@ -9,7 +9,7 @@ import pytest
 
 # package imports
 from openpyxl.tests.helper import compare_xml
-from openpyxl.reader.workbook import read_properties_core
+from openpyxl.workbook.properties import read_properties
 from openpyxl.writer.workbook import (
     write_properties_app
 )
@@ -22,7 +22,7 @@ def test_read_properties_core(datadir):
     datadir.join("genuine").chdir()
     archive = ZipFile("empty.xlsx")
     content = archive.read(ARC_CORE)
-    prop = read_properties_core(content)
+    prop = read_properties(content)
     assert prop.creator == '*.*'
     assert prop.last_modified_by == 'Charlie Clark'
     assert prop.created == datetime(2010, 4, 9, 20, 43, 12)
@@ -33,9 +33,9 @@ def test_read_properties_libreeoffice(datadir):
     datadir.join("genuine").chdir()
     archive = ZipFile("empty_libre.xlsx")
     content = archive.read(ARC_CORE)
-    prop = read_properties_core(content)
-    assert prop.creator == ''
-    assert prop.last_modified_by == ''
+    prop = read_properties(content)
+    assert prop.creator is None
+    assert prop.last_modified_by is None
 
 
 @pytest.mark.parametrize("filename", ['empty.xlsx', 'empty_libre.xlsx'])
