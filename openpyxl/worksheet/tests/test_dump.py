@@ -93,11 +93,6 @@ def test_open_too_many_files():
     wb.save(test_filename)
     os.remove(test_filename)
 
-def test_create_temp_file():
-    f = dump_worksheet.create_temporary_file()
-    if not os.path.isfile(f):
-        raise Exception("The file %s does not exist" % f)
-
 
 def test_dump_with_font():
     from openpyxl.writer.dump_worksheet import WriteOnlyCell
