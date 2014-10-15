@@ -1,33 +1,10 @@
 # coding=utf8
 
 # Copyright (c) 2010-2014 openpyxl
-#
-# Permission is hereby granted, free of charge, to any person obtaining a copy
-# of this software and associated documentation files (the "Software"), to deal
-# in the Software without restriction, including without limitation the rights
-# to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-# copies of the Software, and to permit persons to whom the Software is
-# furnished to do so, subject to the following conditions:
-#
-# The above copyright notice and this permission notice shall be included in
-# all copies or substantial portions of the Software.
-#
-# THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-# IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-# FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-# AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-# LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-# OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
-# THE SOFTWARE.
-#
-# @license: http://www.opensource.org/licenses/mit-license.php
-# @author: see AUTHORS file
 
 # Python stdlib imports
 from datetime import datetime
 from io import BytesIO
-from tempfile import NamedTemporaryFile
-from zipfile import ZipFile
 
 import pytest
 
@@ -42,7 +19,6 @@ from openpyxl.styles import numbers, Style
 from openpyxl.reader.worksheet import read_worksheet
 from openpyxl.reader.excel import load_workbook
 from openpyxl.reader.workbook import read_workbook_code_name
-from openpyxl.exceptions import InvalidFileException
 from openpyxl.date_time import CALENDAR_WINDOWS_1900, CALENDAR_MAC_1904
 from openpyxl.xml.constants import ARC_WORKBOOK
 
@@ -261,66 +237,3 @@ def test_guess_types(datadir):
         wb = load_workbook('guess_types.xlsx', guess_types=guess)
         ws = wb.get_active_sheet()
         assert isinstance(ws.cell('D2').value, dtype), 'wrong dtype (%s) when guess type is: %s (%s instead)' % (dtype, guess, type(ws.cell('A1').value))
-
-
-def test_get_xml_iter():
-    #1 file object
-    #2 stream (file-like)
-    #3 string
-    #4 zipfile
-    from openpyxl.reader.worksheet import _get_xml_iter
-    from tempfile import TemporaryFile
-
-    FUT = _get_xml_iter
-    s = b""
-    stream = FUT(s)
-    assert isinstance(stream, BytesIO), type(stream)
-
-    u = unicode(s)
-    stream = FUT(u)
-    assert isinstance(stream, BytesIO), type(stream)
-
-    f = TemporaryFile(mode='rb+', prefix='openpyxl.', suffix='.unpack.temp')
-    stream = FUT(f)
-    assert stream == f
-    f.close()
-
-    t = TemporaryFile()
-    z = ZipFile(t, mode="w")
-    z.writestr("test", "whatever")
-    stream = FUT(z.open("test"))
-    assert hasattr(stream, "read")
-    # z.close()
-    try:
-        z.close()
-    except IOError:
-        # you can't just close zipfiles in Windows
-        if z.fp is not None:
-            z.fp.close() # python 2.6
-        else:
-            z.close() # python 2.7
-
-
-def test_read_autofilter(datadir):
-    datadir.join("reader").chdir()
-    wb = load_workbook("bug275.xlsx")
-    ws = wb.active
-    assert ws.auto_filter.ref == 'A1:B6'
-
-
-class TestBadFormats:
-
-    def test_xlsb(self):
-        tmp = NamedTemporaryFile(suffix='.xlsb')
-        with pytest.raises(InvalidFileException):
-            load_workbook(filename=tmp.name)
-
-    def test_xls(self):
-        tmp = NamedTemporaryFile(suffix='.xls')
-        with pytest.raises(InvalidFileException):
-            load_workbook(filename=tmp.name)
-
-    def test_no(self):
-        tmp = NamedTemporaryFile(suffix='.no-format')
-        with pytest.raises(InvalidFileException):
-            load_workbook(filename=tmp.name)
