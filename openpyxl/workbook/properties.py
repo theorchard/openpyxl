@@ -53,6 +53,10 @@ class DocumentProperties(Strict):
                  subject=None,
                  title=None,
                  ):
+        self.contentStatus = contentStatus
+        self.lastPrinted = lastPrinted
+        self.revision = revision
+        self.version = version
         self.creator = creator
         self.lastModifiedBy = lastModifiedBy
         self.creator = creator
@@ -61,6 +65,8 @@ class DocumentProperties(Strict):
         self.title = title
         self.subject = subject
         self.description = description
+        self.identifier = identifier
+        self.language = language
         self._keywords = keywords
         self.category = category
         self.excel_base_date = CALENDAR_WINDOWS_1900
@@ -78,7 +84,7 @@ class DocumentProperties(Strict):
         for attr in self.__fields__:
             value = getattr(self, attr)
             if value is not None:
-                return attr, safe_string(value)
+                yield attr, safe_string(value)
 
 
 class DocumentSecurity(object):
