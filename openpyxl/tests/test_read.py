@@ -138,33 +138,21 @@ def test_read_workbook_with_no_core_properties(datadir):
     assert prop.modified == prop.created
 
 
-@pytest.fixture
-def workbook_with_styles(datadir):
+@pytest.mark.parametrize("cell, number_format",
+                    [
+                        ('A1', numbers.FORMAT_GENERAL),
+                        ('A2', numbers.FORMAT_DATE_XLSX14),
+                        ('A3', numbers.FORMAT_NUMBER_00),
+                        ('A4', numbers.FORMAT_DATE_TIME3),
+                        ('A5', numbers.FORMAT_PERCENTAGE_00),
+                    ]
+                    )
+def test_read_general_style(datadir, cell, number_format):
     datadir.join("genuine").chdir()
     wb = load_workbook('empty-with-styles.xlsx')
     return wb["Sheet1"]
-
-class TestReadWorkbookWithStyles(object):
-
-    def test_read_general_style(self, workbook_with_styles):
-        ws = workbook_with_styles
-        assert ws.cell('A1').style.number_format == numbers.FORMAT_GENERAL
-
-    def test_read_date_style(self, workbook_with_styles):
-        ws = workbook_with_styles
-        assert ws.cell('A2').style.number_format == numbers.FORMAT_DATE_XLSX14
-
-    def test_read_number_style(self, workbook_with_styles):
-        ws = workbook_with_styles
-        assert ws.cell('A3').style.number_format == numbers.FORMAT_NUMBER_00
-
-    def test_read_time_style(self, workbook_with_styles):
-        ws = workbook_with_styles
-        assert ws.cell('A4').style.number_format == numbers.FORMAT_DATE_TIME3
-
-    def test_read_percentage_style(self, workbook_with_styles):
-        ws = workbook_with_styles
-        assert ws.cell('A5').style.number_format == numbers.FORMAT_PERCENTAGE_00
+    ws = workbook_with_styles
+    assert ws[cell].number_format == number_format
 
 
 @pytest.fixture
