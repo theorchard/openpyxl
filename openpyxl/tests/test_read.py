@@ -56,24 +56,6 @@ def standard_workbook(datadir):
     return load_workbook("empty.xlsx")
 
 
-def test_read_standard_workbook(standard_workbook):
-    wb = standard_workbook
-    assert isinstance(wb, Workbook)
-
-
-def test_read_standard_workbook_from_fileobj(datadir):
-    datadir.join("genuine").chdir()
-    fo = open('empty.xlsx', mode='rb')
-    wb = load_workbook(fo)
-    assert isinstance(wb, Workbook)
-
-
-def test_read_nostring_workbook(datadir):
-    datadir.join("genuine").chdir()
-    wb = load_workbook('empty-no-string.xlsx')
-    assert isinstance(wb, Workbook)
-
-
 def test_read_worksheet(standard_workbook):
     wb = standard_workbook
     sheet2 = wb['Sheet2 - Numbers']
