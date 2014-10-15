@@ -2,6 +2,7 @@ from __future__ import absolute_import
 # Copyright (c) 2010-2014 openpyxl
 
 from io import BytesIO
+from tempfile import NamedTemporaryFile
 
 from openpyxl.exceptions import InvalidFileException
 from .. excel import load_workbook
