@@ -98,30 +98,6 @@ def test_create_temp_file():
     if not os.path.isfile(f):
         raise Exception("The file %s does not exist" % f)
 
-def test_dump_twice():
-    test_filename = _get_test_filename()
-
-    wb = Workbook(optimized_write=True)
-    ws = wb.create_sheet()
-    ws.append(['hello'])
-
-    wb.save(test_filename)
-    os.remove(test_filename)
-    with pytest.raises(WorkbookAlreadySaved):
-        wb.save(test_filename)
-
-def test_append_after_save():
-    test_filename = _get_test_filename()
-
-    wb = Workbook(optimized_write=True)
-    ws = wb.create_sheet()
-    ws.append(['hello'])
-
-    wb.save(test_filename)
-    os.remove(test_filename)
-    with pytest.raises(WorkbookAlreadySaved):
-        ws.append(['hello'])
-
 
 def test_dump_with_font():
     from openpyxl.writer.dump_worksheet import WriteOnlyCell
