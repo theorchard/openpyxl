@@ -105,20 +105,23 @@ def write_properties(props):
     """Write the core properties to xml."""
     root = Element('{%s}coreProperties' % COREPROPS_NS)
     SubElement(root, '{%s}creator' % DCORE_NS).text = props.creator
-    SubElement(root, '{%s}lastModifiedBy' % COREPROPS_NS).text = props.lastModifiedBy
+    SubElement(root, '{%s}title' % DCORE_NS).text = props.title
+    SubElement(root, '{%s}description' % DCORE_NS).text = props.description
+    SubElement(root, '{%s}subject' % DCORE_NS).text = props.subject
     SubElement(root, '{%s}created' % DCTERMS_NS, {'{%s}type' % XSI_NS:
                                                   '%s:W3CDTF' % DCTERMS_PREFIX}).text = props.created
     SubElement(root, '{%s}modified' % DCTERMS_NS,
                {'{%s}type' % XSI_NS: '%s:W3CDTF' % DCTERMS_PREFIX}).text = props.modified
-    SubElement(root, '{%s}title' % DCORE_NS).text = props.title
-    SubElement(root, '{%s}description' % DCORE_NS).text = props.description
-    SubElement(root, '{%s}subject' % DCORE_NS).text = props.subject
+    SubElement(root, '{%s}lastModifiedBy' % COREPROPS_NS).text = props.lastModifiedBy
     node = SubElement(root, '{%s}keywords' % COREPROPS_NS)
     for kw in props.keywords:
         SubElement(node, "{%s}keyword").text = kw
     SubElement(root, '{%s}category' % COREPROPS_NS).text = props.category
     return tostring(root)
 
+
+def read_properties(xml_source):
+    pass
 
 
 class DocumentSecurity(object):

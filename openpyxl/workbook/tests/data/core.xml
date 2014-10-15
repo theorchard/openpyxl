@@ -4,12 +4,12 @@
     xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:dcmitype="http://purl.org/dc/dcmitype/"
     xmlns:dcterms="http://purl.org/dc/terms/" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
     <dc:creator>TEST_USER</dc:creator>
-    <cp:lastModifiedBy>SOMEBODY</cp:lastModifiedBy>
-    <dcterms:created xsi:type="dcterms:W3CDTF">2010-04-01T20:30:00Z</dcterms:created>
-    <dcterms:modified xsi:type="dcterms:W3CDTF">2010-04-05T14:05:30Z</dcterms:modified>
     <dc:title />
     <dc:description />
     <dc:subject />
+    <dcterms:created xsi:type="dcterms:W3CDTF">2010-04-01T20:30:00Z</dcterms:created>
+    <dcterms:modified xsi:type="dcterms:W3CDTF">2010-04-05T14:05:30Z</dcterms:modified>
+    <cp:lastModifiedBy>SOMEBODY</cp:lastModifiedBy>
     <cp:keywords />
     <cp:category />
 </cp:coreProperties>
