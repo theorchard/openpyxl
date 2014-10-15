@@ -3,11 +3,33 @@ from __future__ import absolute_import
 
 import datetime
 
-from openpyxl.compat import safe_string
-from openpyxl.date_time import CALENDAR_WINDOWS_1900, datetime_to_W3CDTF
+from openpyxl.compat import safe_string, unicode
+from openpyxl.date_time import CALENDAR_WINDOWS_1900, datetime_to_W3CDTF, W3CDTF_to_datetime
 from openpyxl.descriptors import Strict, String, Typed, Sequence, Alias
 from openpyxl.xml.functions import ElementTree, Element, SubElement, tostring
 from openpyxl.xml.constants import COREPROPS_NS, DCORE_NS, XSI_NS, DCTERMS_NS, DCTERMS_PREFIX
+
+
+
+class W3CDateTime(Typed):
+
+    expected_type = datetime.datetime
+
+    def __set__(self, instance, value):
+        if value is not None and isinstance(value, unicode):
+            try:
+                value = W3CDTF_to_datetime(value)
+            except ValueError:
+                raise ValueError("Value must be W3C datetime format")
+        super(W3CDateTime, self).__set__(instance, value)
+
+
+    def __get__(self, instance, cls):
+        if instance is None:
+            return self
+        value = instance.__dict__[self.name]
+        if value is not None:
+            return datetime_to_W3CDTF(value)
 
 
 class DocumentProperties(Strict):
@@ -17,7 +39,7 @@ class DocumentProperties(Strict):
 
     category = String(allow_none=True)
     contentStatus = String(allow_none=True)
-    keywords = Sequence(allow_none=True)
+    keywords = Sequence(expected_type=str)
     lastModifiedBy = String(allow_none=True)
     lastPrinted = String(allow_none=True)
     revision = String(allow_none=True)
@@ -25,12 +47,12 @@ class DocumentProperties(Strict):
     last_modified_by = Alias("lastModifiedBy")
 
     # Dublin Core Properties
-    created = Typed(expected_type=datetime.datetime, allow_none=True)
+    created = W3CDateTime(expected_type=datetime.datetime, allow_none=True)
     creator = String(allow_none=True)
     description = String(allow_none=True)
     identifier = String(allow_none=True)
     language = String(allow_none=True)
-    modified = Typed(expected_type=datetime.datetime, allow_none=True)
+    modified = W3CDateTime(expected_type=datetime.datetime, allow_none=True)
     subject = String(allow_none=True)
     title = String(allow_none=True)
 
@@ -84,12 +106,10 @@ def write_properties(props):
     root = Element('{%s}coreProperties' % COREPROPS_NS)
     SubElement(root, '{%s}creator' % DCORE_NS).text = props.creator
     SubElement(root, '{%s}lastModifiedBy' % COREPROPS_NS).text = props.lastModifiedBy
-    SubElement(root, '{%s}created' % DCTERMS_NS,
-               {'{%s}type' % XSI_NS: '%s:W3CDTF' % DCTERMS_PREFIX}).text = \
-                   datetime_to_W3CDTF(props.created)
+    SubElement(root, '{%s}created' % DCTERMS_NS, {'{%s}type' % XSI_NS:
+                                                  '%s:W3CDTF' % DCTERMS_PREFIX}).text = props.created
     SubElement(root, '{%s}modified' % DCTERMS_NS,
-               {'{%s}type' % XSI_NS: '%s:W3CDTF' % DCTERMS_PREFIX}).text = \
-                   datetime_to_W3CDTF(props.modified)
+               {'{%s}type' % XSI_NS: '%s:W3CDTF' % DCTERMS_PREFIX}).text = props.modified
     SubElement(root, '{%s}title' % DCORE_NS).text = props.title
     SubElement(root, '{%s}description' % DCORE_NS).text = props.description
     SubElement(root, '{%s}subject' % DCORE_NS).text = props.subject

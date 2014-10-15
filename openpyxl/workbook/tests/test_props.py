@@ -16,7 +16,7 @@ def DocumentProperties():
 def test_ctor(DocumentProperties):
     dt = datetime.datetime(2014, 10, 12, 10, 35, 36)
     props = DocumentProperties(created=dt, modified=dt)
-    assert dict(props) == {'created': '2014-10-12 10:35:36', 'modified': '2014-10-12 10:35:36', 'creator': 'openpyxl'}
+    assert dict(props) == {'created': '2014-10-12T10:35:36Z', 'modified': '2014-10-12T10:35:36Z', 'creator': 'openpyxl'}
 
 
 def test_write_properties_core(datadir, DocumentProperties):
