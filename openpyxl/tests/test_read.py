@@ -182,13 +182,11 @@ def test_data_only(datadir):
     datadir.join("reader").chdir()
     wb = load_workbook('formulae.xlsx', data_only=True)
     ws = wb.active
-    ws.parent.data_only = True
     # Test cells returning values only, not formulae
-    assert ws.formula_attributes == {}
-    assert ws['A2'].data_type == 'n' and ws.cell('A2').value == 12345
-    assert ws['A3'].data_type == 'n' and ws.cell('A3').value == 12345
-    assert ws['A4'].data_type == 'n' and ws.cell('A4').value == 24690
-    assert ws['A5'].data_type == 'n' and ws.cell('A5').value == 49380
+    assert ws['A2'].value == 12345
+    assert ws['A3'].value == 12345
+    assert ws['A4'].value == 24690
+    assert ws['A5'].value == 49380
 
 
 def test_guess_types(datadir):
