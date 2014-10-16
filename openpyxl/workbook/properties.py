@@ -16,7 +16,7 @@ class W3CDateTime(Typed):
     expected_type = datetime.datetime
 
     def __set__(self, instance, value):
-        if value is not None and isinstance(value, unicode):
+        if value is not None and isinstance(value, str):
             try:
                 value = W3CDTF_to_datetime(value)
             except ValueError:
