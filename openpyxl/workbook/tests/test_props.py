@@ -4,7 +4,9 @@ from __future__ import absolute_import
 import datetime
 
 import pytest
+from lxml.etree import fromstring
 from openpyxl.tests.helper import compare_xml
+from openpyxl.tests.schema import core_props_schema
 
 
 @pytest.fixture()
@@ -28,10 +30,21 @@ def test_write_properties_core(datadir, DocumentProperties):
     prop.last_modified_by = 'SOMEBODY'
     prop.created = datetime.datetime(2010, 4, 1, 20, 30, 00)
     prop.modified = datetime.datetime(2010, 4, 5, 14, 5, 30)
+    prop.lastPrinted = datetime.datetime(2014, 10, 14, 10, 30)
     content = write_properties(prop)
     with open('core.xml') as expected:
         diff = compare_xml(content, expected.read())
     assert diff is None, diff
+
+
+def test_validate_scheme(DocumentProperties):
+    props = DocumentProperties()
+    props.keywords = "one, two, three"
+    props.lastPrinted = datetime.datetime.now()
+    from .. properties import write_properties
+    xml = write_properties(props)
+    root = fromstring(xml)
+    core_props_schema.assertValid(root)
 
 
 def test_read_properties_core(datadir):

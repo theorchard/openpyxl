@@ -5,7 +5,7 @@ import datetime
 
 from openpyxl.compat import safe_string, unicode
 from openpyxl.date_time import CALENDAR_WINDOWS_1900, datetime_to_W3CDTF, W3CDTF_to_datetime
-from openpyxl.descriptors import Strict, String, Typed, Sequence, Alias
+from openpyxl.descriptors import Strict, String, Typed, Alias
 from openpyxl.xml.functions import ElementTree, Element, SubElement, tostring, fromstring
 from openpyxl.xml.constants import COREPROPS_NS, DCORE_NS, XSI_NS, DCTERMS_NS, DCTERMS_PREFIX
 
@@ -31,9 +31,9 @@ class DocumentProperties(Strict):
 
     category = String(allow_none=True)
     contentStatus = String(allow_none=True)
-    keywords = Sequence(expected_type=str)
+    keywords = String(allow_none=True)
     lastModifiedBy = String(allow_none=True)
-    lastPrinted = String(allow_none=True)
+    lastPrinted = W3CDateTime(expected_type=datetime.datetime, allow_none=True)
     revision = String(allow_none=True)
     version = String(allow_none=True)
     last_modified_by = Alias("lastModifiedBy")
@@ -55,7 +55,7 @@ class DocumentProperties(Strict):
     def __init__(self,
                  category=None,
                  contentStatus=None,
-                 keywords=[],
+                 keywords=None,
                  lastModifiedBy=None,
                  lastPrinted=None,
                  revision=None,
@@ -105,13 +105,17 @@ def write_properties(props):
         SubElement(root, '{%s}%s' % (DCTERMS_NS, attr),
                    {'{%s}type' % XSI_NS:'%s:W3CDTF' % DCTERMS_PREFIX}).text = value
 
-    for attr in ("lastModifiedBy", "category", "contentStatus",
-                 "lastPrinted", "version", "revision"):
+    for attr in ("lastModifiedBy", "category", "contentStatus", "version",
+                 "revision", "keywords"):
         SubElement(root, '{%s}%s' % (COREPROPS_NS, attr)).text = getattr(props, attr)
 
-    node = SubElement(root, '{%s}keywords' % COREPROPS_NS)
-    for kw in props.keywords:
-        SubElement(node, "{%s}keyword").text = kw
+    if props.lastPrinted is not None:
+        SubElement(root, "{%s}lastPrinted" % COREPROPS_NS).text = datetime_to_W3CDTF(props.lastPrinted
+                                                                            )
+
+    #node = SubElement(root, '{%s}keywords' % COREPROPS_NS)
+    #for kw in props.keywords:
+        #SubElement(node, "{%s}keyword" % COREPROPS_NS).text = kw
     return tostring(root)
 
 
@@ -135,6 +139,10 @@ def read_properties(xml_source):
         node =  root.find('{%s}%s' % (COREPROPS_NS, attr))
         if node is not None:
             setattr(properties, attr, node.text)
+
+    kw = root.find("{%s}keywords" % COREPROPS_NS)
+    if kw is not None:
+        properties.keywords = [node.text for node in kw]
 
     return properties
 
