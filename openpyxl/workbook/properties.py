@@ -48,7 +48,7 @@ class DocumentProperties(Strict):
     created = W3CDateTime(expected_type=datetime.datetime, allow_none=True)
     modified = W3CDateTime(expected_type=datetime.datetime, allow_none=True)
 
-    __fields__ = ("category", "contentStatus", "lastModifiedBy",
+    __fields__ = ("category", "contentStatus", "lastModifiedBy", "keywords",
                 "lastPrinted", "revision", "version", "created", "creator", "description",
                 "identifier", "language", "modified", "subject", "title")
 
@@ -75,7 +75,6 @@ class DocumentProperties(Strict):
         self.version = version
         self.creator = creator
         self.lastModifiedBy = lastModifiedBy
-        self.creator = creator
         self.modified = modified
         self.created = created
         self.title = title

@@ -55,6 +55,7 @@ def test_dict_interface(SampleProperties):
         'subject': 'The subject',
         'title': 'The title',
         'version': '2.5',
+        'keywords': 'one, two, three',
                            }
 
 
