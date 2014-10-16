@@ -112,10 +112,6 @@ def write_properties(props):
     if props.lastPrinted is not None:
         SubElement(root, "{%s}lastPrinted" % COREPROPS_NS).text = datetime_to_W3CDTF(props.lastPrinted
                                                                             )
-
-    #node = SubElement(root, '{%s}keywords' % COREPROPS_NS)
-    #for kw in props.keywords:
-        #SubElement(node, "{%s}keyword" % COREPROPS_NS).text = kw
     return tostring(root)
 
 
@@ -135,17 +131,12 @@ def read_properties(xml_source):
             setattr(properties, attr, node.text)
 
     for attr in ("lastModifiedBy", "category", "contentStatus",
-                 "lastPrinted", "version", "revision"):
+                 "lastPrinted", "version", "revision", "keywords"):
         node =  root.find('{%s}%s' % (COREPROPS_NS, attr))
         if node is not None:
             setattr(properties, attr, node.text)
 
-    kw = root.find("{%s}keywords" % COREPROPS_NS)
-    if kw is not None:
-        properties.keywords = [node.text for node in kw]
-
     return properties
-
 
 
 class DocumentSecurity(object):

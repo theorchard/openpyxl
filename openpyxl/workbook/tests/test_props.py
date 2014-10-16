@@ -45,7 +45,7 @@ def test_validate_schema(DocumentProperties):
     props.lastPrinted = datetime.datetime(2014, 10, 14, 10, 30)
     props.category = "The category"
     props.contentStatus = "The status"
-    prop.creator = 'TEST_USER'
+    props.creator = 'TEST_USER'
     props.lastModifiedBy = "SOMEBODY"
     props.revision = "0"
     props.version = "2.5"
