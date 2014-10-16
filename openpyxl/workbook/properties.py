@@ -6,7 +6,7 @@ import datetime
 from openpyxl.compat import safe_string, unicode
 from openpyxl.date_time import CALENDAR_WINDOWS_1900, datetime_to_W3CDTF, W3CDTF_to_datetime
 from openpyxl.descriptors import Strict, String, Typed, Alias
-from openpyxl.xml.functions import ElementTree, Element, SubElement, tostring, fromstring, safe_iterator, QName
+from openpyxl.xml.functions import ElementTree, Element, SubElement, tostring, fromstring, safe_iterator, localname
 from openpyxl.xml.constants import COREPROPS_NS, DCORE_NS, XSI_NS, DCTERMS_NS, DCTERMS_PREFIX
 
 
@@ -119,8 +119,8 @@ def read_properties(xml_source):
     root = fromstring(xml_source)
 
     for node in safe_iterator(root):
-        tag = QName(node.tag)
-        setattr(properties, tag.localname, node.text)
+        tag = localname(node)
+        setattr(properties, tag, node.text)
 
     return properties
 
