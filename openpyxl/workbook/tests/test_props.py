@@ -37,10 +37,21 @@ def test_write_properties_core(datadir, DocumentProperties):
     assert diff is None, diff
 
 
+@pytest.mark.lxml_required
 def test_validate_scheme(DocumentProperties):
     props = DocumentProperties()
     props.keywords = "one, two, three"
     props.lastPrinted = datetime.datetime.now()
+    props.category = "The category"
+    props.contentStatus = "The status"
+    props.lastModifiedBy = "Charlie Clark"
+    props.revision = "0"
+    props.version = "2.5"
+    props.description = "The description"
+    props.identifier = "The identifier"
+    props.language = "The language"
+    props.subject = "The subject"
+    props.title = "The title"
     from .. properties import write_properties
     xml = write_properties(props)
     root = fromstring(xml)
