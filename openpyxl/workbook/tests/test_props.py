@@ -9,35 +9,17 @@ from openpyxl.tests.helper import compare_xml
 from openpyxl.tests.schema import core_props_schema
 
 
-@pytest.fixture()
-def DocumentProperties():
+def test_ctor():
     from .. properties import DocumentProperties
-    return DocumentProperties
-
-
-def test_ctor(DocumentProperties):
     dt = datetime.datetime(2014, 10, 12, 10, 35, 36)
     props = DocumentProperties(created=dt, modified=dt)
     assert dict(props) == {'created': '2014-10-12 10:35:36', 'modified':
                            '2014-10-12 10:35:36', 'creator': 'openpyxl',}
 
 
-def test_write_properties_core(datadir, DocumentProperties):
-    from .. properties import write_properties
-    datadir.chdir()
-    prop = DocumentProperties()
-    prop.creator = 'TEST_USER'
-    prop.last_modified_by = 'SOMEBODY'
-    prop.created = datetime.datetime(2010, 4, 1, 20, 30, 00)
-    prop.modified = datetime.datetime(2010, 4, 5, 14, 5, 30)
-    prop.lastPrinted = datetime.datetime(2014, 10, 14, 10, 30)
-    content = write_properties(prop)
-    with open('core.xml') as expected:
-        diff = compare_xml(content, expected.read())
-    assert diff is None, diff
-
-
-def test_validate_schema(DocumentProperties):
+@pytest.fixture()
+def SampleProperties():
+    from .. properties import DocumentProperties
     props = DocumentProperties()
     props.keywords = "one, two, three"
     props.created = datetime.datetime(2010, 4, 1, 20, 30, 00)
@@ -54,28 +36,51 @@ def test_validate_schema(DocumentProperties):
     props.language = "The language"
     props.subject = "The subject"
     props.title = "The title"
+    return props
+
+
+def test_dict_interface(SampleProperties):
+    assert dict(SampleProperties) == {
+        'created': '2010-04-01 20:30:00',
+        'creator': 'TEST_USER',
+        'lastModifiedBy': 'SOMEBODY',
+        'modified':'2010-04-05 14:05:30',
+        'category': 'The category',
+        'contentStatus': 'The status',
+        'description': 'The description',
+        'identifier': 'The identifier',
+        'language': 'The language',
+        'lastPrinted': '2014-10-14 10:30:00',
+        'revision': '0',
+        'subject': 'The subject',
+        'title': 'The title',
+        'version': '2.5',
+                           }
+
+
+def test_write_properties_core(datadir, SampleProperties):
     from .. properties import write_properties
-    xml = write_properties(props)
+    datadir.chdir()
+
+    content = write_properties(SampleProperties)
+    with open('core.xml') as expected:
+        diff = compare_xml(content, expected.read())
+    assert diff is None, diff
+
+
+def test_validate_schema(SampleProperties):
+    from .. properties import write_properties
+
+    xml = write_properties(SampleProperties)
     root = fromstring(xml)
     core_props_schema.assertValid(root)
 
 
-def test_read_properties_core(datadir):
+def test_read_properties_core(datadir, SampleProperties):
     from .. properties import read_properties
     datadir.chdir()
-    with open("sample_core_properties.xml") as src:
-        content = src.read()
-    prop = read_properties(content)
-    assert prop.creator == '*.*'
-    assert prop.last_modified_by == 'Charlie Clark'
-    assert prop.created == datetime.datetime(2010, 4, 9, 20, 43, 12)
-    assert prop.modified ==  datetime.datetime(2014, 1, 2, 14, 53, 6)
 
-
-def test_read_properties_libreeoffice(datadir):
-    from .. properties import read_properties
-    datadir.chdir()
-    with open("libre_office_properties.xml") as src:
+    with open("core.xml") as src:
         content = src.read()
-    prop = read_properties(content)
-    assert prop.revision == "0"
+    props = read_properties(content)
+    assert dict(props) == dict(SampleProperties)
