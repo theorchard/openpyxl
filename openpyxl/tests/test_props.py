@@ -36,24 +36,3 @@ def test_write_properties_app(datadir):
     with open('app.xml') as expected:
         diff = compare_xml(content, expected.read())
     assert diff is None, diff
-
-
-def test_read_workbook_with_no_core_properties(datadir):
-    from openpyxl.workbook import DocumentProperties
-    from openpyxl.reader.excel import _load_workbook
-
-    datadir.join('genuine').chdir()
-    archive = ZipFile('empty_with_no_properties.xlsx')
-    wb = Workbook()
-    default_props = DocumentProperties()
-    _load_workbook(wb, archive, None, False, False)
-    prop = wb.properties
-    assert prop.creator == default_props.creator
-    assert prop.lastModifiedBy == default_props.lastModifiedBy
-    assert prop.title == default_props.title
-    assert prop.subject == default_props.subject
-    assert prop.description == default_props.description
-    assert prop.category == default_props.category
-    assert prop.keywords == default_props.keywords
-    assert prop.created.timetuple()[:9] == default_props.created.timetuple()[:9] # might break if tests run on the stoke of midnight
-    assert prop.modified.timetuple()[:9] == prop.created.timetuple()[:9]
