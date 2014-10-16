@@ -6,7 +6,7 @@ import datetime
 from openpyxl.compat import safe_string, unicode
 from openpyxl.date_time import CALENDAR_WINDOWS_1900, datetime_to_W3CDTF, W3CDTF_to_datetime
 from openpyxl.descriptors import Strict, String, Typed, Alias
-from openpyxl.xml.functions import ElementTree, Element, SubElement, tostring, fromstring
+from openpyxl.xml.functions import ElementTree, Element, SubElement, tostring, fromstring, safe_iterator, QName
 from openpyxl.xml.constants import COREPROPS_NS, DCORE_NS, XSI_NS, DCTERMS_NS, DCTERMS_PREFIX
 
 
@@ -119,22 +119,9 @@ def read_properties(xml_source):
     properties = DocumentProperties()
     root = fromstring(xml_source)
 
-    for attr in ("creator", "title", "description", "subject", "identifier",
-                 "language"):
-        node =  root.find('{%s}%s' % (DCORE_NS, attr))
-        if node is not None:
-            setattr(properties, attr, node.text)
-
-    for attr in ("created", "modified"):
-        node =  root.find('{%s}%s' % (DCTERMS_NS, attr))
-        if node is not None:
-            setattr(properties, attr, node.text)
-
-    for attr in ("lastModifiedBy", "category", "contentStatus",
-                 "lastPrinted", "version", "revision", "keywords"):
-        node =  root.find('{%s}%s' % (COREPROPS_NS, attr))
-        if node is not None:
-            setattr(properties, attr, node.text)
+    for node in safe_iterator(root):
+        tag = QName(node.tag)
+        setattr(properties, tag.localname, node.text)
 
     return properties
 
