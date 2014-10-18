@@ -200,7 +200,7 @@ class StyleWriter(object):
                         fmt_id = _custom_fmts.add(nf) + 165
                         self._write_number_format(number_format_node, fmt_id, nf)
                     else:
-                        fmt_id = _custom_fmts.index(nf)
+                        fmt_id = _custom_fmts.index(nf) + 165
                 vals['numFmtId'] = '%d' % fmt_id
                 vals['applyNumberFormat'] = '1'
 
