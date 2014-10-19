@@ -47,7 +47,7 @@ def test_read_sheets_titles(datadir, filename):
 
     datadir.join("genuine").chdir()
     archive = ZipFile(filename)
-    sheet_titles = [s[1] for s in read_sheets(archive)]
+    sheet_titles = [s['name'] for s in read_sheets(archive)]
     assert sheet_titles == ['Sheet1 - Text', 'Sheet2 - Numbers', 'Sheet3 - Formulas', 'Sheet4 - Dates']
 
 

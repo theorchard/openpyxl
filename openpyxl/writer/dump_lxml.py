@@ -6,7 +6,7 @@ from inspect import isgenerator
 import os
 from lxml.etree import xmlfile, Element, SubElement
 
-from openpyxl.compat import safe_string
+from openpyxl.compat import safe_string, range
 from openpyxl.cell import get_column_letter, Cell
 
 from . dump_worksheet import (
@@ -90,22 +90,19 @@ class LXMLWorksheet(DumpWorksheet):
         :param row: iterable containing values to append
         :type row: iterable
         """
-        if (not isinstance(row, (list, tuple, range))
-            and not isgenerator(row)):
+        if (not isgenerator(row) and
+            not isinstance(row, (list, tuple, range))
+            ):
             self._invalid_row(row)
         cell = WriteOnlyCell(self) # singleton
 
         self._max_row += 1
-        span = len(row)
-        self._max_col = max(self._max_col, span)
         row_idx = self._max_row
         if self.writer is None:
             self.writer = self._write_header()
             next(self.writer)
 
-        attrs = {'r': '%d' % self._max_row,
-                 'spans': '1:%d' % self._max_col}
-        el = Element("row", attrs)
+        el = Element("row", r='%d' % self._max_row)
 
         for col_idx, value in enumerate(row, 1):
             if value is None:
@@ -129,6 +126,8 @@ class LXMLWorksheet(DumpWorksheet):
             el.append(tree)
             if dirty_cell:
                 cell = WriteOnlyCell(self)
+        self._max_col = max(self._max_col, col_idx)
+        el.set('spans', '1:%d' % col_idx)
         try:
             self.writer.send(el)
         except StopIteration:

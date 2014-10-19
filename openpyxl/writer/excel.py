@@ -92,6 +92,9 @@ class ExcelWriter(object):
             archive.writestr(ARC_THEME, self.workbook.loaded_theme)
         else:
             archive.writestr(ARC_THEME, write_theme())
+        for sheet in self.workbook.worksheets:
+            sheet.conditional_formatting.setDxfStyles(self.workbook)
+
         archive.writestr(ARC_STYLE, self.style_writer.write_table())
         archive.writestr(ARC_WORKBOOK, write_workbook(self.workbook))
 
