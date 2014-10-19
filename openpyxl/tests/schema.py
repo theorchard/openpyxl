@@ -42,6 +42,9 @@ chart_schema = XMLSchema(file=chart_src)
 drawing_src = os.path.join(SCHEMA_FOLDER, 'dml-spreadsheetDrawing.xsd')
 drawing_schema = XMLSchema(file=drawing_src)
 
+core_src = os.path.join(SCHEMA_FOLDER, 'opc-coreProperties.xsd')
+core_props_schema = XMLSchema(file=core_src)
+
 sml_files = ['xl/styles.xml']  # , 'xl/workbook.xml']
 
 

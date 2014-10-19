@@ -386,7 +386,7 @@ class TestStyleWriter(object):
                              bottom=medium_blue)
         cf = ConditionalFormatting()
         cf.add('A1:A2', FormulaRule(formula="[A1=1]", font=whiteFont, border=blueBorder, fill=redFill))
-        cf.setDxfStyles(self.workbook)
+        cf._save_styles(self.workbook)
         assert len(self.workbook.style_properties['dxf_list']) == 1
         assert 'font' in self.workbook.style_properties['dxf_list'][0]
         assert 'border' in self.workbook.style_properties['dxf_list'][0]

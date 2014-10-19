@@ -43,3 +43,8 @@ def pytest_runtest_setup(item):
             from openpyxl import LXML
             if not LXML:
                 pytest.skip("LXML is required for some features such as schema validation")
+        elif item.get_marker("lxml_buffering"):
+            from lxml.etree import LIBXML_VERSION
+            if LIBXML_VERSION < (3, 4, 0, 0):
+                pytest.skip("LXML >= 3.4 is required")
+

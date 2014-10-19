@@ -92,8 +92,7 @@ def absolute_coordinate(coord_string):
     else:
         return coord_string
 
-@lru_cache(maxsize=1000)
-def get_column_letter(col_idx):
+def _get_column_letter(col_idx):
     """Convert a column number into a column letter (3 -> 'C')
 
     Right shift the column col_idx by 26 to find column letters in reverse
@@ -116,14 +115,32 @@ def get_column_letter(col_idx):
     return ''.join(reversed(letters))
 
 
-_COL_STRING_CACHE = dict((get_column_letter(i), i) for i in range(1, 18279))
+_COL_STRING_CACHE = {}
+_STRING_COL_CACHE = {}
+for i in range(1, 18279):
+    col = _get_column_letter(i)
+    _STRING_COL_CACHE[i] = col
+    _COL_STRING_CACHE[col] = i
+
+
+def get_column_letter(idx, cache=_STRING_COL_CACHE):
+    try:
+        return cache[idx]
+    except KeyError:
+        raise ValueError("Invalid column index {0}".format(idx))
+del _STRING_COL_CACHE
+del _get_column_letter
+
 def column_index_from_string(str_col, cache=_COL_STRING_CACHE):
     # we use a function argument to get indexed name lookup
-    col = cache.get(str_col.upper())
-    if col is None:
+    try:
+        return cache[str_col.upper()]
+    except KeyError:
         raise ValueError("{0} is not a valid column name".format(str_col))
-    return col
 del _COL_STRING_CACHE
+
+
+
 
 
 PERCENT_REGEX = re.compile(r'^\-?(?P<number>[0-9]*\.?[0-9]*\s?)\%$')
@@ -326,7 +343,10 @@ class Cell(object):
 
     def _cast_datetime(self, value):
         """Convert Python datetime to Excel and set formatting"""
-        if isinstance(value, datetime.date):
+        if isinstance(value, datetime.datetime):
+            value = to_excel(value, self.base_date)
+            self.number_format = numbers.FORMAT_DATE_DATETIME
+        elif isinstance(value, datetime.date):
             value = to_excel(value, self.base_date)
             self.number_format = numbers.FORMAT_DATE_YYYYMMDD2
         elif isinstance(value, datetime.time):
