@@ -1,26 +1,5 @@
 from __future__ import absolute_import
 # Copyright (c) 2010-2014 openpyxl
-#
-# Permission is hereby granted, free of charge, to any person obtaining a copy
-# of this software and associated documentation files (the "Software"), to deal
-# in the Software without restriction, including without limitation the rights
-# to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-# copies of the Software, and to permit persons to whom the Software is
-# furnished to do so, subject to the following conditions:
-#
-# The above copyright notice and this permission notice shall be included in
-# all copies or substantial portions of the Software.
-#
-# THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-# IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-# FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-# AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-# LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-# OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
-# THE SOFTWARE.
-#
-# @license: http://www.opensource.org/licenses/mit-license.php
-# @author: see AUTHORS file
 
 """Write a .xlsx file."""
 
@@ -52,9 +31,9 @@ from openpyxl.writer.workbook import (
     write_root_rels,
     write_workbook_rels,
     write_properties_app,
-    write_properties_core,
     write_workbook
     )
+from openpyxl.workbook.properties import write_properties
 from openpyxl.writer.theme import write_theme
 from openpyxl.writer.styles import StyleWriter
 from openpyxl.writer.drawings import DrawingWriter, ShapeWriter
@@ -88,7 +67,7 @@ class ExcelWriter(object):
         archive.writestr(ARC_ROOT_RELS, write_root_rels(self.workbook))
         archive.writestr(ARC_WORKBOOK_RELS, write_workbook_rels(self.workbook))
         archive.writestr(ARC_APP, write_properties_app(self.workbook))
-        archive.writestr(ARC_CORE, write_properties_core(self.workbook.properties))
+        archive.writestr(ARC_CORE, write_properties(self.workbook.properties))
         if self.workbook.loaded_theme:
             archive.writestr(ARC_THEME, self.workbook.loaded_theme)
         else:

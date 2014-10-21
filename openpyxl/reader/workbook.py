@@ -40,28 +40,6 @@ import re
 VALID_WORKSHEET = WORKSHEET_TYPE
 
 
-def read_properties_core(xml_source):
-    """Read assorted file properties."""
-    properties = DocumentProperties()
-    root = fromstring(xml_source)
-    properties.creator = root.findtext('{%s}creator' % DCORE_NS, '')
-    properties.last_modified_by = root.findtext('{%s}lastModifiedBy' % COREPROPS_NS, '')
-
-    created_node = root.find('{%s}created' % DCTERMS_NS)
-    if created_node is not None:
-        properties.created = W3CDTF_to_datetime(created_node.text)
-    else:
-        properties.created = datetime.datetime.now()
-
-    modified_node = root.find('{%s}modified' % DCTERMS_NS)
-    if modified_node is not None:
-        properties.modified = W3CDTF_to_datetime(modified_node.text)
-    else:
-        properties.modified = properties.created
-
-    return properties
-
-
 def read_excel_base_date(xml_source):
     root = fromstring(text = xml_source)
     wbPr = root.find('{%s}workbookPr' % SHEET_MAIN_NS)
