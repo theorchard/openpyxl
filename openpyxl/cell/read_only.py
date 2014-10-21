@@ -4,7 +4,7 @@ from __future__ import absolute_import
 
 from openpyxl.compat import unicode
 
-from openpyxl.cell import Cell, NUMBER_REGEX
+from openpyxl.cell import Cell
 from openpyxl.date_time import from_excel
 from openpyxl.styles import is_date_format, Style
 
@@ -85,13 +85,10 @@ class ReadOnlyCell(object):
         if value is None:
             self.data_type = Cell.TYPE_NULL
         elif self.data_type == Cell.TYPE_NUMERIC:
-            if NUMBER_REGEX.match(str(value)):
-                try:
-                    value = int(value)
-                except ValueError:
-                    value = float(value)
-            else:
-                value = None
+            try:
+                value = int(value)
+            except ValueError:
+                value = float(value)
         self._value = value
 
     @property
