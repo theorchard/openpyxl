@@ -384,3 +384,14 @@ class TestBadFormats:
         tmp = NamedTemporaryFile(suffix='.no-format')
         with pytest.raises(InvalidFileException):
             load_workbook(filename=tmp.name)
+
+
+def test_read_hyperlinks_read_only(datadir):
+    datadir.join("reader").chdir()
+    wb = load_workbook("bug328.xlsx", read_only=True, data_only=True)
+    ws = wb['Modification Summary']
+    content = []
+    for row in ws.rows:
+        for cell in row:
+            content.append(cell.value)
+    assert len(content) == 114

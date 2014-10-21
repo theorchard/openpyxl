@@ -143,10 +143,15 @@ class IterableWorksheet(Worksheet):
                             data_type = cell.get('t', 'n')
                             style_id = cell.get('s')
                             formula = cell.findtext(FORMULA_TAG)
-                            value = cell.findtext(VALUE_TAG)
-                            if formula is not None and not self.parent.data_only:
-                                data_type = Cell.TYPE_FORMULA
-                                value = "=%s" % formula
+                            value_node = cell.find(VALUE_TAG)
+                            if value_node is None:
+                                value = None
+                            else:
+                                value = value_node.text
+                            if formula is not None:
+                                if not self.parent.data_only:
+                                    data_type = Cell.TYPE_FORMULA
+                                    value = "=%s" % formula
                             yield ReadOnlyCell(self, row, column_str,
                                                value, data_type, style_id)
             if element.tag in (CELL_TAG, VALUE_TAG, FORMULA_TAG):
