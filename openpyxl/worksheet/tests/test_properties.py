@@ -1,49 +1,72 @@
 # Copyright (c) 2010-2014 openpyxl
 
 import pytest
+from lxml.etree import fromstring
 from openpyxl.styles.colors import Color
-from ..properties import Outline, PageSetup
+from openpyxl.tests.schema import sheet_schema
+from openpyxl.tests.helper import compare_xml
+from _pytest.main import Node
 
+from openpyxl.xml.functions import safe_iterator
+
+def test_ctor():
+    from .. properties import WorksheetProperties
+    color1 = 'F0F0F0'
+    wsprops = WorksheetProperties(tabColor=color1)
+    assert dict(wsprops) == {}
 
 @pytest.fixture
-def WorksheetProperties():
+def TabColorProps():
     from .. properties import WorksheetProperties
-    return WorksheetProperties
-
-def test_empty_wsproperties(WorksheetProperties):
     wsp = WorksheetProperties()
-    assert wsp.codeName == None
-    assert wsp.enableFormatConditionsCalculation == None
-    assert wsp.filterMode == None
-    assert wsp.published == None
-    assert wsp.syncHorizontal == None
-    assert wsp.syncRef == None
-    assert wsp.syncVertical == None
-    assert wsp.transitionEvaluation == None
-    assert wsp.transitionEntry == None
-    assert wsp.tabColor == None
-    assert isinstance(wsp.outlinePr, Outline)
-    assert isinstance(wsp.pageSetUpPr,PageSetup)
+    wsp.filterMode = False
+    wsp.tabColor = '1072BA'
+    return wsp
 
-def test_tab_color(WorksheetProperties):
-    wsp = WorksheetProperties(tabColor = '1072BA')
-    assert wsp.tabColor.value == '001072BA'
-    wsp.tabColor = "001073AB"
-    assert wsp.tabColor == Color(rgb='001073AB')
-    with pytest.raises(ValueError):
-        wsp.tabColor = "01072BA"
-    with pytest.raises(ValueError):
-        wsp.tabColor = ""
-    with pytest.raises(ValueError):
-        wsp.tabColor = "12345"
-    wsp.tabColor = "123456"
-    assert wsp.tabColor == Color(rgb='00123456')
-    wsp.tabColor = "12345600"
-    assert wsp.tabColor == Color(rgb='12345600')
-    with pytest.raises(ValueError):
-        wsp.tabColor = "#1234567"
-    with pytest.raises(ValueError):
-        wsp.tabColor = "ABCDEFGHI"
-    with pytest.raises(TypeError):
-        wsp.tabColor = 123456
-        
+def test_TabColorProps(TabColorProps):
+    assert dict(TabColorProps) == {'filterMode':'false'}
+    assert TabColorProps.filterMode == False
+    assert TabColorProps.tabColor.value == '001072BA'
+    assert TabColorProps.tabColor.type == 'rgb'
+    assert TabColorProps.tabColor.tint == 0.0
+
+def test_write_properties(TabColorProps):
+    from .. properties import write_sheetPr
+
+    content = write_sheetPr(TabColorProps)
+    expected = """ <s:sheetPr xmlns:s="http://schemas.openxmlformats.org/spreadsheetml/2006/main" filterMode="false"><s:tabColor rgb="001072BA"/></s:sheetPr>"""
+    diff = compare_xml(content, expected)
+    assert diff is None, diff
+
+@pytest.fixture
+def SimpleTestProps():
+    from .. properties import WorksheetProperties, PageSetup
+    wsp = WorksheetProperties()
+    wsp.filterMode = False
+    wsp.tabColor = 'FF123456'
+    wsp.pageSetUpPr = PageSetup(fitToPage=False)
+    return wsp
+
+def test_parse_properties(datadir, SimpleTestProps):
+    from .. properties import parse_sheetPr
+    datadir.chdir()
+
+    with open("sheetPr2.xml") as src:
+        content = src.read()
+
+    parseditem = parse_sheetPr(fromstring(content))
+    assert dict(parseditem) == dict(SimpleTestProps)
+    assert parseditem.tabColor == SimpleTestProps.tabColor
+    assert dict(parseditem.pageSetUpPr) == dict(SimpleTestProps.pageSetUpPr)
+
+    with open("fullsheet.xml") as src:
+        content = src.read()
+
+    root = fromstring(content)
+    for node in safe_iterator(root):
+        if node.tag == SimpleTestProps.tag:
+            parseditem = parse_sheetPr(node)
+
+    assert dict(parseditem) == dict(SimpleTestProps)
+    assert parseditem.tabColor == SimpleTestProps.tabColor
+    assert dict(parseditem.pageSetUpPr) == dict(SimpleTestProps.pageSetUpPr)

@@ -91,9 +91,9 @@ def cells_from_range(range_string):
     Yields one row at a time.
     """
     min_col, min_row, max_col, max_row = range_boundaries(range_string)
-    for row in range(min_row, max_row+1):
+    for row in range(min_row, max_row + 1):
         yield tuple('%s%d' % (get_column_letter(col), row)
-                    for col in range(min_col, max_col+1))
+                    for col in range(min_col, max_col + 1))
 
 
 class Worksheet(object):
@@ -179,7 +179,7 @@ class Worksheet(object):
     @property
     def parent(self):
         return self._parent
-    
+
     @property
     def encoding(self):
         return self._parent.encoding
@@ -220,7 +220,7 @@ class Worksheet(object):
             msg = 'Maximum 31 characters allowed in sheet title'
             raise SheetTitleException(msg)
         self._title = value
-                
+
     @deprecated('this method is private and should not be called directly')
     def unique_sheet_name(self, value):
         return self._unique_sheet_name(value)
@@ -447,10 +447,10 @@ class Worksheet(object):
         :rtype: generator
         """
         # Column name cache is very important in large files.
-        cache = dict((col, get_column_letter(col)) for col in range(min_col, max_col+1))
-        for row in range(min_row, max_row+1):
+        cache = dict((col, get_column_letter(col)) for col in range(min_col, max_col + 1))
+        for row in range(min_row, max_row + 1):
             yield tuple(self._get_cell('%s%d' % (cache[col], row))
-                        for col in range(min_col, max_col+1))
+                        for col in range(min_col, max_col + 1))
 
 
     def get_named_range(self, range_string):
@@ -602,7 +602,7 @@ class Worksheet(object):
                                               end_row)
         elif ":" not in range_string:
             if COORD_RE.match(range_string):
-                return # Single cell
+                return  # Single cell
             msg = "Range must be a cell range (e.g. A1:E1)"
             raise InsufficientCoordinatesException(msg)
         else:
