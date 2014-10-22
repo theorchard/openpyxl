@@ -7,7 +7,7 @@ from openpyxl.compat import safe_string
 from openpyxl.descriptors import Strict, String, Bool, Typed
 from openpyxl.styles.colors import ColorDescriptor
 from openpyxl.xml.constants import SHEET_MAIN_NS
-from openpyxl.xml.functions import Element, tostring
+from openpyxl.xml.functions import Element
 from openpyxl.styles.colors import Color
 
 class Outline(Strict):
@@ -33,13 +33,13 @@ class Outline(Strict):
 
 
     def __iter__(self):
-        for attr in ("applyStyles", "summaryBelow" "summaryRight", "showOutlineSymbols"):
+        for attr in ("applyStyles", "summaryBelow", "summaryRight", "showOutlineSymbols"):
             value = getattr(self, attr)
             if value is not None:
                 yield attr, safe_string(value)
 
 
-class PageSetup(Strict):
+class PageSetupPr(Strict):
 
     tag = "{%s}pageSetUpPr" % SHEET_MAIN_NS
 
@@ -72,7 +72,7 @@ class WorksheetProperties(Strict):
     transitionEntry = Bool(allow_none=True)
     tabColor = ColorDescriptor(allow_none=True)
     outlinePr = Typed(expected_type=Outline, allow_none=True)
-    pageSetUpPr = Typed(expected_type=PageSetup, allow_none=True)
+    pageSetUpPr = Typed(expected_type=PageSetupPr, allow_none=True)
 
 
     def __init__(self,
@@ -108,7 +108,7 @@ class WorksheetProperties(Strict):
     def __iter__(self):
         for attr in ("codeName", "enableFormatConditionsCalculation",
                      "filterMode", "published", "syncHorizontal", "syncRef",
-                     "syncVertical", "transitionEvaluation", "transitionEntry"):
+                     "syncVertical", "transitionEvaluation", "transitionEntry", "tabColor", "outlinePr", "pageSetUpPr"):
             value = getattr(self, attr)
             if value is not None:
                 if attr in ("enableFormatConditionsCalculation", "filterMode", "published", "syncHorizontal"
@@ -117,9 +117,34 @@ class WorksheetProperties(Strict):
                         yield attr, 'true'
                     else:
                         yield attr, 'false'
+
+                elif attr in ("tabColor", "outlinePr", "pageSetUpPr"):
+                    yield attr, dict(value)
+
                 else:
                     yield attr, safe_string(value)
+                    
 
+    def get_vba_code(self):
+        ''' for compatibility with previous versions '''
+        for attr in ("codeName", "enableFormatConditionsCalculation",
+                     "filterMode", "published", "syncHorizontal", "syncRef",
+                     "syncVertical", "transitionEvaluation", "transitionEntry"):
+            value = getattr(self, attr)
+            if value is not None:
+                yield attr, safe_string(value)
+                
+
+    def set_vba_code(self, vba_code):
+        ''' for compatibility with previous versions '''
+        for k, v in vba_code.items():
+            if k in ("codeName", "enableFormatConditionsCalculation",
+                     "filterMode", "published", "syncHorizontal", "syncRef",
+                     "syncVertical", "transitionEvaluation", "transitionEntry"):
+                setattr(self, k, v)
+
+        return
+    
 
 def parse_sheetPr(node):
     props = WorksheetProperties(**node.attrib)
@@ -128,9 +153,9 @@ def parse_sheetPr(node):
     if outline is not None:
         props.outlinePr = Outline(**outline.attrib)
 
-    page_setup = node.find(PageSetup.tag)
+    page_setup = node.find(PageSetupPr.tag)
     if page_setup is not None:
-        props.pageSetUpPr = PageSetup(**page_setup.attrib)
+        props.pageSetUpPr = PageSetupPr(**page_setup.attrib)
 
     tab_color = node.find('{%s}tabColor' % SHEET_MAIN_NS)
     if tab_color is not None:
@@ -139,7 +164,13 @@ def parse_sheetPr(node):
 
 
 def write_sheetPr(props):
-    el = Element(props.tag, dict(props))
+
+    attributes = {}
+    for k, v in dict(props).items():
+        if not isinstance(v, dict):
+            attributes[k] = v
+
+    el = Element(props.tag, attributes)
 
     outline = props.outlinePr
     if outline:
@@ -152,4 +183,4 @@ def write_sheetPr(props):
     if props.tabColor:
         el.append(Element('{%s}tabColor' % SHEET_MAIN_NS, rgb=props.tabColor.value))
 
-    return tostring(el)
+    return el

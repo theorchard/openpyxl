@@ -17,6 +17,7 @@ from openpyxl.xml.constants import SHEET_MAIN_NS
 from openpyxl.xml.functions import safe_iterator
 from openpyxl.styles import Color
 from openpyxl.formatting import ConditionalFormatting
+from openpyxl.worksheet.properties import parse_sheetPr
 
 
 def _get_xml_iter(xml_source):
@@ -284,7 +285,7 @@ class WorkSheetParser(object):
 
 
     def parse_properties(self, element):
-        self.ws.vba_code = element.attrib
+        self.ws.sheet_properties = parse_sheetPr(element)
 
 
     def parse_legacy_drawing(self, element):

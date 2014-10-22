@@ -7,13 +7,14 @@ from openpyxl.tests.schema import sheet_schema
 from openpyxl.tests.helper import compare_xml
 from _pytest.main import Node
 
-from openpyxl.xml.functions import safe_iterator
+from openpyxl.xml.functions import safe_iterator, tostring
 
 def test_ctor():
-    from .. properties import WorksheetProperties
-    color1 = 'F0F0F0'
-    wsprops = WorksheetProperties(tabColor=color1)
-    assert dict(wsprops) == {}
+    from .. properties import WorksheetProperties, Outline
+    color_test = 'F0F0F0'
+    outline_pr = Outline(summaryBelow=True, summaryRight=True)
+    wsprops = WorksheetProperties(tabColor=color_test, outlinePr=outline_pr)
+    assert dict(wsprops) == {'tabColor': {'rgb': '00F0F0F0'}, 'outlinePr': {'summaryBelow': '1', 'summaryRight': '1'}}
 
 @pytest.fixture
 def TabColorProps():
@@ -24,27 +25,23 @@ def TabColorProps():
     return wsp
 
 def test_TabColorProps(TabColorProps):
-    assert dict(TabColorProps) == {'filterMode':'false'}
-    assert TabColorProps.filterMode == False
-    assert TabColorProps.tabColor.value == '001072BA'
-    assert TabColorProps.tabColor.type == 'rgb'
-    assert TabColorProps.tabColor.tint == 0.0
+    assert dict(TabColorProps) == {'filterMode':'false', 'tabColor': {'rgb': '001072BA'}}
 
 def test_write_properties(TabColorProps):
     from .. properties import write_sheetPr
 
     content = write_sheetPr(TabColorProps)
     expected = """ <s:sheetPr xmlns:s="http://schemas.openxmlformats.org/spreadsheetml/2006/main" filterMode="false"><s:tabColor rgb="001072BA"/></s:sheetPr>"""
-    diff = compare_xml(content, expected)
+    diff = compare_xml(tostring(content), expected)
     assert diff is None, diff
 
 @pytest.fixture
 def SimpleTestProps():
-    from .. properties import WorksheetProperties, PageSetup
+    from .. properties import WorksheetProperties, PageSetupPr
     wsp = WorksheetProperties()
     wsp.filterMode = False
     wsp.tabColor = 'FF123456'
-    wsp.pageSetUpPr = PageSetup(fitToPage=False)
+    wsp.pageSetUpPr = PageSetupPr(fitToPage=False)
     return wsp
 
 def test_parse_properties(datadir, SimpleTestProps):

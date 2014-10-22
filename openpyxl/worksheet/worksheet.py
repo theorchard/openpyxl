@@ -49,7 +49,7 @@ from .page import PageSetup, PageMargins
 from .dimensions import ColumnDimension, RowDimension, DimensionHolder
 from .protection import SheetProtection
 from .filters import AutoFilter
-from .properties import WorksheetProperties
+from .properties import WorksheetProperties, Outline, PageSetupPr
 
 
 def flatten(results):
@@ -152,15 +152,15 @@ class Worksheet(object):
         self.selected_cell = 'A1'
         self.active_cell = 'A1'
         self.sheet_state = self.SHEETSTATE_VISIBLE
-        self.page_setup = PageSetup()
+        self._page_setup = PageSetup()
         self.page_margins = PageMargins()
         self.header_footer = HeaderFooter()
         self.sheet_view = SheetView()
         self.protection = SheetProtection()
         self.show_gridlines = True
         self.print_gridlines = False
-        self.show_summary_below = True
-        self.show_summary_right = True
+#         self.show_summary_below = True
+#         self.show_summary_right = True
         self.default_row_dimension = RowDimension(worksheet=self)
         self.default_column_dimension = ColumnDimension(worksheet=self)
         self._auto_filter = AutoFilter()
@@ -169,12 +169,43 @@ class Worksheet(object):
         self.formula_attributes = {}
         self.orientation = None
         self.conditional_formatting = ConditionalFormatting()
-        self.vba_code = {}
+#         self.vba_code = {}
         self.vba_controls = None
         self.sheet_properties = WorksheetProperties()
+        self.sheet_properties.outlinePr = Outline(summaryBelow=True, summaryRight=True)
 
     def __repr__(self):
         return self.repr_format % self.title
+
+    """ To keep compatibility with previous versions"""
+    @property
+    def show_summary_below(self):
+        return self.sheet_properties.outlinePr.summaryBelow
+
+    @property
+    def show_summary_right(self):
+        return self.sheet_properties.outlinePr.summaryRight
+
+    @property
+    def vba_code(self):
+        return self.sheet_properties.get_vba_code()
+
+    @vba_code.setter
+    def vba_code(self, value):
+        self.sheet_properties.set_vba_code(value)
+    
+    @property
+    def page_setup(self):
+        return self._page_setup
+ 
+    @page_setup.setter
+    def page_setup(self, value):
+        self._page_setup = value
+        if value.fitToPage:
+            self.sheet_properties.pageSetUpPr = PageSetupPr(fitToPage=value.fitToPage)
+        
+
+    """ End To keep compatibility with previous versions"""
 
     @property
     def parent(self):
