@@ -15,7 +15,8 @@ from openpyxl.compat import (
     range,
     basestring,
     iteritems,
-    deprecated
+    deprecated,
+    safe_string
 )
 
 # package imports
@@ -188,22 +189,31 @@ class Worksheet(object):
 
     @property
     def vba_code(self):
-        return self.sheet_properties.get_vba_code()
+        for attr in ("codeName", "enableFormatConditionsCalculation",
+                     "filterMode", "published", "syncHorizontal", "syncRef",
+                     "syncVertical", "transitionEvaluation", "transitionEntry"):
+            value = getattr(self.sheet_properties, attr)
+            if value is not None:
+                yield attr, safe_string(value)
 
     @vba_code.setter
     def vba_code(self, value):
-        self.sheet_properties.set_vba_code(value)
-    
+        for k, v in value.items():
+            if k in ("codeName", "enableFormatConditionsCalculation",
+                     "filterMode", "published", "syncHorizontal", "syncRef",
+                     "syncVertical", "transitionEvaluation", "transitionEntry"):
+                setattr(self.sheet_properties, k, v)
+
     @property
     def page_setup(self):
         return self._page_setup
- 
+
     @page_setup.setter
     def page_setup(self, value):
         self._page_setup = value
         if value.fitToPage:
             self.sheet_properties.pageSetUpPr = PageSetupPr(fitToPage=value.fitToPage)
-        
+
 
     """ End To keep compatibility with previous versions"""
 
