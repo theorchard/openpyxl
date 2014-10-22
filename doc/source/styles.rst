@@ -161,12 +161,10 @@ Edit Print Settings
 >>>
 >>> ws.page_setup.orientation = ws.ORIENTATION_LANDSCAPE
 >>> ws.page_setup.paperSize = ws.PAPERSIZE_TABLOID
->>> ws.page_setup.fitToPage = True
 >>> ws.page_setup.fitToHeight = 0
 >>> ws.page_setup.fitToWidth = 1
 >>> ws.page_setup.horizontalCentered = True
 >>> ws.page_setup.verticalCentered = True
-
 
 
 Header / Footer
@@ -185,3 +183,28 @@ Header / Footer
 
 # Or just
 >>> ws.header_footer.right_footer.text = 'My Right Footer'
+
+
+Worksheet Additional Properties
+-------------------------------
+These are advanced properties for particular behaviours, the most used ones are the "fitTopage" page setup property and the tabColor that define the background color of the worksheet tab.
+
+Available properties for worksheet: "codeName", "enableFormatConditionsCalculation", "filterMode", "published", "syncHorizontal", "syncRef", "syncVertical", "transitionEvaluation", "transitionEntry", "tabColor".
+Available fields for page setup properties: "autoPageBreaks", "fitToPage".
+Available fields for outline properties: "applyStyles", "summaryBelow", "summaryRight", "showOutlineSymbols".
+
+see http://msdn.microsoft.com/en-us/library/documentformat.openxml.spreadsheet.sheetproperties%28v=office.14%29.aspx_ for details.
+
+.. :: doctest
+
+>>> from openpyxl.workbook import Workbook
+>>> from openpyxl.worksheet.properties import WorksheetProperties, Outline, PageSetupPr
+>>>
+>>> wb = Workbook()
+>>> ws = wb.active
+>>>
+>>> wsprops = ws.sheet_properties
+>>> wsprops.tabColor = "1072BA"
+>>> wsprops.filterMode = False
+>>> wsprops.pageSetUpPr = PageSetupPr(fitToPage=True)
+>>> wsprops.outlinePr = Outline(summaryBelow=True, summaryRight=True)
