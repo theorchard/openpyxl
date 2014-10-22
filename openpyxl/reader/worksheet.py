@@ -186,7 +186,7 @@ class WorkSheetParser(object):
         self.page_margins = PageMargins(**margins)
 
     def parse_page_setup(self, element):
-        for key in ("orientation", "paperSize", "scale", "fitToPage",
+        for key in ("orientation", "paperSize", "scale",
                     "fitToHeight", "fitToWidth", "firstPageNumber",
                     "useFirstPageNumber"):
             value = element.get(key)

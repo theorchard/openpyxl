@@ -13,6 +13,7 @@ from openpyxl import Workbook
 from .. worksheet import write_worksheet
 
 from openpyxl.tests.helper import compare_xml
+from openpyxl.worksheet.properties import PageSetupPr
 
 
 class DummyWorksheet:
