@@ -153,7 +153,7 @@ class Worksheet(object):
         self.selected_cell = 'A1'
         self.active_cell = 'A1'
         self.sheet_state = self.SHEETSTATE_VISIBLE
-        self._page_setup = PageSetup()
+        self.page_setup = PageSetup()
         self.page_margins = PageMargins()
         self.header_footer = HeaderFooter()
         self.sheet_view = SheetView()
@@ -203,17 +203,6 @@ class Worksheet(object):
                      "filterMode", "published", "syncHorizontal", "syncRef",
                      "syncVertical", "transitionEvaluation", "transitionEntry"):
                 setattr(self.sheet_properties, k, v)
-
-    @property
-    def page_setup(self):
-        return self._page_setup
-
-    @page_setup.setter
-    def page_setup(self, value):
-        self._page_setup = value
-        if value.fitToPage:
-            self.sheet_properties.pageSetUpPr = PageSetupPr(fitToPage=value.fitToPage)
-
 
     """ End To keep compatibility with previous versions"""
 

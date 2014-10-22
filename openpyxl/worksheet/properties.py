@@ -123,18 +123,7 @@ class WorksheetProperties(Strict):
 
                 else:
                     yield attr, safe_string(value)
-                    
 
-#     def set_vba_code(self, vba_code):
-#         ''' for compatibility with previous versions '''
-#         for k, v in vba_code.items():
-#             if k in ("codeName", "enableFormatConditionsCalculation",
-#                      "filterMode", "published", "syncHorizontal", "syncRef",
-#                      "syncVertical", "transitionEvaluation", "transitionEntry"):
-#                 setattr(self, k, v)
-# 
-#         return
-    
 
 def parse_sheetPr(node):
     props = WorksheetProperties(**node.attrib)

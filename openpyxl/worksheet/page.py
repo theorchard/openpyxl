@@ -29,13 +29,13 @@ from openpyxl.descriptors import Strict, Float
 
 class PageSetup(object):
     """Information about page layout for this sheet"""
-    valid_setup = ("orientation", "paperSize", "scale", "fitToPage",
-                   "fitToHeight", "fitToWidth", "firstPageNumber", "useFirstPageNumber")
+    valid_setup = ("orientation", "paperSize", "scale", "fitToHeight", "fitToWidth"
+                   , "firstPageNumber", "useFirstPageNumber")
     valid_options = ("horizontalCentered", "verticalCentered")
     orientation = None
     paperSize = None
     scale = None
-    fitToPage = None
+#     fitToPage = None
     fitToHeight = None
     fitToWidth = None
     firstPageNumber = None
@@ -89,7 +89,7 @@ class PageMargins(Strict):
         self.left = left
         self.right = right
         self.top = top
-        self.bottom =  bottom
+        self.bottom = bottom
         self.header = header
         self.footer = footer
 

@@ -44,8 +44,6 @@ def row_sort(cell):
 def write_properties(worksheet):
     wsp = worksheet.sheet_properties
     pr = write_sheetPr(wsp)
-#     if worksheet.page_setup.fitToPage:
-#         pr.append(Element('pageSetUpPr', fitToPage='1'))
     return pr
 
 

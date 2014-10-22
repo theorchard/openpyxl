@@ -718,11 +718,12 @@ def test_printer_settings(worksheet):
     ws = worksheet
     ws.page_setup.orientation = ws.ORIENTATION_LANDSCAPE
     ws.page_setup.paperSize = ws.PAPERSIZE_TABLOID
-    ws.page_setup.fitToPage = True
     ws.page_setup.fitToHeight = 0
     ws.page_setup.fitToWidth = 1
     ws.page_setup.horizontalCentered = True
     ws.page_setup.verticalCentered = True
+    page_setup_prop = PageSetupPr(fitToPage=1)
+    ws.sheet_properties.pageSetUpPr = page_setup_prop
     xml = write_worksheet(ws, None)
     expected = """
     <worksheet xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main" xmlns:r="http://schemas.openxmlformats.org/officeDocument/2006/relationships">
