@@ -48,7 +48,8 @@ XSD = "http://www.w3.org/2001/XMLSchema"
 
 mapping = {
     'xsd:boolean':'Bool',
-    'xsd:unsignedInt':'Integer'
+    'xsd:unsignedInt':'Integer',
+    'xsd:double':'Float'
 }
 
 def classify(tagname):
@@ -69,12 +70,14 @@ class %s(Strict):
 """ % tagname[3:]
     attrs = []
 
-    for attr in node.iterfind("{%s}attribute" % XSD):
-        attr = attr.attrib
+    for el in node.iterfind("{%s}attribute" % XSD):
+        attr = el.attrib
+        if 'ref' in attr:
+            continue
         attrs.append(attr['name'])
         if attr['type'] in mapping:
             attr['type'] = mapping[attr['type']]
-        if attr["use"] == "optional":
+        if attr.get("use") == "optional":
             attr["use"] = "allow_none=True"
         else:
             attr["use"] = ""
@@ -84,4 +87,8 @@ class %s(Strict):
     s += "    def __init__(self,\n    %s=None):\n" % ("=None,\n    ".join(attrs))
     for attr in attrs:
         s += "    {0} = {0}\n".format(attr)
+
+    for el in node.iterfind("{%s}sequence/{%s}element" % (XSD, XSD)):
+        s += "\n\n"
+        s += classify(el.get('type'))
     return s
