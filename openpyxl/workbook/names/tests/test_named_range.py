@@ -9,7 +9,7 @@ from openpyxl.compat import zip
 
 # package imports
 from .. named_range import split_named_range, NamedRange, NamedValue
-from openpyxl.reader.workbook import read_named_ranges
+from openpyxl.workbook.names.named_range import read_named_ranges
 from openpyxl.exceptions import NamedRangeException
 from openpyxl.reader.excel import load_workbook
 
@@ -259,3 +259,23 @@ class TestNameRefersToValue:
 
         values = ['3.33', '14.4', '9.99']
         assert [r.value for r in ranges if hasattr(r, 'value')] == values
+
+
+@pytest.mark.parametrize("value",
+                         [
+                             "OFFSET(rep!$AK$1,0,0,COUNT(rep!$AK$1),1)",
+                             "VLOOKUP(Country!$E$3, Table_Currencies[#All], 2, 9)"
+                         ])
+def test_formula_names(value):
+    from .. named_range import FORMULA_REGEX
+    assert FORMULA_REGEX.match(value)
+
+
+@pytest.mark.parametrize("value",
+                         [
+                             "OFFSET(rep!$AK$1,0,0,COUNT(rep!$AK$1),1)",
+                             "VLOOKUP(Country!$E$3, Table_Currencies[#All], 2, 9)"
+                         ])
+def test_formula_not_range(value):
+    from .. named_range import refers_to_range
+    assert refers_to_range(value) is None

@@ -138,7 +138,7 @@ TIME_REGEX = re.compile(r"""
 ([0-5][0-9])?\.
 (?P<microsecond>\d{1,6}))
 """, re.VERBOSE)
-NUMBER_REGEX = re.compile(r'^-?([\d]|[\d]+\.[\d]*|\.[\d]+|[1-9][\d]+\.?[\d]*)((E|e)-?[\d]+)?$')
+NUMBER_REGEX = re.compile(r'^-?([\d]|[\d]+\.[\d]*|\.[\d]+|[1-9][\d]+\.?[\d]*)((E|e)[-+]?[\d]+)?$')
 
 
 class Cell(object):
