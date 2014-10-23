@@ -1,0 +1,85 @@
+<worksheet xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main" xmlns:r="http://schemas.openxmlformats.org/officeDocument/2006/relationships">
+    <dimension ref="A1:F3"/>
+    <sheetViews>
+        <sheetView tabSelected="1" workbookViewId="0" rightToLeft="false"/>
+    </sheetViews>
+    <sheetFormatPr defaultRowHeight="12.75"/>
+    <sheetData>
+        <row outlineLevel="0" r="1">
+            <c r="A1" s="0" t="inlineStr">
+                <is>
+                    <t>ID</t>
+                </is>
+            </c><c r="B1" s="0" t="inlineStr">
+                <is>
+                    <t>Field1</t>
+                </is>
+            </c><c r="C1" s="0" t="inlineStr">
+                <is>
+                    <t>Field2</t>
+                </is>
+            </c><c r="D1" s="0" t="inlineStr">
+                <is>
+                    <t>Field3</t>
+                </is>
+            </c><c r="E1" s="0" t="inlineStr">
+                <is>
+                    <t>DateField</t>
+                </is>
+            </c><c r="F1" s="0" t="inlineStr">
+                <is>
+                    <t>Field5</t>
+                </is>
+            </c>
+        </row>
+        <row outlineLevel="0" r="2">
+            <c r="A2" s="0">
+                <v>5</v>
+            </c><c r="B2" s="0" t="inlineStr">
+                <is>
+                    <t>1</t>
+                </is>
+            </c><c r="C2" s="0" t="inlineStr">
+                <is>
+                    <t>2</t>
+                </is>
+            </c><c r="D2" s="0" t="inlineStr">
+                <is>
+                    <t>3</t>
+                </is>
+            </c><c r="E2" s="1">
+                <v>41621</v>
+            </c><c r="F2" s="0" t="inlineStr">
+                <is>
+                    <t>4</t>
+                </is>
+            </c>
+        </row>
+        <row outlineLevel="0" r="3">
+            <c r="A3" s="0">
+                <v>6</v>
+            </c><c r="B3" s="0" t="inlineStr">
+                <is>
+                    <t>This</t>
+                </is>
+            </c><c r="C3" s="0" t="inlineStr">
+                <is>
+                    <t>is</t>
+                </is>
+            </c><c r="D3" s="0" t="inlineStr">
+                <is>
+                    <t>fake</t>
+                </is>
+            </c><c r="E3" s="1">
+                <v>41622</v>
+            </c><c r="F3" s="0" t="inlineStr">
+                <is>
+                    <t>data</t>
+                </is>
+            </c>
+        </row>
+    </sheetData>
+    <phoneticPr fontId="0" type="noConversion"/>
+    <pageMargins left="0.75" right="0.75" top="1" bottom="1" header="0.5" footer="0.5"/>
+    <headerFooter alignWithMargins="0"/>
+</worksheet>

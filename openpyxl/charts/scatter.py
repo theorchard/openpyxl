@@ -1,0 +1,15 @@
+from __future__ import absolute_import
+# Copyright (c) 2010-2014 openpyxl
+
+from .graph import GraphChart
+
+
+class ScatterChart(GraphChart):
+
+    TYPE = "scatterChart"
+
+    def __init__(self, auto_axis=True):
+        super(ScatterChart, self).__init__(auto_axis)
+        self.x_axis.type = "valAx"
+        self.x_axis.cross_between = "midCat"
+        self.y_axis.cross_between = "midCat"
