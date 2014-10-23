@@ -19,15 +19,16 @@ from openpyxl.compat import (
 )
 
 # package imports
-import openpyxl.cell
-from openpyxl.cell import (
+from openpyxl.utils import (
     coordinate_from_string,
     COORD_RE,
     ABSOLUTE_RE,
     column_index_from_string,
     get_column_letter,
-    Cell
+    range_boundaries,
+    cells_from_range,
 )
+from openpyxl.cell import Cell
 from openpyxl.exceptions import (
     SheetTitleException,
     InsufficientCoordinatesException,
@@ -49,6 +50,7 @@ from .page import PageSetup, PageMargins
 from .dimensions import ColumnDimension, RowDimension, DimensionHolder
 from .protection import SheetProtection
 from .filters import AutoFilter
+from .views import SheetView
 
 
 def flatten(results):
@@ -56,43 +58,6 @@ def flatten(results):
 
     for row in results:
         yield(c.value for c in row)
-
-
-class SheetView(object):
-    """Information about the visible portions of this sheet."""
-    pass
-
-
-def range_boundaries(range_string):
-    """
-    Convert a range string into a tuple of boundaries:
-    (min_col, min_row, max_col, max_row)
-    Cell coordinates will be converted into a range with the cell at both end
-    """
-    m = ABSOLUTE_RE.match(range_string)
-    min_col, min_row, sep, max_col, max_row = m.groups()
-    min_col = column_index_from_string(min_col)
-    min_row = int(min_row)
-
-    if max_col is None or max_row is None:
-        max_col = min_col
-        max_row = min_row
-    else:
-        max_col = column_index_from_string(max_col)
-        max_row = int(max_row)
-
-    return min_col, min_row, max_col, max_row
-
-
-def cells_from_range(range_string):
-    """
-    Get individual addresses for every cell in a range.
-    Yields one row at a time.
-    """
-    min_col, min_row, max_col, max_row = range_boundaries(range_string)
-    for row in range(min_row, max_row+1):
-        yield tuple('%s%d' % (get_column_letter(col), row)
-                    for col in range(min_col, max_col+1))
 
 
 class Worksheet(object):
@@ -319,7 +284,7 @@ class Worksheet(object):
 
         if not coordinate in self._cells:
             column, row = coordinate_from_string(coordinate)
-            new_cell = openpyxl.cell.Cell(self, column, row)
+            new_cell = Cell(self, column, row)
             self._cells[coordinate] = new_cell
             if column not in self.column_dimensions:
                 self.column_dimensions[column] = ColumnDimension(column, worksheet=self)
@@ -446,7 +411,6 @@ class Worksheet(object):
         """
         # Column name cache is very important in large files.
         cache = dict((col, get_column_letter(col)) for col in range(min_col, max_col+1))
-        rows = []
         for row in range(min_row, max_row+1):
             yield tuple(self._get_cell('%s%d' % (cache[col], row))
                         for col in range(min_col, max_col+1))
@@ -702,7 +666,7 @@ class Worksheet(object):
     @property
     def rows(self):
         """Iterate over all rows in the worksheet"""
-        return tuple(row for row in self.iter_rows())
+        return tuple(self.iter_rows())
 
     @property
     def columns(self):

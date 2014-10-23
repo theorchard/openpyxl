@@ -1,5 +1,5 @@
 
-from openpyxl.writer.charts import PieChartWriter
+from openpyxl.charts.writer import PieChartWriter
 from openpyxl.xml.constants import CHART_NS
 from openpyxl.xml.functions import safe_iterator, fromstring
 
@@ -56,4 +56,4 @@ class TestPieChartWriter(object):
         datadir.chdir()
         with open("PieChart.xml") as expected:
             diff = compare_xml(xml, expected.read())
-            assert diff is None, diff
+        assert diff is None, diff
