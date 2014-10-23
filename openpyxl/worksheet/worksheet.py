@@ -50,6 +50,7 @@ from .page import PageSetup, PageMargins
 from .dimensions import ColumnDimension, RowDimension, DimensionHolder
 from .protection import SheetProtection
 from .filters import AutoFilter
+from .views import SheetView
 
 
 def flatten(results):
@@ -57,12 +58,6 @@ def flatten(results):
 
     for row in results:
         yield(c.value for c in row)
-
-
-class SheetView(object):
-    """Information about the visible portions of this sheet."""
-    pass
-
 
 
 class Worksheet(object):
