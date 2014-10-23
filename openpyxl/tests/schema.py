@@ -62,3 +62,46 @@ def validate_archive(file_path):
                 sheet_schema.assertValid(root)
     finally:
         zipfile.close()
+
+
+XSD = "http://www.w3.org/2001/XMLSchema"
+
+mapping = {
+    'xsd:boolean':'Bool',
+    'xsd:unsignedInt':'Integer'
+}
+
+def classify(tagname):
+    """
+    Generate a Python-class based on the schema definition
+    """
+    schema = parse(sheet_src)
+    nodes = schema.iterfind("{%s}complexType" % XSD)
+    for node in nodes:
+        if node.get('name') == tagname:
+            break
+
+    s = """
+from openpyxl.descriptors import Strict
+
+
+class %s(Strict):
+""" % tagname[3:]
+    attrs = []
+
+    for attr in node.iterfind("{%s}attribute" % XSD):
+        attr = attr.attrib
+        attrs.append(attr['name'])
+        if attr['type'] in mapping:
+            attr['type'] = mapping[attr['type']]
+        if attr["use"] == "optional":
+            attr["use"] = "allow_none=True"
+        else:
+            attr["use"] = ""
+        s += "    {name} = {type}({use})\n".format(**attr)
+
+    s += "\n"
+    s += "    def __init__(self,\n    %s=None):\n" % ("=None,\n    ".join(attrs))
+    for attr in attrs:
+        s += "    {0} = {0}\n".format(attr)
+    return s
