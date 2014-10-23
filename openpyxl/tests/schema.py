@@ -49,6 +49,7 @@ XSD = "http://www.w3.org/2001/XMLSchema"
 mapping = {
     'xsd:boolean':'Bool',
     'xsd:unsignedInt':'Integer',
+    'xsd:int':'Integer',
     'xsd:double':'Float'
 }
 
