@@ -146,6 +146,7 @@ class TestCellValueTypes(object):
                                  ( 1e1, 10),
                                  ('4', 4),
                                  ('-1E3', -1000),
+                                 ('2e+2', 200),
                                  (4, 4),
                                  (decimal.Decimal('3.14'), decimal.Decimal('3.14')),
                              ]

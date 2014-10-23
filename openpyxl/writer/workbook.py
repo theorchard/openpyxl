@@ -1,26 +1,5 @@
 from __future__ import absolute_import
 # Copyright (c) 2010-2014 openpyxl
-#
-# Permission is hereby granted, free of charge, to any person obtaining a copy
-# of this software and associated documentation files (the "Software"), to deal
-# in the Software without restriction, including without limitation the rights
-# to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-# copies of the Software, and to permit persons to whom the Software is
-# furnished to do so, subject to the following conditions:
-#
-# The above copyright notice and this permission notice shall be included in
-# all copies or substantial portions of the Software.
-#
-# THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-# IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-# FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-# AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-# LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-# OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
-# THE SOFTWARE.
-#
-# @license: http://www.opensource.org/licenses/mit-license.php
-# @author: see AUTHORS file
 
 """Write the workbook global settings to the archive."""
 
@@ -29,8 +8,9 @@ from functools import partial
 # package imports
 
 from openpyxl import LXML
-from openpyxl.xml.functions import Element, SubElement
+from openpyxl.compat import safe_string
 from openpyxl.cell import absolute_coordinate
+from openpyxl.xml.functions import Element, SubElement
 from openpyxl.xml.constants import (
     ARC_CORE,
     ARC_WORKBOOK,
@@ -294,7 +274,7 @@ def _write_defined_names(workbook, names):
     for named_range in workbook.get_named_ranges():
         attrs = dict(named_range)
         if named_range.scope is not None:
-            attrs['localSheetId'] = '%d' % workbook.get_index(named_range.scope)
+            attrs['localSheetId'] = safe_string(named_range.scope)
 
         name = Element('{%s}definedName' % SHEET_MAIN_NS, attrs)
         name.text = named_range.value

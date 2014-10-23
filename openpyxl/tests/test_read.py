@@ -45,6 +45,7 @@ from openpyxl.reader.workbook import read_workbook_code_name
 from openpyxl.exceptions import InvalidFileException
 from openpyxl.date_time import CALENDAR_WINDOWS_1900, CALENDAR_MAC_1904
 from openpyxl.xml.constants import ARC_WORKBOOK
+from openpyxl.worksheet.iter_worksheet import IterableWorksheet
 
 
 def test_read_standalone_worksheet(datadir):
@@ -198,7 +199,7 @@ class TestReadBaseDateFormat(object):
         ws = date_std_1900["Sheet1"]
         assert ws.cell('A1').style.number_format == numbers.FORMAT_DATE_XLSX14
 
-    def test_read_date_value(sel, date_std_1900, date_mac_1904):
+    def test_read_date_value(self, date_std_1900, date_mac_1904):
         win = date_std_1900["Sheet1"]
         mac = date_mac_1904["Sheet1"]
         datetuple = (2011, 10, 31)
@@ -384,3 +385,11 @@ class TestBadFormats:
         tmp = NamedTemporaryFile(suffix='.no-format')
         with pytest.raises(InvalidFileException):
             load_workbook(filename=tmp.name)
+
+
+def test_read_hyperlinks_read_only(datadir):
+    datadir.join("reader").chdir()
+    filename = 'bug328_hyperlinks.xml'
+    ws = IterableWorksheet(Workbook(data_only=True, read_only=True), "Sheet",
+                           "", filename, ['SOMETEXT'], [])
+    assert ws['F2'].value is None

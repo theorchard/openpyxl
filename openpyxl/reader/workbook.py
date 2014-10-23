@@ -37,8 +37,6 @@ import datetime
 import re
 
 # constants
-BUGGY_NAMED_RANGES = re.compile("|".join(['NA()', '#REF!']))
-DISCARDED_RANGES = re.compile("|".join(['Excel_BuiltIn', 'Print_Area']))
 VALID_WORKSHEET = WORKSHEET
 
 
@@ -102,8 +100,10 @@ def read_sheets(archive):
     xml_source = archive.read(ARC_WORKBOOK)
     tree = fromstring(xml_source)
     for element in safe_iterator(tree, '{%s}sheet' % SHEET_MAIN_NS):
-        rId = element.get("{%s}id" % REL_NS)
-        yield rId, element.get('name'), element.get('state')
+        attrib = element.attrib
+        attrib['id'] = attrib["{%s}id" % REL_NS]
+        del attrib["{%s}id" % REL_NS]
+        yield attrib
 
 
 def detect_worksheets(archive):
@@ -115,51 +115,16 @@ def detect_worksheets(archive):
     content_types = read_content_types(archive)
     valid_sheets = dict((path, ct) for ct, path in content_types if ct == VALID_WORKSHEET)
     rels = dict(read_rels(archive))
-    for rId, title, state in read_sheets(archive):
-        rel = rels[rId]
-        rel['title'] = title
+    for sheet in read_sheets(archive):
+        rel = rels[sheet['id']]
+        rel['title'] = sheet['name']
+        rel['sheet_id'] = sheet['sheetId']
+        state = sheet.get('state')
         if state is not None:
             rel['state'] = state
         if ("/" + rel['path'] in valid_sheets
             or "worksheets" in rel['path']): # fallback in case content type is missing
             yield rel
-
-
-def read_named_ranges(xml_source, workbook):
-    """Read named ranges, excluding poorly defined ranges."""
-    sheetnames = set(sheet.title for sheet in workbook.worksheets)
-    root = fromstring(xml_source)
-    for name_node in safe_iterator(root, '{%s}definedName' %SHEET_MAIN_NS):
-
-        range_name = name_node.get('name')
-        if DISCARDED_RANGES.search(range_name) or BUGGY_NAMED_RANGES.search(range_name):
-            continue
-
-        node_text = name_node.text
-
-        if external_range(node_text):
-            # treat names referring to external workbooks as values
-            named_range = NamedValue(range_name, node_text)
-
-        elif refers_to_range(node_text):
-            destinations = split_named_range(node_text)
-            # it can happen that a valid named range references
-            # a missing worksheet, when Excel didn't properly maintain
-            # the named range list
-            destinations = [(workbook[sheet], cells) for sheet, cells in destinations
-                            if sheet in sheetnames]
-            if not destinations:
-                continue
-            named_range = NamedRange(range_name, destinations)
-        else:
-            named_range = NamedValue(range_name, node_text)
-
-
-        location_id = name_node.get("localSheetId")
-        if location_id is not None:
-            named_range.scope = workbook.worksheets[int(location_id)]
-
-        yield named_range
 
 
 def detect_external_links(archive):
