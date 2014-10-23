@@ -15,13 +15,18 @@ __docformat__ = "restructuredtext en"
 import datetime
 import re
 
-from openpyxl.compat import NUMERIC_TYPES
-from openpyxl.compat import lru_cache, range
+from openpyxl.compat import (
+    unicode,
+    basestring,
+    bytes,
+    NUMERIC_TYPES,
+    lru_cache,
+    range,
+)
 from openpyxl.units import (
     DEFAULT_ROW_HEIGHT,
     DEFAULT_COLUMN_WIDTH
 )
-from openpyxl.compat import unicode, basestring, bytes
 from openpyxl.date_time import (
     to_excel,
     time_to_days,
@@ -39,8 +44,6 @@ from openpyxl.utils import (
     get_column_letter,
     column_index_from_string,
     coordinate_from_string,
-    COORD_RE,
-    ABSOLUTE_RE,
 )
 from openpyxl.styles import is_date_format
 from openpyxl.styles import numbers
