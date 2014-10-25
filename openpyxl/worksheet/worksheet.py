@@ -125,8 +125,6 @@ class Worksheet(object):
         self.protection = SheetProtection()
         self.show_gridlines = True
         self.print_gridlines = False
-#         self.show_summary_below = True
-#         self.show_summary_right = True
         self.default_row_dimension = RowDimension(worksheet=self)
         self.default_column_dimension = ColumnDimension(worksheet=self)
         self._auto_filter = AutoFilter()
@@ -135,7 +133,6 @@ class Worksheet(object):
         self.formula_attributes = {}
         self.orientation = None
         self.conditional_formatting = ConditionalFormatting()
-#         self.vba_code = {}
         self.vba_controls = None
         self.sheet_properties = WorksheetProperties()
         self.sheet_properties.outlinePr = Outline(summaryBelow=True, summaryRight=True)
