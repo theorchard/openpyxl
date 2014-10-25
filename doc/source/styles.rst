@@ -204,7 +204,7 @@ see http://msdn.microsoft.com/en-us/library/documentformat.openxml.spreadsheet.s
 .. :: doctest
 
 >>> from openpyxl.workbook import Workbook
->>> from openpyxl.worksheet.properties import WorksheetProperties, Outline, PageSetupPr
+>>> from openpyxl.worksheet.properties import WorksheetProperties, PageSetupPr
 >>>
 >>> wb = Workbook()
 >>> ws = wb.active
