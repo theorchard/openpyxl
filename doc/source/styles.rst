@@ -193,12 +193,13 @@ Available properties for worksheet: "codeName", "enableFormatConditionsCalculati
 Available fields for page setup properties: "autoPageBreaks", "fitToPage".
 Available fields for outline properties: "applyStyles", "summaryBelow", "summaryRight", "showOutlineSymbols".
 
+see http://msdn.microsoft.com/en-us/library/documentformat.openxml.spreadsheet.sheetproperties%28v=office.14%29.aspx_ for details.
+
 ..note:: 
 	By default, outline properties are intitialized so you can directly modify each of their 4 attributes, while page setup properties don't. 
 	If you want modify the latter, you should first initialize a PageSetupPr object with the required parameters. 
 	Once done, they can be directly modified by the routine later if needed.
 
-see http://msdn.microsoft.com/en-us/library/documentformat.openxml.spreadsheet.sheetproperties%28v=office.14%29.aspx_ for details.
 
 .. :: doctest
 
