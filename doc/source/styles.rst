@@ -193,6 +193,11 @@ Available properties for worksheet: "codeName", "enableFormatConditionsCalculati
 Available fields for page setup properties: "autoPageBreaks", "fitToPage".
 Available fields for outline properties: "applyStyles", "summaryBelow", "summaryRight", "showOutlineSymbols".
 
+..note:: 
+	By default, outline properties are intitialized so you can directly modify each of their 4 attributes, while page setup properties don't. 
+	If you want modify the latter, you should first initialize a PageSetupPr object with the required parameters. 
+	Once done, they can be directly modified by the routine later if needed).
+
 see http://msdn.microsoft.com/en-us/library/documentformat.openxml.spreadsheet.sheetproperties%28v=office.14%29.aspx_ for details.
 
 .. :: doctest
@@ -206,5 +211,7 @@ see http://msdn.microsoft.com/en-us/library/documentformat.openxml.spreadsheet.s
 >>> wsprops = ws.sheet_properties
 >>> wsprops.tabColor = "1072BA"
 >>> wsprops.filterMode = False
->>> wsprops.pageSetUpPr = PageSetupPr(fitToPage=True)
->>> wsprops.outlinePr = Outline(summaryBelow=True, summaryRight=True)
+>>> wsprops.pageSetUpPr = PageSetupPr(fitToPage=True, autoPageBreaks=False)
+>>> wsprops.outlinePr.summaryBelow = False
+>>> wsprops.outlinePr.applyStyles = True
+>>> wsprops.pageSetUpPr.autoPageBreaks = True
