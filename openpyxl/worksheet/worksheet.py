@@ -52,6 +52,7 @@ from .dimensions import ColumnDimension, RowDimension, DimensionHolder
 from .protection import SheetProtection
 from .filters import AutoFilter
 from .views import SheetView
+from .properties import WorksheetProperties, Outline, PageSetupPr
 
 
 def flatten(results):
@@ -62,7 +63,6 @@ def flatten(results):
 
 
 class Worksheet(object):
-"""from .properties import WorksheetProperties, Outline, PageSetupPr"""
     """Represents a worksheet.
 
     Do not create worksheets yourself,
