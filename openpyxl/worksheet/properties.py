@@ -111,16 +111,9 @@ class WorksheetProperties(Strict):
                      "syncVertical", "transitionEvaluation", "transitionEntry", "tabColor", "outlinePr", "pageSetUpPr"):
             value = getattr(self, attr)
             if value is not None:
-                if attr in ("enableFormatConditionsCalculation", "filterMode", "published", "syncHorizontal"
-                            , "syncVertical", "transitionEvaluation", "transitionEntry"):
-                    if value:
-                        yield attr, 'true'
-                    else:
-                        yield attr, 'false'
-
-                elif attr in ("tabColor", "outlinePr", "pageSetUpPr"):
+                if attr in ("tabColor", "outlinePr", "pageSetUpPr"):
                     yield attr, dict(value)
-
+ 
                 else:
                     yield attr, safe_string(value)
 
