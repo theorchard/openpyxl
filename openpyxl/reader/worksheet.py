@@ -90,7 +90,9 @@ class WorkSheetParser(object):
             self.ws.conditional_formatting.update(self.ws.conditional_formatting.parse_rules)
 
     def parse_cell(self, element):
-        value = element.findtext(self.VALUE_TAG)
+        value = element.find(self.VALUE_TAG)
+        if value is not None:
+            value = value.text
         formula = element.find(self.FORMULA_TAG)
         data_type = element.get('t', 'n')
         coordinate = element.get('r')

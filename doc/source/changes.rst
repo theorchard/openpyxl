@@ -13,13 +13,14 @@ Minor changes
 * Use a 2-way cache for column index lookups
 
 
-2.1.2 (unreleased)
+2.1.2 (2014-10-23)
 ==================
 
 
 Minor changes
 -------------
 * `PR 30 <https://bitbucket.org/openpyxl/openpyxl/pull-request/30/>`_ Fix regex for positive exponentials
+* `PR 28 <https://bitbucket.org/openpyxl/openpyxl/pull-request/28/>`_ `#328 <https://bitbucket.org/openpyxl/openpyxl/issue/328/valueerror-when-using-rows-on-sheet-with>`_ ValueError when using .rows on sheet with hyperlinks
 
 
 Bug fixes
@@ -27,8 +28,9 @@ Bug fixes
 
 
 * `#120 <https://bitbucket.org/openpyxl/openpyxl/issue/120>`_, `#168 <https://bitbucket.org/openpyxl/openpyxl/issue/168>`_ defined names with formulae raise exceptions, `#292 <https://bitbucket.org/openpyxl/openpyxl/issue/292>`_
+* `#328 <https://bitbucket.org/openpyxl/openpyxl/issue/328/>`_ ValueError when reading cells with hyperlinks
 * `#369 <https://bitbucket.org/openpyxl/openpyxl/issue/369>`_ IndexError when reading definedNames
-* `#372 <https://bitbucket.org/openpyxl/openpyxl/issue/372>` number_format not consistently applied from styles
+* `#372 <https://bitbucket.org/openpyxl/openpyxl/issue/372>`_ number_format not consistently applied from styles
 
 
 2.1.1 (2014-10-08)

@@ -220,3 +220,13 @@ def test_read_style_iter(tmpdir):
     cell = ws_iter['A1']
 
     assert cell.style.font == ft
+
+
+def test_read_hyperlinks_read_only(datadir, Workbook):
+    from openpyxl.worksheet.iter_worksheet import IterableWorksheet
+
+    datadir.join("reader").chdir()
+    filename = 'bug328_hyperlinks.xml'
+    ws = IterableWorksheet(Workbook(data_only=True, read_only=True), "Sheet",
+                           "", filename, ['SOMETEXT'], [])
+    assert ws['F2'].value is None

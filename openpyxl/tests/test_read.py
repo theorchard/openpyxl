@@ -78,8 +78,7 @@ def test_read_worksheet(standard_workbook):
 def test_read_general_style(datadir, cell, number_format):
     datadir.join("genuine").chdir()
     wb = load_workbook('empty-with-styles.xlsx')
-    return wb["Sheet1"]
-    ws = workbook_with_styles
+    ws = wb["Sheet1"]
     assert ws[cell].number_format == number_format
 
 

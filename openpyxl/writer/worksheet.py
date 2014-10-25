@@ -11,10 +11,10 @@ from io import BytesIO
 from openpyxl.compat import safe_string, itervalues
 
 # package imports
+from openpyxl.utils import COORD_RE
 from openpyxl.cell import (
     coordinate_from_string,
     column_index_from_string,
-    COORD_RE
 )
 from openpyxl.xml.functions import (
     XMLGenerator,

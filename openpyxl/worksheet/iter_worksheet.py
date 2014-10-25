@@ -14,13 +14,13 @@ from openpyxl.xml.functions import iterparse
 
 # package
 from openpyxl.worksheet import Worksheet
-from openpyxl.cell import (
+from openpyxl.utils import (
     ABSOLUTE_RE,
     coordinate_from_string,
     column_index_from_string,
     get_column_letter,
-    Cell
 )
+from openpyxl.cell import Cell
 from openpyxl.cell.read_only import ReadOnlyCell, EMPTY_CELL
 from openpyxl.xml.functions import safe_iterator
 from openpyxl.xml.constants import SHEET_MAIN_NS
@@ -143,10 +143,13 @@ class IterableWorksheet(Worksheet):
                             data_type = cell.get('t', 'n')
                             style_id = cell.get('s')
                             formula = cell.findtext(FORMULA_TAG)
-                            value = cell.findtext(VALUE_TAG)
-                            if formula is not None and not self.parent.data_only:
-                                data_type = Cell.TYPE_FORMULA
-                                value = "=%s" % formula
+                            value = cell.find(VALUE_TAG)
+                            if value is not None:
+                                value = value.text
+                            if formula is not None:
+                                if not self.parent.data_only:
+                                    data_type = Cell.TYPE_FORMULA
+                                    value = "=%s" % formula
                             yield ReadOnlyCell(self, row, column_str,
                                                value, data_type, style_id)
             if element.tag in (CELL_TAG, VALUE_TAG, FORMULA_TAG):
