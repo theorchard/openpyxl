@@ -14,7 +14,9 @@ def test_ctor():
     color_test = 'F0F0F0'
     outline_pr = Outline(summaryBelow=True, summaryRight=True)
     wsprops = WorksheetProperties(tabColor=color_test, outlinePr=outline_pr)
-    assert dict(wsprops) == {'tabColor': {'rgb': '00F0F0F0'}, 'outlinePr': {'summaryBelow': '1', 'summaryRight': '1'}}
+    assert dict(wsprops) == {}
+    assert dict(wsprops.outlinePr) == {'summaryBelow': '1', 'summaryRight': '1'}
+    assert dict(wsprops.tabColor) == {'rgb': '00F0F0F0'}
 
 
 @pytest.fixture

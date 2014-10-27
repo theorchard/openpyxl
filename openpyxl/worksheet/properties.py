@@ -108,14 +108,10 @@ class WorksheetProperties(Strict):
     def __iter__(self):
         for attr in ("codeName", "enableFormatConditionsCalculation",
                      "filterMode", "published", "syncHorizontal", "syncRef",
-                     "syncVertical", "transitionEvaluation", "transitionEntry", "tabColor", "outlinePr", "pageSetUpPr"):
+                     "syncVertical", "transitionEvaluation", "transitionEntry"):
             value = getattr(self, attr)
             if value is not None:
-                if attr in ("tabColor", "outlinePr", "pageSetUpPr"):
-                    yield attr, dict(value)
- 
-                else:
-                    yield attr, safe_string(value)
+                yield attr, safe_string(value)
 
 
 def parse_sheetPr(node):
