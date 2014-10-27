@@ -64,6 +64,8 @@ def classify(tagname):
         if node.get('name') == tagname:
             break
 
+    types = set()
+
     s = """
 from openpyxl.descriptors import Strict
 
@@ -79,6 +81,7 @@ class %s(Strict):
         attrs.append(attr['name'])
         if attr['type'] in mapping:
             attr['type'] = mapping[attr['type']]
+            types.add(mapping[attr['type']])
         if attr.get("use") == "optional":
             attr["use"] = "allow_none=True"
         else:
