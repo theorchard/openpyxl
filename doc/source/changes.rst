@@ -8,6 +8,12 @@ Minor changes
 * `PR 31 <https://bitbucket.org/openpyxl/openpyxl/pull-request/31/>`_ Correct tutorial
 
 
+Bug fixes
+---------
+
+
+* `#379 <https://bitbucket.org/openpyxl/openpyxl/issue/379>`_ ws.append() doesn't set RowDimension Correctly
+
 
 2.1.2 (2014-10-23)
 ==================
