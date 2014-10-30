@@ -225,6 +225,14 @@ class TestWorksheet(object):
         with pytest.raises(ValueError):
             Relationship('bad_type')
 
+
+    def test_append(self):
+        ws = Worksheet(self.wb)
+        ws.append(['value'])
+        assert ws['A1'].value == "value"
+        assert ws.row_dimensions[1].worksheet is ws
+
+
     def test_append_list(self):
         ws = Worksheet(self.wb)
 

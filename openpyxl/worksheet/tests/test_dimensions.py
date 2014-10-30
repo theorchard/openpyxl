@@ -59,7 +59,7 @@ def test_row_dimension(key, value, expected):
                          )
 def test_col_dimensions(key, value, expected):
     from .. dimensions import ColumnDimension
-    cd = ColumnDimension()
+    cd = ColumnDimension(worksheet=None)
     setattr(cd, key, value)
     assert dict(cd) == expected
 

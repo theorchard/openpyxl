@@ -138,7 +138,8 @@ class Worksheet(object):
         else:
             self.title = title
         self.row_dimensions = {}
-        self.column_dimensions = DimensionHolder([])
+        self.column_dimensions = DimensionHolder(worksheet=self,
+                                                 direction=[])
         self.page_breaks = []
         self._cells = {}
         self._styles = {}
@@ -322,9 +323,9 @@ class Worksheet(object):
             new_cell = openpyxl.cell.Cell(self, column, row)
             self._cells[coordinate] = new_cell
             if column not in self.column_dimensions:
-                self.column_dimensions[column] = ColumnDimension(column, worksheet=self)
+                self.column_dimensions[column] = ColumnDimension(index=column, worksheet=self)
             if row not in self.row_dimensions:
-                self.row_dimensions[row] = RowDimension(row, worksheet=self)
+                self.row_dimensions[row] = RowDimension(index=row, worksheet=self)
         return self._cells[coordinate]
 
     def __getitem__(self, key):
@@ -692,7 +693,7 @@ class Worksheet(object):
 
         else:
             self._invalid_row(iterable)
-        self.row_dimensions[row_idx] = RowDimension(row_idx)
+        self.row_dimensions[row_idx] = RowDimension(worksheet=self, index=row_idx)
 
     def _invalid_row(self, iterable):
         raise TypeError('Value must be a list, tuple, range or generator, or a dict. Supplied value is {0}'.format(

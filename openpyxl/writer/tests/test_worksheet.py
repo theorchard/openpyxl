@@ -74,7 +74,7 @@ def test_no_cols(write_cols, DummyWorksheet):
 
 def test_col_widths(write_cols, ColumnDimension, DummyWorksheet):
     ws = DummyWorksheet
-    ws.column_dimensions['A'] = ColumnDimension(width=4)
+    ws.column_dimensions['A'] = ColumnDimension(worksheet=ws, width=4)
     cols = write_cols(ws)
     xml = tostring(cols)
     expected = """<cols><col width="4" min="1" max="1" customWidth="1"></col></cols>"""
@@ -84,7 +84,7 @@ def test_col_widths(write_cols, ColumnDimension, DummyWorksheet):
 
 def test_col_style(write_cols, ColumnDimension, DummyWorksheet):
     ws = DummyWorksheet
-    cd = ColumnDimension()
+    cd = ColumnDimension(worksheet=ws)
     ws.column_dimensions['A'] = cd
     cd._style = 1
     cols = write_cols(ws)
@@ -99,7 +99,7 @@ def test_lots_cols(write_cols, ColumnDimension, DummyWorksheet):
     from openpyxl.cell import get_column_letter
     for i in range(1, 15):
         label = get_column_letter(i)
-        cd = ColumnDimension()
+        cd = ColumnDimension(worksheet=ws)
         cd._style = i
         ws.column_dimensions[label] = cd
     cols = write_cols(ws)
@@ -141,7 +141,8 @@ def test_sheet_format(write_format, ColumnDimension, DummyWorksheet):
 
 def test_outline_format(write_format, ColumnDimension, DummyWorksheet):
     worksheet = DummyWorksheet
-    worksheet.column_dimensions['A'] = ColumnDimension(outline_level=1)
+    worksheet.column_dimensions['A'] = ColumnDimension(worksheet=worksheet,
+                                                       outline_level=1)
     fmt = write_format(worksheet)
     xml = tostring(fmt)
     expected = """<sheetFormatPr defaultRowHeight="15" baseColWidth="10" outlineLevelCol="1" />"""
@@ -151,7 +152,8 @@ def test_outline_format(write_format, ColumnDimension, DummyWorksheet):
 
 def test_outline_cols(write_cols, ColumnDimension, DummyWorksheet):
     worksheet = DummyWorksheet
-    worksheet.column_dimensions['A'] = ColumnDimension(outline_level=1)
+    worksheet.column_dimensions['A'] = ColumnDimension(worksheet=worksheet,
+                                                       outline_level=1)
     cols = write_cols(worksheet)
     xml = tostring(cols)
     expected = """<cols><col max="1" min="1" outlineLevel="1"/></cols>"""

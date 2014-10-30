@@ -63,6 +63,7 @@ class RowDimension(Dimension):
     thickTop = Bool()
 
     def __init__(self,
+                 worksheet,
                  index=0,
                  ht=None,
                  customHeight=None, # do not write
@@ -78,7 +79,7 @@ class RowDimension(Dimension):
                  spans=None,
                  thickBot=None,
                  thickTop=None,
-                 worksheet=None):
+                 ):
         if r is not None:
             index = r
         if height is not None:
@@ -134,6 +135,7 @@ class ColumnDimension(Dimension):
                                          'min', 'max')
 
     def __init__(self,
+                 worksheet,
                  index='A',
                  width=None,
                  bestFit=False,
@@ -146,8 +148,7 @@ class ColumnDimension(Dimension):
                  max=None,
                  customWidth=False, # do not write
                  visible=None,
-                 auto_size=None,
-                 worksheet=None):
+                 auto_size=None,):
         self.width = width
         self.min = min
         self.max = max
@@ -183,7 +184,8 @@ class ColumnDimension(Dimension):
 
 class DimensionHolder(OrderedDict):
     "hold (row|column)dimensions and allow operations over them"
-    def __init__(self, direction, *args, **kwargs):
+    def __init__(self, worksheet, direction, *args, **kwargs):
+        self.worksheet = worksheet
         self.direction = direction
         super(DimensionHolder, self).__init__(*args, **kwargs)
 
@@ -200,7 +202,7 @@ class DimensionHolder(OrderedDict):
         if start in self:
             new_dim = self.pop(start)
         else:
-            new_dim = ColumnDimension(index=start)
+            new_dim = ColumnDimension(worksheet=self.worksheet, index=start)
 
         work_sequence = get_column_interval(start, end)
         for column_letter in work_sequence:
