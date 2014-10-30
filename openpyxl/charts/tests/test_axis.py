@@ -16,7 +16,11 @@ def test_less_than_one(value, result):
 def test_axis_ctor(Axis):
     axis = Axis()
     assert axis.title == ""
-    assert axis.auto_axis is True
+    assert axis.auto_axis is False
+
+
+def test_axis_auto_axis(Axis):
+    axis = Axis(auto_axis=True)
     with pytest.raises(ZeroDivisionError):
         axis.max == 0
     with pytest.raises(ZeroDivisionError):
@@ -38,10 +42,9 @@ def test_axis_ctor(Axis):
                          ]
                          )
 def test_scaling(Axis, set_max, set_min, min, max, unit):
-    axis = Axis()
+    axis = Axis(auto_axis=True)
     axis.max = set_max
     axis.min = set_min
     assert axis.min == min
     assert axis.max == max
     assert axis.unit == unit
-
