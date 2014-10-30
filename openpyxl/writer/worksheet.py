@@ -33,6 +33,7 @@ from openpyxl.xml.constants import (
 from openpyxl.compat.itertools import iteritems, iterkeys
 from openpyxl.formatting import ConditionalFormatting
 from openpyxl.worksheet.datavalidation import writer
+from openpyxl.worksheet.properties import WorksheetProperties, write_sheetPr
 
 
 def row_sort(cell):
@@ -40,14 +41,9 @@ def row_sort(cell):
     return column_index_from_string(cell.column)
 
 
-def write_properties(worksheet, vba_attrs):
-    pr = Element('sheetPr', vba_attrs)
-    summary = Element('outlinePr',
-                      summaryBelow='%d' % worksheet.show_summary_below,
-                      summaryRight= '%d' % worksheet.show_summary_right)
-    pr.append(summary)
-    if worksheet.page_setup.fitToPage:
-        pr.append(Element('pageSetUpPr', fitToPage='1'))
+def write_properties(worksheet):
+    wsp = worksheet.sheet_properties
+    pr = write_sheetPr(wsp)
     return pr
 
 
@@ -142,7 +138,7 @@ def write_autofilter(worksheet):
             for val in filter_column.vals:
                 flt.append(Element('filter', val=val))
         if auto_filter.sort_conditions:
-            srt = SubElement(el,  'sortState', ref=auto_filter.ref)
+            srt = SubElement(el, 'sortState', ref=auto_filter.ref)
             for sort_condition in auto_filter.sort_conditions:
                 sort_attr = {'ref': sort_condition.ref}
                 if sort_condition.descending:
@@ -243,7 +239,7 @@ def write_hyperlinks(worksheet):
 def write_pagebreaks(worksheet):
     breaks = worksheet.page_breaks
     if breaks:
-        tag = Element( 'rowBreaks', {'count': str(len(breaks)),
+        tag = Element('rowBreaks', {'count': str(len(breaks)),
                                      'manualBreakCount': str(len(breaks))})
         for b in breaks:
             tag.append(Element('brk', id=str(b), man=true, max='16383',
@@ -260,7 +256,7 @@ def write_worksheet(worksheet, shared_strings):
               {'xmlns': SHEET_MAIN_NS,
                'xmlns:r': REL_NS})
 
-    props = write_properties(worksheet, worksheet.vba_code)
+    props = write_properties(worksheet)
     xml_file.write(tostring(props))
 
     dim = Element('dimension', {'ref': '%s' % worksheet.calculate_dimension()})

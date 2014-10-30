@@ -32,7 +32,12 @@ Sheets are given a name automatically when they are created.
 They are numbered in sequence (Sheet, Sheet1, Sheet2, ...).
 You can change this name at any time with the `title` property::
 
-    ws.title = "New Title"
+    ws.title = "New Title"  
+
+The background color of the tab holding this title is white by default.
+You can change this providing an RRGGBB color code to the sheet_properties.tabColor property::
+
+    ws.sheet_properties.tabColor = "1072BA"
 
 Once you gave a worksheet a name, you can get it as a key of the workbook or
 using the :func:`openpyxl.workbook.Workbook.get_sheet_by_name` method ::

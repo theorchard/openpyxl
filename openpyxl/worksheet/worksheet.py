@@ -15,7 +15,8 @@ from openpyxl.compat import (
     range,
     basestring,
     iteritems,
-    deprecated
+    deprecated,
+    safe_string
 )
 
 # package imports
@@ -51,6 +52,7 @@ from .dimensions import ColumnDimension, RowDimension, DimensionHolder
 from .protection import SheetProtection
 from .filters import AutoFilter
 from .views import SheetView
+from .properties import WorksheetProperties, Outline, PageSetupPr
 
 
 def flatten(results):
@@ -123,8 +125,6 @@ class Worksheet(object):
         self.protection = SheetProtection()
         self.show_gridlines = True
         self.print_gridlines = False
-        self.show_summary_below = True
-        self.show_summary_right = True
         self.default_row_dimension = RowDimension(worksheet=self)
         self.default_column_dimension = ColumnDimension(worksheet=self)
         self._auto_filter = AutoFilter()
@@ -133,11 +133,40 @@ class Worksheet(object):
         self.formula_attributes = {}
         self.orientation = None
         self.conditional_formatting = ConditionalFormatting()
-        self.vba_code = {}
         self.vba_controls = None
+        self.sheet_properties = WorksheetProperties()
+        self.sheet_properties.outlinePr = Outline(summaryBelow=True, summaryRight=True)
 
     def __repr__(self):
         return self.repr_format % self.title
+
+    """ To keep compatibility with previous versions"""
+    @property
+    def show_summary_below(self):
+        return self.sheet_properties.outlinePr.summaryBelow
+
+    @property
+    def show_summary_right(self):
+        return self.sheet_properties.outlinePr.summaryRight
+
+    @property
+    def vba_code(self):
+        for attr in ("codeName", "enableFormatConditionsCalculation",
+                     "filterMode", "published", "syncHorizontal", "syncRef",
+                     "syncVertical", "transitionEvaluation", "transitionEntry"):
+            value = getattr(self.sheet_properties, attr)
+            if value is not None:
+                yield attr, safe_string(value)
+
+    @vba_code.setter
+    def vba_code(self, value):
+        for k, v in value.items():
+            if k in ("codeName", "enableFormatConditionsCalculation",
+                     "filterMode", "published", "syncHorizontal", "syncRef",
+                     "syncVertical", "transitionEvaluation", "transitionEntry"):
+                setattr(self.sheet_properties, k, v)
+
+    """ End To keep compatibility with previous versions"""
 
     @property
     def parent(self):
@@ -410,10 +439,10 @@ class Worksheet(object):
         :rtype: generator
         """
         # Column name cache is very important in large files.
-        cache = dict((col, get_column_letter(col)) for col in range(min_col, max_col+1))
-        for row in range(min_row, max_row+1):
+        cache = dict((col, get_column_letter(col)) for col in range(min_col, max_col + 1))
+        for row in range(min_row, max_row + 1):
             yield tuple(self._get_cell('%s%d' % (cache[col], row))
-                        for col in range(min_col, max_col+1))
+                        for col in range(min_col, max_col + 1))
 
 
     def get_named_range(self, range_string):
@@ -565,7 +594,7 @@ class Worksheet(object):
                                               end_row)
         elif ":" not in range_string:
             if COORD_RE.match(range_string):
-                return # Single cell
+                return  # Single cell
             msg = "Range must be a cell range (e.g. A1:E1)"
             raise InsufficientCoordinatesException(msg)
         else:
