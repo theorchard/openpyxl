@@ -111,26 +111,26 @@ def test_max_column(sample_workbook, sheetname, col):
     assert ws.max_column == col
 
 
-expected = [['This is cell A1 in Sheet 1', None, None, None, None, None, None],
-            [None, None, None, None, None, None, None],
-            [None, None, None, None, None, None, None],
-            [None, None, None, None, None, None, None],
-            [None, None, None, None, None, None, 'This is cell G5'], ]
-def test_read_fast_integrated(sample_workbook):
-    wb = sample_workbook
-    ws = wb['Sheet1 - Text']
-    for row, expected_row in zip(ws.iter_rows(), self.expected):
-        row_values = [x.value for x in row]
-        assert row_values == expected_row
-
-
 def test_read_single_cell_range(sample_workbook):
     wb = sample_workbook
     ws = wb['Sheet1 - Text']
     assert 'This is cell A1 in Sheet 1' == list(ws.iter_rows('A1'))[0][0].value
 
 
-def test_read_fast_integrated(sample_workbook):
+expected = [['This is cell A1 in Sheet 1', None, None, None, None, None, None],
+            [None, None, None, None, None, None, None],
+            [None, None, None, None, None, None, None],
+            [None, None, None, None, None, None, None],
+            [None, None, None, None, None, None, 'This is cell G5'], ]
+def test_read_fast_integrated_1(sample_workbook):
+    wb = sample_workbook
+    ws = wb['Sheet1 - Text']
+    for row, expected_row in zip(ws.iter_rows(), expected):
+        row_values = [x.value for x in row]
+        assert row_values == expected_row
+
+
+def test_read_fast_integrated_2(sample_workbook):
     wb = sample_workbook
     expected = [[x + 1] for x in range(30)]
     query_range = 'D1:D30'
@@ -140,7 +140,7 @@ def test_read_fast_integrated(sample_workbook):
         assert row_values == expected_row
 
 
-def test_read_fast_integrated(sample_workbook):
+def test_read_fast_integrated_3(sample_workbook):
     wb = sample_workbook
     query_range = 'K1:K30'
     expected = expected = [[(x + 1) / 100.0] for x in range(30)]
@@ -220,3 +220,13 @@ def test_read_style_iter(tmpdir):
     cell = ws_iter['A1']
 
     assert cell.style.font == ft
+
+
+def test_read_hyperlinks_read_only(datadir, Workbook):
+    from openpyxl.worksheet.iter_worksheet import IterableWorksheet
+
+    datadir.join("reader").chdir()
+    filename = 'bug328_hyperlinks.xml'
+    ws = IterableWorksheet(Workbook(data_only=True, read_only=True), "Sheet",
+                           "", filename, ['SOMETEXT'], [])
+    assert ws['F2'].value is None

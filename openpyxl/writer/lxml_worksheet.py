@@ -49,7 +49,7 @@ def write_worksheet(worksheet, shared_strings):
     with xmlfile(out) as xf:
         with xf.element('worksheet', nsmap=NSMAP):
 
-            props = write_properties(worksheet, worksheet.vba_code)
+            props = write_properties(worksheet)
             xf.write(props)
 
             dim = Element('dimension', {'ref': '%s' % worksheet.calculate_dimension()})
