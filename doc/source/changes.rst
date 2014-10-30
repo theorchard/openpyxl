@@ -1,3 +1,14 @@
+2.1.3 (unreleased)
+==================
+
+
+Minor changes
+-------------
+
+* `PR 31 <https://bitbucket.org/openpyxl/openpyxl/pull-request/31/>`_ Correct tutorial
+
+
+
 2.1.2 (2014-10-23)
 ==================
 
