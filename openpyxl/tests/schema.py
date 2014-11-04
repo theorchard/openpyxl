@@ -22,6 +22,8 @@ chart_schema = XMLSchema(file=chart_src)
 drawing_src = os.path.join(SCHEMA_FOLDER, 'dml-spreadsheetDrawing.xsd')
 drawing_schema = XMLSchema(file=drawing_src)
 
+drawing_main_src = os.path.join(SCHEMA_FOLDER, "dml-main.xsd")
+
 core_src = os.path.join(SCHEMA_FOLDER, 'opc-coreProperties.xsd')
 core_props_schema = XMLSchema(file=core_src)
 
@@ -54,15 +56,21 @@ mapping = {
     'xsd:string':'String',
 }
 
-def classify(tagname):
+def classify(tagname, src=sheet_src, schema=None):
     """
     Generate a Python-class based on the schema definition
     """
-    schema = parse(sheet_src)
+    if schema is None:
+        schema = parse(src)
     nodes = schema.iterfind("{%s}complexType" % XSD)
+    tag = None
     for node in nodes:
         if node.get('name') == tagname:
+            tag = tagname
             break
+    if tag is None:
+        pass
+        raise ValueError("Tag {0} not found".format(tagname))
 
     types = set()
 
@@ -81,13 +89,13 @@ class %s(Strict):
         attrs.append(attr['name'])
         if attr['type'] in mapping:
             attr['type'] = mapping[attr['type']]
-            types.add(mapping[attr['type']])
+            types.add(attr['type'])
         if attr.get("use") == "optional":
             attr["use"] = "allow_none=True"
         else:
             attr["use"] = ""
         if attr.get("type").startswith("ST_"):
-            s += "    " + simple(attr.get("type"))
+            s += "    " + simple(attr.get("type"), schema)
         s += "    {name} = {type}({use})\n".format(**attr)
 
     s += "\n"
@@ -97,21 +105,28 @@ class %s(Strict):
 
     s += "    def __init__(self,\n    %s=None):\n" % ("=None,\n    ".join(attrs))
     for attr in attrs:
-        s += "    {0} = {0}\n".format(attr)
+        s += "        self.{0} = {0}\n".format(attr)
 
     for el in node.iterfind("{%s}sequence/{%s}element" % (XSD, XSD)):
         s += "\n\n"
-        s += classify(el.get('type'))
+        typename = el.get("type")
+        if typename.startswith("xsd:"):
+            s += mapping[typename]
+        elif typename.startswith("a:"):
+            s += classify(typename[2:], src=drawing_main_src)
+        else:
+            s += classify(el.get('type'), schema=schema)
     return s
 
 
-def simple(tagname):
+def simple(tagname, schema):
 
-    schema = parse(sheet_src)
     for node in schema.iterfind("{%s}simpleType" % XSD):
         if node.get("name") == tagname:
             break
     constraint = node.find("{%s}restriction" % XSD)
+    if constraint is None:
+        return "unknown defintion for {0}".format(tagname)
     typ = constraint.get("base")
     typ = "{0}()".format(mapping.get(typ, typ))
     values = constraint.findall("{%s}enumeration" % XSD)
