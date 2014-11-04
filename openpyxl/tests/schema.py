@@ -54,6 +54,10 @@ mapping = {
     'xsd:int':'Integer',
     'xsd:double':'Float',
     'xsd:string':'String',
+    'xsd:unsignedByte':'MinMax',
+    'xsd:byte':'MinMax',
+    'xsd:long':'Integer',
+    'xsd:token':'String',
 }
 
 def classify(tagname, src=sheet_src, schema=None):
@@ -74,14 +78,10 @@ def classify(tagname, src=sheet_src, schema=None):
 
     types = set()
 
-    s = """
-from openpyxl.descriptors import Strict
-
-
-class %s(Strict):
-""" % tagname[3:]
+    s = """\n\nclass %s(Strict):\n\n""" % tagname[3:]
     attrs = []
 
+    # attributes
     for el in node.iterfind("{%s}attribute" % XSD):
         attr = el.attrib
         if 'ref' in attr:
@@ -95,28 +95,44 @@ class %s(Strict):
         else:
             attr["use"] = ""
         if attr.get("type").startswith("ST_"):
-            s += "    " + simple(attr.get("type"), schema)
+            attr['type'] = simple(attr.get("type"), schema)
+            types.add(attr['type'].split("(")[0])
+            s += "    {name} = {type}\n".format(**attr)
+        else:
+            s += "    {name} = {type}({use})\n".format(**attr)
+
+    children = []
+    for el in node.iterfind("{%s}sequence/{%s}element" % (XSD, XSD)):
+        attr = {'name': el.get("name"),}
+
+        typename = el.get("type")
+        if typename.startswith("xsd:"):
+            attr['type'] = mapping[typename]
+            types.add(attr['type'])
+        else:
+            children.append(typename)
+            if typename.startswith("a:"):
+                attr['type'] = typename[5:]
+            else:
+                attr['type'] = typename[3:]
+
+        attr['use'] = ""
+        if el.get("minOccurs") == "0":
+            attr['use'] = "allow_none=True"
+        attrs.append(attr['name'])
         s += "    {name} = {type}({use})\n".format(**attr)
 
-    s += "\n"
-
-    for el in node.iterfind("{%s}sequence/{%s}element" % (XSD, XSD)):
-        s += "    {name} = {type}()\n".format(name=el.get("name"), type=el.get("type")[3:])
-
-    s += "    def __init__(self,\n    %s=None):\n" % ("=None,\n    ".join(attrs))
+    if attrs:
+        s += "\n    def __init__(self,\n"
+        for a in attrs:
+            s += "                 %s=None,\n" % a
+        s += "                ):\n"
+    else:
+        s += "    pass"
     for attr in attrs:
         s += "        self.{0} = {0}\n".format(attr)
 
-    for el in node.iterfind("{%s}sequence/{%s}element" % (XSD, XSD)):
-        s += "\n\n"
-        typename = el.get("type")
-        if typename.startswith("xsd:"):
-            s += mapping[typename]
-        elif typename.startswith("a:"):
-            s += classify(typename[2:], src=drawing_main_src)
-        else:
-            s += classify(el.get('type'), schema=schema)
-    return s
+    return s, types, children
 
 
 def simple(tagname, schema):
@@ -133,4 +149,4 @@ def simple(tagname, schema):
     values = [v.get('value') for v in values]
     if values:
         typ = "Set(values=({0}))".format(values)
-    return "{0} = {1}\n".format(tagname[3:], typ)
+    return typ
