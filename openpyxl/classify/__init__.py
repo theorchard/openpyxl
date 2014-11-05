@@ -5,10 +5,13 @@ from __future__ import absolute_import, print_function
 Generate Python classes from XML Schema
 """
 
+import re
+
 from openpyxl.tests.schema import (
     sheet_src,
     chart_src,
     drawing_main_src,
+    shared_src,
     )
 
 from lxml.etree import parse
@@ -27,6 +30,8 @@ mapping = {
     'xsd:long':'Integer',
     'xsd:token':'String',
 }
+
+ST_REGEX = re.compile("(?P<schema>[a-z]:)(?P<typename>ST_[A-Za-z]+)")
 
 def classify(tagname, src=sheet_src, schema=None):
     """
@@ -74,12 +79,19 @@ def classify(tagname, src=sheet_src, schema=None):
         attr = {'name': el.get("name"),}
 
         typename = el.get("type")
+        match = ST_REGEX.match(typename)
         if typename.startswith("xsd:"):
             attr['type'] = mapping[typename]
             types.add(attr['type'])
+        elif match is not None:
+            src = srcs_mapping[match.group('schema')]
+            typename = match.group('typename')
+            attr['type'] = simple(typename, parse(src))
         else:
             children.append(typename)
-            if typename.startswith("a:"):
+            if (typename.startswith("a:")
+                or typename.startswith("s:")
+                ):
                 attr['type'] = typename[5:]
             else:
                 attr['type'] = typename[3:]
@@ -119,6 +131,7 @@ def simple(tagname, schema):
         typ = "Set(values=({0}))".format(values)
     return typ
 
+srcs_mapping = {'a:':drawing_main_src, 's:':shared_src}
 
 class ClassMaker:
     """
@@ -137,10 +150,13 @@ class ClassMaker:
         self.body += body
         self.types = self.types.union(types)
         for child in children:
-            if child.startswith("a:"):
+            if (child.startswith("a:")
+                or child.startswith("s:")
+                ):
+                src = srcs_mapping[child[:2]]
                 tagname = child[2:]
                 if tagname not in self.classes:
-                    cm = ClassMaker(tagname, src=drawing_main_src, classes=self.classes)
+                    cm = ClassMaker(tagname, src=src, classes=self.classes)
                     self.body += cm.body
                     self.types.union(cm.types)
                     self.classes.add(tagname)
