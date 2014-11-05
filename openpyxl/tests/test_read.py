@@ -208,6 +208,18 @@ class TestReadBaseDateFormat(object):
         assert win.cell('A1').value == dt
         assert mac.cell('A1').value == win.cell('A1').value
 
+    def test_empty_date_cell(self, date_std_1900, date_mac_1904):
+        win = date_std_1900["Sheet1"]
+        mac = date_mac_1904["Sheet1"]
+        datetuple = (2011, 10, 31)
+        dt = datetime(datetuple[0], datetuple[1], datetuple[2])
+        mac.cell('A1').value = dt
+        win.cell('A1').value = dt
+        mac.cell('A1').value = None
+        win.cell('A1').value = None
+        assert mac.cell('A1').value == None
+        assert win.cell('A1').value == None
+
 
 def test_repair_central_directory():
     from openpyxl.reader.excel import repair_central_directory, CENTRAL_DIRECTORY_SIGNATURE
