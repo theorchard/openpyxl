@@ -27,6 +27,8 @@ drawing_main_src = os.path.join(SCHEMA_FOLDER, "dml-main.xsd")
 core_src = os.path.join(SCHEMA_FOLDER, 'opc-coreProperties.xsd')
 core_props_schema = XMLSchema(file=core_src)
 
+shared_src = os.path.join(SCHEMA_FOLDER, "shared-commonSimpleTypes.xsd")
+
 sml_files = ['xl/styles.xml']  # , 'xl/workbook.xml']
 
 
