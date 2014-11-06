@@ -52,12 +52,12 @@ def to_excel(dt, offset=CALENDAR_WINDOWS_1900):
 @lru_cache()
 def from_excel(value, offset=CALENDAR_WINDOWS_1900):
     if value is None:
-        return None
+        return
     else:
         parts = list(jd2gcal(MJD_0, value + offset - MJD_0))
         fractions = value - int(value)
         diff = datetime.timedelta(days=fractions)
-        if 1 > value > 0 or 0 > value > -1:
+        if 0 < abs(value) < 1:
             return days_to_time(diff)
         return datetime.datetime(*parts[:3]) + diff
 
