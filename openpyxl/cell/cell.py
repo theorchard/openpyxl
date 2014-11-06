@@ -343,6 +343,8 @@ class Cell(object):
             ':rtype: depends on the value (string, float, int or '
             ':class:`datetime.datetime`)'"""
         value = self._value
+        if value is None:
+            return
         if self.is_date():
             value = from_excel(value, self.base_date)
         return value
