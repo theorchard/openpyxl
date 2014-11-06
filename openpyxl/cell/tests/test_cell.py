@@ -346,10 +346,10 @@ def test_is_date():
     ws = Worksheet(wb)
     cell = Cell(ws, 'A', 1)
     cell.value = datetime.now()
-    assert cell.is_date() == True
+    assert cell.is_date == True
     cell.value = 'testme'
     assert 'testme' == cell.value
-    assert cell.is_date() is False
+    assert cell.is_date is False
 
 def test_is_not_date_color_format():
 
@@ -360,7 +360,7 @@ def test_is_not_date_color_format():
     cell.value = -13.5
     cell.style = cell.style.copy(number_format='0.00_);[Red]\(0.00\)')
 
-    assert cell.is_date() is False
+    assert cell.is_date is False
 
 def test_comment_count():
     wb = Workbook()

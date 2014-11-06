@@ -278,7 +278,7 @@ class Cell(object):
         value = self._value
         if value is None:
             return
-        if self.is_date():
+        if self.is_date:
             value = from_excel(value, self.base_date)
         return value
 
@@ -326,6 +326,7 @@ class Cell(object):
         """Set a new formatting code for numeric values"""
         self.style = self.style.copy(number_format=format_code)
 
+    @property
     def is_date(self):
         """Whether the value is formatted as a date
 
