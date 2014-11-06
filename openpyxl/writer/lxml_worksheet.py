@@ -150,7 +150,7 @@ def write_rows(xf, worksheet):
 
                 row_cells = cells_by_row[row_idx]
                 for cell in sorted(row_cells, key=row_sort):
-                    if cell.value is None and cell._style == 0:
+                    if cell.value is None and not cell.has_style:
                         continue
                     write_cell(xf, worksheet, cell)
 
