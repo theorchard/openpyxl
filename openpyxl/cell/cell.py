@@ -276,6 +276,8 @@ class Cell(object):
             ':rtype: depends on the value (string, float, int or '
             ':class:`datetime.datetime`)'"""
         value = self._value
+        if value is None:
+            return
         if self.is_date():
             value = from_excel(value, self.base_date)
         return value
@@ -329,9 +331,7 @@ class Cell(object):
 
         :rtype: bool
         """
-        return (self.has_style
-                and is_date_format(self.number_format)
-                and self.data_type == self.TYPE_NUMERIC)
+        return self.data_type == self.TYPE_NUMERIC and is_date_format(self.number_format)
 
     @property
     def has_style(self):

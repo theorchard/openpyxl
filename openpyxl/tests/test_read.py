@@ -31,6 +31,10 @@ def test_read_standalone_worksheet(datadir):
         _guess_types = True
         data_only = False
 
+        def __init__(self):
+            self.shared_styles = IndexedList()
+            self.shared_styles.add(Style())
+
         def get_sheet_by_name(self, value):
             return None
 

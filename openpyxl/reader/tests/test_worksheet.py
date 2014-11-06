@@ -62,7 +62,9 @@ def Worksheet(Workbook):
         data_only = False
 
         def __init__(self):
-            self.shared_styles = IndexedList(range(28))
+            self.shared_styles = IndexedList()
+            self.shared_styles.add(DummyStyle())
+            self.shared_styles.extend(range(27))
             self.shared_styles.add(Style())
 
 
