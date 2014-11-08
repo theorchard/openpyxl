@@ -162,6 +162,7 @@ class TestCellValueTypes(object):
                                  ('2e+2', 200),
                                  (4, 4),
                                  (decimal.Decimal('3.14'), decimal.Decimal('3.14')),
+                                 ('3.1%', 0.031),
                              ]
                             )
     def test_numeric(self, value, expected):
@@ -193,19 +194,6 @@ class TestCellValueTypes(object):
     def test_error_codes(self, error_string):
         self.cell.value = error_string
         assert self.cell.data_type == 'e'
-
-
-    @pytest.mark.parametrize("infer, expected",
-                             [
-                                 (True, safe_string(0.0314)),
-                                 (False, '3.14%'),
-                             ]
-                             )
-    def test_insert_percentage(self, infer, expected):
-        self.cell.parent.parent._guess_types= infer
-        self.cell.value = '3.14%'
-        assert expected == safe_string(self.cell.internal_value)
-        assert self.cell.style.number_format == numbers.FORMAT_PERCENTAGE
 
 
     @pytest.mark.parametrize("value, internal, number_format",
