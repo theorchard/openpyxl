@@ -225,21 +225,6 @@ class TestCellValueTypes(object):
         assert self.cell.value is None
 
 
-@pytest.mark.parametrize("value, datatype",
-                         [
-                            (None, Cell.TYPE_NULL),
-                            ('.0e000', Cell.TYPE_NUMERIC),
-                            ('-0.e-0', Cell.TYPE_NUMERIC),
-                            ('1E', Cell.TYPE_STRING)
-                         ])
-def test_data_type_check(value, datatype):
-    ws = build_dummy_worksheet()
-    ws.parent._guess_types = True
-    cell = Cell(ws, 'A', 1)
-    cell.value = value
-    assert cell.data_type == datatype
-
-
 def test_set_bad_type():
     ws = build_dummy_worksheet()
     cell = Cell(ws, 'A', 1)
