@@ -233,11 +233,18 @@ class TestCellValueTypes(object):
         assert self.cell.number_format == number_format
 
 
-    def test_empty_cell_formatted_as_date(self):
+    @pytest.mark.parametrize("value, is_date",
+                             [
+                                 (None, True,),
+                                 ("testme", False),
+                                 (True, False),
+                             ]
+                             )
+    def test_cell_formatted_as_date(self, value, is_date):
         self.cell.value = datetime.today()
-        self.cell.value = None
-        assert self.cell.is_date
-        assert self.cell.value is None
+        self.cell.value = value
+        assert self.cell.is_date == is_date
+        assert self.cell.value == value
 
 
 def test_set_bad_type():
@@ -303,14 +310,6 @@ def test_repr():
     cell = Cell(ws, 'A', 1)
     assert repr(cell), '<Cell Sheet1.A1>' == 'Got bad repr: %s' % repr(cell)
 
-def test_is_date():
-    wb = Workbook()
-    ws = Worksheet(wb)
-    cell = Cell(ws, 'A', 1)
-    cell.value = datetime.now()
-    cell.value = 'testme'
-    assert 'testme' == cell.value
-    assert cell.is_date is False
 
 def test_is_not_date_color_format():
 
