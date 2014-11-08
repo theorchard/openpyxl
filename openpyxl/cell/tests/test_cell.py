@@ -218,6 +218,11 @@ class TestCellValueTypes(object):
                                      40372,
                                      "yyyy-mm-dd"
                                  ),
+                                 (
+                                     time(1, 3),
+                                     0.04375,
+                                     "h:mm:ss",
+                                 )
                              ]
                              )
     def test_insert_date(self, value, internal, number_format):
@@ -287,24 +292,10 @@ def test_timedelta():
     cell = Cell(ws, 'A', 1)
     cell.value = timedelta(days=1, hours=3)
     assert cell.value == 1.125
-    assert cell.TYPE_NUMERIC == cell.data_type
+    assert cell.data_type == 'n'
+    assert cell.is_date is False
+    assert cell.number_format == "[hh]:mm:ss"
 
-
-def test_date_format_on_non_date():
-    wb = Workbook()
-    ws = Worksheet(wb)
-    cell = Cell(ws, 'A', 1)
-    cell.value = datetime.now()
-    cell.value = 'testme'
-    assert 'testme' == cell.value
-
-def test_set_get_date():
-    today = datetime(2010, 1, 18, 14, 15, 20, 1600)
-    wb = Workbook()
-    ws = Worksheet(wb)
-    cell = Cell(ws, 'A', 1)
-    cell.value = today
-    assert today == cell.value
 
 def test_repr():
     wb = Workbook()
@@ -317,7 +308,6 @@ def test_is_date():
     ws = Worksheet(wb)
     cell = Cell(ws, 'A', 1)
     cell.value = datetime.now()
-    assert cell.is_date == True
     cell.value = 'testme'
     assert 'testme' == cell.value
     assert cell.is_date is False
