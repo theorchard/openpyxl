@@ -287,7 +287,7 @@ class Cell(object):
             ':rtype: depends on the value (string, float, int or '
             ':class:`datetime.datetime`)'"""
         value = self._value
-        if self.is_date and value is not None:
+        if value is not None and self.is_date:
             value = from_excel(value, self.base_date)
         return value
 
