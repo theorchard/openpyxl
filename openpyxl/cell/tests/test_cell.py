@@ -311,17 +311,6 @@ def test_repr():
     assert repr(cell), '<Cell Sheet1.A1>' == 'Got bad repr: %s' % repr(cell)
 
 
-def test_is_not_date_color_format():
-
-    wb = Workbook()
-    ws = Worksheet(wb)
-    cell = Cell(ws, 'A', 1)
-
-    cell.value = -13.5
-    cell.style = cell.style.copy(number_format='0.00_);[Red]\(0.00\)')
-
-    assert cell.is_date is False
-
 def test_comment_count():
     wb = Workbook()
     ws = Worksheet(wb)
