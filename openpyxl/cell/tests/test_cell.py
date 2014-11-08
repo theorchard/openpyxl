@@ -8,6 +8,7 @@ from datetime import time, datetime, timedelta, date
 import pytest
 
 # package imports
+from openpyxl.collections import IndexedList
 from openpyxl.compat import safe_string
 from openpyxl.worksheet import Worksheet
 from openpyxl.workbook import Workbook
@@ -23,7 +24,7 @@ from openpyxl.cell import (
     absolute_coordinate
     )
 from openpyxl.comments import Comment
-from openpyxl.styles import numbers
+from openpyxl.styles import numbers, Style
 
 import decimal
 
@@ -33,6 +34,9 @@ def build_dummy_worksheet():
     class Ws(object):
         class Wb(object):
             excel_base_date = CALENDAR_WINDOWS_1900
+            shared_styles = IndexedList([Style()])
+
+
         encoding = 'utf-8'
         parent = Wb()
         title = "Dummy Worksheet"
@@ -118,6 +122,41 @@ def test_initial_value():
     assert cell.TYPE_STRING == cell.data_type
 
 
+@pytest.fixture
+def dummy_cell(request):
+    ws = build_dummy_worksheet()
+    cell = Cell(ws, 'A', 1)
+    return cell
+
+
+@pytest.fixture(params=[True, False])
+def guess_types(request):
+    return request.param
+
+
+@pytest.mark.parametrize("value, expected",
+                         [
+                             ('4.2', 4.2),
+                             ('-42.000', -42),
+                             ( '0', 0),
+                             ('0.9999', 0.9999),
+                             ('99E-02', 0.99),
+                             ('4', 4),
+                             ('-1E3', -1000),
+                             ('2e+2', 200),
+                             ('3.1%', 0.031),
+                         ]
+                        )
+def test_infer_numeric(dummy_cell, guess_types, value, expected):
+    cell = dummy_cell
+    cell.parent.parent._guess_types = guess_types
+    cell.value = value
+    if cell.guess_types:
+        assert cell.value == expected
+    else:
+        cell.value == value
+
+
 class TestCellValueTypes(object):
 
     @classmethod
@@ -143,26 +182,6 @@ class TestCellValueTypes(object):
         self.cell.data_type = datatype
         assert self.cell.data_type == datatype
         self.cell.value = None
-        assert self.cell.data_type == 'n'
-
-
-    @pytest.mark.parametrize("value, expected",
-                             [
-                                 ('4.2', 4.2),
-                                 ('-42.000', -42),
-                                 ( '0', 0),
-                                 ('0.9999', 0.9999),
-                                 ('99E-02', 0.99),
-                                 ('4', 4),
-                                 ('-1E3', -1000),
-                                 ('2e+2', 200),
-                                 ('3.1%', 0.031),
-                             ]
-                            )
-    def test_infer_numeric(self, value, expected):
-        self.cell.parent.parent._guess_types = True
-        self.cell.value = value
-        assert self.cell.internal_value == expected
         assert self.cell.data_type == 'n'
 
 
