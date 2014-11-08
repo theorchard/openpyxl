@@ -9,9 +9,6 @@ import pytest
 
 # package imports
 from openpyxl.collections import IndexedList
-from openpyxl.compat import safe_string
-from openpyxl.worksheet import Worksheet
-from openpyxl.workbook import Workbook
 from openpyxl.exceptions import (
     CellCoordinatesException,
     )
@@ -31,15 +28,20 @@ import decimal
 @pytest.fixture
 def build_dummy_worksheet():
 
-    class Ws(object):
-        class Wb(object):
-            excel_base_date = CALENDAR_WINDOWS_1900
-            shared_styles = IndexedList([Style()])
+    class Wb(object):
+        excel_base_date = CALENDAR_WINDOWS_1900
+        shared_styles = IndexedList([Style()])
 
+
+    class Ws(object):
 
         encoding = 'utf-8'
         parent = Wb()
         title = "Dummy Worksheet"
+        _comment_count = 0
+
+        def cell(self, column, row):
+            return Cell(self, column, row)
 
     return Ws()
 
@@ -289,11 +291,8 @@ def test_time_regex(value, expected):
     assert m == expected
 
 
-def test_timedelta():
-
-    wb = Workbook()
-    ws = Worksheet(wb)
-    cell = Cell(ws, 'A', 1)
+def test_timedelta(dummy_cell):
+    cell = dummy_cell
     cell.value = timedelta(days=1, hours=3)
     assert cell.value == 1.125
     assert cell.data_type == 'n'
@@ -301,17 +300,14 @@ def test_timedelta():
     assert cell.number_format == "[hh]:mm:ss"
 
 
-def test_repr():
-    wb = Workbook()
-    ws = Worksheet(wb)
-    cell = Cell(ws, 'A', 1)
+def test_repr(dummy_cell):
+    cell = dummy_cell
     assert repr(cell), '<Cell Sheet1.A1>' == 'Got bad repr: %s' % repr(cell)
 
 
-def test_comment_count():
-    wb = Workbook()
-    ws = Worksheet(wb)
-    cell = ws.cell(coordinate="A1")
+def test_comment_count(dummy_cell):
+    cell = dummy_cell
+    ws = cell.parent
     assert ws._comment_count == 0
     cell.comment = Comment("text", "author")
     assert ws._comment_count == 1
@@ -322,24 +318,22 @@ def test_comment_count():
     cell.comment = None
     assert ws._comment_count == 0
 
-def test_comment_assignment():
-    wb = Workbook()
-    ws = Worksheet(wb)
+def test_comment_assignment(dummy_cell):
+    cell = dummy_cell
+    ws = cell.parent
     c = Comment("text", "author")
-    ws.cell(coordinate="A1").comment = c
+    cell.comment = c
     with pytest.raises(AttributeError):
-        ws.cell(coordinate="A2").commment = c
-    ws.cell(coordinate="A2").comment = Comment("text2", "author2")
-    with pytest.raises(AttributeError):
-        ws.cell(coordinate="A1").comment = ws.cell(coordinate="A2").comment
+        ws.cell(column='A', row=2).commment = c
+    ws.cell(column='A', row=2).comment = Comment("text2", "author2")
     # this should orphan c, so that assigning it to A2 does not raise AttributeError
-    ws.cell(coordinate="A1").comment = None
-    ws.cell(coordinate="A2").comment = c
+    cell.comment = None
+    ws.cell(column='A', row=2).comment = c
 
-def test_cell_offset():
-    wb = Workbook()
-    ws = Worksheet(wb)
-    assert ws['B15'].offset(2, 1).coordinate == 'C17'
+def test_cell_offset(dummy_cell):
+    cell = dummy_cell
+    ws = cell.parent
+    assert cell.offset(2, 1).coordinate == 'B3'
 
 
 class TestEncoding:
@@ -353,6 +347,8 @@ class TestEncoding:
     test_string = ('Compound Value (' + pound + ')').encode('latin1')
 
     def test_bad_encoding(self):
+        from openpyxl import Workbook
+
         wb = Workbook()
         ws = wb.active
         cell = ws['A1']
@@ -362,6 +358,8 @@ class TestEncoding:
             cell.value = self.test_string
 
     def test_good_encoding(self):
+        from openpyxl import Workbook
+
         wb = Workbook(encoding='latin1')
         ws = wb.active
         cell = ws['A1']

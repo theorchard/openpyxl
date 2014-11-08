@@ -384,10 +384,10 @@ class Cell(object):
 
         :rtype: :class:`openpyxl.cell.Cell`
         """
-        offset_column = get_column_letter(column_index_from_string(
-            self.column) + column)
+        offset_column = get_column_letter(
+            column_index_from_string(self.column) + column)
         offset_row = self.row + row
-        return self.parent.cell('%s%s' % (offset_column, offset_row))
+        return self.parent.cell(column=offset_column, row=offset_row)
 
     @property
     def anchor(self):
