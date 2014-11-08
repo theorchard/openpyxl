@@ -3,7 +3,7 @@ from __future__ import absolute_import
 
 import pytest
 
-from openpyxl.collections import IndexedList
+from openpyxl.utils.collections import IndexedList
 
 def test_invalid_dimension_ctor():
     from .. dimensions import Dimension

@@ -23,7 +23,7 @@ from openpyxl.formatting import ConditionalFormatting
 import pytest
 from zipfile import ZIP_DEFLATED, ZipFile
 from openpyxl.tests.helper import compare_xml
-from openpyxl.collections import IndexedList
+from openpyxl.utils.collections import IndexedList
 
 
 @pytest.fixture

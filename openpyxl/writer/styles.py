@@ -6,7 +6,7 @@ from __future__ import absolute_import
 # package imports
 
 from openpyxl.compat import safe_string
-from openpyxl.collections import IndexedList
+from openpyxl.utils.collections import IndexedList
 from openpyxl.xml.functions import (
     Element,
     SubElement,

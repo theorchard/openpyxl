@@ -8,7 +8,7 @@ from datetime import time, datetime, timedelta, date
 import pytest
 
 # package imports
-from openpyxl.collections import IndexedList
+from openpyxl.utils.collections import IndexedList
 
 from openpyxl.date_time import CALENDAR_WINDOWS_1900
 from openpyxl.cell import Cell
