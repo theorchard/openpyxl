@@ -17,6 +17,7 @@ from openpyxl.xml.constants import SHEET_MAIN_NS
 from openpyxl.xml.functions import safe_iterator
 from openpyxl.styles import Color
 from openpyxl.formatting import ConditionalFormatting
+from openpyxl.worksheet.properties import parse_sheetPr
 
 
 def _get_xml_iter(xml_source):
@@ -187,7 +188,7 @@ class WorkSheetParser(object):
         self.page_margins = PageMargins(**margins)
 
     def parse_page_setup(self, element):
-        for key in ("orientation", "paperSize", "scale", "fitToPage",
+        for key in ("orientation", "paperSize", "scale",
                     "fitToHeight", "fitToWidth", "firstPageNumber",
                     "useFirstPageNumber"):
             value = element.get(key)
@@ -286,7 +287,7 @@ class WorkSheetParser(object):
 
 
     def parse_properties(self, element):
-        self.ws.vba_code = element.attrib
+        self.ws.sheet_properties = parse_sheetPr(element)
 
 
     def parse_legacy_drawing(self, element):

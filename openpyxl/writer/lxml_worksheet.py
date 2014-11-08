@@ -49,7 +49,7 @@ def write_worksheet(worksheet, shared_strings):
     with xmlfile(out) as xf:
         with xf.element('worksheet', nsmap=NSMAP):
 
-            props = write_properties(worksheet, worksheet.vba_code)
+            props = write_properties(worksheet)
             xf.write(props)
 
             dim = Element('dimension', {'ref': '%s' % worksheet.calculate_dimension()})
@@ -150,6 +150,8 @@ def write_rows(xf, worksheet):
 
                 row_cells = cells_by_row[row_idx]
                 for cell in sorted(row_cells, key=row_sort):
+                    if cell.value is None and not cell.has_style:
+                        continue
                     write_cell(xf, worksheet, cell)
 
 

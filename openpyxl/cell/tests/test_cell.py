@@ -208,24 +208,32 @@ class TestCellValueTypes(object):
         assert self.cell.style.number_format == numbers.FORMAT_PERCENTAGE
 
 
-    @pytest.mark.parametrize("value, internal",
+    @pytest.mark.parametrize("value, internal, number_format",
                              [
-                                 (datetime(2010, 7, 13, 6, 37, 41) ,40372.27616898148),
-                                 (date(2010, 7, 13), 40372),
+                                 (
+                                     datetime(2010, 7, 13, 6, 37, 41),
+                                     40372.27616898148,
+                                     "yyyy-mm-dd h:mm:ss"
+                                 ),
+                                 (
+                                     date(2010, 7, 13),
+                                     40372,
+                                     "yyyy-mm-dd"
+                                 ),
                              ]
                              )
-    def test_insert_date(self, value, internal):
+    def test_insert_date(self, value, internal, number_format):
         self.cell.value = value
         assert self.cell.data_type == 'n'
         assert self.cell.internal_value == internal
-        assert self.cell.is_date()
-        assert self.cell.number_format == "yyyy-mm-dd"
+        assert self.cell.is_date
+        assert self.cell.number_format == number_format
 
 
     def test_empty_cell_formatted_as_date(self):
         self.cell.value = datetime.today()
         self.cell.value = None
-        assert self.cell.is_date()
+        assert self.cell.is_date
         assert self.cell.value is None
 
 
@@ -342,10 +350,10 @@ def test_is_date():
     ws = Worksheet(wb)
     cell = Cell(ws, 'A', 1)
     cell.value = datetime.now()
-    assert cell.is_date() == True
+    assert cell.is_date == True
     cell.value = 'testme'
     assert 'testme' == cell.value
-    assert cell.is_date() is False
+    assert cell.is_date is False
 
 def test_is_not_date_color_format():
 
@@ -356,7 +364,7 @@ def test_is_not_date_color_format():
     cell.value = -13.5
     cell.style = cell.style.copy(number_format='0.00_);[Red]\(0.00\)')
 
-    assert cell.is_date() is False
+    assert cell.is_date is False
 
 def test_comment_count():
     wb = Workbook()

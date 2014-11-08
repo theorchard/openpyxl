@@ -58,7 +58,4 @@ There are many types of conditional formatting - below are some examples for set
 ...             {'type': 'expression', 'dxf': {'fill': redFill},
 ...              'formula': ['ISBLANK(E1)'], 'stopIfTrue': '1'})
 >>>
->>> # Before writing, call setDxfStyles before saving when adding a conditional format that has a font/border/fill
->>> ws.conditional_formatting.setDxfStyles(wb)
 >>> wb.save("test.xlsx")
-

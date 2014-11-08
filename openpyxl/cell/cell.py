@@ -15,13 +15,19 @@ __docformat__ = "restructuredtext en"
 import datetime
 import re
 
-from openpyxl.compat import NUMERIC_TYPES
-from openpyxl.compat import lru_cache, range, deprecated
+from openpyxl.compat import (
+    unicode,
+    basestring,
+    bytes,
+    NUMERIC_TYPES,
+    lru_cache,
+    range,
+    deprecated,
+)
 from openpyxl.units import (
     DEFAULT_ROW_HEIGHT,
     DEFAULT_COLUMN_WIDTH
 )
-from openpyxl.compat import unicode, basestring, bytes
 from openpyxl.date_time import (
     to_excel,
     time_to_days,
@@ -33,97 +39,22 @@ from openpyxl.exceptions import (
     IllegalCharacterError
 )
 from openpyxl.units import points_to_pixels
+from openpyxl.utils import (
+    absolute_coordinate,
+    get_column_interval,
+    get_column_letter,
+    column_index_from_string,
+    coordinate_from_string,
+)
 from openpyxl.styles import is_date_format
 from openpyxl.styles import numbers
 
-
-# package imports
-
 # constants
-COORD_RE = re.compile('^[$]?([A-Z]+)[$]?(\d+)$')
-ABSOLUTE_RE = re.compile(
-'''^[$]?
-(?P<min_col>[A-Z]+)
-[$]?
-(?P<min_row>\d+)
-(:[$]?
-(?P<max_col>[A-Z]+)
-[$]?
-(?P<max_row>\d+))?$''',
-re.VERBOSE)
-ILLEGAL_CHARACTERS_RE = re.compile(r'[\000-\010]|[\013-\014]|[\016-\037]')
+
 
 TIME_TYPES = (datetime.datetime, datetime.date, datetime.time, datetime.timedelta)
 STRING_TYPES = (basestring, unicode, bytes)
 KNOWN_TYPES = NUMERIC_TYPES + TIME_TYPES + STRING_TYPES + (bool, type(None))
-
-
-def get_column_interval(start, end):
-    if isinstance(start, basestring):
-        start = column_index_from_string(start)
-    if isinstance(end, basestring):
-        end = column_index_from_string(end)
-    return [get_column_letter(x) for x in range(start, end + 1)]
-
-def coordinate_from_string(coord_string):
-    """Convert a coordinate string like 'B12' to a tuple ('B', 12)"""
-    match = COORD_RE.match(coord_string.upper())
-    if not match:
-        msg = 'Invalid cell coordinates (%s)' % coord_string
-        raise CellCoordinatesException(msg)
-    column, row = match.groups()
-    row = int(row)
-    if not row:
-        msg = "There is no row 0 (%s)" % coord_string
-        raise CellCoordinatesException(msg)
-    return (column, row)
-
-
-def absolute_coordinate(coord_string):
-    """Convert a coordinate to an absolute coordinate string (B12 -> $B$12)"""
-    m = ABSOLUTE_RE.match(coord_string.upper())
-    if m:
-        parts = m.groups()
-        if all(parts[-2:]):
-            return '$%s$%s:$%s$%s' % (parts[0], parts[1], parts[3], parts[4])
-        else:
-            return '$%s$%s' % (parts[0], parts[1])
-    else:
-        return coord_string
-
-@lru_cache(maxsize=1000)
-def get_column_letter(col_idx):
-    """Convert a column number into a column letter (3 -> 'C')
-
-    Right shift the column col_idx by 26 to find column letters in reverse
-    order.  These numbers are 1-based, and can be converted to ASCII
-    ordinals by adding 64.
-
-    """
-    # these indicies corrospond to A -> ZZZ and include all allowed
-    # columns
-    if not 1 <= col_idx <= 18278:
-        raise ValueError("Invalid column index {0}".format(col_idx))
-    letters = []
-    while col_idx > 0:
-        col_idx, remainder = divmod(col_idx, 26)
-        # check for exact division and borrow if needed
-        if remainder == 0:
-            remainder = 26
-            col_idx -= 1
-        letters.append(chr(remainder+64))
-    return ''.join(reversed(letters))
-
-
-_COL_STRING_CACHE = dict((get_column_letter(i), i) for i in range(1, 18279))
-def column_index_from_string(str_col, cache=_COL_STRING_CACHE):
-    # we use a function argument to get indexed name lookup
-    col = cache.get(str_col.upper())
-    if col is None:
-        raise ValueError("{0} is not a valid column name".format(str_col))
-    return col
-del _COL_STRING_CACHE
-
 
 PERCENT_REGEX = re.compile(r'^\-?(?P<number>[0-9]*\.?[0-9]*\s?)\%$')
 TIME_REGEX = re.compile(r"""
@@ -138,6 +69,7 @@ TIME_REGEX = re.compile(r"""
 (?P<microsecond>\d{1,6}))
 """, re.VERBOSE)
 NUMBER_REGEX = re.compile(r'^-?([\d]|[\d]+\.[\d]*|\.[\d]+|[1-9][\d]+\.?[\d]*)((E|e)[-+]?[\d]+)?$')
+ILLEGAL_CHARACTERS_RE = re.compile(r'[\000-\010]|[\013-\014]|[\016-\037]')
 
 
 class Cell(object):
@@ -335,7 +267,10 @@ class Cell(object):
 
     def _cast_datetime(self, value):
         """Convert Python datetime to Excel and set formatting"""
-        if isinstance(value, datetime.date):
+        if isinstance(value, datetime.datetime):
+            value = to_excel(value, self.base_date)
+            self.number_format = numbers.FORMAT_DATE_DATETIME
+        elif isinstance(value, datetime.date):
             value = to_excel(value, self.base_date)
             self.number_format = numbers.FORMAT_DATE_YYYYMMDD2
         elif isinstance(value, datetime.time):
@@ -352,7 +287,7 @@ class Cell(object):
             ':rtype: depends on the value (string, float, int or '
             ':class:`datetime.datetime`)'"""
         value = self._value
-        if self.is_date() and value is not None:
+        if self.is_date and value is not None:
             value = from_excel(value, self.base_date)
         return value
 
@@ -400,14 +335,13 @@ class Cell(object):
         """Set a new formatting code for numeric values"""
         self.style = self.style.copy(number_format=format_code)
 
+    @property
     def is_date(self):
         """Whether the value is formatted as a date
 
         :rtype: bool
         """
-        return (self.has_style
-                and is_date_format(self.number_format)
-                and self.data_type == self.TYPE_NUMERIC)
+        return self.data_type == self.TYPE_NUMERIC and is_date_format(self.number_format)
 
     @property
     def has_style(self):
