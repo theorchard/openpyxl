@@ -148,7 +148,6 @@ class TestCellValueTypes(object):
 
     @pytest.mark.parametrize("value, expected",
                              [
-                                 (42, 42),
                                  ('4.2', 4.2),
                                  ('-42.000', -42),
                                  ( '0', 0),
@@ -165,7 +164,7 @@ class TestCellValueTypes(object):
                                  ('3.1%', 0.031),
                              ]
                             )
-    def test_numeric(self, value, expected):
+    def test_infer_numeric(self, value, expected):
         self.cell.parent.parent._guess_types = True
         self.cell.value = value
         assert self.cell.internal_value == expected
