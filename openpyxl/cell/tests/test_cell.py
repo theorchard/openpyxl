@@ -116,12 +116,6 @@ def test_column_letter(value, expected):
     assert get_column_letter(value) == expected
 
 
-def test_initial_value():
-    ws = build_dummy_worksheet()
-    cell = Cell(ws, 'A', 1, value='17.5')
-    assert cell.TYPE_STRING == cell.data_type
-
-
 @pytest.fixture
 def dummy_cell(request):
     ws = build_dummy_worksheet()
@@ -145,6 +139,9 @@ def guess_types(request):
                              ('-1E3', -1000),
                              ('2e+2', 200),
                              ('3.1%', 0.031),
+                             ('03:40:16', time(3, 40, 16)),
+                             ('03:40', time(3, 40)),
+                             ('30:33.865633336', time(0, 30, 33, 865633))
                          ]
                         )
 def test_infer_numeric(dummy_cell, guess_types, value, expected):
@@ -281,22 +278,6 @@ def test_time_regex(value, expected):
     from openpyxl.cell.cell import TIME_REGEX
     m = TIME_REGEX.findall(value)
     assert m == expected
-
-
-values = (
-    ('03:40:16', time(3, 40, 16)),
-    ('03:40', time(3, 40)),
-    ('30:33.865633336', time(0, 30, 33, 865633))
-)
-@pytest.mark.parametrize("value, expected",
-                         values)
-def test_time(value, expected):
-    wb = Workbook(guess_types=True)
-    ws = Worksheet(wb)
-    cell = Cell(ws, 'A', 1)
-    cell.value = value
-    assert cell.value == expected
-    assert cell.TYPE_NUMERIC == cell.data_type
 
 
 def test_timedelta():
