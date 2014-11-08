@@ -28,7 +28,7 @@ from openpyxl.units import (
     DEFAULT_ROW_HEIGHT,
     DEFAULT_COLUMN_WIDTH
 )
-from openpyxl.date_time import (
+from openpyxl.utils.datetime  import (
     to_excel,
     time_to_days,
     timedelta_to_days,

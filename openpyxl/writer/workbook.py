@@ -36,7 +36,7 @@ from openpyxl.xml.constants import (
     EXTERNAL_LINK,
 )
 from openpyxl.xml.functions import tostring, fromstring
-from openpyxl.date_time import datetime_to_W3CDTF
+from openpyxl.utils.datetime  import datetime_to_W3CDTF
 from openpyxl.worksheet import Worksheet
 from openpyxl.workbook.properties import write_properties
 

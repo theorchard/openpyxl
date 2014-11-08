@@ -5,7 +5,7 @@ from __future__ import absolute_import
 from openpyxl.compat import unicode
 
 from openpyxl.cell import Cell
-from openpyxl.date_time import from_excel
+from openpyxl.utils.datetime  import from_excel
 from openpyxl.styles import is_date_format, Style
 
 

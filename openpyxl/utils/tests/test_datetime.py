@@ -6,16 +6,16 @@ from datetime import datetime, date, timedelta, time
 import pytest
 
 # package imports
-from openpyxl.date_time import CALENDAR_MAC_1904, from_excel
+from openpyxl.utils.datetime  import CALENDAR_MAC_1904, from_excel
 
 
 def test_datetime_to_W3CDTF():
-    from openpyxl.date_time import datetime_to_W3CDTF
+    from openpyxl.utils.datetime  import datetime_to_W3CDTF
     assert datetime_to_W3CDTF(datetime(2013, 7, 15, 6, 52, 33)) == "2013-07-15T06:52:33Z"
 
 
 def test_W3CDTF_to_datetime():
-    from openpyxl.date_time import W3CDTF_to_datetime
+    from openpyxl.utils.datetime  import W3CDTF_to_datetime
     value = "2011-06-30T13:35:26Z"
     assert W3CDTF_to_datetime(value) == datetime(2011, 6, 30, 13, 35, 26)
     value = "2013-03-04T12:19:01.00Z"
@@ -33,7 +33,7 @@ def test_W3CDTF_to_datetime():
                              (datetime(1506, 10, 15), -143618.0),
                          ])
 def test_to_excel(value, expected):
-    from openpyxl.date_time import to_excel
+    from openpyxl.utils.datetime  import to_excel
     FUT = to_excel
     assert FUT(value) == expected
 
@@ -47,7 +47,7 @@ def test_to_excel(value, expected):
                              (datetime(1506, 10, 15), -145079.0)
                          ])
 def test_to_excel_mac(value, expected):
-    from openpyxl.date_time import to_excel
+    from openpyxl.utils.datetime  import to_excel
     FUT = to_excel
     assert FUT(value, CALENDAR_MAC_1904) == expected
 
@@ -64,7 +64,7 @@ def test_to_excel_mac(value, expected):
                              (None, None),
                          ])
 def test_from_excel(value, expected):
-    from openpyxl.date_time import from_excel
+    from openpyxl.utils.datetime  import from_excel
     FUT = from_excel
     assert FUT(value) == expected
 
@@ -77,13 +77,13 @@ def test_from_excel(value, expected):
                              (-25063, datetime(1835, 5, 19))
                          ])
 def test_from_excel_mac(value, expected):
-    from openpyxl.date_time import from_excel
+    from openpyxl.utils.datetime  import from_excel
     FUT = from_excel
     assert FUT(value, CALENDAR_MAC_1904) == expected
 
 
 def test_time_to_days():
-    from openpyxl.date_time import time_to_days
+    from openpyxl.utils.datetime  import time_to_days
     FUT = time_to_days
     t1 = time(13, 55, 12, 36)
     assert FUT(t1) == 0.5800000004166667
@@ -92,14 +92,14 @@ def test_time_to_days():
 
 
 def test_timedelta_to_days():
-    from openpyxl.date_time import timedelta_to_days
+    from openpyxl.utils.datetime  import timedelta_to_days
     FUT = timedelta_to_days
     td = timedelta(days=1, hours=3)
     assert FUT(td) == 1.125
 
 
 def test_days_to_time():
-    from openpyxl.date_time import days_to_time
+    from openpyxl.utils.datetime  import days_to_time
     td = timedelta(0, 51320, 1600)
     FUT = days_to_time
     assert FUT(td) == time(14, 15, 20, 1600)

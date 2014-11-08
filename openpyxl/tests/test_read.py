@@ -18,7 +18,7 @@ from openpyxl.workbook import Workbook
 from openpyxl.styles import numbers, Style
 from openpyxl.reader.worksheet import read_worksheet
 from openpyxl.reader.excel import load_workbook
-from openpyxl.date_time import CALENDAR_WINDOWS_1900, CALENDAR_MAC_1904
+from openpyxl.utils.datetime  import CALENDAR_WINDOWS_1900, CALENDAR_MAC_1904
 
 
 def test_read_standalone_worksheet(datadir):
