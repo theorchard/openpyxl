@@ -197,14 +197,15 @@ class TestCellValueTypes(object):
 
     @pytest.mark.parametrize("infer, expected",
                              [
-                                 (False, '3.14%'),
                                  (True, safe_string(0.0314)),
+                                 (False, '3.14%'),
                              ]
                              )
     def test_insert_percentage(self, infer, expected):
         self.cell.parent.parent._guess_types= infer
         self.cell.value = '3.14%'
         assert expected == safe_string(self.cell.internal_value)
+        assert self.cell.style.number_format == numbers.FORMAT_PERCENTAGE
 
 
     @pytest.mark.parametrize("value, internal",
@@ -226,11 +227,6 @@ class TestCellValueTypes(object):
         self.cell.value = None
         assert self.cell.is_date()
         assert self.cell.value is None
-
-
-    def test_number_format_style(self):
-        self.cell.value = '12.6%'
-        assert self.cell.style.number_format == numbers.FORMAT_PERCENTAGE
 
 
 @pytest.mark.parametrize("value, datatype",
