@@ -60,8 +60,8 @@ def test_to_excel_mac(value, expected):
                              (-25063, datetime(1831, 5, 18, 0, 0)),
                              (40372.27616898148, datetime(2010, 7, 13, 6, 37, 41)),
                              (40196.5939815, datetime(2010, 1, 18, 14, 15, 20, 1600)),
-                             (0.125, time(3, 0),
-                             (None, None)),
+                             (0.125, time(3, 0)),
+                             (None, None),
                          ])
 def test_from_excel(value, expected):
     from openpyxl.date_time import from_excel
@@ -80,7 +80,6 @@ def test_from_excel_mac(value, expected):
     from openpyxl.date_time import from_excel
     FUT = from_excel
     assert FUT(value, CALENDAR_MAC_1904) == expected
-
 
 
 def test_time_to_days():
