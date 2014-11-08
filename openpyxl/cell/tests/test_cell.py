@@ -126,8 +126,17 @@ class TestCellValueTypes(object):
         ws = Worksheet(wb)
         cls.cell = Cell(ws, 'A', 1)
 
-    def test_1st(self):
-        assert self.cell.TYPE_NULL == self.cell.data_type
+    def test_ctor(self):
+        cell = self.cell
+        assert cell.data_type == 'n'
+        assert cell.column == 'A'
+        assert cell.row == 1
+        assert cell.coordinate == "A1"
+        assert cell.value is None
+        assert isinstance(cell.parent, Worksheet)
+        assert cell.xf_index == 0
+        assert cell.comment is None
+
 
     def test_null(self):
         self.cell.value = None
