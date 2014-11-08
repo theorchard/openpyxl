@@ -27,7 +27,7 @@ from datetime import datetime, date, timedelta, time
 import pytest
 
 # package imports
-from openpyxl.date_time import CALENDAR_MAC_1904
+from openpyxl.date_time import CALENDAR_MAC_1904, from_excel
 
 
 def test_datetime_to_W3CDTF():
@@ -81,7 +81,8 @@ def test_to_excel_mac(value, expected):
                              (-25063, datetime(1831, 5, 18, 0, 0)),
                              (40372.27616898148, datetime(2010, 7, 13, 6, 37, 41)),
                              (40196.5939815, datetime(2010, 1, 18, 14, 15, 20, 1600)),
-                             (0.125, time(3, 0)),
+                             (0.125, time(3, 0),
+                             (None, None)),
                          ])
 def test_from_excel(value, expected):
     from openpyxl.date_time import from_excel
@@ -124,3 +125,14 @@ def test_days_to_time():
     td = timedelta(0, 51320, 1600)
     FUT = days_to_time
     assert FUT(td) == time(14, 15, 20, 1600)
+
+
+def test_empty_date_cell():
+    from openpyxl.workbook import Workbook
+    wb = Workbook()
+    ws = wb.active
+    datetuple = (2011, 10, 31)
+    dt = datetime(datetuple[0], datetuple[1], datetuple[2])
+    ws.cell('A1').value = dt
+    ws.cell('A1').value = None
+    assert ws.cell('A1').value == None
