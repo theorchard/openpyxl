@@ -154,102 +154,99 @@ def test_infer_numeric(dummy_cell, guess_types, value, expected):
         cell.value == value
 
 
-class TestCellValueTypes(object):
-
-    @classmethod
-    def setup_class(cls):
-        wb = Workbook()
-        ws = Worksheet(wb)
-        cls.cell = Cell(ws, 'A', 1)
-
-    def test_ctor(self):
-        cell = self.cell
-        assert cell.data_type == 'n'
-        assert cell.column == 'A'
-        assert cell.row == 1
-        assert cell.coordinate == "A1"
-        assert cell.value is None
-        assert isinstance(cell.parent, Worksheet)
-        assert cell.xf_index == 0
-        assert cell.comment is None
+def test_ctor(dummy_cell):
+    cell = dummy_cell
+    assert cell.data_type == 'n'
+    assert cell.column == 'A'
+    assert cell.row == 1
+    assert cell.coordinate == "A1"
+    assert cell.value is None
+    assert cell.xf_index == 0
+    assert cell.comment is None
 
 
-    @pytest.mark.parametrize("datatype", ['n', 'd', 's', 'b', 'f', 'e'])
-    def test_null(self, datatype):
-        self.cell.data_type = datatype
-        assert self.cell.data_type == datatype
-        self.cell.value = None
-        assert self.cell.data_type == 'n'
+@pytest.mark.parametrize("datatype", ['n', 'd', 's', 'b', 'f', 'e'])
+def test_null(dummy_cell, datatype):
+    cell = dummy_cell
+    cell.data_type = datatype
+    assert cell.data_type == datatype
+    cell.value = None
+    assert cell.data_type == 'n'
 
 
-    @pytest.mark.parametrize("value", ['hello', ".", '0800'])
-    def test_string(self, value):
-        self.cell.value = 'hello'
-        assert self.cell.data_type == 's'
+@pytest.mark.parametrize("value", ['hello', ".", '0800'])
+def test_string(dummy_cell, value):
+    cell = dummy_cell
+    cell.value = 'hello'
+    assert cell.data_type == 's'
 
 
-    @pytest.mark.parametrize("value", ['=42', '=if(A1<4;-1;1)'])
-    def test_formula(self, value):
-        self.cell.value = value
-        assert self.cell.data_type == 'f'
+@pytest.mark.parametrize("value", ['=42', '=if(A1<4;-1;1)'])
+def test_formula(dummy_cell, value):
+    cell = dummy_cell
+    cell.value = value
+    assert cell.data_type == 'f'
 
 
-    @pytest.mark.parametrize("value", [True, False])
-    def test_boolean(self, value):
-        self.cell.value = True
-        assert self.cell.data_type == 'b'
+@pytest.mark.parametrize("value", [True, False])
+def test_boolean(dummy_cell, value):
+    cell = dummy_cell
+    cell.value = True
+    assert cell.data_type == 'b'
 
 
-    @pytest.mark.parametrize("error_string", Cell.ERROR_CODES)
-    def test_error_codes(self, error_string):
-        self.cell.value = error_string
-        assert self.cell.data_type == 'e'
+@pytest.mark.parametrize("error_string", Cell.ERROR_CODES)
+def test_error_codes(dummy_cell, error_string):
+    cell = dummy_cell
+    cell.value = error_string
+    assert cell.data_type == 'e'
 
 
-    @pytest.mark.parametrize("value, internal, number_format",
-                             [
-                                 (
-                                     datetime(2010, 7, 13, 6, 37, 41),
-                                     40372.27616898148,
-                                     "yyyy-mm-dd h:mm:ss"
-                                 ),
-                                 (
-                                     date(2010, 7, 13),
-                                     40372,
-                                     "yyyy-mm-dd"
-                                 ),
-                                 (
-                                     time(1, 3),
-                                     0.04375,
-                                     "h:mm:ss",
-                                 )
-                             ]
+@pytest.mark.parametrize("value, internal, number_format",
+                         [
+                             (
+                                 datetime(2010, 7, 13, 6, 37, 41),
+                                 40372.27616898148,
+                                 "yyyy-mm-dd h:mm:ss"
+                             ),
+                             (
+                                 date(2010, 7, 13),
+                                 40372,
+                                 "yyyy-mm-dd"
+                             ),
+                             (
+                                 time(1, 3),
+                                 0.04375,
+                                 "h:mm:ss",
                              )
-    def test_insert_date(self, value, internal, number_format):
-        self.cell.value = value
-        assert self.cell.data_type == 'n'
-        assert self.cell.internal_value == internal
-        assert self.cell.is_date
-        assert self.cell.number_format == number_format
+                         ]
+                         )
+def test_insert_date(dummy_cell, value, internal, number_format):
+    cell = dummy_cell
+    cell.value = value
+    assert cell.data_type == 'n'
+    assert cell.internal_value == internal
+    assert cell.is_date
+    assert cell.number_format == number_format
 
 
-    @pytest.mark.parametrize("value, is_date",
-                             [
-                                 (None, True,),
-                                 ("testme", False),
-                                 (True, False),
-                             ]
-                             )
-    def test_cell_formatted_as_date(self, value, is_date):
-        self.cell.value = datetime.today()
-        self.cell.value = value
-        assert self.cell.is_date == is_date
-        assert self.cell.value == value
+@pytest.mark.parametrize("value, is_date",
+                         [
+                             (None, True,),
+                             ("testme", False),
+                             (True, False),
+                         ]
+                         )
+def test_cell_formatted_as_date(dummy_cell, value, is_date):
+    cell = dummy_cell
+    cell.value = datetime.today()
+    cell.value = value
+    assert cell.is_date == is_date
+    assert cell.value == value
 
 
-def test_set_bad_type():
-    ws = build_dummy_worksheet()
-    cell = Cell(ws, 'A', 1)
+def test_set_bad_type(dummy_cell):
+    cell = dummy_cell
     with pytest.raises(ValueError):
         cell.set_explicit_value(1, 'q')
 
@@ -371,11 +368,9 @@ class TestEncoding:
         cell.value = self.test_string
 
 
-def test_style():
-    from openpyxl.styles import Font, Style
-    wb = Workbook()
-    ws = wb.active
-    cell = ws['A1']
+def test_style(dummy_cell):
+    from openpyxl.styles import Font
+    cell = dummy_cell
     new_style = Style(font=Font(bold=True))
     cell.style = new_style
-    assert new_style in wb.shared_styles
+    assert new_style in cell.parent.parent.shared_styles
