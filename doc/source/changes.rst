@@ -6,13 +6,14 @@ Minor changes
 -------------
 
 * `PR 31 <https://bitbucket.org/openpyxl/openpyxl/pull-request/31/>`_ Correct tutorial
+* `PR 32 <https://bitbucket.org/openpyxl/openpyxl/pull-request/32/>`_ See #380
 
 
 Bug fixes
 ---------
 
-
 * `#379 <https://bitbucket.org/openpyxl/openpyxl/issue/379>`_ ws.append() doesn't set RowDimension Correctly
+* `#380 <https://bitbucket.org/openpyxl/openpyxl/issue/379>`_ empty cells formatted as datetimes raise exceptions
 
 
 2.1.2 (2014-10-23)
