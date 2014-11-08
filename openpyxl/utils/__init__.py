@@ -8,8 +8,8 @@ Collection of utilities used within the package and also available for client co
 import datetime
 import re
 
-from . compat import basestring
-from . exceptions import CellCoordinatesException
+from openpyxl.compat import basestring
+from openpyxl.exceptions import CellCoordinatesException
 
 # constants
 COORD_RE = re.compile('^[$]?([A-Z]+)[$]?(\d+)$')
