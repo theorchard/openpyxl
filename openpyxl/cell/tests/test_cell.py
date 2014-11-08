@@ -138,9 +138,13 @@ class TestCellValueTypes(object):
         assert cell.comment is None
 
 
-    def test_null(self):
+    @pytest.mark.parametrize("datatype", ['n', 'd', 's', 'b', 'f', 'e'])
+    def test_null(self, datatype):
+        self.cell.data_type = datatype
+        assert self.cell.data_type == datatype
         self.cell.value = None
-        assert self.cell.TYPE_NULL == self.cell.data_type
+        assert self.cell.data_type == 'n'
+
 
     @pytest.mark.parametrize("value, expected",
                              [
