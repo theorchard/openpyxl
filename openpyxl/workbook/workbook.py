@@ -80,6 +80,7 @@ class Workbook(object):
         self._fills = IndexedList()
         self._numbers = IndexedList()
         self._protections = IndexedList()
+        self._colors = IndexedList()
 
 
     @deprecated('this method is private and should not be called directly')

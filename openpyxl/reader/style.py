@@ -213,7 +213,7 @@ class SharedStylesParser(object):
 def read_style_table(xml_source):
     p = SharedStylesParser(xml_source)
     p.parse()
-    return p.shared_styles, p.color_index, p.cond_styles
+    return p
 
 
 def bool_attrib(element, attr):

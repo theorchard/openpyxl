@@ -878,7 +878,7 @@ def test_parse_dxfs(datadir):
     w = StyleWriter(wb)
     w._write_dxfs()
     write_xml = tostring(w._root)
-    read_style_prop = read_style_table(write_xml)
-    assert len(read_style_prop[2]) == len(wb.style_properties['dxf_list'])
+    read_style_prop = read_style_table(write_xml).cond_styles
+    assert len(read_style_prop) == len(wb.style_properties['dxf_list'])
     for i, dxf in enumerate(read_style_prop[2]):
         assert repr(wb.style_properties['dxf_list'][i] == dxf)

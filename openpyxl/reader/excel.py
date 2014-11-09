@@ -206,10 +206,15 @@ def _load_workbook(wb, archive, filename, read_only, keep_vba):
     except KeyError:
         assert wb.loaded_theme == None, "even though the theme information is missing there is a theme object ?"
 
-    style_table, color_index, cond_styles = read_style_table(archive.read(ARC_STYLE))
-    wb.shared_styles = style_table
-    wb.style_properties = {'dxf_list': cond_styles}
-    wb.cond_styles = cond_styles
+    parsed_styles = read_style_table(archive.read(ARC_STYLE))
+    wb.shared_styles = parsed_styles.shared_styles
+    wb.style_properties = {'dxf_list': parsed_styles.cond_styles}
+    wb.cond_styles = parsed_styles.cond_styles
+    wb._colors = parsed_styles.color_index
+    wb._borders = parsed_styles.border_list
+    wb._fonts = parsed_styles.font_list
+    wb._fills = parsed_styles.fill_list
+    wb._numbers = parsed_styles.custom_num_formats
 
     wb.excel_base_date = read_excel_base_date(xml_source=archive.read(ARC_WORKBOOK))
 
@@ -223,13 +228,13 @@ def _load_workbook(wb, archive, filename, read_only, keep_vba):
 
         if not read_only:
             new_ws = read_worksheet(archive.read(worksheet_path), wb,
-                                    sheet_name, shared_strings, style_table,
-                                    color_index=color_index,
+                                    sheet_name, shared_strings, wb.shared_styles,
+                                    color_index=wb._colors,
                                     keep_vba=keep_vba)
         else:
             new_ws = read_worksheet(None, wb, sheet_name, shared_strings,
-                                    style_table,
-                                    color_index=color_index,
+                                    wb.shared_styles,
+                                    color_index=wb._colors,
                                     worksheet_path=worksheet_path)
 
         new_ws.sheet_state = sheet.get('state') or 'visible'
