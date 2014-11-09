@@ -32,6 +32,11 @@ class SharedStylesParser(object):
         self.cond_styles = []
         self.style_prop = {}
         self.color_index = COLOR_INDEX
+        self.font_list = IndexedList()
+        self.fill_list = IndexedList()
+        self.border_list = IndexedList()
+        self.alignments = IndexedList()
+        self.protections = IndexedList()
 
     def parse(self):
         self.parse_custom_num_formats()
@@ -40,8 +45,6 @@ class SharedStylesParser(object):
         self.font_list = IndexedList(self.parse_fonts())
         self.fill_list = IndexedList(self.parse_fills())
         self.border_list = IndexedList(self.parse_borders())
-        self.alignments = IndexedList()
-        self.protections = IndexedList()
         self.parse_dxfs()
         self.parse_cell_xfs()
 
@@ -188,7 +191,9 @@ class SharedStylesParser(object):
             if bool_attrib(xf, 'applyAlignment'):
                 al = xf.find('{%s}alignment' % SHEET_MAIN_NS)
                 if al is not None:
-                    _style['alignment'] = Alignment(**al.attrib)
+                    alignment = Alignment(**al.attrib)
+                    self.alignments.add(alignment)
+                    _style['alignment'] = alignment
 
             if bool_attrib(xf, 'applyFont'):
                 _style['font'] = self.font_list[int(xf.get('fontId'))]
@@ -202,7 +207,9 @@ class SharedStylesParser(object):
             if bool_attrib(xf, 'applyProtection'):
                 prot = xf.find('{%s}protection' % SHEET_MAIN_NS)
                 if prot is not None:
-                    _style['protection'] = Protection(**prot.attrib)
+                    protection = Protection(**prot.attrib)
+                    self.alignments.add(protection)
+                    _style['protection'] = protection
             _styles.append(Style(**_style))
 
         self.shared_styles = IndexedList(_styles)
