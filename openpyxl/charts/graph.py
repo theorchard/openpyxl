@@ -1,7 +1,7 @@
 from __future__ import absolute_import
 # Copyright (c) 2010-2014 openpyxl
 
-from openpyxl.units import pixels_to_EMU
+from openpyxl.utils.units import pixels_to_EMU
 
 from .axis import CategoryAxis, ValueAxis
 from .chart import Chart

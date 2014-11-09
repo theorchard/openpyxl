@@ -24,7 +24,7 @@ from openpyxl.compat import (
     range,
     deprecated,
 )
-from openpyxl.units import (
+from openpyxl.utils.units import (
     DEFAULT_ROW_HEIGHT,
     DEFAULT_COLUMN_WIDTH
 )
@@ -38,7 +38,7 @@ from openpyxl.exceptions import (
     CellCoordinatesException,
     IllegalCharacterError
 )
-from openpyxl.units import points_to_pixels
+from openpyxl.utils.units import points_to_pixels
 from openpyxl.utils.cell import (
     absolute_coordinate,
     get_column_interval,

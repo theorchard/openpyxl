@@ -36,7 +36,7 @@ from openpyxl.exceptions import (
     CellCoordinatesException,
     NamedRangeException
 )
-from openpyxl.units import (
+from openpyxl.utils.units import (
     points_to_pixels,
     DEFAULT_COLUMN_WIDTH,
     DEFAULT_ROW_HEIGHT
