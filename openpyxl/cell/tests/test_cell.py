@@ -1,25 +1,26 @@
+from __future__ import absolute_import
 # Copyright (c) 2010-2014 openpyxl
 #
 
 # Python stdlib imports
 from datetime import time, datetime, timedelta, date
+import decimal
 
 # 3rd party imports
 import pytest
 
 # package imports
-from openpyxl.utils.collections import IndexedList
-
-from openpyxl.utils.datetime  import CALENDAR_WINDOWS_1900
-from openpyxl.cell import Cell
 
 from openpyxl.comments import Comment
-from openpyxl.styles import numbers, Style
+from ..cell import Cell
 
-import decimal
 
 @pytest.fixture
 def build_dummy_worksheet():
+    from openpyxl.utils.collections import IndexedList
+    from openpyxl.utils.datetime  import CALENDAR_WINDOWS_1900
+    from openpyxl.cell import Cell
+    from openpyxl.styles import Style
 
     class Wb(object):
         excel_base_date = CALENDAR_WINDOWS_1900
@@ -42,7 +43,7 @@ def build_dummy_worksheet():
 @pytest.fixture
 def dummy_cell(request):
     ws = build_dummy_worksheet()
-    cell = Cell(ws, 'A', 1)
+    cell = ws.cell('A', 1)
     return cell
 
 
@@ -174,12 +175,13 @@ def test_set_bad_type(dummy_cell):
         cell.set_explicit_value(1, 'q')
 
 
-def test_illegal_chacters():
+def test_illegal_chacters(dummy_cell):
     from openpyxl.exceptions import IllegalCharacterError
     from openpyxl.compat import range
     from itertools import chain
-    ws = build_dummy_worksheet()
-    cell = Cell(ws, 'A', 1)
+    cell = dummy_cell
+    #ws = build_dummy_worksheet()
+    #cell = Cell(ws, 'A', 1)
 
     # The bytes 0x00 through 0x1F inclusive must be manually escaped in values.
 
@@ -288,7 +290,7 @@ class TestEncoding:
 
 
 def test_style(dummy_cell):
-    from openpyxl.styles import Font
+    from openpyxl.styles import Font, Style
     cell = dummy_cell
     new_style = Style(font=Font(bold=True))
     cell.style = new_style

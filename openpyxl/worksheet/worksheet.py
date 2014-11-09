@@ -20,7 +20,7 @@ from openpyxl.compat import (
 )
 
 # package imports
-from openpyxl.utils import (
+from openpyxl.utils.cell import (
     coordinate_from_string,
     COORD_RE,
     ABSOLUTE_RE,

@@ -8,7 +8,7 @@ import pytest
 
 
 def test_datetime_to_W3CDTF():
-    from openpyxl.utils.datetime import datetime_to_W3CDTF
+    from ..datetime import datetime_to_W3CDTF
     assert datetime_to_W3CDTF(datetime(2013, 7, 15, 6, 52, 33)) == "2013-07-15T06:52:33Z"
 
 

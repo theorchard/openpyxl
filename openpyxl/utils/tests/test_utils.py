@@ -1,8 +1,9 @@
+from __future__ import absolute_import
 # Copyright (c) 2010-2014 openpyxl
 
 import pytest
 
-from openpyxl.utils import (
+from ..cell import (
     column_index_from_string,
     coordinate_from_string,
     get_column_letter,
