@@ -191,13 +191,13 @@ class SharedStylesParser(object):
                 _style['alignment'] = Alignment(**alignment)
 
             if bool_attrib(xf, 'applyFont'):
-                _style['font'] = self.font_list[int(xf.get('fontId'))].copy()
+                _style['font'] = self.font_list[int(xf.get('fontId'))]
 
             if bool_attrib(xf, 'applyFill'):
-                _style['fill'] = self.fill_list[int(xf.get('fillId'))].copy()
+                _style['fill'] = self.fill_list[int(xf.get('fillId'))]
 
             if bool_attrib(xf, 'applyBorder'):
-                _style['border'] = self.border_list[int(xf.get('borderId'))].copy()
+                _style['border'] = self.border_list[int(xf.get('borderId'))]
 
             if bool_attrib(xf, 'applyProtection'):
                 protection = {}
