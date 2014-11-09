@@ -226,17 +226,16 @@ def _load_workbook(wb, archive, filename, read_only, keep_vba):
         if not worksheet_path in valid_files:
             continue
 
-        if not read_only:
-            new_ws = read_worksheet(archive.read(worksheet_path), wb,
-                                    sheet_name, shared_strings, wb.shared_styles,
-                                    color_index=wb._colors,
-                                    keep_vba=keep_vba)
-        else:
+        if read_only:
             new_ws = read_worksheet(None, wb, sheet_name, shared_strings,
                                     wb.shared_styles,
                                     color_index=wb._colors,
                                     worksheet_path=worksheet_path)
-
+        else:
+            new_ws = read_worksheet(archive.read(worksheet_path), wb,
+                                    sheet_name, shared_strings, wb.shared_styles,
+                                    color_index=wb._colors,
+                                    keep_vba=keep_vba)
         new_ws.sheet_state = sheet.get('state') or 'visible'
         wb._add_sheet(new_ws)
 
