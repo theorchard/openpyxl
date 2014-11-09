@@ -76,6 +76,14 @@ openpyxl.worksheet.relationship module
     :undoc-members:
     :show-inheritance:
 
+openpyxl.worksheet.views module
+-------------------------------
+
+.. automodule:: openpyxl.worksheet.views
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
 openpyxl.worksheet.worksheet module
 -----------------------------------
 
