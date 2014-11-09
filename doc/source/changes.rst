@@ -6,11 +6,13 @@ Major changes
 -------------
 * Charts will no longer try and calculate axes by default
 * Support for template file types - PR21
+* Moved ancillary functions and classes into utils package - single place of reference
 
 
 Minor changes
 -------------
 * Use a 2-way cache for column index lookups
+* Clean up tests in cells
 
 
 2.1.3 (unreleased)
