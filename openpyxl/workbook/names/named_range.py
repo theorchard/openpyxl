@@ -10,7 +10,7 @@ import warnings
 # package imports
 from openpyxl.utils.cell import absolute_coordinate
 from openpyxl.compat import unicode
-from openpyxl.exceptions import NamedRangeException
+from openpyxl.utils.exceptions import NamedRangeException
 from openpyxl.xml.functions import fromstring, safe_iterator
 from openpyxl.xml.constants import SHEET_MAIN_NS
 

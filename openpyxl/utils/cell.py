@@ -9,7 +9,7 @@ import datetime
 import re
 
 from openpyxl.compat import basestring
-from openpyxl.exceptions import CellCoordinatesException
+from openpyxl.utils.exceptions import CellCoordinatesException
 
 # constants
 COORD_RE = re.compile('^[$]?([A-Z]+)[$]?(\d+)$')

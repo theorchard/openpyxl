@@ -34,7 +34,7 @@ from openpyxl.utils.datetime  import (
     timedelta_to_days,
     from_excel
     )
-from openpyxl.exceptions import (
+from openpyxl.utils.exceptions import (
     CellCoordinatesException,
     IllegalCharacterError
 )

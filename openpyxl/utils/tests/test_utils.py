@@ -11,7 +11,7 @@ from ..cell import (
     get_column_interval,
 )
 
-from openpyxl.exceptions import (
+from openpyxl.utils.exceptions import (
     CellCoordinatesException,
     )
 

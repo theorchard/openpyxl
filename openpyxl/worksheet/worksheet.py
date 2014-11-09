@@ -30,7 +30,7 @@ from openpyxl.utils.cell import (
     cells_from_range,
 )
 from openpyxl.cell import Cell
-from openpyxl.exceptions import (
+from openpyxl.utils.exceptions import (
     SheetTitleException,
     InsufficientCoordinatesException,
     CellCoordinatesException,

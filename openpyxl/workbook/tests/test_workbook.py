@@ -29,7 +29,7 @@ import datetime
 from openpyxl.workbook import Workbook
 from openpyxl.reader.excel import load_workbook
 from openpyxl.workbook.names.named_range import NamedRange
-from openpyxl.exceptions import ReadOnlyWorkbookException
+from openpyxl.utils.exceptions import ReadOnlyWorkbookException
 
 # test imports
 import pytest

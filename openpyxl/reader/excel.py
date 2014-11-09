@@ -21,7 +21,7 @@ except ImportError:
 
 
 # package imports
-from openpyxl.exceptions import OpenModeError, InvalidFileException
+from openpyxl.utils.exceptions import OpenModeError, InvalidFileException
 from openpyxl.xml.constants import (
     ARC_SHARED_STRINGS,
     ARC_CORE,

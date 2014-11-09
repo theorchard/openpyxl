@@ -7,7 +7,7 @@ from zipfile import ZipFile
 
 from lxml.etree import iterparse, fromstring
 
-from openpyxl.exceptions import InvalidFileException
+from openpyxl.utils.exceptions import InvalidFileException
 from openpyxl import load_workbook
 from openpyxl.compat import unicode
 from openpyxl.xml.constants import SHEET_MAIN_NS
