@@ -40,6 +40,8 @@ class SharedStylesParser(object):
         self.font_list = IndexedList(self.parse_fonts())
         self.fill_list = IndexedList(self.parse_fills())
         self.border_list = IndexedList(self.parse_borders())
+        self.alignments = IndexedList()
+        self.protections = IndexedList()
         self.parse_dxfs()
         self.parse_cell_xfs()
 
@@ -184,11 +186,9 @@ class SharedStylesParser(object):
                 _style['number_format'] = format_code
 
             if bool_attrib(xf, 'applyAlignment'):
-                alignment = {}
                 al = xf.find('{%s}alignment' % SHEET_MAIN_NS)
                 if al is not None:
-                    alignment = al.attrib
-                _style['alignment'] = Alignment(**alignment)
+                    _style['alignment'] = Alignment(**al.attrib)
 
             if bool_attrib(xf, 'applyFont'):
                 _style['font'] = self.font_list[int(xf.get('fontId'))]
@@ -200,11 +200,9 @@ class SharedStylesParser(object):
                 _style['border'] = self.border_list[int(xf.get('borderId'))]
 
             if bool_attrib(xf, 'applyProtection'):
-                protection = {}
                 prot = xf.find('{%s}protection' % SHEET_MAIN_NS)
                 if prot is not None:
-                    protection.update(prot.attrib)
-                _style['protection'] = Protection(**protection)
+                    _style['protection'] = Protection(**prot.attrib)
             _styles.append(Style(**_style))
 
         self.shared_styles = IndexedList(_styles)
