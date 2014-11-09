@@ -4,7 +4,7 @@ from __future__ import absolute_import
 """Read shared style definitions"""
 
 # package imports
-from openpyxl.utils.collections import IndexedList
+from openpyxl.utils.indexed_list import IndexedList
 from openpyxl.xml.functions import fromstring, safe_iterator, localname
 from openpyxl.exceptions import MissingNumberFormat
 from openpyxl.styles import (

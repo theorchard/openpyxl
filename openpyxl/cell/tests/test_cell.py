@@ -17,7 +17,7 @@ from ..cell import Cell
 
 @pytest.fixture
 def build_dummy_worksheet():
-    from openpyxl.utils.collections import IndexedList
+    from openpyxl.utils.indexed_list import IndexedList
     from openpyxl.utils.datetime  import CALENDAR_WINDOWS_1900
     from openpyxl.cell import Cell
     from openpyxl.styles import Style
