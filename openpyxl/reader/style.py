@@ -37,9 +37,9 @@ class SharedStylesParser(object):
         self.parse_custom_num_formats()
         self.parse_color_index()
         self.style_prop['color_index'] = self.color_index
-        self.font_list = list(self.parse_fonts())
-        self.fill_list = list(self.parse_fills())
-        self.border_list = list(self.parse_borders())
+        self.font_list = IndexedList(self.parse_fonts())
+        self.fill_list = IndexedList(self.parse_fills())
+        self.border_list = IndexedList(self.parse_borders())
         self.parse_dxfs()
         self.parse_cell_xfs()
 
@@ -62,7 +62,7 @@ class SharedStylesParser(object):
             indexedColors = colors.find('{%s}indexedColors' % SHEET_MAIN_NS)
             if indexedColors is not None:
                 color_nodes = safe_iterator(indexedColors, '{%s}rgbColor' % SHEET_MAIN_NS)
-                self.color_index = [node.get('rgb') for node in color_nodes]
+                self.color_index = IndexedList([node.get('rgb') for node in color_nodes])
 
     def parse_dxfs(self):
         """Read in the dxfs effects - used by conditional formatting."""
