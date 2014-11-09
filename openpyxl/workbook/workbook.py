@@ -54,6 +54,7 @@ class Workbook(object):
         self.shared_strings = IndexedList()
         self.shared_styles = IndexedList()
         self.shared_styles.add(Style())
+        self._setup_styles()
         self.loaded_theme = None
         self._worksheet_class = worksheet_class
         self.vba_archive = None
@@ -69,6 +70,17 @@ class Workbook(object):
 
         if not self.write_only:
             self.worksheets.append(self._worksheet_class(parent_workbook=self))
+
+
+    def _setup_styles(self):
+        """Bootstrap styles"""
+        self._fonts = IndexedList()
+        self._alignments = IndexedList()
+        self._borders = IndexedList()
+        self._fills = IndexedList()
+        self._numbers = IndexedList()
+        self._protections = IndexedList()
+
 
     @deprecated('this method is private and should not be called directly')
     def read_workbook_settings(self, xml_source):
