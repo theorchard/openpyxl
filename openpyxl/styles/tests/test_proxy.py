@@ -8,15 +8,15 @@ import pytest
 def dummy_object():
     class Dummy:
 
-        def __init__(self):
-            self.a = 1
-            self.b = 2
-            self.c = 3
+        def __init__(self, a, b, c):
+            self.a = a
+            self.b = b
+            self.c = c
 
         def __repr__(self):
             return "dummy object"
 
-    return Dummy()
+    return Dummy(a=1, b=2, c=3)
 
 
 @pytest.fixture
@@ -38,3 +38,10 @@ def test_non_writable(proxy):
 
 def test_repr(proxy):
     assert repr(proxy) == "dummy object"
+
+
+def test_copy(proxy):
+    cp = proxy.copy(a='a')
+    assert cp.a == 'a'
+    assert cp.b == 2
+    assert cp.c == 3

@@ -26,3 +26,9 @@ class Proxy(object):
             raise AttributeError("Style objects are immutable and cannot be changed."
                                  "Reassign the style with a copy")
         super(Proxy, self).__setattr__(attr, value)
+
+
+    def copy(self, **kw):
+        items = self.__target.__dict__
+        items.update(kw)
+        return self.__target.__class__(**items)
