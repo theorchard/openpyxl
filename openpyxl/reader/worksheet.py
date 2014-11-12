@@ -117,7 +117,7 @@ class WorkSheetParser(object):
 
         cell = self.ws[coordinate]
         if style_id is not None:
-            cell._style = int(style_id)
+            cell._style_id = int(style_id)
 
         if value is not None:
             if data_type == 'n':

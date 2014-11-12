@@ -87,7 +87,14 @@ class Cell(object):
                  'xf_index',
                  '_hyperlink_rel',
                  '_comment',
-                 '_style',)
+                 '_style_id',
+                 '_font_id',
+                 '_fill_id',
+                 '_alignment_id',
+                 '_border_id',
+                 '_number_format',
+                 '_protection_id',
+                 )
 
     ERROR_CODES = ('#NULL!',
                    '#DIV/0!',
@@ -109,8 +116,9 @@ class Cell(object):
     VALID_TYPES = (TYPE_STRING, TYPE_FORMULA, TYPE_NUMERIC, TYPE_BOOL,
                    TYPE_NULL, TYPE_INLINE, TYPE_ERROR, TYPE_FORMULA_CACHE_STRING)
 
+
+
     def __init__(self, worksheet, column, row, value=None):
-        self._style = 0
         self.column = column.upper()
         self.row = row
         self.coordinate = '%s%d' % (self.column, self.row)
@@ -123,6 +131,14 @@ class Cell(object):
             self.value = value
         self.xf_index = 0
         self._comment = None
+        # style
+        self._style_id = None
+        self._font_id = None
+        self._border_id = None
+        self._alignment_id = None
+        self._fill_id = None
+        self._protection_id = None
+        self._number_format = None
 
     @property
     def encoding(self):
@@ -328,12 +344,12 @@ class Cell(object):
 
     @property
     def number_format(self):
-        return self.style.number_format
+        return self._number_format
 
     @number_format.setter
     def number_format(self, format_code):
         """Set a new formatting code for numeric values"""
-        self.style = self.style.copy(number_format=format_code)
+        self._number_format = format_code
 
     @property
     def is_date(self):
@@ -346,17 +362,19 @@ class Cell(object):
     @property
     def has_style(self):
         """Check if the parent worksheet has a style for this cell"""
-        return self._style != 0
+        return self._style_id is not None
 
     @property
     def style(self):
         """Returns the :class:`openpyxl.style.Style` object for this cell"""
-        style = self.parent.parent.shared_styles[self._style]
+        if not self.has_style:
+            return
+        style = self.parent.parent.shared_styles[self._style_id]
         return StyleProxy(style)
 
     @style.setter
     def style(self, new_style):
-        self._style = self.parent.parent.shared_styles.add(new_style)
+        self._style_id = self.parent.parent.shared_styles.add(new_style)
 
     @property
     def font(self):
