@@ -46,8 +46,8 @@ from openpyxl.utils.cell import (
     column_index_from_string,
     coordinate_from_string,
 )
-from openpyxl.styles import is_date_format
-from openpyxl.styles import numbers
+from openpyxl.styles import numbers, is_date_format
+from openpyxl.styles.proxy import StyleProxy
 
 # constants
 
@@ -351,7 +351,8 @@ class Cell(object):
     @property
     def style(self):
         """Returns the :class:`openpyxl.style.Style` object for this cell"""
-        return self.parent.parent.shared_styles[self._style]
+        style = self.parent.parent.shared_styles[self._style]
+        return StyleProxy(style)
 
     @style.setter
     def style(self, new_style):
@@ -359,19 +360,23 @@ class Cell(object):
 
     @property
     def font(self):
-        return self.style.font
+        return StyleProxy(self.style.font)
 
     @property
     def fill(self):
-        return self.style.fill
+        return StyleProxy(self.style.fill)
 
     @property
     def border(self):
-        return self.style.border
+        return StyleProxy(self.style.border)
 
     @property
     def alignment(self):
-        return self.style.alignment
+        return StyleProxy(self.style.alignment)
+
+    @property
+    def protection(self):
+        return StyleProxy(self.style.protection)
 
     def offset(self, row=0, column=0):
         """Returns a cell location relative to this cell.
