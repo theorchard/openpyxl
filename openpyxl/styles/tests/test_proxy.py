@@ -22,7 +22,7 @@ def dummy_object():
 @pytest.fixture
 def proxy(dummy_object):
     from .. proxy import StyleProxy
-    return Proxy(dummy_object)
+    return StyleProxy(dummy_object)
 
 
 def test_ctor(proxy):
