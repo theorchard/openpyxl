@@ -73,6 +73,9 @@ def Worksheet(Workbook):
     class DummyStyle:
         number_format = numbers.FORMAT_GENERAL
 
+        def copy(self, **kw):
+            return self
+
 
     class DummyWorksheet:
 
