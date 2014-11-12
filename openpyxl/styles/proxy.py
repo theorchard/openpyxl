@@ -10,6 +10,8 @@ class StyleProxy(object):
     __slots__ = ('__target')
 
     def __init__(self, target):
+        if not hasattr(target, 'copy'):
+            raise TypeError("Proxied objects must have a copy method.")
         self.__target = target
 
 
@@ -22,13 +24,11 @@ class StyleProxy(object):
 
 
     def __setattr__(self, attr, value):
-        if attr != "_Proxy__target":
+        if attr != "_StyleProxy__target":
             raise AttributeError("Style objects are immutable and cannot be changed."
                                  "Reassign the style with a copy")
-        super(Proxy, self).__setattr__(attr, value)
+        super(StyleProxy, self).__setattr__(attr, value)
 
 
     def copy(self, **kw):
-        items = self.__target.__dict__
-        items.update(kw)
-        return self.__target.__class__(**items)
+        return self.__target.copy(**kw)
