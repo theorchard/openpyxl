@@ -46,7 +46,7 @@ from openpyxl.utils.cell import (
     column_index_from_string,
     coordinate_from_string,
 )
-from openpyxl.styles import numbers, is_date_format
+from openpyxl.styles import numbers, is_date_format, Style
 from openpyxl.styles.proxy import StyleProxy
 
 # constants
@@ -122,6 +122,14 @@ class Cell(object):
         self.column = column.upper()
         self.row = row
         self.coordinate = '%s%d' % (self.column, self.row)
+        # style
+        self._style_id = None
+        self._font_id = None
+        self._border_id = None
+        self._alignment_id = None
+        self._fill_id = None
+        self._protection_id = None
+        self._number_format = None
         # _value is the stored value, while value is the displayed value
         self._value = None
         self._hyperlink_rel = None
@@ -131,14 +139,7 @@ class Cell(object):
             self.value = value
         self.xf_index = 0
         self._comment = None
-        # style
-        self._style_id = None
-        self._font_id = None
-        self._border_id = None
-        self._alignment_id = None
-        self._fill_id = None
-        self._protection_id = None
-        self._number_format = None
+
 
     @property
     def encoding(self):
@@ -344,12 +345,16 @@ class Cell(object):
 
     @property
     def number_format(self):
-        return self._number_format
+        if self.has_style:
+            return self.style.number_format
 
     @number_format.setter
     def number_format(self, format_code):
         """Set a new formatting code for numeric values"""
-        self._number_format = format_code
+        if not self.has_style:
+            self.style = Style(number_format=format_code)
+        else:
+            self.style = self.style.copy(number_format = format_code)
 
     @property
     def is_date(self):

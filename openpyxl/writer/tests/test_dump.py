@@ -138,7 +138,7 @@ def test_append_cell(DumpWorksheet):
     ws = DumpWorksheet
     cell = WriteOnlyCell(ws, "Hello there")
     assert ws.parent.shared_strings == []
-    cell._style = 5
+    cell._style_id = 5
     ws.append([cell])
     assert ws.parent.shared_strings == ['Hello there']
     content = ws.get_temporary_file(ws._fileobj_content_name)

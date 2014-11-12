@@ -72,7 +72,7 @@ def test_read_worksheet(standard_workbook):
 
 @pytest.mark.parametrize("cell, number_format",
                     [
-                        ('A1', numbers.FORMAT_GENERAL),
+                        ('A1', None),
                         ('A2', numbers.FORMAT_DATE_XLSX14),
                         ('A3', numbers.FORMAT_NUMBER_00),
                         ('A4', numbers.FORMAT_DATE_TIME3),
