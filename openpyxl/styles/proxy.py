@@ -31,4 +31,5 @@ class StyleProxy(object):
 
 
     def copy(self, **kw):
+        """Return a copy of the proxied object. Keyword args will be passed through"""
         return self.__target.copy(**kw)
