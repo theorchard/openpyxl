@@ -355,7 +355,7 @@ class Cell(StyledObject):
 
     @property
     def _borders(self):
-        return sself.parent.parent._borders
+        return self.parent.parent._borders
 
     @property
     def _fills(self):
@@ -363,7 +363,7 @@ class Cell(StyledObject):
 
     @property
     def _fonts(self):
-        return sself.parent.parent._fonts
+        return self.parent.parent._fonts
 
     @property
     def _number_formats(self):
@@ -375,7 +375,7 @@ class Cell(StyledObject):
 
     @property
     def _styles(self):
-        return self.parent.parent._styles
+        return self.parent.parent.shared_styles
 
     def offset(self, row=0, column=0):
         """Returns a cell location relative to this cell.
