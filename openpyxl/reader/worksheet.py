@@ -118,6 +118,13 @@ class WorkSheetParser(object):
         cell = self.ws[coordinate]
         if style_id is not None:
             cell._style_id = int(style_id)
+            style = self.style_table[cell._style_id]
+            cell.font = style.font
+            cell.fill = style.fill
+            cell.border = style.border
+            cell.alignment = style.alignment
+            cell.number_format = style.number_format
+            cell.protection = style.protection
 
         if value is not None:
             if data_type == 'n':
