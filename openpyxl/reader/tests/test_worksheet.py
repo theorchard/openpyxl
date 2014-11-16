@@ -63,8 +63,7 @@ def Worksheet(Workbook):
 
         def __init__(self):
             self.shared_styles = IndexedList()
-            self.shared_styles.add(DummyStyle())
-            self.shared_styles.extend(range(27))
+            self.shared_styles.extend((28*[DummyStyle()]))
             self.shared_styles.add(Style())
             self._fonts = IndexedList()
             self._fills = IndexedList()
@@ -78,9 +77,16 @@ def Worksheet(Workbook):
 
     class DummyStyle:
         number_format = numbers.FORMAT_GENERAL
+        font = ""
+        fill = ""
+        border = ""
+        alignment = ""
+        protection = ""
 
         def copy(self, **kw):
             return self
+
+
 
 
     class DummyWorksheet:
@@ -331,6 +337,7 @@ def test_boolean(Worksheet, WorkSheetParser):
 def test_inline_string(Worksheet, WorkSheetParser, datadir):
     ws = Worksheet
     parser = WorkSheetParser
+    parser.style_table = ws.parent.shared_styles
     datadir.chdir()
 
     with open("Table1-XmlFromAccess.xml") as src:
@@ -345,6 +352,7 @@ def test_inline_string(Worksheet, WorkSheetParser, datadir):
 def test_inline_richtext(Worksheet, WorkSheetParser, datadir):
     ws = Worksheet
     parser = WorkSheetParser
+    parser.style_table = ws.parent.shared_styles
     datadir.chdir()
     with open("jasper_sheet.xml", "rb") as src:
         sheet = fromstring(src.read())
