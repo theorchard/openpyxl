@@ -59,7 +59,8 @@ class StyledObject(ABC):
         self._border_id = None
         self._alignment_id = None
         self._protection_id = None
-        self.number_format = None
+        self._number_format_id = None
+        self._style_id = None
 
     @abstractproperty
     def _fonts(self):
@@ -135,3 +136,32 @@ class StyledObject(ABC):
     def protection(self, value):
         self._protection_id = self._protections.add(value)
 
+
+    @abstractproperty
+    def _styles(self):
+        return IndexedList()
+
+    @property
+    def style(self):
+        fo = self._styles.get(self._style_id)
+        if fo is not None:
+            return StyleProxy(fo)
+
+    @style.setter
+    def style(self, value):
+        self._style_id = self._styles.add(value)
+
+
+    @abstractproperty
+    def _number_formats(self):
+        return IndexedList()
+
+    @property
+    def number_format(self):
+        fo = self._number_formats.get(self._number_format_id)
+        if fo is not None:
+            return StyleProxy(fo)
+
+    @number_format.setter
+    def number_format(self, value):
+        self._number_format_id = self._number_formats.add(value)
