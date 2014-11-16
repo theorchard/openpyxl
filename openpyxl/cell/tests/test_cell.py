@@ -25,6 +25,7 @@ def build_dummy_worksheet():
     class Wb(object):
         excel_base_date = CALENDAR_WINDOWS_1900
         shared_styles = IndexedList([Style()])
+        _number_formats = IndexedList()
 
 
     class Ws(object):
