@@ -351,31 +351,31 @@ class Cell(StyledObject):
 
     @property
     def _alignments(self):
-        return super()._alignments
+        return self.parent.parent._alignments
 
     @property
     def _borders(self):
-        return super()._borders
+        return sself.parent.parent._borders
 
     @property
     def _fills(self):
-        return super()._fills
+        return self.parent.parent._fills
 
     @property
     def _fonts(self):
-        return super()._fonts
+        return sself.parent.parent._fonts
 
     @property
     def _number_formats(self):
-        return super()._number_formats
+        return self.parent.parent._number_formats
 
     @property
     def _protections(self):
-        return super()._protections
+        return self.parent.parent._protections
 
     @property
     def _styles(self):
-        return super()._styles
+        return self.parent.parent._styles
 
     def offset(self, row=0, column=0):
         """Returns a cell location relative to this cell.
