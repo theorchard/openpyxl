@@ -5,6 +5,8 @@ from abc import abstractmethod, abstractproperty
 from openpyxl.compat.abc import ABC
 from openpyxl.utils.indexed_list import IndexedList
 
+from .numbers import BUILTIN_FORMATS, BUILTIN_FORMATS_REVERSE
+
 
 class StyleProxy(object):
     """
@@ -59,7 +61,7 @@ class StyledObject(ABC):
         self._border_id = None
         self._alignment_id = None
         self._protection_id = None
-        self._number_format_id = None
+        self._number_format_id = 0
         self._style_id = None
 
     @abstractproperty
@@ -158,10 +160,13 @@ class StyledObject(ABC):
 
     @property
     def number_format(self):
-        fo = self._number_formats.get(self._number_format_id)
-        if fo is not None:
-            return StyleProxy(fo)
+        if self._number_format_id < 164:
+            return BUILTIN_FORMATS.get(self._number_format_id, "General")
+        return self._number_formats[self._number_format_id - 164]
 
     @number_format.setter
     def number_format(self, value):
-        self._number_format_id = self._number_formats.add(value)
+        _id = BUILTIN_FORMATS_REVERSE.get(value)
+        if _id is None:
+            _id = self._number_formats.add(value) + 164
+        self._number_format_id = _id
