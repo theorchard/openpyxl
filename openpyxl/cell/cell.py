@@ -47,7 +47,7 @@ from openpyxl.utils.cell import (
     coordinate_from_string,
 )
 from openpyxl.styles import numbers, is_date_format, Style
-from openpyxl.styles.proxy import StyleProxy
+from openpyxl.styles.proxy import StyledObject
 
 # constants
 
@@ -72,7 +72,7 @@ NUMBER_REGEX = re.compile(r'^-?([\d]|[\d]+\.[\d]*|\.[\d]+|[1-9][\d]+\.?[\d]*)((E
 ILLEGAL_CHARACTERS_RE = re.compile(r'[\000-\010]|[\013-\014]|[\016-\037]')
 
 
-class Cell(object):
+class Cell(StyledObject):
     """Describes cell associated properties.
 
     Properties of interest include style, type, value, and address.
@@ -92,7 +92,7 @@ class Cell(object):
                  '_fill_id',
                  '_alignment_id',
                  '_border_id',
-                 '_number_format',
+                 '_number_format_id',
                  '_protection_id',
                  )
 
@@ -119,17 +119,10 @@ class Cell(object):
 
 
     def __init__(self, worksheet, column, row, value=None):
+        super().__init__()
         self.column = column.upper()
         self.row = row
         self.coordinate = '%s%d' % (self.column, self.row)
-        # style
-        self._style_id = None
-        self._font_id = None
-        self._border_id = None
-        self._alignment_id = None
-        self._fill_id = None
-        self._protection_id = None
-        self._number_format = None
         # _value is the stored value, while value is the displayed value
         self._value = None
         self._hyperlink_rel = None
@@ -344,19 +337,6 @@ class Cell(object):
                 self._hyperlink_rel.id or None
 
     @property
-    def number_format(self):
-        if self.has_style:
-            return self.style.number_format
-
-    @number_format.setter
-    def number_format(self, format_code):
-        """Set a new formatting code for numeric values"""
-        if not self.has_style:
-            self.style = Style(number_format=format_code)
-        else:
-            self.style = self.style.copy(number_format = format_code)
-
-    @property
     def is_date(self):
         """Whether the value is formatted as a date
 
@@ -370,36 +350,32 @@ class Cell(object):
         return self._style_id is not None
 
     @property
-    def style(self):
-        """Returns the :class:`openpyxl.style.Style` object for this cell"""
-        if not self.has_style:
-            return
-        style = self.parent.parent.shared_styles[self._style_id]
-        return StyleProxy(style)
-
-    @style.setter
-    def style(self, new_style):
-        self._style_id = self.parent.parent.shared_styles.add(new_style)
+    def _alignments(self):
+        return super()._alignments
 
     @property
-    def font(self):
-        return StyleProxy(self.style.font)
+    def _borders(self):
+        return super()._borders
 
     @property
-    def fill(self):
-        return StyleProxy(self.style.fill)
+    def _fills(self):
+        return super()._fills
 
     @property
-    def border(self):
-        return StyleProxy(self.style.border)
+    def _fonts(self):
+        return super()._fonts
 
     @property
-    def alignment(self):
-        return StyleProxy(self.style.alignment)
+    def _number_formats(self):
+        return super()._number_formats
 
     @property
-    def protection(self):
-        return StyleProxy(self.style.protection)
+    def _protections(self):
+        return super()._protections
+
+    @property
+    def _styles(self):
+        return super()._styles
 
     def offset(self, row=0, column=0):
         """Returns a cell location relative to this cell.
