@@ -70,7 +70,7 @@ class StyledObject(ABC):
 
     @property
     def font(self):
-        fo = self._fonts.get(self._font_id)
+        fo = self._fonts[self._font_id]
         if fo is not None:
             return StyleProxy(fo)
 
@@ -85,12 +85,12 @@ class StyledObject(ABC):
 
     @property
     def fill(self):
-        fo = self._fonts.get(self._fill_id)
+        fo = self._fills[self._fill_id]
         if fo is not None:
             return StyleProxy(fo)
 
     @fill.setter
-    def font(self, value):
+    def fill(self, value):
         self._fill_id = self._fills.add(value)
 
 
@@ -100,7 +100,7 @@ class StyledObject(ABC):
 
     @property
     def border(self):
-        fo = self._fonts.get(self._border_id)
+        fo = self._borders[self._border_id]
         if fo is not None:
             return StyleProxy(fo)
 
@@ -115,7 +115,7 @@ class StyledObject(ABC):
 
     @property
     def alignment(self):
-        fo = self._fonts.get(self._alignment_id)
+        fo = self._alignments[self._alignment_id]
         if fo is not None:
             return StyleProxy(fo)
 
@@ -130,7 +130,7 @@ class StyledObject(ABC):
 
     @property
     def protection(self):
-        fo = self._fonts.get(self._protection_id)
+        fo = self._protections[self._protection_id]
         if fo is not None:
             return StyleProxy(fo)
 
@@ -145,7 +145,7 @@ class StyledObject(ABC):
 
     @property
     def style(self):
-        fo = self._styles.get(self._style_id)
+        fo = self._styles[self._style_id]
         if fo is not None:
             return StyleProxy(fo)
 
