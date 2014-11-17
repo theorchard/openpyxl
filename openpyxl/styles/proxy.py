@@ -2,6 +2,8 @@ from __future__ import absolute_import
 # Copyright (c) 2010-2014 openpyxl
 
 from abc import abstractmethod, abstractproperty
+from collections import namedtuple
+
 from openpyxl.compat.abc import ABC
 from openpyxl.utils.indexed_list import IndexedList
 
@@ -47,6 +49,11 @@ class StyleProxy(object):
 
     def __ne__(self, other):
         return not self == other
+
+
+
+StyleValues = namedtuple("StyleLabel", "alignment border fill font number_format protection")
+
 
 
 class StyledObject(ABC):
@@ -148,6 +155,12 @@ class StyledObject(ABC):
     @style.setter
     def style(self, value):
         self._style_id = self._styles.add(value)
+
+    @property
+    def _style_values(self):
+        return StyleValues(self._alignment_id, self._border_id,
+                           self._fill_id, self._font_id, self._number_format_id,
+                           self._protection_id)
 
 
     @abstractproperty
