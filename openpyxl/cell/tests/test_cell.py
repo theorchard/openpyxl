@@ -229,6 +229,13 @@ def test_repr(dummy_cell):
     assert repr(cell), '<Cell Sheet1.A1>' == 'Got bad repr: %s' % repr(cell)
 
 
+def test_comment_assignment(dummy_cell):
+    assert dummy_cell.comment is None
+    comm = Comment("text", "author")
+    dummy_cell.comment = comm
+    assert dummy_cell.comment == comm
+
+
 def test_comment_count(dummy_cell):
     cell = dummy_cell
     ws = cell.parent
@@ -241,13 +248,6 @@ def test_comment_count(dummy_cell):
     assert ws._comment_count == 0
     cell.comment = None
     assert ws._comment_count == 0
-
-
-def test_comment_assignment(dummy_cell):
-    assert dummy_cell.comment is None
-    comm = Comment("text", "author")
-    dummy_cell.comment = comm
-    assert dummy_cell.comment == comm
 
 
 def test_only_one_cell_per_comment(dummy_cell):
