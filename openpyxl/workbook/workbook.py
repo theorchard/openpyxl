@@ -78,7 +78,7 @@ class Workbook(object):
         self._alignments = IndexedList()
         self._borders = IndexedList()
         self._fills = IndexedList()
-        self._numbers = IndexedList()
+        self._number_formats = IndexedList()
         self._protections = IndexedList()
         self._colors = IndexedList()
 
