@@ -438,13 +438,6 @@ class Cell(StyledObject):
 
     @comment.setter
     def comment(self, value):
-        if (value is not None
-            and value._parent is not None
-            and value is not self.comment):
-            raise AttributeError(
-                "Comment already assigned to %s in worksheet %s. Cannot assign a comment to more than one cell" %
-                (value._parent.coordinate, value._parent.parent.title)
-                )
 
         # Ensure the number of comments for the parent worksheet is up-to-date
         if value is None and self._comment is not None:
@@ -452,10 +445,8 @@ class Cell(StyledObject):
         if value is not None and self._comment is None:
             self.parent._comment_count += 1
 
-        # orphan the old comment
-        if self._comment is not None:
-            self._comment._parent = None
-
-        self._comment = value
         if value is not None:
-            self._comment._parent = self
+            value.parent = self
+        elif value is None and self._comment:
+            self._comment.parent = None
+        self._comment = value

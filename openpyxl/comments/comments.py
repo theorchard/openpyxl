@@ -37,3 +37,13 @@ class Comment(object):
     @text.setter
     def text(self, value):
         self._text = value
+
+    @property
+    def parent(self):
+        return self._parent
+
+    @parent.setter
+    def parent(self, cell):
+        if cell is not None and self._parent is not None and self._parent != cell:
+            raise AttributeError("Comment already assigned to %s in worksheet %s. Cannot assign a comment to more than one cell" % (cell.coordinate, cell.parent.title))
+        self._parent = cell
