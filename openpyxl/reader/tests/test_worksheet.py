@@ -176,7 +176,6 @@ def test_hidden_row(datadir, Worksheet, WorkSheetParser):
     assert dict(ws.row_dimensions[2]) == {'hidden': '1'}
 
 
-@pytest.mark.xfail
 def test_styled_row(datadir, Worksheet, WorkSheetParser):
     datadir.chdir()
     ws = Worksheet
@@ -187,10 +186,7 @@ def test_styled_row(datadir, Worksheet, WorkSheetParser):
     with open("complex-styles-worksheet.xml", "rb") as src:
         rows = iterparse(src, tag='{%s}row' % SHEET_MAIN_NS)
         for _, row in rows:
-            try:
-                parser.parse_row_dimensions(row)
-            except AttributeError:
-                pass # ignore errors when cells are parsed
+            parser.parse_row_dimensions(row)
     assert 23 in ws.row_dimensions
     rd = ws.row_dimensions[23]
     assert rd._style == 28
