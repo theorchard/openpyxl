@@ -16,6 +16,7 @@ from openpyxl.worksheet import Worksheet
 from openpyxl.writer.dump_worksheet import DumpWorksheet, save_dump
 from . names.named_range import NamedRange
 from openpyxl.styles import Style
+from openpyxl.styles.proxy import StyleId
 from openpyxl.writer.excel import save_workbook
 from openpyxl.utils.exceptions import ReadOnlyWorkbookException
 from openpyxl.xml import LXML
@@ -81,7 +82,7 @@ class Workbook(object):
         self._number_formats = IndexedList()
         self._protections = IndexedList()
         self._colors = IndexedList()
-        self._cell_styles = IndexedList()
+        self._cell_styles = IndexedList([StyleId(0, 0, 0, 0, 0, 0)])
 
 
     @deprecated('this method is private and should not be called directly')
