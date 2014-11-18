@@ -294,23 +294,17 @@ def test_open_too_many_files(temp_file):
     wb.save(temp_file)
 
 
-@pytest.mark.xfail
 def test_dump_with_font(temp_file):
     from openpyxl.writer.dump_worksheet import WriteOnlyCell
 
     wb = Workbook(optimized_write=True)
     ws = wb.create_sheet()
-    user_style = Style(font=Font(name='Courrier', size=36))
+    user_font = Font(name='Courrier', size=36)
     cell = WriteOnlyCell(ws, value='hello')
-    cell.style = Style(font=Font(name='Courrier', size=36))
+    cell.font = user_font
 
     ws.append([cell, 3.14, None])
-    assert user_style in wb.shared_styles
-    wb.save(temp_file)
-
-    wb2 = load_workbook(temp_file)
-    ws2 = wb2[ws.title]
-    assert ws2['A1'].style == user_style
+    assert user_font in wb._fonts
 
 
 def test_dump_with_comment(temp_file):
