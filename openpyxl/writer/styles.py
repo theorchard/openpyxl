@@ -32,9 +32,9 @@ class StyleWriter(object):
 
     def write_table(self):
         number_format_node = SubElement(self._root, 'numFmts')
-        fonts_node = self._write_fonts()
-        fills_node = self._write_fills()
-        borders_node = self._write_borders()
+        fonts_node = SubElement(self._root, 'fonts')
+        fills_node = SubElement(self._root, 'fills', {'count':'2'})
+        borders_node = SubElement(self._root, 'borders')
         self._write_cell_style_xfs()
         self._write_cell_xfs(number_format_node, fonts_node, fills_node, borders_node)
         self._write_cell_style()
@@ -50,22 +50,22 @@ class StyleWriter(object):
         attrs = dict(color)
         SubElement(node, key, attrs)
 
-    def _write_fonts(self):
-        """ add fonts part to root
-            return {font.crc => index}
-        """
+    #def _write_fonts(self):
+        #""" add fonts part to root
+            #return {font.crc => index}
+        #"""
 
-        fonts = SubElement(self._root, 'fonts')
+        #fonts = SubElement(self._root, 'fonts')
 
-        # default
-        font_node = SubElement(fonts, 'font')
-        SubElement(font_node, 'sz', {'val':'11'})
-        SubElement(font_node, 'color', {'theme':'1'})
-        SubElement(font_node, 'name', {'val':'Calibri'})
-        SubElement(font_node, 'family', {'val':'2'})
-        SubElement(font_node, 'scheme', {'val':'minor'})
+        ## default
+        #font_node = SubElement(fonts, 'font')
+        #SubElement(font_node, 'sz', {'val':'11'})
+        #SubElement(font_node, 'color', {'theme':'1'})
+        #SubElement(font_node, 'name', {'val':'Calibri'})
+        #SubElement(font_node, 'family', {'val':'2'})
+        #SubElement(font_node, 'scheme', {'val':'minor'})
 
-        return fonts
+        #return fonts
 
 
     def _write_font(self, node, font):
@@ -89,13 +89,13 @@ class StyleWriter(object):
         ConditionalElement(node, "charset", font.charset, {'val':str(font.charset)})
 
 
-    def _write_fills(self):
-        fills = SubElement(self._root, 'fills', {'count':'2'})
-        fill = SubElement(fills, 'fill')
-        SubElement(fill, 'patternFill', {'patternType':'none'})
-        fill = SubElement(fills, 'fill')
-        SubElement(fill, 'patternFill', {'patternType':'gray125'})
-        return fills
+    #def _write_fills(self):
+        #fills = SubElement(self._root, 'fills', {'count':'2'})
+        #fill = SubElement(fills, 'fill')
+        #SubElement(fill, 'patternFill', {'patternType':'none'})
+        #fill = SubElement(fills, 'fill')
+        #SubElement(fill, 'patternFill', {'patternType':'gray125'})
+        #return fills
 
     def _write_pattern_fill(self, node, fill):
         if fill != DEFAULTS.fill and fill.fill_type is not None:
@@ -112,17 +112,17 @@ class StyleWriter(object):
             stop = SubElement(node, "stop", {"position":safe_string(idx)})
             self._write_color(stop, color)
 
-    def _write_borders(self):
-        borders = SubElement(self._root, 'borders')
+    #def _write_borders(self):
+        #borders = SubElement(self._root, 'borders')
 
-        # default
-        border = SubElement(borders, 'border')
-        SubElement(border, 'left')
-        SubElement(border, 'right')
-        SubElement(border, 'top')
-        SubElement(border, 'bottom')
-        SubElement(border, 'diagonal')
-        return borders
+        ## default
+        #border = SubElement(borders, 'border')
+        #SubElement(border, 'left')
+        #SubElement(border, 'right')
+        #SubElement(border, 'top')
+        #SubElement(border, 'bottom')
+        #SubElement(border, 'diagonal')
+        #return borders
 
     def _write_border(self, node, border):
         """Write the child elements for an individual border section"""
