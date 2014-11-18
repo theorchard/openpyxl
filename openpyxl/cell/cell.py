@@ -373,9 +373,14 @@ class Cell(StyledObject):
     def _protections(self):
         return self.parent.parent._protections
 
+    # legacy
     @property
     def _styles(self):
         return self.parent.parent.shared_styles
+
+    @property
+    def _cell_styles(self):
+        return self.parent.parent._cell_styles
 
     def offset(self, row=0, column=0):
         """Returns a cell location relative to this cell.

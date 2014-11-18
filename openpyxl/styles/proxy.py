@@ -156,11 +156,17 @@ class StyledObject(ABC):
     def style(self, value):
         self._style_id = self._styles.add(value)
 
+
+    @abstractproperty
+    def _cell_styles(self):
+        return IndexedList()
+
     @property
-    def _style_values(self):
-        return StyleValues(self._alignment_id, self._border_id,
-                           self._fill_id, self._font_id, self._number_format_id,
-                           self._protection_id)
+    def style_id(self):
+        style = StyleValues(self._alignment_id, self._border_id,
+                            self._fill_id, self._font_id, self._number_format_id,
+                            self._protection_id)
+        return self._cell_styles.add(style)
 
 
     @abstractproperty
