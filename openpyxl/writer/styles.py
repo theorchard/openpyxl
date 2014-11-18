@@ -55,7 +55,7 @@ class StyleWriter(object):
         return self.wb._protections
 
     def write_table(self):
-        self._write_number_format(number_format_node, idx, nf)
+        self._write_number_format()
 
         fonts_node = SubElement(self._root, 'fonts', count=len(self.fonts))
         for font in self.fonts:
