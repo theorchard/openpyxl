@@ -500,6 +500,35 @@ class TestCreateStyle(object):
             assert diff is None, diff
 
 
+@pytest.mark.xfail
+def test_empty_workbook():
+    wb = Workbook()
+    writer = StyleWriter(wb)
+    expected = """
+    <styleSheet>
+      <numFmts count="0"/>
+      <fonts count="1"/>
+      <fills count="2"/>
+      <borders count="1"/>
+      <cellStyleXfs count="1">
+        <xf borderId="0" fillId="0" fontId="0" numFmtId="0"/>
+      </cellStyleXfs>
+      <cellXfs count="1">
+        <xf borderId="0" fillId="0" fontId="0" numFmtId="0" xfId="0"/>
+      </cellXfs>
+      <cellStyles count="1">
+        <cellStyle builtinId="0" name="Normal" xfId="0"/>
+      </cellStyles>
+      <dxfs count="0"/>
+      <tableStyles count="0" defaultPivotStyle="PivotStyleLight16" defaultTableStyle="TableStyleMedium9"/>
+    </styleSheet>
+    """
+    xml = writer.write_table()
+    diff = compare_xml(xml, expected)
+    assert diff is None, diff
+
+
+@pytest.mark.xfail
 def test_complex_styles(datadir):
     """Hold on to your hats"""
     from openpyxl import load_workbook
