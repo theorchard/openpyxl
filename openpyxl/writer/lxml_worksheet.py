@@ -160,7 +160,7 @@ def write_cell(xf, worksheet, cell):
     coordinate = cell.coordinate
     attributes = {'r': coordinate}
     if cell.has_style:
-        attributes['s'] = '%d' % cell._style_id
+        attributes['s'] = '%d' % cell.style_id
 
     if cell.data_type != 'f':
         attributes['t'] = cell.data_type
