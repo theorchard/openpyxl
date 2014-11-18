@@ -52,7 +52,7 @@ class StyleProxy(object):
 
 
 
-StyleValues = namedtuple("StyleLabel", "alignment border fill font number_format protection")
+StyleId = namedtuple("StyleId", "alignment border fill font number_format protection")
 
 
 
@@ -63,13 +63,13 @@ class StyledObject(ABC):
 
     @abstractmethod
     def __init__(self):
-        self._font_id = None
-        self._fill_id = None
-        self._border_id = None
-        self._alignment_id = None
-        self._protection_id = None
+        self._font_id = 0
+        self._fill_id = 0
+        self._border_id = 0
+        self._alignment_id = 0
+        self._protection_id = 0
         self._number_format_id = 0
-        self._style_id = None
+        self._style_id = 0
 
     @abstractproperty
     def _fonts(self):
@@ -163,7 +163,7 @@ class StyledObject(ABC):
 
     @property
     def style_id(self):
-        style = StyleValues(self._alignment_id, self._border_id,
+        style = StyleId(self._alignment_id, self._border_id,
                             self._fill_id, self._font_id, self._number_format_id,
                             self._protection_id)
         return self._cell_styles.add(style)
