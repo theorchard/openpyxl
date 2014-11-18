@@ -56,10 +56,7 @@ class StyleWriter(object):
 
     def write_table(self):
         self._write_number_format()
-
-        fonts_node = SubElement(self._root, 'fonts', count=len(self.fonts))
-        for font in self.fonts:
-            self._write_font(fonts_node, font)
+        self._write_font()
 
         fills_node = SubElement(self._root, 'fills', count=len(self.fills))
         for fill in self.fills:
@@ -84,8 +81,11 @@ class StyleWriter(object):
         attrs = dict(color)
         SubElement(node, key, attrs)
 
-    def _write_font(self, node, font):
-        node = SubElement(node, "font")
+    def _write_font(self):
+        fonts_node = SubElement(self._root, 'fonts', count="%d" % len(self.fonts))
+        for font in self.fonts:
+            node = SubElement(fonts_node, "font")
+
         # if present vertAlign has to be at the start otherwise Excel has a problem
         ConditionalElement(node, "vertAlign", font.vertAlign, {'val':font.vertAlign})
         SubElement(node, 'sz', {'val':str(font.size)})

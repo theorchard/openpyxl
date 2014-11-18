@@ -44,6 +44,7 @@ class DummyElement:
 class DummyWorkbook:
 
     style_properties = []
+    _fonts = set()
 
 
 def test_write_gradient_fill():
@@ -108,11 +109,13 @@ def test_write_font():
     wb = DummyWorkbook()
     from openpyxl.styles import Font
     ft = Font(name='Calibri', charset=204, vertAlign='superscript', underline=Font.UNDERLINE_SINGLE)
+    wb._fonts.add(ft)
     writer = StyleWriter(wb)
-    writer._write_font(writer._root, ft)
+    writer._write_font()
     xml = tostring(writer._root)
     expected = """
     <styleSheet xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main">
+    <fonts count="1">
         <font>
           <vertAlign val="superscript"></vertAlign>
           <sz val="11.0"></sz>
@@ -122,6 +125,7 @@ def test_write_font():
           <u></u>
           <charset val="204"></charset>
          </font>
+    </fonts>
     </styleSheet>
     """
     diff = compare_xml(xml, expected)
