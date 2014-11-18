@@ -53,17 +53,17 @@ def test_write_gradient_fill():
     writer = StyleWriter(DummyWorkbook())
     writer._write_gradient_fill(writer._root, fill)
     xml = tostring(writer._root)
-    expected = """<?xml version="1.0" ?>
-<styleSheet xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main">
-  <gradientFill degree="90" type="linear">
-    <stop position="0">
-      <color theme="0"/>
-    </stop>
-    <stop position="1">
-      <color theme="4"/>
-    </stop>
-  </gradientFill>
-</styleSheet>
+    expected = """
+    <styleSheet xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main">
+      <gradientFill degree="90" type="linear">
+        <stop position="0">
+          <color theme="0"/>
+        </stop>
+        <stop position="1">
+          <color theme="4"/>
+        </stop>
+      </gradientFill>
+    </styleSheet>
     """
     diff = compare_xml(xml, expected)
     assert diff is None, diff
@@ -75,12 +75,12 @@ def test_write_pattern_fill():
     writer = StyleWriter(DummyWorkbook())
     writer._write_pattern_fill(writer._root, fill)
     xml = tostring(writer._root)
-    expected = """<?xml version="1.0" ?>
-<styleSheet xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main">
-  <patternFill patternType="solid">
-     <fgColor rgb="00808000" />
-  </patternFill>
-</styleSheet>
+    expected = """
+    <styleSheet xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main">
+      <patternFill patternType="solid">
+         <fgColor rgb="00808000" />
+      </patternFill>
+    </styleSheet>
     """
     diff = compare_xml(xml, expected)
     assert diff is None, diff
@@ -265,7 +265,8 @@ class TestStyleWriter(object):
         w._write_cell_xfs(nft, fonts, fills, borders)
 
         xml = tostring(w._root)
-        expected = """ <styleSheet xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main">
+        expected = """
+        <styleSheet xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main">
         <cellXfs count="2">
           <xf borderId="0" fillId="0" fontId="0" numFmtId="0" xfId="0"/>
           <xf applyFill="1" borderId="0" fillId="2" fontId="0" numFmtId="0" xfId="0"/>
