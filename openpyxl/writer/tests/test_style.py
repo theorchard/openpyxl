@@ -45,6 +45,7 @@ class DummyWorkbook:
 
     style_properties = []
     _fonts = set()
+    _borders = set()
 
 
 def test_write_gradient_fill():
@@ -86,20 +87,23 @@ def test_write_pattern_fill():
 
 
 def test_write_borders():
-    borders = Border()
+    wb = DummyWorkbook()
+    wb._borders.add(Border())
     writer = StyleWriter(DummyWorkbook())
-    writer._write_border(writer._root, borders)
+    writer._write_border()
     xml = tostring(writer._root)
-    expected = """<?xml version="1.0"?>
-<styleSheet xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main">
-  <border>
-    <left/>
-    <right/>
-    <top/>
-    <bottom/>
-    <diagonal/>
-  </border>
-</styleSheet>
+    expected = """
+    <styleSheet xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main">
+      <borders count="1">
+      <border>
+        <left/>
+        <right/>
+        <top/>
+        <bottom/>
+        <diagonal/>
+      </border>
+      </borders>
+    </styleSheet>
     """
     diff = compare_xml(xml, expected)
     assert diff is None, diff

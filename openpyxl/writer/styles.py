@@ -59,10 +59,6 @@ class StyleWriter(object):
         self._write_font()
         self._write_fill()
 
-        borders_node = SubElement(self._root, 'borders', count=len(self.borders))
-        for border in self.borders:
-            self._write_border(borders_node, border)
-
         self._write_cell_style_xfs()
         self._write_cell_xfs(number_format_node, fonts_node, fills_node, borders_node)
         self._write_cell_style()
@@ -116,7 +112,7 @@ class StyleWriter(object):
             self._write_color(stop, color)
 
     def _write_fill(self):
-        fills_node = SubElement(self._root, 'fills', count=len(self.fills))
+        fills_node = SubElement(self._root, 'fills', count="%d" % len(self.fills))
         for fill in self.fills:
             fill_node = SubElement(fills_node, 'fill')
             if isinstance(fill, PatternFill):
@@ -124,13 +120,15 @@ class StyleWriter(object):
             else:
                 self._write_gradient_fill(fill_node, fill)
 
-    def _write_border(self, node, border):
+    def _write_border(self):
         """Write the child elements for an individual border section"""
-        border_node = SubElement(node, 'border', dict(border))
-        for tag, elem in border.children:
-            side = SubElement(border_node, tag, dict(elem))
-            if elem.color is not None:
-                self._write_color(side, elem.color)
+        borders_node = SubElement(self._root, 'borders', count="%d" % len(self.borders))
+        for border in self.borders:
+            border_node = SubElement(borders_node, 'border', dict(border))
+            for tag, elem in border.children:
+                side = SubElement(border_node, tag, dict(elem))
+                if elem.color is not None:
+                    self._write_color(side, elem.color)
 
     def _write_cell_style_xfs(self):
         cell_style_xfs = SubElement(self._root, 'cellStyleXfs', {'count':'1'})
