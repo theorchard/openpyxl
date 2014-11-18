@@ -159,11 +159,15 @@ class TestStyleWriter(object):
 
     def test_nb_style(self):
         for i in range(1, 6):
-            self.worksheet.cell(row=1, column=i).style = Style(font=Font(size=i))
+            cell = self.worksheet.cell(row=1, column=i)
+            cell.font = Font(size=i)
+            _ = cell.style_id
         w = StyleWriter(self.workbook)
         assert len(w.styles) == 6  # 5 + the default
 
-        self.worksheet.cell('A10').style = Style(border=Border(top=Side(border_style=borders.BORDER_THIN)))
+        cell = self.worksheet.cell('A10')
+        cell.border=Border(top=Side(border_style=borders.BORDER_THIN))
+        _ = cell.style_id
         w = StyleWriter(self.workbook)
         assert len(w.styles) == 7
 
@@ -500,7 +504,6 @@ class TestCreateStyle(object):
             assert diff is None, diff
 
 
-#@pytest.mark.xfail
 def test_empty_workbook():
     wb = Workbook()
     writer = StyleWriter(wb)
