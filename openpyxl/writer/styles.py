@@ -57,10 +57,7 @@ class StyleWriter(object):
     def write_table(self):
         self._write_number_format()
         self._write_font()
-
-        fills_node = SubElement(self._root, 'fills', count=len(self.fills))
-        for fill in self.fills:
-            self._write_fill(fills_node, fill)
+        self._write_fill()
 
         borders_node = SubElement(self._root, 'borders', count=len(self.borders))
         for border in self.borders:
@@ -118,12 +115,14 @@ class StyleWriter(object):
             stop = SubElement(node, "stop", {"position":safe_string(idx)})
             self._write_color(stop, color)
 
-    def _write_fill(self, node, fill):
-        fill_node = SubElement(node, 'fill')
-        if isinstance(fill, PatternFill):
-            self._write_pattern_fill(fill_node, fill)
-        else:
-            self._write_gradient_fill(fill_node, fill)
+    def _write_fill(self):
+        fills_node = SubElement(self._root, 'fills', count=len(self.fills))
+        for fill in self.fills:
+            fill_node = SubElement(fills_node, 'fill')
+            if isinstance(fill, PatternFill):
+                self._write_pattern_fill(fill_node, fill)
+            else:
+                self._write_gradient_fill(fill_node, fill)
 
     def _write_border(self, node, border):
         """Write the child elements for an individual border section"""
