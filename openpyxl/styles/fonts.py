@@ -91,3 +91,6 @@ class Font(HashableObject):
         self.condense = condense
         self.extend = extend
         self.scheme = scheme
+
+
+DEFAULT_FONT = Font()

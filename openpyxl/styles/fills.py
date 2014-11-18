@@ -75,6 +75,10 @@ class PatternFill(Fill):
         self.bgColor = bgColor
 
 
+DEFAULT_EMPTY_FILL = PatternFill()
+DEFAULT_GRAY_FILL = PatternFill(patternType='gray125')
+
+
 class GradientFill(Fill):
 
     spec = """18.8.24"""
