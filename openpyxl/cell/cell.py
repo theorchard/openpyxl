@@ -347,7 +347,7 @@ class Cell(StyledObject):
     @property
     def has_style(self):
         """Check if the parent worksheet has a style for this cell"""
-        return self._style_id is not None
+        return self.style_id is not 0
 
     @property
     def _alignments(self):
