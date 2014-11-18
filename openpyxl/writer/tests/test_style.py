@@ -500,16 +500,38 @@ class TestCreateStyle(object):
             assert diff is None, diff
 
 
-@pytest.mark.xfail
+#@pytest.mark.xfail
 def test_empty_workbook():
     wb = Workbook()
     writer = StyleWriter(wb)
     expected = """
     <styleSheet>
       <numFmts count="0"/>
-      <fonts count="1"/>
-      <fills count="2"/>
-      <borders count="1"/>
+      <fonts count="1">
+        <font>
+          <sz val="11.0"/>
+          <color rgb="00000000"/>
+          <name val="Calibri"/>
+          <family val="2"/>
+        </font>
+      </fonts>
+      <fills count="2">
+       <fill>
+          <patternFill patternType="none" />
+       </fill>
+       <fill>
+          <patternFill patternType="gray125"/>
+        </fill>
+      </fills>
+      <borders count="1">
+        <border>
+          <left/>
+          <right/>
+          <top/>
+          <bottom/>
+          <diagonal/>
+        </border>
+      </borders>
       <cellStyleXfs count="1">
         <xf borderId="0" fillId="0" fontId="0" numFmtId="0"/>
       </cellStyleXfs>
