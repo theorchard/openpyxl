@@ -171,6 +171,7 @@ class StyleWriter(object):
 
 
     def _write_alignment(self, node, alignment):
+        alignment = self.wb._alignments[alignment]
         values = dict(alignment)
         if values.get('horizontal', 'general') == 'general':
             del values['horizontal']
