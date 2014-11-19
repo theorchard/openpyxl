@@ -194,29 +194,25 @@ class TestStyleWriter(object):
         assert diff is None, diff
 
 
-    @pytest.mark.xfail
     def test_xfs_number_format(self):
+        fmts = ["0.0%", "0.000%", "0.00%"]
+        for
         for o in range(1, 4):
             for i in range(1, 4):
                 # Two of these are custom, 0.0% and 0.000%. 0.00% is a built in format ID
-                self.worksheet.cell(row=o, column=i).number_format = '0.' + '0' * i + '%'
-                # hack
+                cell = self.worksheet.cell(row=o, column=i)
+                cell.number_format = '0.' + '0' * i + '%'
+                _ = cell.style_id # add to workbooks styles
         w = StyleWriter(self.workbook)
-        fonts = borders = fills = DummyElement()
-        nft = SubElement(w._root, 'numFmts')
-        w._write_cell_xfs(nft, fonts, fills, borders)
+        w._write_cell_xfs()
 
         expected = """
         <styleSheet xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main">
-            <numFmts count="2">
-                <numFmt formatCode="0.0%" numFmtId="165"/>
-                <numFmt formatCode="0.000%" numFmtId="166"/>
-            </numFmts>
             <cellXfs count="4">
                 <xf borderId="0" fillId="0" fontId="0" numFmtId="0" xfId="0"/>
-                <xf applyNumberFormat="1" borderId="0" fillId="0" fontId="0" numFmtId="165" xfId="0"/>
+                <xf applyNumberFormat="1" borderId="0" fillId="0" fontId="0" numFmtId="164" xfId="0"/>
                 <xf applyNumberFormat="1" borderId="0" fillId="0" fontId="0" numFmtId="10" xfId="0"/>
-                <xf applyNumberFormat="1" borderId="0" fillId="0" fontId="0" numFmtId="166" xfId="0"/>
+                <xf applyNumberFormat="1" borderId="0" fillId="0" fontId="0" numFmtId="165" xfId="0"/>
             </cellXfs>
         </styleSheet>
         """
