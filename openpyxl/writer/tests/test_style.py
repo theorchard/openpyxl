@@ -226,13 +226,14 @@ class TestStyleWriter(object):
 
 
     def test_xfs_fonts(self):
-        st = Style(font=Font(size=12, bold=True))
-        self.worksheet.cell('A1').style = st
+        cell = self.worksheet.cell('A1')
+        cell.font = Font(size=12, bold=True)
+        _ = cell.style_id
         w = StyleWriter(self.workbook)
 
         nft = borders = fills = DummyElement()
         fonts = Element("fonts")
-        w._write_cell_xfs(nft, fonts, fills, borders)
+        w._write_cell_xfs()
         xml = unicode(tostring(w._root))
         assert """applyFont="1" """ in xml
         assert """fontId="1" """ in xml
