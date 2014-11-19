@@ -482,19 +482,3 @@ def test_empty_workbook():
     xml = writer.write_table()
     diff = compare_xml(xml, expected)
     assert diff is None, diff
-
-
-@pytest.mark.xfail
-def test_complex_styles(datadir):
-    """Hold on to your hats"""
-    from openpyxl import load_workbook
-    datadir.join("..", "..", "..", "reader", "tests", "data").chdir()
-    wb = load_workbook("complex-styles.xlsx")
-
-    datadir.chdir()
-    with open("complex-styles.xml") as reference:
-        writer = StyleWriter(wb)
-        xml = writer.write_table()
-        expected = reference.read()
-        diff = compare_xml(xml, expected)
-        assert diff is None, diff
