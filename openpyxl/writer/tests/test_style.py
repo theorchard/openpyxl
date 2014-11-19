@@ -90,7 +90,7 @@ def test_write_borders():
     wb = DummyWorkbook()
     wb._borders.add(Border())
     writer = StyleWriter(DummyWorkbook())
-    writer._write_border()
+    writer._write_borders()
     xml = tostring(writer._root)
     expected = """
     <styleSheet xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main">
@@ -115,7 +115,7 @@ def test_write_font():
     ft = Font(name='Calibri', charset=204, vertAlign='superscript', underline=Font.UNDERLINE_SINGLE)
     wb._fonts.add(ft)
     writer = StyleWriter(wb)
-    writer._write_font()
+    writer._write_fonts()
     xml = tostring(writer._root)
     expected = """
     <styleSheet xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main">
