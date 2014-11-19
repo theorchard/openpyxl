@@ -93,4 +93,6 @@ class Font(HashableObject):
         self.scheme = scheme
 
 
-DEFAULT_FONT = Font()
+from . colors import Color
+
+DEFAULT_FONT = Font(color=Color(theme=1), scheme="minor")

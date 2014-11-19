@@ -91,7 +91,7 @@ class StyleWriter(object):
 
         # if present vertAlign has to be at the start otherwise Excel has a problem
         ConditionalElement(node, "vertAlign", font.vertAlign, {'val':font.vertAlign})
-        SubElement(node, 'sz', {'val':str(font.size)})
+        SubElement(node, 'sz', {'val':'%d' % font.size})
         self._write_color(node, font.color)
         SubElement(node, 'name', {'val':font.name})
         SubElement(node, 'family', {'val': '%d' % font.family})
@@ -102,7 +102,7 @@ class StyleWriter(object):
 
         # Don't write the 'scheme' element because it appears to prevent
         # the font name from being applied in Excel.
-        #SubElement(font_node, 'scheme', {'val':'minor'})
+        ConditionalElement(node, 'scheme', font.scheme, {'val':font.scheme})
 
         ConditionalElement(node, "u", font.underline=='single')
         ConditionalElement(node, "charset", font.charset, {'val':str(font.charset)})

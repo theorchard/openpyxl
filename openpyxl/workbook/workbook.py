@@ -97,7 +97,7 @@ class Workbook(object):
         self._number_formats = IndexedList()
 
         self._protections = IndexedList()
-        self._protections.add(Protection)
+        self._protections.add(Protection())
 
         self._colors = IndexedList()
         self._cell_styles = IndexedList([StyleId(0, 0, 0, 0, 0, 0)])
