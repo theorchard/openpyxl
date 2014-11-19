@@ -180,7 +180,7 @@ class TestStyleWriter(object):
     def test_default_xfs(self):
         w = StyleWriter(self.workbook)
         fonts = nft = borders = fills = DummyElement()
-        w._write_cell_xfs(nft, fonts, fills, borders)
+        w._write_cell_xfs()
         xml = tostring(w._root)
         expected = """
         <styleSheet xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main">
@@ -231,25 +231,17 @@ class TestStyleWriter(object):
         _ = cell.style_id
         w = StyleWriter(self.workbook)
 
-        nft = borders = fills = DummyElement()
-        fonts = Element("fonts")
         w._write_cell_xfs()
-        xml = unicode(tostring(w._root))
-        assert """applyFont="1" """ in xml
-        assert """fontId="1" """ in xml
+        xml = tostring(w._root)
 
         expected = """
-        <fonts count="2">
-        <font>
-            <sz val="12.0" />
-            <color rgb="00000000"></color>
-            <name val="Calibri" />
-            <family val="2" />
-            <b></b>
-        </font>
-        </fonts>
+        <styleSheet xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main">
+          <cellXfs count="2">
+            <xf borderId="0" fillId="0" fontId="0" numFmtId="0" xfId="0"/>
+            <xf applyFont="1" borderId="0" fillId="0" fontId="1" numFmtId="0" xfId="0"/>
+          </cellXfs>
+        </styleSheet>
         """
-        xml = tostring(fonts)
         diff = compare_xml(xml, expected)
         assert diff is None, diff
 
