@@ -228,7 +228,7 @@ class TestStyleWriter(object):
     def test_xfs_fonts(self):
         cell = self.worksheet.cell('A1')
         cell.font = Font(size=12, bold=True)
-        _ = cell.style_id
+        _ = cell.style_id # update workbook styles
         w = StyleWriter(self.workbook)
 
         w._write_cell_xfs()
@@ -250,7 +250,7 @@ class TestStyleWriter(object):
         cell = self.worksheet.cell('A1')
         cell.fill = fill=PatternFill(fill_type='solid',
                                      start_color=Color(colors.DARKYELLOW))
-        _ = cell.style_id
+        _ = cell.style_id # update workbook styles
         w = StyleWriter(self.workbook)
         w._write_cell_xfs()
 
@@ -268,13 +268,13 @@ class TestStyleWriter(object):
 
 
     def test_xfs_borders(self):
-        st = Style(border=Border(top=Side(border_style=borders.BORDER_THIN,
-                                              color=Color(colors.DARKYELLOW))))
-        self.worksheet.cell('A1').style = st
+        cell = self.worksheet.cell('A1')
+        cell.border=Border(top=Side(border_style=borders.BORDER_THIN,
+                                    color=Color(colors.DARKYELLOW)))
+        _ = cell.style_id # update workbook styles
+
         w = StyleWriter(self.workbook)
-        fonts = nft = fills = DummyElement()
-        border_node = Element("borders")
-        w._write_cell_xfs(nft, fonts, fills, border_node)
+        w._write_cell_xfs()
 
         xml = tostring(w._root)
         expected = """
@@ -288,22 +288,6 @@ class TestStyleWriter(object):
         diff = compare_xml(xml, expected)
         assert diff is None, diff
 
-        xml = tostring(border_node)
-        expected = """
-          <borders count="2">
-            <border>
-              <left />
-              <right />
-              <top style="thin">
-                <color rgb="00808000"></color>
-              </top>
-              <bottom />
-              <diagonal />
-            </border>
-          </borders>
-        """
-        diff = compare_xml(xml, expected)
-        assert diff is None, diff
 
     @pytest.mark.parametrize("value, expected",
                              [
