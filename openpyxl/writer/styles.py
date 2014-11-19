@@ -78,7 +78,7 @@ class StyleWriter(object):
 
     def _write_number_formats(self):
         node = SubElement(self._root, 'numFmts', count= "%d" % len(self.number_formats))
-        for idx, nf in enumerate(self.number_formats):
+        for idx, nf in enumerate(self.number_formats, 164):
             SubElement(node, 'numFmt', {'numFmtId':'%d' % idx,
                                         'formatCode':'%s' % nf}
                        )
