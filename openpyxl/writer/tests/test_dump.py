@@ -256,7 +256,6 @@ def test_dump_string_table():
                      ]
 
 
-@pytest.mark.xfail
 def test_dump_sheet_with_styles(temp_file):
     wb = Workbook(optimized_write=True)
     ws = wb.create_sheet()
