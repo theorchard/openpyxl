@@ -60,7 +60,7 @@ class StyleWriter(object):
         self._write_fill()
 
         self._write_cell_style_xfs()
-        self._write_cell_xfs(number_format_node, fonts_node, fills_node, borders_node)
+        self._write_cell_xfs()
         self._write_cell_style()
         self._write_dxfs()
         self._write_table_styles()
@@ -98,8 +98,9 @@ class StyleWriter(object):
         ConditionalElement(node, "charset", font.charset, {'val':str(font.charset)})
 
     def _write_pattern_fill(self, node, fill):
-        node = SubElement(node, 'patternFill', {'patternType':
-                                                fill.fill_type})
+        node = SubElement(node, 'patternFill')
+        if fill.patternType is not None:
+            node.set('patternType', fill.patternType)
         if fill.start_color != DEFAULTS.fill.start_color:
             self._write_color(node, fill.start_color, 'fgColor')
         if fill.end_color != DEFAULTS.fill.end_color:
