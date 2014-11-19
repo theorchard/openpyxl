@@ -195,14 +195,10 @@ class TestStyleWriter(object):
 
 
     def test_xfs_number_format(self):
-        fmts = ["0.0%", "0.000%", "0.00%"]
-        for
-        for o in range(1, 4):
-            for i in range(1, 4):
-                # Two of these are custom, 0.0% and 0.000%. 0.00% is a built in format ID
-                cell = self.worksheet.cell(row=o, column=i)
-                cell.number_format = '0.' + '0' * i + '%'
-                _ = cell.style_id # add to workbooks styles
+        for idx, nf in enumerate(["0.0%", "0.00%", "0.000%"], 1):
+            cell = self.worksheet.cell(row=idx, column=1)
+            cell.number_format = nf
+            _ = cell.style_id # add to workbook styles
         w = StyleWriter(self.workbook)
         w._write_cell_xfs()
 
