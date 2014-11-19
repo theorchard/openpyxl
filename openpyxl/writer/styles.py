@@ -139,7 +139,7 @@ class StyleWriter(object):
         """ write styles combinations based on ids found in tables """
         # writing the cellXfs
         cell_xfs = SubElement(self._root, 'cellXfs',
-            {'count':'%d' % len(self.styles)})
+                              count='%d' % len(self.styles))
 
         # default
         def _get_default_vals():
