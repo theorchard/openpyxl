@@ -332,20 +332,6 @@ class TestStyleWriter(object):
         assert diff is None, diff
 
 
-    def test_rewrite_styles(self):
-        """Test to verify Bugfix # 46"""
-        self.worksheet['A1'].value = 'Value'
-        self.worksheet['B2'].value = '14%'
-        saved_wb = save_virtual_workbook(self.workbook)
-        second_wb = load_workbook(BytesIO(saved_wb))
-        assert isinstance(second_wb, Workbook)
-        ws = second_wb.get_sheet_by_name('Sheet1')
-        assert ws.cell('A1').value == 'Value'
-        ws['A2'].value = 'Bar!'
-        saved_wb = save_virtual_workbook(second_wb)
-        third_wb = load_workbook(BytesIO(saved_wb))
-        assert third_wb
-
     def test_write_dxf(self):
         redFill = PatternFill(start_color=Color('FFEE1111'),
                        end_color=Color('FFEE1111'),
