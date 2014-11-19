@@ -165,19 +165,21 @@ class StyleWriter(object):
                 vals['numFmtId'] = '%d' % st.number_format
                 vals['applyNumberFormat'] = '1'
 
-            if st.alignment != DEFAULTS.alignment:
+            if st.alignment != 0:
                 vals['applyAlignment'] = '1'
 
-            if st.protection != DEFAULTS.protection:
+            if st.protection != 0:
                 vals['applyProtection'] = '1'
 
             node = SubElement(cell_xfs, 'xf', vals)
 
-            if st.alignment != DEFAULTS.alignment:
-                self._write_alignment(node, st.alignment)
+            if st.alignment != 0:
+                al = self.alignments[st.alignment]
+                self._write_alignment(node, al)
 
-            if st.protection != DEFAULTS.protection:
-                self._write_protection(node, st.protection)
+            if st.protection != 0:
+                prot = self.protections[st.protection]
+                self._write_protection(node, prot)
 
 
     def _write_number_format(self):
@@ -189,7 +191,6 @@ class StyleWriter(object):
 
 
     def _write_alignment(self, node, alignment):
-        alignment = self.wb._alignments[alignment]
         values = dict(alignment)
         if values.get('horizontal', 'general') == 'general':
             del values['horizontal']
