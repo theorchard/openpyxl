@@ -247,37 +247,22 @@ class TestStyleWriter(object):
 
 
     def test_xfs_fills(self):
-        st = Style(fill=PatternFill(
-            fill_type='solid',
-            start_color=Color(colors.DARKYELLOW))
-                   )
-        self.worksheet.cell('A1').style = st
+        cell = self.worksheet.cell('A1')
+        cell.fill = fill=PatternFill(fill_type='solid',
+                                     start_color=Color(colors.DARKYELLOW))
+        _ = cell.style_id
         w = StyleWriter(self.workbook)
-        nft = borders = fonts = DummyElement()
-        fills = Element("fills")
-        w._write_cell_xfs(nft, fonts, fills, borders)
+        w._write_cell_xfs()
 
         xml = tostring(w._root)
         expected = """
         <styleSheet xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main">
-        <cellXfs count="2">
-          <xf borderId="0" fillId="0" fontId="0" numFmtId="0" xfId="0"/>
-          <xf applyFill="1" borderId="0" fillId="2" fontId="0" numFmtId="0" xfId="0"/>
-        </cellXfs>
+          <cellXfs count="2">
+            <xf borderId="0" fillId="0" fontId="0" numFmtId="0" xfId="0"/>
+            <xf applyFill="1" borderId="0" fillId="2" fontId="0" numFmtId="0" xfId="0"/>
+          </cellXfs>
         </styleSheet>
         """
-        diff = compare_xml(xml, expected)
-        assert diff is None, diff
-
-        expected = """<fills count="3">
-            <fill>
-              <patternFill patternType="solid">
-                <fgColor rgb="00808000"></fgColor>
-               </patternFill>
-            </fill>
-          </fills>
-        """
-        xml = tostring(fills)
         diff = compare_xml(xml, expected)
         assert diff is None, diff
 
