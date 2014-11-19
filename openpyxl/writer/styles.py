@@ -58,6 +58,7 @@ class StyleWriter(object):
         self._write_number_format()
         self._write_font()
         self._write_fill()
+        self._write_border()
 
         self._write_cell_style_xfs()
         self._write_cell_xfs()
