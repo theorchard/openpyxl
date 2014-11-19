@@ -55,7 +55,7 @@ class StyleWriter(object):
         return self.wb._protections
 
     def write_table(self):
-        self._write_number_format()
+        self._write_number_formats()
         self._write_fonts()
         self._write_fills()
         self._write_borders()
@@ -74,6 +74,15 @@ class StyleWriter(object):
         """
         attrs = dict(color)
         SubElement(node, key, attrs)
+
+
+    def _write_number_formats(self):
+        node = SubElement(self._root, 'numFmts', count= "%d" % len(self.number_formats))
+        for idx, nf in enumerate(self.number_formats):
+            SubElement(node, 'numFmt', {'numFmtId':'%d' % idx,
+                                        'formatCode':'%s' % nf}
+                       )
+
 
     def _write_fonts(self):
         fonts_node = SubElement(self._root, 'fonts', count="%d" % len(self.fonts))
@@ -180,14 +189,6 @@ class StyleWriter(object):
                 node.set('applyProtection', '1')
                 prot = self.protections[st.protection]
                 self._write_protection(node, prot)
-
-
-    def _write_number_format(self):
-        node = SubElement(self._root, 'numFmts', count= "%d" % len(self.number_formats))
-        for idx, nf in enumerate(self.number_formats):
-            SubElement(node, 'numFmt', {'numFmtId':'%d' % idx,
-                                        'formatCode':'%s' % nf}
-                       )
 
 
     def _write_alignment(self, node, alignment):

@@ -141,7 +141,7 @@ def test_write_number_formats():
     wb = DummyWorkbook()
     wb._number_formats = ['YYYY']
     writer = StyleWriter(wb)
-    writer._write_number_format()
+    writer._write_number_formats()
     xml = tostring(writer._root)
     expected = """
     <styleSheet xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main">
