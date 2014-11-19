@@ -451,7 +451,7 @@ def test_empty_workbook():
     wb = Workbook()
     writer = StyleWriter(wb)
     expected = """
-    <styleSheet>
+    <styleSheet xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main">
       <numFmts count="0"/>
       <fonts count="1">
         <font>
