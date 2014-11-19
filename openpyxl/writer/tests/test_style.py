@@ -122,7 +122,7 @@ def test_write_font():
     <fonts count="1">
         <font>
           <vertAlign val="superscript"></vertAlign>
-          <sz val="11.0"></sz>
+          <sz val="11"></sz>
           <color rgb="00000000"></color>
           <name val="Calibri"></name>
           <family val="2"></family>
@@ -408,36 +408,30 @@ class TestStyleWriter(object):
         assert diff is None, diff
 
 
-class TestCreateStyle(object):
+def test_simple_styles(datadir):
+    wb = Workbook(guess_types=True)
+    ws = wb.active
+    now = datetime.datetime.now()
+    for idx, v in enumerate(['12.34%', now, 'This is a test', '31.31415', None], 1):
+        ws.append([v])
+        _ = ws.cell(column=1, row=idx).style_id
 
-    @classmethod
-    def setup_class(cls):
-        now = datetime.datetime.now()
-        cls.workbook = Workbook(guess_types=True)
-        cls.worksheet = cls.workbook.create_sheet()
-        cls.worksheet.cell(coordinate='A1').value = '12.34%'  # 2
-        cls.worksheet.cell(coordinate='B4').value = now  # 3
-        cls.worksheet.cell(coordinate='B5').value = now
-        cls.worksheet.cell(coordinate='C14').value = 'This is a test'  # 1
-        cls.worksheet.cell(coordinate='D9').value = '31.31415'  # 3
-        st = Style(number_format=numbers.FORMAT_NUMBER_00,
-                   protection=Protection(locked=True))  # 4
-        cls.worksheet.cell(coordinate='D9').style = st
-        st2 = Style(protection=Protection(hidden=True))  # 5
-        cls.worksheet.cell(coordinate='E1').style = st2
-        cls.writer = StyleWriter(cls.workbook)
+    # set explicit formats
+    ws['D9'].number_format = numbers.FORMAT_NUMBER_00
+    ws['D9'].protection = Protection(locked=True)
+    ws['D9'].style_id
+    ws['E1'].protection = Protection(hidden=True)
+    ws['E1'].style_id
 
-    @pytest.mark.xfail
-    def test_create_style_table(self):
-        assert len(self.writer.styles) == 5
+    assert len(wb._cell_styles) == 5
+    writer = StyleWriter(wb)
 
-    @pytest.mark.xfail
-    def test_write_style_table(self, datadir):
-        datadir.chdir()
-        with open('simple-styles.xml') as reference_file:
-            xml = self.writer.write_table()
-            diff = compare_xml(xml, reference_file.read())
-            assert diff is None, diff
+    datadir.chdir()
+    with open('simple-styles.xml') as reference_file:
+        expected = reference_file.read()
+    xml = writer.write_table()
+    diff = compare_xml(xml, expected)
+    assert diff is None, diff
 
 
 def test_empty_workbook():
