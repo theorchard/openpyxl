@@ -135,7 +135,7 @@ class StyleWriter(object):
         SubElement(cell_style_xfs, 'xf',
             {'numFmtId':"0", 'fontId':"0", 'fillId':"0", 'borderId':"0"})
 
-    def _write_cell_xfs(self, number_format_node, fonts_node, fills_node, borders_node):
+    def _write_cell_xfs(self):
         """ write styles combinations based on ids found in tables """
         # writing the cellXfs
         cell_xfs = SubElement(self._root, 'cellXfs',
