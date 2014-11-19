@@ -75,14 +75,18 @@ class Workbook(object):
 
     def _setup_styles(self):
         """Bootstrap styles"""
+        from openpyxl.styles.alignment import Alignment
         from openpyxl.styles.borders import DEFAULT_BORDER
         from openpyxl.styles.fills import DEFAULT_EMPTY_FILL, DEFAULT_GRAY_FILL
         from openpyxl.styles.fonts import DEFAULT_FONT
+        from openpyxl.styles.protection import Protection
 
         self._fonts = IndexedList()
         self._fonts.add(DEFAULT_FONT)
 
         self._alignments = IndexedList()
+        self._alignments.add(Alignment())
+
         self._borders = IndexedList()
         self._borders.add(DEFAULT_BORDER)
 
@@ -91,7 +95,10 @@ class Workbook(object):
         self._fills.add(DEFAULT_GRAY_FILL)
 
         self._number_formats = IndexedList()
+
         self._protections = IndexedList()
+        self._protections.add(Protection)
+
         self._colors = IndexedList()
         self._cell_styles = IndexedList([StyleId(0, 0, 0, 0, 0, 0)])
 
