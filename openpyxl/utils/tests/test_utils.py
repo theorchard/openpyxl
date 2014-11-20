@@ -11,7 +11,7 @@ from .. import (
     get_column_interval,
 )
 
-from ..utils.exceptions import (
+from ..exceptions import (
     CellCoordinatesException,
     )
 
