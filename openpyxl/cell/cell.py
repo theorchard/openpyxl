@@ -39,7 +39,7 @@ from openpyxl.utils.exceptions import (
     IllegalCharacterError
 )
 from openpyxl.utils.units import points_to_pixels
-from openpyxl.utils.cell import (
+from openpyxl.utils import (
     absolute_coordinate,
     get_column_interval,
     get_column_letter,

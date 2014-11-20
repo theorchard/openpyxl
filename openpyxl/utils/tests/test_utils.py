@@ -3,7 +3,7 @@ from __future__ import absolute_import
 
 import pytest
 
-from ..cell import (
+from .. import (
     column_index_from_string,
     coordinate_from_string,
     get_column_letter,
@@ -11,7 +11,7 @@ from ..cell import (
     get_column_interval,
 )
 
-from openpyxl.utils.exceptions import (
+from ..utils.exceptions import (
     CellCoordinatesException,
     )
 
