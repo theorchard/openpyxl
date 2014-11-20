@@ -159,7 +159,6 @@ def test_add_local_named_range(tmpdir):
     wb.save(dest_filename)
 
 
-@pytest.mark.xfail
 def test_write_regular_date(tmpdir):
     tmpdir.chdir()
     today = datetime.datetime(2010, 1, 18, 14, 15, 20, 1600)
@@ -176,7 +175,6 @@ def test_write_regular_date(tmpdir):
     assert test_sheet.cell("A1").value == today
 
 
-@pytest.mark.xfail
 def test_write_regular_float(tmpdir):
     float_value = 1.0 / 3.0
     book = Workbook()
