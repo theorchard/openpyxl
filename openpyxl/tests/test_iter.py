@@ -39,6 +39,7 @@ def test_get_max_cell(datadir, filename):
 
     class Workbook:
         excel_base_date = None
+        _cell_styles = [None]
 
         def get_sheet_names(self):
             return []
