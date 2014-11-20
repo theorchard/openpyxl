@@ -60,10 +60,10 @@ class StyleWriter(object):
         self._write_fills()
         self._write_borders()
 
-        self._write_cell_style_xfs()
-        self._write_cell_xfs()
-        self._write_cell_style()
-        self._write_dxfs()
+        self._write_named_styles()
+        self._write_cell_styles()
+        self._write_style_names()
+        self._write_conditional_styles()
         self._write_table_styles()
 
         return tostring(self._root)
@@ -143,12 +143,12 @@ class StyleWriter(object):
                 if elem.color is not None:
                     self._write_color(side, elem.color)
 
-    def _write_cell_style_xfs(self):
+    def _write_named_styles(self):
         cell_style_xfs = SubElement(self._root, 'cellStyleXfs', {'count':'1'})
         SubElement(cell_style_xfs, 'xf',
             {'numFmtId':"0", 'fontId':"0", 'fillId':"0", 'borderId':"0"})
 
-    def _write_cell_xfs(self):
+    def _write_cell_styles(self):
         """ write styles combinations based on ids found in tables """
         # writing the cellXfs
         cell_xfs = SubElement(self._root, 'cellXfs',
@@ -204,12 +204,12 @@ class StyleWriter(object):
         SubElement(node, 'protection', dict(protection))
 
 
-    def _write_cell_style(self):
+    def _write_style_names(self):
         cell_styles = SubElement(self._root, 'cellStyles', {'count':'1'})
         SubElement(cell_styles, 'cellStyle',
             {'name':"Normal", 'xfId':"0", 'builtinId':"0"})
 
-    def _write_dxfs(self):
+    def _write_conditional_styles(self):
         if self.wb.style_properties and 'dxf_list' in self.wb.style_properties:
             dxfs = SubElement(self._root, 'dxfs', {'count': str(len(self.wb.style_properties['dxf_list']))})
             for d in self.wb.style_properties['dxf_list']:

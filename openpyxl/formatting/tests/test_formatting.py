@@ -339,7 +339,7 @@ class TestConditionalFormatting(object):
 
         # Second, verify conditional formatting dxf styles
         w = StyleWriter(self.workbook)
-        w._write_dxfs()
+        w._write_conditional_styles()
         xml = tostring(w._root)
         diff = compare_xml(xml, """
         <styleSheet xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main">
@@ -876,7 +876,7 @@ def test_parse_dxfs(datadir):
 
     # Verify that the dxf styles stay the same when they're written and read back in.
     w = StyleWriter(wb)
-    w._write_dxfs()
+    w._write_conditional_styles()
     write_xml = tostring(w._root)
     read_style_prop = read_style_table(write_xml).cond_styles
     assert len(read_style_prop) == len(wb.style_properties['dxf_list'])

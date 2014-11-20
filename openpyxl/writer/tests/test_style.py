@@ -181,7 +181,7 @@ class TestStyleWriter(object):
     def test_default_xfs(self):
         w = StyleWriter(self.workbook)
         fonts = nft = borders = fills = DummyElement()
-        w._write_cell_xfs()
+        w._write_cell_styles()
         xml = tostring(w._root)
         expected = """
         <styleSheet xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main">
@@ -200,7 +200,7 @@ class TestStyleWriter(object):
             cell.number_format = nf
             _ = cell.style_id # add to workbook styles
         w = StyleWriter(self.workbook)
-        w._write_cell_xfs()
+        w._write_cell_styles()
 
         expected = """
         <styleSheet xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main">
@@ -224,7 +224,7 @@ class TestStyleWriter(object):
         _ = cell.style_id # update workbook styles
         w = StyleWriter(self.workbook)
 
-        w._write_cell_xfs()
+        w._write_cell_styles()
         xml = tostring(w._root)
 
         expected = """
@@ -245,7 +245,7 @@ class TestStyleWriter(object):
                                      start_color=Color(colors.DARKYELLOW))
         _ = cell.style_id # update workbook styles
         w = StyleWriter(self.workbook)
-        w._write_cell_xfs()
+        w._write_cell_styles()
 
         xml = tostring(w._root)
         expected = """
@@ -267,7 +267,7 @@ class TestStyleWriter(object):
         _ = cell.style_id # update workbook styles
 
         w = StyleWriter(self.workbook)
-        w._write_cell_xfs()
+        w._write_cell_styles()
 
         xml = tostring(w._root)
         expected = """
@@ -346,7 +346,7 @@ class TestStyleWriter(object):
         assert 'fill' in self.workbook.style_properties['dxf_list'][0]
 
         w = StyleWriter(self.workbook)
-        w._write_dxfs()
+        w._write_conditional_styles()
         xml = tostring(w._root)
 
         diff = compare_xml(xml, """
@@ -392,7 +392,7 @@ class TestStyleWriter(object):
         _ = cell.style_id
 
         w = StyleWriter(self.workbook)
-        w._write_cell_xfs()
+        w._write_cell_styles()
         xml = tostring(w._root)
         expected = """
         <styleSheet xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main">
