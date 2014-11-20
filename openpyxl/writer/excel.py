@@ -72,10 +72,6 @@ class ExcelWriter(object):
             archive.writestr(ARC_THEME, self.workbook.loaded_theme)
         else:
             archive.writestr(ARC_THEME, write_theme())
-        for sheet in self.workbook.worksheets:
-            sheet.conditional_formatting._save_styles(self.workbook)
-
-        archive.writestr(ARC_STYLE, self.style_writer.write_table())
         archive.writestr(ARC_WORKBOOK, write_workbook(self.workbook))
 
         if self.workbook.vba_archive:
@@ -86,9 +82,13 @@ class ExcelWriter(object):
                         archive.writestr(name, vba_archive.read(name))
                         break
 
+        for sheet in self.workbook.worksheets:
+            sheet.conditional_formatting._save_styles(self.workbook)
+
         self._write_worksheets(archive)
         self._write_string_table(archive)
         self._write_external_links(archive)
+        archive.writestr(ARC_STYLE, self.style_writer.write_table())
 
     def _write_string_table(self, archive):
         archive.writestr(ARC_SHARED_STRINGS,
