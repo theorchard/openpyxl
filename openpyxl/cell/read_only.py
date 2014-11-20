@@ -7,6 +7,7 @@ from openpyxl.compat import unicode
 from openpyxl.cell import Cell
 from openpyxl.utils.datetime  import from_excel
 from openpyxl.styles import is_date_format, Style
+from openpyxl.styles.numbers import BUILTIN_FORMATS
 
 
 class ReadOnlyCell(object):
@@ -95,7 +96,20 @@ class ReadOnlyCell(object):
     def style(self):
         if self.style_id is None:
             return Style()
-        return self.sheet.parent.shared_styles[self.style_id]
+        wb = self.sheet.parent
+        styles_id = wb._cell_styles[self.style_id]
+        font = wb._fonts[styles_id.font]
+        fill = wb._fills[styles_id.fill]
+        alignment = wb._alignments[styles_id.alignment]
+        border = wb._borders[styles_id.border]
+        protection = wb._protections[styles_id.protection]
+        if styles_id.number_format < 164:
+            number_format = BUILTIN_FORMATS.get(styles_id.number_format, "General")
+        else:
+            number_format = wb._number_formats[styles_id.number_format - 164]
+
+        return Style(font=font, alignment=alignment, fill=fill,
+                     number_format=number_format, border=border, protection=protection)
 
 
 EMPTY_CELL = ReadOnlyCell(None, None, None, None)
