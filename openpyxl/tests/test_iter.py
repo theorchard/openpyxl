@@ -1,7 +1,6 @@
 # Copyright (c) 2010-2014 openpyxl
 
 import datetime
-import os.path
 
 import pytest
 
