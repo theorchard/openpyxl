@@ -209,7 +209,7 @@ def test_read_style_iter(tmpdir):
     wb = Workbook()
     ws = wb.worksheets[0]
     cell = ws.cell('A1')
-    cell.style = Style(font=ft)
+    cell.font = ft
 
     xlsx_file = "read_only_styles.xlsx"
     wb.save(xlsx_file)

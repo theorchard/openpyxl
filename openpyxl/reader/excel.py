@@ -210,6 +210,7 @@ def _load_workbook(wb, archive, filename, read_only, keep_vba):
     wb.shared_styles = parsed_styles.shared_styles
     wb.style_properties = {'dxf_list': parsed_styles.cond_styles}
     wb.cond_styles = parsed_styles.cond_styles
+    wb._cell_styles = parsed_styles.cell_styles
     wb._colors = parsed_styles.color_index
     wb._borders = parsed_styles.border_list
     wb._fonts = parsed_styles.font_list
