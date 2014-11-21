@@ -250,15 +250,16 @@ class MatchPattern(Descriptor):
     def __init__(self, name=None, **kw):
         if 'pattern' not in kw:
             raise TypeError('missing pattern value')
+        
         super(MatchPattern, self).__init__(name, **kw)
+        self.test_pattern = re.compile(self.pattern)
+        
 
     def __set__(self, instance, value):
 
         if ((self.allow_none and value is not None)
             or not self.allow_none):
-            test_pattern = re.compile(self.pattern)
-
-            if not test_pattern.match(value):
+            if not self.test_pattern.match(value):
                 raise ValueError('Value does not match pattern {0}'.format(self.pattern))
 
         super(MatchPattern, self).__set__(instance, value)
