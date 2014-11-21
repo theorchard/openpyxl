@@ -98,16 +98,24 @@ class PageSetup(Strict):
         self.verticalDpi = untuple(verticalDpi)
         self.copies = untuple(copies)
         self.id = untuple(id)
-
-    @deprecated("this attribute has to be called via print_options")
+    
+    @deprecated("this property does not exists anymore")
+    def setup(self):
+        pass
+    
+    @deprecated("this property does not exists anymore")
+    def options(self):
+        pass
+    
+    @deprecated("this property has to be called via print_options")
     def horizontalCentered(self):
         pass
 
-    @deprecated("this attribute has to be called via print_options")
+    @deprecated("this property has to be called via print_options")
     def verticalCentered(self):
         pass
 
-    @deprecated("this attribute has to be called via sheet_properties")
+    @deprecated("this property has to be called via sheet_properties")
     def fitToPage(self):
         pass
 
