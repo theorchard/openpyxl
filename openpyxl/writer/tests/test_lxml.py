@@ -35,11 +35,10 @@ def worksheet():
                              (None, """<c r="A1" t="n"></c>"""),
                              (datetime.date(2011, 12, 25), """<c r="A1" t="n" s="1"><v>40902</v></c>"""),
                          ])
-def test_write_cell(value, expected):
+def test_write_cell(worksheet, value, expected):
     from .. lxml_worksheet import write_cell
 
-    wb = Workbook()
-    ws = wb.active
+    ws = worksheet
     ws['A1'] = value
 
     out = BytesIO()

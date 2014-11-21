@@ -64,8 +64,8 @@ def test_write_cell(LXMLWorksheet, value, expected):
     from openpyxl.cell import Cell
     from .. dump_lxml import write_cell
     ws = LXMLWorksheet
-    c = Cell(ws, 'A', 1, value)
-    el = write_cell(ws, c)
+    cell = Cell(ws, 'A', 1, value)
+    el = write_cell(ws, cell)
     xml = tostring(el)
     diff = compare_xml(xml, expected)
     assert diff is None, diff

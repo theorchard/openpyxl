@@ -14,7 +14,7 @@ from openpyxl.xml.functions import iterparse
 
 # package
 from openpyxl.worksheet import Worksheet
-from openpyxl.utils.cell import (
+from openpyxl.utils import (
     ABSOLUTE_RE,
     coordinate_from_string,
     column_index_from_string,
@@ -141,7 +141,7 @@ class IterableWorksheet(Worksheet):
                             break
                         if min_col <= column:
                             data_type = cell.get('t', 'n')
-                            style_id = cell.get('s')
+                            style_id = int(cell.get('s', 0))
                             formula = cell.findtext(FORMULA_TAG)
                             value = cell.find(VALUE_TAG)
                             if value is not None:
@@ -150,8 +150,9 @@ class IterableWorksheet(Worksheet):
                                 if not self.parent.data_only:
                                     data_type = Cell.TYPE_FORMULA
                                     value = "=%s" % formula
+
                             yield ReadOnlyCell(self, row, column_str,
-                                               value, data_type, style_id)
+                                               value, data_type, self.parent._cell_styles[style_id])
             if element.tag in (CELL_TAG, VALUE_TAG, FORMULA_TAG):
                 # sub-elements of rows should be skipped
                 continue

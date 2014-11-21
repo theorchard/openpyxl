@@ -44,6 +44,8 @@ class DummyElement:
 class DummyWorkbook:
 
     style_properties = []
+    _fonts = set()
+    _borders = set()
 
 
 def test_write_gradient_fill():
@@ -51,17 +53,17 @@ def test_write_gradient_fill():
     writer = StyleWriter(DummyWorkbook())
     writer._write_gradient_fill(writer._root, fill)
     xml = tostring(writer._root)
-    expected = """<?xml version="1.0" ?>
-<styleSheet xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main">
-  <gradientFill degree="90" type="linear">
-    <stop position="0">
-      <color theme="0"/>
-    </stop>
-    <stop position="1">
-      <color theme="4"/>
-    </stop>
-  </gradientFill>
-</styleSheet>
+    expected = """
+    <styleSheet xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main">
+      <gradientFill degree="90" type="linear">
+        <stop position="0">
+          <color theme="0"/>
+        </stop>
+        <stop position="1">
+          <color theme="4"/>
+        </stop>
+      </gradientFill>
+    </styleSheet>
     """
     diff = compare_xml(xml, expected)
     assert diff is None, diff
@@ -73,32 +75,35 @@ def test_write_pattern_fill():
     writer = StyleWriter(DummyWorkbook())
     writer._write_pattern_fill(writer._root, fill)
     xml = tostring(writer._root)
-    expected = """<?xml version="1.0" ?>
-<styleSheet xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main">
-  <patternFill patternType="solid">
-     <fgColor rgb="00808000" />
-  </patternFill>
-</styleSheet>
+    expected = """
+    <styleSheet xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main">
+      <patternFill patternType="solid">
+         <fgColor rgb="00808000" />
+      </patternFill>
+    </styleSheet>
     """
     diff = compare_xml(xml, expected)
     assert diff is None, diff
 
 
 def test_write_borders():
-    borders = Border()
+    wb = DummyWorkbook()
+    wb._borders.add(Border())
     writer = StyleWriter(DummyWorkbook())
-    writer._write_border(writer._root, borders)
+    writer._write_borders()
     xml = tostring(writer._root)
-    expected = """<?xml version="1.0"?>
-<styleSheet xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main">
-  <border>
-    <left/>
-    <right/>
-    <top/>
-    <bottom/>
-    <diagonal/>
-  </border>
-</styleSheet>
+    expected = """
+    <styleSheet xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main">
+      <borders count="1">
+      <border>
+        <left/>
+        <right/>
+        <top/>
+        <bottom/>
+        <diagonal/>
+      </border>
+      </borders>
+    </styleSheet>
     """
     diff = compare_xml(xml, expected)
     assert diff is None, diff
@@ -108,20 +113,23 @@ def test_write_font():
     wb = DummyWorkbook()
     from openpyxl.styles import Font
     ft = Font(name='Calibri', charset=204, vertAlign='superscript', underline=Font.UNDERLINE_SINGLE)
+    wb._fonts.add(ft)
     writer = StyleWriter(wb)
-    writer._write_font(writer._root, ft)
+    writer._write_fonts()
     xml = tostring(writer._root)
     expected = """
     <styleSheet xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main">
+    <fonts count="1">
         <font>
           <vertAlign val="superscript"></vertAlign>
-          <sz val="11.0"></sz>
+          <sz val="11"></sz>
           <color rgb="00000000"></color>
           <name val="Calibri"></name>
           <family val="2"></family>
           <u></u>
           <charset val="204"></charset>
          </font>
+    </fonts>
     </styleSheet>
     """
     diff = compare_xml(xml, expected)
@@ -130,17 +138,15 @@ def test_write_font():
 
 def test_write_number_formats():
     wb = DummyWorkbook()
-    from openpyxl.styles import Style
-    wb.shared_styles = [
-        Style(),
-        Style(number_format='YYYY')
-    ]
+    wb._number_formats = ['YYYY']
     writer = StyleWriter(wb)
-    writer._write_number_format(writer._root, 0, "YYYY")
+    writer._write_number_formats()
     xml = tostring(writer._root)
     expected = """
     <styleSheet xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main">
-           <numFmt formatCode="YYYY" numFmtId="0"></numFmt>
+       <numFmts count="1">
+           <numFmt formatCode="YYYY" numFmtId="164"></numFmt>
+        </numFmts>
     </styleSheet>
     """
     diff = compare_xml(xml, expected)
@@ -159,11 +165,15 @@ class TestStyleWriter(object):
 
     def test_nb_style(self):
         for i in range(1, 6):
-            self.worksheet.cell(row=1, column=i).style = Style(font=Font(size=i))
+            cell = self.worksheet.cell(row=1, column=i)
+            cell.font = Font(size=i)
+            _ = cell.style_id
         w = StyleWriter(self.workbook)
         assert len(w.styles) == 6  # 5 + the default
 
-        self.worksheet.cell('A10').style = Style(border=Border(top=Side(border_style=borders.BORDER_THIN)))
+        cell = self.worksheet.cell('A10')
+        cell.border=Border(top=Side(border_style=borders.BORDER_THIN))
+        _ = cell.style_id
         w = StyleWriter(self.workbook)
         assert len(w.styles) == 7
 
@@ -171,7 +181,7 @@ class TestStyleWriter(object):
     def test_default_xfs(self):
         w = StyleWriter(self.workbook)
         fonts = nft = borders = fills = DummyElement()
-        w._write_cell_xfs(nft, fonts, fills, borders)
+        w._write_cell_styles()
         xml = tostring(w._root)
         expected = """
         <styleSheet xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main">
@@ -185,26 +195,20 @@ class TestStyleWriter(object):
 
 
     def test_xfs_number_format(self):
-        for o in range(1, 4):
-            for i in range(1, 4):
-                # Two of these are custom, 0.0% and 0.000%. 0.00% is a built in format ID
-                self.worksheet.cell(row=o, column=i).number_format = '0.' + '0' * i + '%'
+        for idx, nf in enumerate(["0.0%", "0.00%", "0.000%"], 1):
+            cell = self.worksheet.cell(row=idx, column=1)
+            cell.number_format = nf
+            _ = cell.style_id # add to workbook styles
         w = StyleWriter(self.workbook)
-        fonts = borders = fills = DummyElement()
-        nft = SubElement(w._root, 'numFmts')
-        w._write_cell_xfs(nft, fonts, fills, borders)
+        w._write_cell_styles()
 
         expected = """
         <styleSheet xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main">
-            <numFmts count="2">
-                <numFmt formatCode="0.0%" numFmtId="165"/>
-                <numFmt formatCode="0.000%" numFmtId="166"/>
-            </numFmts>
             <cellXfs count="4">
                 <xf borderId="0" fillId="0" fontId="0" numFmtId="0" xfId="0"/>
-                <xf applyNumberFormat="1" borderId="0" fillId="0" fontId="0" numFmtId="165" xfId="0"/>
+                <xf applyNumberFormat="1" borderId="0" fillId="0" fontId="0" numFmtId="164" xfId="0"/>
                 <xf applyNumberFormat="1" borderId="0" fillId="0" fontId="0" numFmtId="10" xfId="0"/>
-                <xf applyNumberFormat="1" borderId="0" fillId="0" fontId="0" numFmtId="166" xfId="0"/>
+                <xf applyNumberFormat="1" borderId="0" fillId="0" fontId="0" numFmtId="165" xfId="0"/>
             </cellXfs>
         </styleSheet>
         """
@@ -215,76 +219,55 @@ class TestStyleWriter(object):
 
 
     def test_xfs_fonts(self):
-        st = Style(font=Font(size=12, bold=True))
-        self.worksheet.cell('A1').style = st
+        cell = self.worksheet.cell('A1')
+        cell.font = Font(size=12, bold=True)
+        _ = cell.style_id # update workbook styles
         w = StyleWriter(self.workbook)
 
-        nft = borders = fills = DummyElement()
-        fonts = Element("fonts")
-        w._write_cell_xfs(nft, fonts, fills, borders)
-        xml = unicode(tostring(w._root))
-        assert """applyFont="1" """ in xml
-        assert """fontId="1" """ in xml
+        w._write_cell_styles()
+        xml = tostring(w._root)
 
         expected = """
-        <fonts count="2">
-        <font>
-            <sz val="12.0" />
-            <color rgb="00000000"></color>
-            <name val="Calibri" />
-            <family val="2" />
-            <b></b>
-        </font>
-        </fonts>
-        """
-        xml = tostring(fonts)
-        diff = compare_xml(xml, expected)
-        assert diff is None, diff
-
-
-    def test_xfs_fills(self):
-        st = Style(fill=PatternFill(
-            fill_type='solid',
-            start_color=Color(colors.DARKYELLOW))
-                   )
-        self.worksheet.cell('A1').style = st
-        w = StyleWriter(self.workbook)
-        nft = borders = fonts = DummyElement()
-        fills = Element("fills")
-        w._write_cell_xfs(nft, fonts, fills, borders)
-
-        xml = tostring(w._root)
-        expected = """ <styleSheet xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main">
-        <cellXfs count="2">
-          <xf borderId="0" fillId="0" fontId="0" numFmtId="0" xfId="0"/>
-          <xf applyFill="1" borderId="0" fillId="2" fontId="0" numFmtId="0" xfId="0"/>
-        </cellXfs>
+        <styleSheet xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main">
+          <cellXfs count="2">
+            <xf borderId="0" fillId="0" fontId="0" numFmtId="0" xfId="0"/>
+            <xf applyFont="1" borderId="0" fillId="0" fontId="1" numFmtId="0" xfId="0"/>
+          </cellXfs>
         </styleSheet>
         """
         diff = compare_xml(xml, expected)
         assert diff is None, diff
 
-        expected = """<fills count="3">
-            <fill>
-              <patternFill patternType="solid">
-                <fgColor rgb="00808000"></fgColor>
-               </patternFill>
-            </fill>
-          </fills>
+
+    def test_xfs_fills(self):
+        cell = self.worksheet.cell('A1')
+        cell.fill = fill=PatternFill(fill_type='solid',
+                                     start_color=Color(colors.DARKYELLOW))
+        _ = cell.style_id # update workbook styles
+        w = StyleWriter(self.workbook)
+        w._write_cell_styles()
+
+        xml = tostring(w._root)
+        expected = """
+        <styleSheet xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main">
+          <cellXfs count="2">
+            <xf borderId="0" fillId="0" fontId="0" numFmtId="0" xfId="0"/>
+            <xf applyFill="1" borderId="0" fillId="2" fontId="0" numFmtId="0" xfId="0"/>
+          </cellXfs>
+        </styleSheet>
         """
-        xml = tostring(fills)
         diff = compare_xml(xml, expected)
         assert diff is None, diff
 
 
     def test_xfs_borders(self):
-        st = Style(border=Border(top=Side(border_style=borders.BORDER_THIN,
-                                              color=Color(colors.DARKYELLOW))))
-        self.worksheet.cell('A1').style = st
+        cell = self.worksheet.cell('A1')
+        cell.border=Border(top=Side(border_style=borders.BORDER_THIN,
+                                    color=Color(colors.DARKYELLOW)))
+        _ = cell.style_id # update workbook styles
+
         w = StyleWriter(self.workbook)
-        fonts = nft = fills = DummyElement()
-        border_node = Element("borders")
-        w._write_cell_xfs(nft, fonts, fills, border_node)
+        w._write_cell_styles()
 
         xml = tostring(w._root)
         expected = """
@@ -298,22 +281,6 @@ class TestStyleWriter(object):
         diff = compare_xml(xml, expected)
         assert diff is None, diff
 
-        xml = tostring(border_node)
-        expected = """
-          <borders count="2">
-            <border>
-              <left />
-              <right />
-              <top style="thin">
-                <color rgb="00808000"></color>
-              </top>
-              <bottom />
-              <diagonal />
-            </border>
-          </borders>
-        """
-        diff = compare_xml(xml, expected)
-        assert diff is None, diff
 
     @pytest.mark.parametrize("value, expected",
                              [
@@ -358,20 +325,6 @@ class TestStyleWriter(object):
         assert diff is None, diff
 
 
-    def test_rewrite_styles(self):
-        """Test to verify Bugfix # 46"""
-        self.worksheet['A1'].value = 'Value'
-        self.worksheet['B2'].value = '14%'
-        saved_wb = save_virtual_workbook(self.workbook)
-        second_wb = load_workbook(BytesIO(saved_wb))
-        assert isinstance(second_wb, Workbook)
-        ws = second_wb.get_sheet_by_name('Sheet1')
-        assert ws.cell('A1').value == 'Value'
-        ws['A2'].value = 'Bar!'
-        saved_wb = save_virtual_workbook(second_wb)
-        third_wb = load_workbook(BytesIO(saved_wb))
-        assert third_wb
-
     def test_write_dxf(self):
         redFill = PatternFill(start_color=Color('FFEE1111'),
                        end_color=Color('FFEE1111'),
@@ -393,7 +346,7 @@ class TestStyleWriter(object):
         assert 'fill' in self.workbook.style_properties['dxf_list'][0]
 
         w = StyleWriter(self.workbook)
-        w._write_dxfs()
+        w._write_conditional_styles()
         xml = tostring(w._root)
 
         diff = compare_xml(xml, """
@@ -434,26 +387,15 @@ class TestStyleWriter(object):
         assert diff is None, diff
 
     def test_protection(self):
-        prot = Protection(locked=True,
-                          hidden=True)
-        self.worksheet.cell('A1').style = Style(protection=prot)
-        w = StyleWriter(self.workbook)
-        w._write_protection(w._root, prot)
-        xml = tostring(w._root)
-        expected = """
-        <styleSheet xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main">
-          <protection hidden="1" locked="1"/>
-        </styleSheet>
-                """
-        diff = compare_xml(xml, expected)
-        assert diff is None, diff
+        cell = self.worksheet.cell('A1')
+        cell.protection = Protection(locked=True, hidden=True)
+        _ = cell.style_id
 
-        nft = fonts = borders = fills = Element('empty')
-        w._write_cell_xfs(nft, fonts, fills, borders)
+        w = StyleWriter(self.workbook)
+        w._write_cell_styles()
         xml = tostring(w._root)
         expected = """
         <styleSheet xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main">
-          <protection hidden="1" locked="1"/>
           <cellXfs count="2">
             <xf borderId="0" fillId="0" fontId="0" numFmtId="0" xfId="0"/>
             <xf applyProtection="1" borderId="0" fillId="0" fontId="0" numFmtId="0" xfId="0">
@@ -466,46 +408,77 @@ class TestStyleWriter(object):
         assert diff is None, diff
 
 
-class TestCreateStyle(object):
+def test_simple_styles(datadir):
+    wb = Workbook(guess_types=True)
+    ws = wb.active
+    now = datetime.datetime.now()
+    for idx, v in enumerate(['12.34%', now, 'This is a test', '31.31415', None], 1):
+        ws.append([v])
+        _ = ws.cell(column=1, row=idx).style_id
 
-    @classmethod
-    def setup_class(cls):
-        now = datetime.datetime.now()
-        cls.workbook = Workbook(guess_types=True)
-        cls.worksheet = cls.workbook.create_sheet()
-        cls.worksheet.cell(coordinate='A1').value = '12.34%'  # 2
-        cls.worksheet.cell(coordinate='B4').value = now  # 3
-        cls.worksheet.cell(coordinate='B5').value = now
-        cls.worksheet.cell(coordinate='C14').value = 'This is a test'  # 1
-        cls.worksheet.cell(coordinate='D9').value = '31.31415'  # 3
-        st = Style(number_format=numbers.FORMAT_NUMBER_00,
-                   protection=Protection(locked=True))  # 4
-        cls.worksheet.cell(coordinate='D9').style = st
-        st2 = Style(protection=Protection(hidden=True))  # 5
-        cls.worksheet.cell(coordinate='E1').style = st2
-        cls.writer = StyleWriter(cls.workbook)
+    # set explicit formats
+    ws['D9'].number_format = numbers.FORMAT_NUMBER_00
+    ws['D9'].protection = Protection(locked=True)
+    ws['D9'].style_id
+    ws['E1'].protection = Protection(hidden=True)
+    ws['E1'].style_id
 
-    def test_create_style_table(self):
-        assert len(self.writer.styles) == 5
-
-    def test_write_style_table(self, datadir):
-        datadir.chdir()
-        with open('simple-styles.xml') as reference_file:
-            xml = self.writer.write_table()
-            diff = compare_xml(xml, reference_file.read())
-            assert diff is None, diff
-
-
-def test_complex_styles(datadir):
-    """Hold on to your hats"""
-    from openpyxl import load_workbook
-    datadir.join("..", "..", "..", "reader", "tests", "data").chdir()
-    wb = load_workbook("complex-styles.xlsx")
+    assert len(wb._cell_styles) == 5
+    writer = StyleWriter(wb)
 
     datadir.chdir()
-    with open("complex-styles.xml") as reference:
-        writer = StyleWriter(wb)
-        xml = writer.write_table()
-        expected = reference.read()
-        diff = compare_xml(xml, expected)
-        assert diff is None, diff
+    with open('simple-styles.xml') as reference_file:
+        expected = reference_file.read()
+    xml = writer.write_table()
+    diff = compare_xml(xml, expected)
+    assert diff is None, diff
+
+
+def test_empty_workbook():
+    wb = Workbook()
+    writer = StyleWriter(wb)
+    expected = """
+    <styleSheet xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main">
+      <numFmts count="0"/>
+      <fonts count="1">
+        <font>
+          <sz val="11"/>
+          <color theme="1"/>
+          <name val="Calibri"/>
+          <family val="2"/>
+          <scheme val="minor"/>
+        </font>
+      </fonts>
+      <fills count="2">
+       <fill>
+          <patternFill patternType="none" />
+       </fill>
+       <fill>
+          <patternFill patternType="gray125"/>
+        </fill>
+      </fills>
+      <borders count="1">
+        <border>
+          <left/>
+          <right/>
+          <top/>
+          <bottom/>
+          <diagonal/>
+        </border>
+      </borders>
+      <cellStyleXfs count="1">
+        <xf borderId="0" fillId="0" fontId="0" numFmtId="0"/>
+      </cellStyleXfs>
+      <cellXfs count="1">
+        <xf borderId="0" fillId="0" fontId="0" numFmtId="0" xfId="0"/>
+      </cellXfs>
+      <cellStyles count="1">
+        <cellStyle builtinId="0" name="Normal" xfId="0"/>
+      </cellStyles>
+      <dxfs count="0"/>
+      <tableStyles count="0" defaultPivotStyle="PivotStyleLight16" defaultTableStyle="TableStyleMedium9"/>
+    </styleSheet>
+    """
+    xml = writer.write_table()
+    diff = compare_xml(xml, expected)
+    assert diff is None, diff

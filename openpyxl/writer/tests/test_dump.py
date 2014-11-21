@@ -12,6 +12,7 @@ from openpyxl.utils.indexed_list import IndexedList
 from openpyxl.utils.datetime  import CALENDAR_WINDOWS_1900
 from openpyxl.styles import Style
 from openpyxl.styles.fonts import Font
+from openpyxl.styles.proxy import StyleId
 from openpyxl.comments.comments import Comment
 
 class DummyLocalData:
@@ -25,6 +26,8 @@ class DummyWorkbook:
         self.shared_strings = IndexedList()
         self.shared_styles = IndexedList()
         self.shared_styles.add(Style())
+        self._cell_styles = IndexedList([StyleId(0, 0, 0, 0, 0, 0)])
+        self._number_formats = IndexedList()
         self._local_data = DummyLocalData()
         self.encoding = "UTF-8"
         self.excel_base_date = CALENDAR_WINDOWS_1900
@@ -104,7 +107,7 @@ def test_write_header(DumpWorksheet):
     assert diff is None, diff
 
 
-def test_append_data(DumpWorksheet):
+def test_append_cell(DumpWorksheet):
     ws = DumpWorksheet
     ws.append([1])
     assert ws._max_col == 1
@@ -113,6 +116,34 @@ def test_append_data(DumpWorksheet):
     content.seek(0)
     xml = content.read()
     expected = """<row r="1" spans="1:1"><c r="A1" t="n"><v>1</v></c></row>"""
+    diff = compare_xml(xml, expected)
+    assert diff is None, diff
+
+def test_append_cell_with_string(DumpWorksheet):
+    from .. dump_worksheet import WriteOnlyCell
+    ws = DumpWorksheet
+    cell = WriteOnlyCell(ws, "Hello there")
+    ws.append([cell])
+    assert ws.parent.shared_strings == ['Hello there']
+    content = ws.get_temporary_file(ws._fileobj_content_name)
+    content.seek(0)
+    xml = content.read()
+    expected = """<row r="1" spans="1:1"><c r="A1" t="s"><v>0</v></c></row>"""
+    diff = compare_xml(xml, expected)
+    assert diff is None, diff
+
+
+def test_append_cell_with_style(DumpWorksheet):
+    from .. dump_worksheet import WriteOnlyCell
+    ws = DumpWorksheet
+    cell = WriteOnlyCell(ws, "Hello there")
+    cell.number_format = "AB"
+    ws.append([cell])
+    assert ws.parent.shared_strings == ['Hello there']
+    content = ws.get_temporary_file(ws._fileobj_content_name)
+    content.seek(0)
+    xml = content.read()
+    expected = """<row r="1" spans="1:1"><c r="A1" t="s" s="1"><v>0</v></c></row>"""
     diff = compare_xml(xml, expected)
     assert diff is None, diff
 
@@ -131,23 +162,6 @@ def test_write_only_cell():
     assert c.value is None
     assert c.column == 'A'
     assert c.row == 1
-
-
-def test_append_cell(DumpWorksheet):
-    from .. dump_worksheet import WriteOnlyCell
-    ws = DumpWorksheet
-    cell = WriteOnlyCell(ws, "Hello there")
-    assert ws.parent.shared_strings == []
-    cell._style_id = 5
-    ws.append([cell])
-    assert ws.parent.shared_strings == ['Hello there']
-    content = ws.get_temporary_file(ws._fileobj_content_name)
-    content.seek(0)
-    xml = content.read()
-    expected = """<row r="1" spans="1:1"><c r="A1" t="s" s="5"><v>0</v></c></row>"""
-    diff = compare_xml(xml, expected)
-    assert diff is None, diff
-
 
 def test_close_content(DumpWorksheet):
     ws = DumpWorksheet
@@ -284,17 +298,12 @@ def test_dump_with_font(temp_file):
 
     wb = Workbook(optimized_write=True)
     ws = wb.create_sheet()
-    user_style = Style(font=Font(name='Courrier', size=36))
+    user_font = Font(name='Courrier', size=36)
     cell = WriteOnlyCell(ws, value='hello')
-    cell.style = Style(font=Font(name='Courrier', size=36))
+    cell.font = user_font
 
     ws.append([cell, 3.14, None])
-    assert user_style in wb.shared_styles
-    wb.save(temp_file)
-
-    wb2 = load_workbook(temp_file)
-    ws2 = wb2[ws.title]
-    assert ws2['A1'].style == user_style
+    assert user_font in wb._fonts
 
 
 def test_dump_with_comment(temp_file):

@@ -1,7 +1,6 @@
 # Copyright (c) 2010-2014 openpyxl
 
 import datetime
-import os.path
 
 import pytest
 
@@ -40,6 +39,7 @@ def test_get_max_cell(datadir, filename):
 
     class Workbook:
         excel_base_date = None
+        _cell_styles = [None]
 
         def get_sheet_names(self):
             return []
@@ -210,7 +210,7 @@ def test_read_style_iter(tmpdir):
     wb = Workbook()
     ws = wb.worksheets[0]
     cell = ws.cell('A1')
-    cell.style = Style(font=ft)
+    cell.font = ft
 
     xlsx_file = "read_only_styles.xlsx"
     wb.save(xlsx_file)

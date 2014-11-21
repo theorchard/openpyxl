@@ -25,6 +25,7 @@ def build_dummy_worksheet():
     class Wb(object):
         excel_base_date = CALENDAR_WINDOWS_1900
         shared_styles = IndexedList([Style()])
+        _number_formats = IndexedList()
 
 
     class Ws(object):
@@ -228,6 +229,13 @@ def test_repr(dummy_cell):
     assert repr(cell), '<Cell Sheet1.A1>' == 'Got bad repr: %s' % repr(cell)
 
 
+def test_comment_assignment(dummy_cell):
+    assert dummy_cell.comment is None
+    comm = Comment("text", "author")
+    dummy_cell.comment = comm
+    assert dummy_cell.comment == comm
+
+
 def test_comment_count(dummy_cell):
     cell = dummy_cell
     ws = cell.parent
@@ -241,17 +249,23 @@ def test_comment_count(dummy_cell):
     cell.comment = None
     assert ws._comment_count == 0
 
-def test_comment_assignment(dummy_cell):
-    cell = dummy_cell
-    ws = cell.parent
-    c = Comment("text", "author")
-    cell.comment = c
+
+def test_only_one_cell_per_comment(dummy_cell):
+    ws = dummy_cell.parent
+    comm = Comment('text', 'author')
+    dummy_cell.comment = comm
+
+    c2 = ws.cell(column='A', row=2)
     with pytest.raises(AttributeError):
-        ws.cell(column='A', row=2).commment = c
-    ws.cell(column='A', row=2).comment = Comment("text2", "author2")
-    # this should orphan c, so that assigning it to A2 does not raise AttributeError
-    cell.comment = None
-    ws.cell(column='A', row=2).comment = c
+        c2.comment = comm
+
+
+def test_remove_comment(dummy_cell):
+    comm = Comment('text', 'author')
+    dummy_cell.comment = comm
+    dummy_cell.comment = None
+    assert dummy_cell.comment is None
+
 
 def test_cell_offset(dummy_cell):
     cell = dummy_cell

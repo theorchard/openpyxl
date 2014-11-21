@@ -9,7 +9,7 @@ from functools import partial
 
 from openpyxl import LXML
 from openpyxl.compat import safe_string
-from openpyxl.utils.cell import absolute_coordinate
+from openpyxl.utils import absolute_coordinate
 from openpyxl.xml.functions import Element, SubElement
 from openpyxl.xml.constants import (
     ARC_CORE,
