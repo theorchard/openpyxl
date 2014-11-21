@@ -198,8 +198,8 @@ def test_printer_settings(worksheet, write_worksheet):
 #     ws.page_setup.fitToPage = True
     ws.page_setup.fitToHeight = 0
     ws.page_setup.fitToWidth = 1
-    ws.page_setup.horizontalCentered = True
-    ws.page_setup.verticalCentered = True
+    ws.print_options.horizontalCentered = True
+    ws.print_options.verticalCentered = True
     page_setup_prop = PageSetupPr(fitToPage=True)
     ws.sheet_properties.pageSetUpPr = page_setup_prop
     xml = write_worksheet(ws, None)

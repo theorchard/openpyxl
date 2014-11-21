@@ -27,14 +27,15 @@ from openpyxl.compat import safe_string
 from openpyxl.descriptors import Strict, Float, Typed, Bool, Integer, String, Set, MatchPattern
 from openpyxl.xml.functions import Element
 from openpyxl.xml.constants import SHEET_MAIN_NS, REL_NS
+from openpyxl.compat import deprecated
 
 def untuple(value):
     if isinstance(value, tuple):
         return value[0]
     else:
         return value
-    
-class CTPageSetup(Strict):
+
+class PageSetup(Strict):
     """ Worksheet page setup """
 
     tag = "{%s}pageSetup" % SHEET_MAIN_NS
@@ -98,6 +99,18 @@ class CTPageSetup(Strict):
         self.copies = untuple(copies)
         self.id = untuple(id)
 
+    @deprecated("this attribute has to be called via print_options")
+    def horizontalCentered(self):
+        pass
+
+    @deprecated("this attribute has to be called via print_options")
+    def verticalCentered(self):
+        pass
+
+    @deprecated("this attribute has to be called via sheet_properties")
+    def fitToPage(self):
+        pass
+
     def __iter__(self):
         for attr in ("orientation", "paperSize", "scale", "fitToHeight", "fitToWidth", "firstPageNumber", "useFirstPageNumber"
                      , "paperHeight", "paperWidth", "pageOrder", "usePrinterDefaults", "blackAndWhite", "draft", "cellComments", "errors"
@@ -105,7 +118,7 @@ class CTPageSetup(Strict):
             value = getattr(self, attr)
             if value is not None:
                 if attr == "id":
-                    key = '{%s}id' % REL_NS   
+                    key = '{%s}id' % REL_NS
                     yield key, safe_string(value)
                 else:
                     yield attr, safe_string(value)
@@ -151,102 +164,6 @@ class PrintOptions(Strict):
         el = Element(self.tag, dict(self))
 
         return el
-
-
-class PageSetup(object):
-    """Information about page layout for this sheet"""
-
-    setup = Typed(expected_type=CTPageSetup, allow_none=True)
-    options = Typed(expected_type=PrintOptions, allow_none=True)
-    orientation = None
-    paperSize = None
-    scale = None
-    fitToHeight = None
-    fitToWidth = None
-    firstPageNumber = None
-    useFirstPageNumber = None
-    paperHeight = None
-    paperWidth = None
-    pageOrder = None
-    usePrinterDefaults = None
-    blackAndWhite = None
-    draft = None
-    cellComments = None
-    errors = None
-    horizontalDpi = None
-    verticalDpi = None
-    copies = None
-    id = None
-    horizontalCentered = None
-    verticalCentered = None
-    headings = None
-    gridLines = None
-    gridLinesSet = None
-
-    @property
-    def setup(self):
-        setupGroup = CTPageSetup(orientation=self.orientation,
-                                paperSize=self.paperSize,
-                                scale=self.scale,
-                                fitToHeight=self.fitToHeight,
-                                fitToWidth=self.fitToWidth,
-                                firstPageNumber=self.firstPageNumber,
-                                useFirstPageNumber=self.useFirstPageNumber,
-                                paperHeight=self.paperHeight,
-                                paperWidth=self.paperWidth,
-                                pageOrder=self.pageOrder,
-                                usePrinterDefaults=self.usePrinterDefaults,
-                                blackAndWhite=self.blackAndWhite,
-                                draft=self.draft,
-                                cellComments=self.cellComments,
-                                errors=self.errors,
-                                horizontalDpi=self.horizontalDpi,
-                                verticalDpi=self.verticalDpi,
-                                copies=self.copies,
-                                id=self.id
-                                )
-
-        return setupGroup
-
-    @setup.setter
-    def setup(self, values):
-        self.orientation = values.orientation,
-        self.paperSize = values.paperSize,
-        self.scale = values.scale,
-        self.fitToHeight = values.fitToHeight,
-        self.fitToWidth = values.fitToWidth,
-        self.firstPageNumber = values.firstPageNumber,
-        self.useFirstPageNumber = values.useFirstPageNumber,
-        self.paperHeight = values.paperHeight,
-        self.paperWidth = values.paperWidth,
-        self.pageOrder = values.pageOrder,
-        self.usePrinterDefaults = values.usePrinterDefaults,
-        self.blackAndWhite = values.blackAndWhite,
-        self.draft = values.draft,
-        self.cellComments = values.cellComments,
-        self.errors = values.errors,
-        self.horizontalDpi = values.horizontalDpi,
-        self.verticalDpi = values.verticalDpi,
-        self.copies = values.copies
-        self.id = values.id
-
-    @property
-    def options(self):
-        optionsGroup = PrintOptions(horizontalCentered=self.horizontalCentered,
-                 verticalCentered=self.verticalCentered,
-                 headings=self.headings,
-                 gridLines=self.gridLines,
-                 gridLinesSet=self.gridLinesSet)
-
-        return optionsGroup
-
-    @options.setter
-    def options(self, values):
-        self.horizontalCentered = values.horizontalCentered,
-        self.verticalCentered = values.verticalCentered,
-        self.headings = values.headings,
-        self.gridLines = values.gridLines,
-        self.gridLinesSet = values.gridLinesSet
 
 
 class PageMargins(Strict):

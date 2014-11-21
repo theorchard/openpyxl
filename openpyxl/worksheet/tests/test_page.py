@@ -26,20 +26,26 @@ def test_dict_interface(PageMargins):
 
 @pytest.fixture
 def PageSetup():
-    from openpyxl.worksheet import PageSetup
+    from .. page import PageSetup
     return PageSetup
 
 
 def test_page_setup(PageSetup):
     p = PageSetup()
-    assert dict(p.setup) == {}
+    assert dict(p) == {}
     p.scale = 1
-    assert p.setup.scale == 1
+    assert p.scale == 1
 
 
-def test_page_options(PageSetup):
-    p = PageSetup()
-    assert dict(p.options) == {}
+@pytest.fixture
+def PrintOptions():
+    from .. page import PrintOptions
+    return PrintOptions
+
+
+def test_print_options(PrintOptions):
+    p = PrintOptions()
+    assert dict(p) == {}
     p.horizontalCentered = True
     p.verticalCentered = True
-    assert dict(p.options) == {'verticalCentered': '1', 'horizontalCentered': '1'}
+    assert dict(p) == {'verticalCentered': '1', 'horizontalCentered': '1'}

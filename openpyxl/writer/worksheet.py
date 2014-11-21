@@ -298,7 +298,7 @@ def write_worksheet(worksheet, shared_strings):
     if hyper is not None:
         xml_file.write(tostring(hyper))
 
-    options = worksheet.page_setup.options
+    options = worksheet.print_options
     if len(dict(options)) > 0:
 #         tag(doc, 'printOptions', options)        
         new_element = options.write_xml_element()
@@ -306,7 +306,7 @@ def write_worksheet(worksheet, shared_strings):
 
     tag(doc, 'pageMargins', dict(worksheet.page_margins))
 
-    setup = worksheet.page_setup.setup
+    setup = worksheet.page_setup
     if len(dict(setup)) > 0:
 #         tag(doc, 'pageSetup', setup)
         new_element = setup.write_xml_element()

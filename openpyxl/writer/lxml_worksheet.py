@@ -87,7 +87,7 @@ def write_worksheet(worksheet, shared_strings):
                 xf.write(hyper)
 
 
-            options = worksheet.page_setup.options
+            options = worksheet.print_options
             if len(dict(options)) > 0:
                 new_element = options.write_xml_element()
                 xf.write(new_element)
@@ -97,7 +97,7 @@ def write_worksheet(worksheet, shared_strings):
             xf.write(margins)
             del margins
 
-            setup = worksheet.page_setup.setup
+            setup = worksheet.page_setup
             if len(dict(setup)) > 0:
                 new_element = setup.write_xml_element()
                 xf.write(new_element)
