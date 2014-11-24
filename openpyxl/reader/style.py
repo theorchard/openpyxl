@@ -21,6 +21,7 @@ from openpyxl.styles import (
 )
 from openpyxl.styles.colors import COLOR_INDEX, Color
 from openpyxl.styles.proxy import StyleId
+from openpyxl.styles.named_styles import NamedStyle
 from openpyxl.xml.functions import fromstring, safe_iterator, localname
 from openpyxl.xml.constants import SHEET_MAIN_NS
 from copy import deepcopy
@@ -167,15 +168,38 @@ class SharedStylesParser(object):
 
 
     def parse_named_styles(self):
+        """
+        Extract named styles
+        """
         ns = OrderedDict()
-        _styles = safe_iterator(self.root, "{%s}cellStyleXfs" % SHEET_MAIN_NS)
-        _names = safe_iterator(self.root, "{%s}cellStyles" % SHEET_MAIN_NS)
+        styles_node = self.root.find("{%s}cellStyleXfs" % SHEET_MAIN_NS)
+        _styles, _ids = self._parse_xfs(styles_node)
+
+        for _name, idx in self._parse_style_names():
+            _id = _ids[idx]
+            style = NamedStyle()
+            style.alignment = self.alignments[_id.alignment]
+            style.border = self.border_list[_id.border]
+            style.fill = self.fill_list[_id.fill]
+            style.font = self.font_list[_id.font]
+            style.protection = self.protections[_id.protection]
+            ns[_name] = _style
+        self.named_styles = ns
+
+
+    def _parse_style_names(self):
+        names_node = self.root.find("{%s}cellStyles" % SHEET_MAIN_NS)
+        for _name in names_node:
+            yield _name.get("name"), int(_name.get("xfId"))
 
 
     def parse_cell_styles(self):
+        """
+        Extract individual cell styles
+        """
         node = self.root.find('{%s}cellXfs' % SHEET_MAIN_NS)
         if node is not None:
-            self.shared_styles, self.cell_styles = self._parse_cell_xfs(node)
+            self.shared_styles, self.cell_styles = self._parse_xfs(node)
 
 
     def _parse_xfs(self, node):

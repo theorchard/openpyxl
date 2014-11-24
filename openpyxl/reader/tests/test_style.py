@@ -332,3 +332,24 @@ def test_alignment(datadir, StyleReader):
     reader.parse_cell_styles()
     st1 = reader.shared_styles[2]
     assert st1.alignment.textRotation == 255
+
+
+def test_style_names(datadir, StyleReader):
+    datadir.chdir()
+    with open("complex-styles.xml") as src:
+        reader = StyleReader(src.read())
+
+    styles = list(reader._parse_style_names())
+    assert styles == [
+        ('Followed Hyperlink', 2),
+        ('Followed Hyperlink', 4),
+        ('Followed Hyperlink', 6),
+        ('Followed Hyperlink', 8),
+        ('Followed Hyperlink', 10),
+        ('Hyperlink', 1),
+        ('Hyperlink', 3),
+        ('Hyperlink', 5),
+        ('Hyperlink', 7),
+        ('Hyperlink', 9),
+        ('Normal', 0),
+    ]
