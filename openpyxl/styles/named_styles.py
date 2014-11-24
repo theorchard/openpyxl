@@ -6,6 +6,7 @@ from openpyxl.descriptors import (
     Strict,
     Typed,
 )
+from .fills import PatternFill, GradientFill, Fill
 from . fonts import Font
 from . borders import Border
 from . alignment import Alignment
