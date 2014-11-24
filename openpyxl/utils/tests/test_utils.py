@@ -11,10 +11,9 @@ from .. import (
     get_column_interval,
 )
 
+
 def test_coordinates():
-    column, row = coordinate_from_string('ZF46')
-    assert "ZF" == column
-    assert 46 == row
+    assert coordinate_from_string('ZF46') == ("ZF", 46)
 
 
 @pytest.mark.parametrize("value", ['AAA', "AQ0"])
