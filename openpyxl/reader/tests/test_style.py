@@ -372,7 +372,7 @@ def test_named_styles(datadir, StyleReader):
     assert len(reader.named_styles) == 11
     first_style = reader.named_styles[0]
     assert first_style.name == "Followed Hyperlink"
-    assert first_style[0].font == Font(size=12, color=Color(theme=11), underline="single")
-    assert first_style[0].fill == DEFAULT_EMPTY_FILL
-    assert first_style[0].border == Border()
+    assert first_style.font == Font(size=12, color=Color(theme=11), underline="single")
+    assert first_style.fill == DEFAULT_EMPTY_FILL
+    assert first_style.border == Border()
 
