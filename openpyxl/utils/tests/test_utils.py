@@ -21,7 +21,6 @@ def test_coordinates():
     assert "ZF" == column
     assert 46 == row
 
-
 def test_invalid_coordinate():
     with pytest.raises(CellCoordinatesException):
         coordinate_from_string('AAA')
@@ -35,7 +34,7 @@ def test_absolute():
 
 def test_absolute_multiple():
 
-    assert '$ZF$51:$ZF$53' == absolute_coordinate('ZF51:ZF$53')
+    assert '$ZF$51:$ZF$53' == absolute_coordinate('ZF51:ZF53')
 
 
 def test_column_interval():
