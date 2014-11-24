@@ -3,7 +3,7 @@
 import pytest
 
 # package imports
-from openpyxl.compat import safe_string
+from openpyxl.compat import safe_string, OrderedDict
 from openpyxl.reader.excel import load_workbook
 from openpyxl.reader.style import read_style_table
 
@@ -353,3 +353,26 @@ def test_style_names(datadir, StyleReader):
         ('Hyperlink', 9),
         ('Normal', 0),
     ]
+
+
+def test_named_styles(datadir, StyleReader):
+    from openpyxl.styles.named_styles import NamedStyle
+    from openpyxl.styles.fonts import DEFAULT_FONT
+    from openpyxl.styles.fills import DEFAULT_EMPTY_FILL
+
+    datadir.chdir()
+    with open("complex-styles.xml") as src:
+        reader = StyleReader(src.read())
+
+    reader.border_list = list(reader.parse_borders())
+    reader.fill_list = list(reader.parse_fills())
+    reader.font_list = list(reader.parse_fonts())
+    reader.parse_cell_styles()
+    reader.parse_named_styles()
+    assert len(reader.named_styles) == 11
+    first_style = reader.named_styles[0]
+    assert first_style.name == "Followed Hyperlink"
+    assert first_style[0].font == Font(size=12, color=Color(theme=11), underline="single")
+    assert first_style[0].fill == DEFAULT_EMPTY_FILL
+    assert first_style[0].border == Border()
+

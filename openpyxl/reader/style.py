@@ -171,20 +171,22 @@ class SharedStylesParser(object):
         """
         Extract named styles
         """
-        ns = OrderedDict()
+        ns = []
         styles_node = self.root.find("{%s}cellStyleXfs" % SHEET_MAIN_NS)
         _styles, _ids = self._parse_xfs(styles_node)
 
         for _name, idx in self._parse_style_names():
             _id = _ids[idx]
-            style = NamedStyle()
-            style.alignment = self.alignments[_id.alignment]
+            style = NamedStyle(name=_name)
             style.border = self.border_list[_id.border]
             style.fill = self.fill_list[_id.fill]
             style.font = self.font_list[_id.font]
-            style.protection = self.protections[_id.protection]
-            ns[_name] = _style
-        self.named_styles = ns
+            if _id.alignment:
+                style.alignment = self.alignments[_id.alignment]
+            if _id.protection:
+                style.protection = self.protections[_id.protection]
+            ns.append(style)
+        self.named_styles = IndexedList(ns)
 
 
     def _parse_style_names(self):
