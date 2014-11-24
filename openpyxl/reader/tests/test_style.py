@@ -83,7 +83,7 @@ def test_unprotected_cell(StyleReader, datadir):
         reader = StyleReader(src.read())
     from openpyxl.styles import Font
     reader.font_list = [Font(), Font(), Font(), Font(), Font()]
-    reader.parse_cell_xfs()
+    reader.parse_cell_styles()
     assert len(reader.shared_styles) == 3
     # default is cells are locked
     style = reader.shared_styles[0]
@@ -107,7 +107,7 @@ def test_read_xf_no_number_format(datadir, StyleReader):
 
     from openpyxl.styles import Font
     reader.font_list = [Font(), Font()]
-    reader.parse_cell_xfs()
+    reader.parse_cell_styles()
 
     styles = reader.shared_styles
     assert len(styles) == 3
@@ -329,6 +329,6 @@ def test_alignment(datadir, StyleReader):
     datadir.chdir()
     with open("alignment_styles.xml") as src:
         reader = StyleReader(src.read())
-    reader.parse_cell_xfs()
+    reader.parse_cell_styles()
     st1 = reader.shared_styles[2]
     assert st1.alignment.textRotation == 255
