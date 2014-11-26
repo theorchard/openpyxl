@@ -90,21 +90,36 @@ for i in range(1, 18279):
     _COL_STRING_CACHE[col] = i
 
 
-def get_column_letter(idx, cache=_STRING_COL_CACHE):
+def _get_column_letter(idx, cache=_STRING_COL_CACHE):
     try:
         return cache[idx]
     except KeyError:
         raise ValueError("Invalid column index {0}".format(idx))
 del _STRING_COL_CACHE
-del _get_column_letter
 
-def column_index_from_string(str_col, cache=_COL_STRING_CACHE):
+def get_column_letter(idx): # function masked for documentation
+    """Convert a column index into a column letter
+    (3 -> 'C')
+    """
+    return _get_column_letter(idx)
+
+
+def _column_index_from_string(str_col, cache=_COL_STRING_CACHE):
+    """Convert a column name into a numerical index
+    ('A' -> 1)
+    """
     # we use a function argument to get indexed name lookup
     try:
         return cache[str_col.upper()]
     except KeyError:
         raise ValueError("{0} is not a valid column name".format(str_col))
 del _COL_STRING_CACHE
+
+def column_index_from_string(str_col):
+    """Convert a column name into a numerical index
+    ('A' -> 1)
+    """
+    return _column_index_from_string(str_col)
 
 
 def range_boundaries(range_string):

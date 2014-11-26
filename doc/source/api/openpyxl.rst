@@ -8,7 +8,6 @@ Subpackages
 
     openpyxl.cell
     openpyxl.charts
-    openpyxl.classify
     openpyxl.comments
     openpyxl.descriptors
     openpyxl.drawing
