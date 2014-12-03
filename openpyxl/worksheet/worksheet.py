@@ -681,7 +681,7 @@ class Worksheet(object):
             for col_idx, content in enumerate(iterable, 1):
                 col = get_column_letter(col_idx)
                 if col not in self.column_dimensions:
-                    self.column_dimensions[col] = ColumnDimension(col)
+                    self.column_dimensions[col] = ColumnDimension(worksheet=self, index=col)
                 cell = Cell(self, col, row_idx, content)
                 self._cells['%s%d' % (col, row_idx)] = cell
 
