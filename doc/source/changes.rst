@@ -7,6 +7,7 @@ Minor changes
 
 * `PR 31 <https://bitbucket.org/openpyxl/openpyxl/pull-request/31/>`_ Correct tutorial
 * `PR 32 <https://bitbucket.org/openpyxl/openpyxl/pull-request/32/>`_ See #380
+* `PR 37 <https://bitbucket.org/openpyxl/openpyxl/pull-request/37/>`_ Bind worksheet to ColumnDimension objects
 
 
 Bug fixes
