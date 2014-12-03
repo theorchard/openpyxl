@@ -9,7 +9,7 @@ from openpyxl.workbook import Workbook
 
 
 def test_write_content_types(datadir):
-    datadir.join("writer").chdir()
+    datadir.chdir()
     wb = Workbook()
     wb.create_sheet()
     wb.create_sheet()
@@ -20,7 +20,7 @@ def test_write_content_types(datadir):
 
 
 def test_write_root_rels(datadir):
-    datadir.join("writer").chdir()
+    datadir.chdir()
     wb = Workbook()
     content = write_root_rels(wb)
     with open('.rels') as expected:

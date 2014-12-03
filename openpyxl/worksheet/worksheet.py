@@ -15,26 +15,28 @@ from openpyxl.compat import (
     range,
     basestring,
     iteritems,
-    deprecated
+    deprecated,
+    safe_string
 )
 
 # package imports
-import openpyxl.cell
-from openpyxl.cell import (
+from openpyxl.utils import (
     coordinate_from_string,
     COORD_RE,
     ABSOLUTE_RE,
     column_index_from_string,
     get_column_letter,
-    Cell
+    range_boundaries,
+    cells_from_range,
 )
-from openpyxl.exceptions import (
+from openpyxl.cell import Cell
+from openpyxl.utils.exceptions import (
     SheetTitleException,
     InsufficientCoordinatesException,
     CellCoordinatesException,
     NamedRangeException
 )
-from openpyxl.units import (
+from openpyxl.utils.units import (
     points_to_pixels,
     DEFAULT_COLUMN_WIDTH,
     DEFAULT_ROW_HEIGHT
@@ -49,6 +51,8 @@ from .page import PageSetup, PageMargins
 from .dimensions import ColumnDimension, RowDimension, DimensionHolder
 from .protection import SheetProtection
 from .filters import AutoFilter
+from .views import SheetView
+from .properties import WorksheetProperties, Outline, PageSetupPr
 
 
 def flatten(results):
@@ -56,43 +60,6 @@ def flatten(results):
 
     for row in results:
         yield(c.value for c in row)
-
-
-class SheetView(object):
-    """Information about the visible portions of this sheet."""
-    pass
-
-
-def range_boundaries(range_string):
-    """
-    Convert a range string into a tuple of boundaries:
-    (min_col, min_row, max_col, max_row)
-    Cell coordinates will be converted into a range with the cell at both end
-    """
-    m = ABSOLUTE_RE.match(range_string)
-    min_col, min_row, sep, max_col, max_row = m.groups()
-    min_col = column_index_from_string(min_col)
-    min_row = int(min_row)
-
-    if max_col is None or max_row is None:
-        max_col = min_col
-        max_row = min_row
-    else:
-        max_col = column_index_from_string(max_col)
-        max_row = int(max_row)
-
-    return min_col, min_row, max_col, max_row
-
-
-def cells_from_range(range_string):
-    """
-    Get individual addresses for every cell in a range.
-    Yields one row at a time.
-    """
-    min_col, min_row, max_col, max_row = range_boundaries(range_string)
-    for row in range(min_row, max_row+1):
-        yield tuple('%s%d' % (get_column_letter(col), row)
-                    for col in range(min_col, max_col+1))
 
 
 class Worksheet(object):
@@ -159,8 +126,6 @@ class Worksheet(object):
         self.protection = SheetProtection()
         self.show_gridlines = True
         self.print_gridlines = False
-        self.show_summary_below = True
-        self.show_summary_right = True
         self.default_row_dimension = RowDimension(worksheet=self)
         self.default_column_dimension = ColumnDimension(worksheet=self)
         self._auto_filter = AutoFilter()
@@ -169,11 +134,40 @@ class Worksheet(object):
         self.formula_attributes = {}
         self.orientation = None
         self.conditional_formatting = ConditionalFormatting()
-        self.vba_code = {}
         self.vba_controls = None
+        self.sheet_properties = WorksheetProperties()
+        self.sheet_properties.outlinePr = Outline(summaryBelow=True, summaryRight=True)
 
     def __repr__(self):
         return self.repr_format % self.title
+
+    """ To keep compatibility with previous versions"""
+    @property
+    def show_summary_below(self):
+        return self.sheet_properties.outlinePr.summaryBelow
+
+    @property
+    def show_summary_right(self):
+        return self.sheet_properties.outlinePr.summaryRight
+
+    @property
+    def vba_code(self):
+        for attr in ("codeName", "enableFormatConditionsCalculation",
+                     "filterMode", "published", "syncHorizontal", "syncRef",
+                     "syncVertical", "transitionEvaluation", "transitionEntry"):
+            value = getattr(self.sheet_properties, attr)
+            if value is not None:
+                yield attr, safe_string(value)
+
+    @vba_code.setter
+    def vba_code(self, value):
+        for k, v in value.items():
+            if k in ("codeName", "enableFormatConditionsCalculation",
+                     "filterMode", "published", "syncHorizontal", "syncRef",
+                     "syncVertical", "transitionEvaluation", "transitionEntry"):
+                setattr(self.sheet_properties, k, v)
+
+    """ End To keep compatibility with previous versions"""
 
     @property
     def parent(self):
@@ -320,7 +314,7 @@ class Worksheet(object):
 
         if not coordinate in self._cells:
             column, row = coordinate_from_string(coordinate)
-            new_cell = openpyxl.cell.Cell(self, column, row)
+            new_cell = Cell(self, column, row)
             self._cells[coordinate] = new_cell
             if column not in self.column_dimensions:
                 self.column_dimensions[column] = ColumnDimension(index=column, worksheet=self)
@@ -446,11 +440,10 @@ class Worksheet(object):
         :rtype: generator
         """
         # Column name cache is very important in large files.
-        cache = dict((col, get_column_letter(col)) for col in range(min_col, max_col+1))
-        rows = []
-        for row in range(min_row, max_row+1):
+        cache = dict((col, get_column_letter(col)) for col in range(min_col, max_col + 1))
+        for row in range(min_row, max_row + 1):
             yield tuple(self._get_cell('%s%d' % (cache[col], row))
-                        for col in range(min_col, max_col+1))
+                        for col in range(min_col, max_col + 1))
 
 
     def get_named_range(self, range_string):
@@ -602,7 +595,7 @@ class Worksheet(object):
                                               end_row)
         elif ":" not in range_string:
             if COORD_RE.match(range_string):
-                return # Single cell
+                return  # Single cell
             msg = "Range must be a cell range (e.g. A1:E1)"
             raise InsufficientCoordinatesException(msg)
         else:
@@ -703,7 +696,7 @@ class Worksheet(object):
     @property
     def rows(self):
         """Iterate over all rows in the worksheet"""
-        return tuple(row for row in self.iter_rows())
+        return tuple(self.iter_rows())
 
     @property
     def columns(self):

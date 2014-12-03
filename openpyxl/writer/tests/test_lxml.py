@@ -13,6 +13,7 @@ from lxml.etree import xmlfile, tostring
 # test imports
 import pytest
 from openpyxl.tests.helper import compare_xml
+from openpyxl.worksheet.properties import PageSetupPr
 
 
 @pytest.fixture
@@ -34,11 +35,10 @@ def worksheet():
                              (None, """<c r="A1" t="n"></c>"""),
                              (datetime.date(2011, 12, 25), """<c r="A1" t="n" s="1"><v>40902</v></c>"""),
                          ])
-def test_write_cell(value, expected):
+def test_write_cell(worksheet, value, expected):
     from .. lxml_worksheet import write_cell
 
-    wb = Workbook()
-    ws = wb.active
+    ws = worksheet
     ws['A1'] = value
 
     out = BytesIO()
@@ -195,11 +195,13 @@ def test_printer_settings(worksheet, write_worksheet):
     ws = worksheet
     ws.page_setup.orientation = ws.ORIENTATION_LANDSCAPE
     ws.page_setup.paperSize = ws.PAPERSIZE_TABLOID
-    ws.page_setup.fitToPage = True
+#     ws.page_setup.fitToPage = True
     ws.page_setup.fitToHeight = 0
     ws.page_setup.fitToWidth = 1
     ws.page_setup.horizontalCentered = True
     ws.page_setup.verticalCentered = True
+    page_setup_prop = PageSetupPr(fitToPage=True)
+    ws.sheet_properties.pageSetUpPr = page_setup_prop
     xml = write_worksheet(ws, None)
     expected = """
     <worksheet xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main">

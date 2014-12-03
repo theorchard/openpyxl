@@ -10,7 +10,7 @@ class TestLineChart:
         assert c.y_axis.type == "valAx"
 
 
-from openpyxl.writer.charts import LineChartWriter
+from openpyxl.charts.writer import LineChartWriter
 from openpyxl.xml.functions import safe_iterator, fromstring
 from openpyxl.xml.constants import CHART_NS
 
@@ -52,4 +52,4 @@ class TestLineChartWriter(object):
         datadir.chdir()
         with open("LineChart.xml") as expected:
             diff = compare_xml(xml, expected.read())
-            assert diff is None, diff
+        assert diff is None, diff

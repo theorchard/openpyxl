@@ -1,262 +1,188 @@
+from __future__ import absolute_import
 # Copyright (c) 2010-2014 openpyxl
 #
 
 # Python stdlib imports
 from datetime import time, datetime, timedelta, date
+import decimal
 
 # 3rd party imports
 import pytest
 
 # package imports
-from openpyxl.compat import safe_string
-from openpyxl.worksheet import Worksheet
-from openpyxl.workbook import Workbook
-from openpyxl.exceptions import (
-    CellCoordinatesException,
-    )
-from openpyxl.date_time import CALENDAR_WINDOWS_1900
-from openpyxl.cell import (
-    column_index_from_string,
-    coordinate_from_string,
-    get_column_letter,
-    Cell,
-    absolute_coordinate
-    )
-from openpyxl.comments import Comment
-from openpyxl.styles import numbers
 
-import decimal
+from openpyxl.comments import Comment
+from ..cell import Cell
+
 
 @pytest.fixture
 def build_dummy_worksheet():
+    from openpyxl.utils.indexed_list import IndexedList
+    from openpyxl.utils.datetime  import CALENDAR_WINDOWS_1900
+    from openpyxl.cell import Cell
+    from openpyxl.styles import Style
+
+    class Wb(object):
+        excel_base_date = CALENDAR_WINDOWS_1900
+        shared_styles = IndexedList([Style()])
+        _number_formats = IndexedList()
+
 
     class Ws(object):
-        class Wb(object):
-            excel_base_date = CALENDAR_WINDOWS_1900
+
         encoding = 'utf-8'
         parent = Wb()
         title = "Dummy Worksheet"
+        _comment_count = 0
+
+        def cell(self, column, row):
+            return Cell(self, column, row)
 
     return Ws()
 
 
-def test_coordinates():
-    column, row = coordinate_from_string('ZF46')
-    assert "ZF" == column
-    assert 46 == row
+@pytest.fixture
+def dummy_cell(request):
+    ws = build_dummy_worksheet()
+    cell = ws.cell('A', 1)
+    return cell
 
 
-def test_invalid_coordinate():
-    with pytest.raises(CellCoordinatesException):
-        coordinate_from_string('AAA')
+@pytest.fixture(params=[True, False])
+def guess_types(request):
+    return request.param
 
-def test_zero_row():
-    with pytest.raises(CellCoordinatesException):
-        coordinate_from_string('AQ0')
-
-def test_absolute():
-    assert '$ZF$51' == absolute_coordinate('ZF51')
-
-def test_absolute_multiple():
-
-    assert '$ZF$51:$ZF$53' == absolute_coordinate('ZF51:ZF$53')
-
-@pytest.mark.parametrize("column, idx",
-                         [
-                         ('j', 10),
-                         ('Jj', 270),
-                         ('JJj', 7030),
-                         ('A', 1),
-                         ('Z', 26),
-                         ('AA', 27),
-                         ('AZ', 52),
-                         ('BA', 53),
-                         ('BZ',  78),
-                         ('ZA',  677),
-                         ('ZZ',  702),
-                         ('AAA',  703),
-                         ('AAZ',  728),
-                         ('ABC',  731),
-                         ('AZA', 1353),
-                         ('ZZA', 18253),
-                         ('ZZZ', 18278),
-                         ]
-                         )
-def test_column_index(column, idx):
-    assert column_index_from_string(column) == idx
-
-
-@pytest.mark.parametrize("column",
-                         ('JJJJ', '', '$', '1',)
-                         )
-def test_bad_column_index(column):
-    with pytest.raises(ValueError):
-        column_index_from_string(column)
-
-
-@pytest.mark.parametrize("value", (0, 18729))
-def test_column_letter_boundries(value):
-    with pytest.raises(ValueError):
-        get_column_letter(value)
 
 @pytest.mark.parametrize("value, expected",
                          [
-                        (18278, "ZZZ"),
-                        (7030, "JJJ"),
-                        (28, "AB"),
-                        (27, "AA"),
-                        (26, "Z")
+                             ('4.2', 4.2),
+                             ('-42.000', -42),
+                             ( '0', 0),
+                             ('0.9999', 0.9999),
+                             ('99E-02', 0.99),
+                             ('4', 4),
+                             ('-1E3', -1000),
+                             ('2e+2', 200),
+                             ('3.1%', 0.031),
+                             ('03:40:16', time(3, 40, 16)),
+                             ('03:40', time(3, 40)),
+                             ('30:33.865633336', time(0, 30, 33, 865633))
+                         ]
+                        )
+def test_infer_numeric(dummy_cell, guess_types, value, expected):
+    cell = dummy_cell
+    cell.parent.parent._guess_types = guess_types
+    cell.value = value
+    if cell.guess_types:
+        assert cell.value == expected
+    else:
+        cell.value == value
+
+
+def test_ctor(dummy_cell):
+    cell = dummy_cell
+    assert cell.data_type == 'n'
+    assert cell.column == 'A'
+    assert cell.row == 1
+    assert cell.coordinate == "A1"
+    assert cell.value is None
+    assert cell.xf_index == 0
+    assert cell.comment is None
+
+
+@pytest.mark.parametrize("datatype", ['n', 'd', 's', 'b', 'f', 'e'])
+def test_null(dummy_cell, datatype):
+    cell = dummy_cell
+    cell.data_type = datatype
+    assert cell.data_type == datatype
+    cell.value = None
+    assert cell.data_type == 'n'
+
+
+@pytest.mark.parametrize("value", ['hello', ".", '0800'])
+def test_string(dummy_cell, value):
+    cell = dummy_cell
+    cell.value = 'hello'
+    assert cell.data_type == 's'
+
+
+@pytest.mark.parametrize("value", ['=42', '=if(A1<4;-1;1)'])
+def test_formula(dummy_cell, value):
+    cell = dummy_cell
+    cell.value = value
+    assert cell.data_type == 'f'
+
+
+@pytest.mark.parametrize("value", [True, False])
+def test_boolean(dummy_cell, value):
+    cell = dummy_cell
+    cell.value = True
+    assert cell.data_type == 'b'
+
+
+@pytest.mark.parametrize("error_string", Cell.ERROR_CODES)
+def test_error_codes(dummy_cell, error_string):
+    cell = dummy_cell
+    cell.value = error_string
+    assert cell.data_type == 'e'
+
+
+@pytest.mark.parametrize("value, internal, number_format",
+                         [
+                             (
+                                 datetime(2010, 7, 13, 6, 37, 41),
+                                 40372.27616898148,
+                                 "yyyy-mm-dd h:mm:ss"
+                             ),
+                             (
+                                 date(2010, 7, 13),
+                                 40372,
+                                 "yyyy-mm-dd"
+                             ),
+                             (
+                                 time(1, 3),
+                                 0.04375,
+                                 "h:mm:ss",
+                             )
                          ]
                          )
-def test_column_letter(value, expected):
-    assert get_column_letter(value) == expected
-
-
-def test_initial_value():
-    ws = build_dummy_worksheet()
-    cell = Cell(ws, 'A', 1, value='17.5')
-    assert cell.TYPE_STRING == cell.data_type
-
-
-class TestCellValueTypes(object):
-
-    @classmethod
-    def setup_class(cls):
-        wb = Workbook()
-        ws = Worksheet(wb)
-        cls.cell = Cell(ws, 'A', 1)
-
-    def test_ctor(self):
-        cell = self.cell
-        assert cell.data_type == 'n'
-        assert cell.column == 'A'
-        assert cell.row == 1
-        assert cell.coordinate == "A1"
-        assert cell.value is None
-        assert isinstance(cell.parent, Worksheet)
-        assert cell.xf_index == 0
-        assert cell.comment is None
-
-
-    @pytest.mark.parametrize("datatype", ['n', 'd', 's', 'b', 'f', 'e'])
-    def test_null(self, datatype):
-        self.cell.data_type = datatype
-        assert self.cell.data_type == datatype
-        self.cell.value = None
-        assert self.cell.data_type == 'n'
-
-
-    @pytest.mark.parametrize("value, expected",
-                             [
-                                 (42, 42),
-                                 ('4.2', 4.2),
-                                 ('-42.000', -42),
-                                 ( '0', 0),
-                                 (0, 0),
-                                 ( 0.0001, 0.0001),
-                                 ('0.9999', 0.9999),
-                                 ('99E-02', 0.99),
-                                 ( 1e1, 10),
-                                 ('4', 4),
-                                 ('-1E3', -1000),
-                                 ('2e+2', 200),
-                                 (4, 4),
-                                 (decimal.Decimal('3.14'), decimal.Decimal('3.14')),
-                             ]
-                            )
-    def test_numeric(self, value, expected):
-        self.cell.parent.parent._guess_types = True
-        self.cell.value = value
-        assert self.cell.internal_value == expected
-        assert self.cell.data_type == 'n'
-
-
-    @pytest.mark.parametrize("value", ['hello', ".", '0800'])
-    def test_string(self, value):
-        self.cell.value = 'hello'
-        assert self.cell.data_type == 's'
-
-
-    @pytest.mark.parametrize("value", ['=42', '=if(A1<4;-1;1)'])
-    def test_formula(self, value):
-        self.cell.value = value
-        assert self.cell.data_type == 'f'
-
-
-    @pytest.mark.parametrize("value", [True, False])
-    def test_boolean(self, value):
-        self.cell.value = True
-        assert self.cell.data_type == 'b'
-
-
-    @pytest.mark.parametrize("error_string", Cell.ERROR_CODES)
-    def test_error_codes(self, error_string):
-        self.cell.value = error_string
-        assert self.cell.data_type == 'e'
-
-
-    @pytest.mark.parametrize("infer, expected",
-                             [
-                                 (True, safe_string(0.0314)),
-                                 (False, '3.14%'),
-                             ]
-                             )
-    def test_insert_percentage(self, infer, expected):
-        self.cell.parent.parent._guess_types= infer
-        self.cell.value = '3.14%'
-        assert expected == safe_string(self.cell.internal_value)
-        assert self.cell.style.number_format == numbers.FORMAT_PERCENTAGE
-
-
-    @pytest.mark.parametrize("value, internal",
-                             [
-                                 (datetime(2010, 7, 13, 6, 37, 41) ,40372.27616898148),
-                                 (date(2010, 7, 13), 40372),
-                             ]
-                             )
-    def test_insert_date(self, value, internal):
-        self.cell.value = value
-        assert self.cell.data_type == 'n'
-        assert self.cell.internal_value == internal
-        assert self.cell.is_date()
-        assert self.cell.number_format == "yyyy-mm-dd"
-
-
-    def test_empty_cell_formatted_as_date(self):
-        self.cell.value = datetime.today()
-        self.cell.value = None
-        assert self.cell.is_date()
-        assert self.cell.value is None
-
-
-@pytest.mark.parametrize("value, datatype",
-                         [
-                            (None, Cell.TYPE_NULL),
-                            ('.0e000', Cell.TYPE_NUMERIC),
-                            ('-0.e-0', Cell.TYPE_NUMERIC),
-                            ('1E', Cell.TYPE_STRING)
-                         ])
-def test_data_type_check(value, datatype):
-    ws = build_dummy_worksheet()
-    ws.parent._guess_types = True
-    cell = Cell(ws, 'A', 1)
+def test_insert_date(dummy_cell, value, internal, number_format):
+    cell = dummy_cell
     cell.value = value
-    assert cell.data_type == datatype
+    assert cell.data_type == 'n'
+    assert cell.internal_value == internal
+    assert cell.is_date
+    assert cell.number_format == number_format
 
 
-def test_set_bad_type():
-    ws = build_dummy_worksheet()
-    cell = Cell(ws, 'A', 1)
+@pytest.mark.parametrize("value, is_date",
+                         [
+                             (None, True,),
+                             ("testme", False),
+                             (True, False),
+                         ]
+                         )
+def test_cell_formatted_as_date(dummy_cell, value, is_date):
+    cell = dummy_cell
+    cell.value = datetime.today()
+    cell.value = value
+    assert cell.is_date == is_date
+    assert cell.value == value
+
+
+def test_set_bad_type(dummy_cell):
+    cell = dummy_cell
     with pytest.raises(ValueError):
         cell.set_explicit_value(1, 'q')
 
 
-def test_illegal_chacters():
-    from openpyxl.exceptions import IllegalCharacterError
+def test_illegal_chacters(dummy_cell):
+    from openpyxl.utils.exceptions import IllegalCharacterError
     from openpyxl.compat import range
     from itertools import chain
-    ws = build_dummy_worksheet()
-    cell = Cell(ws, 'A', 1)
+    cell = dummy_cell
+    #ws = build_dummy_worksheet()
+    #cell = Cell(ws, 'A', 1)
 
     # The bytes 0x00 through 0x1F inclusive must be manually escaped in values.
 
@@ -289,79 +215,30 @@ def test_time_regex(value, expected):
     assert m == expected
 
 
-values = (
-    ('03:40:16', time(3, 40, 16)),
-    ('03:40', time(3, 40)),
-    ('30:33.865633336', time(0, 30, 33, 865633))
-)
-@pytest.mark.parametrize("value, expected",
-                         values)
-def test_time(value, expected):
-    wb = Workbook(guess_types=True)
-    ws = Worksheet(wb)
-    cell = Cell(ws, 'A', 1)
-    cell.value = value
-    assert cell.value == expected
-    assert cell.TYPE_NUMERIC == cell.data_type
-
-
-def test_timedelta():
-
-    wb = Workbook()
-    ws = Worksheet(wb)
-    cell = Cell(ws, 'A', 1)
+def test_timedelta(dummy_cell):
+    cell = dummy_cell
     cell.value = timedelta(days=1, hours=3)
     assert cell.value == 1.125
-    assert cell.TYPE_NUMERIC == cell.data_type
+    assert cell.data_type == 'n'
+    assert cell.is_date is False
+    assert cell.number_format == "[hh]:mm:ss"
 
 
-def test_date_format_on_non_date():
-    wb = Workbook()
-    ws = Worksheet(wb)
-    cell = Cell(ws, 'A', 1)
-    cell.value = datetime.now()
-    cell.value = 'testme'
-    assert 'testme' == cell.value
-
-def test_set_get_date():
-    today = datetime(2010, 1, 18, 14, 15, 20, 1600)
-    wb = Workbook()
-    ws = Worksheet(wb)
-    cell = Cell(ws, 'A', 1)
-    cell.value = today
-    assert today == cell.value
-
-def test_repr():
-    wb = Workbook()
-    ws = Worksheet(wb)
-    cell = Cell(ws, 'A', 1)
+def test_repr(dummy_cell):
+    cell = dummy_cell
     assert repr(cell), '<Cell Sheet1.A1>' == 'Got bad repr: %s' % repr(cell)
 
-def test_is_date():
-    wb = Workbook()
-    ws = Worksheet(wb)
-    cell = Cell(ws, 'A', 1)
-    cell.value = datetime.now()
-    assert cell.is_date() == True
-    cell.value = 'testme'
-    assert 'testme' == cell.value
-    assert cell.is_date() is False
 
-def test_is_not_date_color_format():
+def test_comment_assignment(dummy_cell):
+    assert dummy_cell.comment is None
+    comm = Comment("text", "author")
+    dummy_cell.comment = comm
+    assert dummy_cell.comment == comm
 
-    wb = Workbook()
-    ws = Worksheet(wb)
-    cell = Cell(ws, 'A', 1)
 
-    cell.value = -13.5
-    cell.style = cell.style.copy(number_format='0.00_);[Red]\(0.00\)')
-
-    assert cell.is_date() is False
-
-def test_comment_count():
-    wb = Workbook()
-    ws = Worksheet(wb)
-    cell = ws.cell(coordinate="A1")
+def test_comment_count(dummy_cell):
+    cell = dummy_cell
+    ws = cell.parent
     assert ws._comment_count == 0
     cell.comment = Comment("text", "author")
     assert ws._comment_count == 1
@@ -372,24 +249,28 @@ def test_comment_count():
     cell.comment = None
     assert ws._comment_count == 0
 
-def test_comment_assignment():
-    wb = Workbook()
-    ws = Worksheet(wb)
-    c = Comment("text", "author")
-    ws.cell(coordinate="A1").comment = c
-    with pytest.raises(AttributeError):
-        ws.cell(coordinate="A2").commment = c
-    ws.cell(coordinate="A2").comment = Comment("text2", "author2")
-    with pytest.raises(AttributeError):
-        ws.cell(coordinate="A1").comment = ws.cell(coordinate="A2").comment
-    # this should orphan c, so that assigning it to A2 does not raise AttributeError
-    ws.cell(coordinate="A1").comment = None
-    ws.cell(coordinate="A2").comment = c
 
-def test_cell_offset():
-    wb = Workbook()
-    ws = Worksheet(wb)
-    assert ws['B15'].offset(2, 1).coordinate == 'C17'
+def test_only_one_cell_per_comment(dummy_cell):
+    ws = dummy_cell.parent
+    comm = Comment('text', 'author')
+    dummy_cell.comment = comm
+
+    c2 = ws.cell(column='A', row=2)
+    with pytest.raises(AttributeError):
+        c2.comment = comm
+
+
+def test_remove_comment(dummy_cell):
+    comm = Comment('text', 'author')
+    dummy_cell.comment = comm
+    dummy_cell.comment = None
+    assert dummy_cell.comment is None
+
+
+def test_cell_offset(dummy_cell):
+    cell = dummy_cell
+    ws = cell.parent
+    assert cell.offset(2, 1).coordinate == 'B3'
 
 
 class TestEncoding:
@@ -403,6 +284,8 @@ class TestEncoding:
     test_string = ('Compound Value (' + pound + ')').encode('latin1')
 
     def test_bad_encoding(self):
+        from openpyxl import Workbook
+
         wb = Workbook()
         ws = wb.active
         cell = ws['A1']
@@ -412,17 +295,17 @@ class TestEncoding:
             cell.value = self.test_string
 
     def test_good_encoding(self):
+        from openpyxl import Workbook
+
         wb = Workbook(encoding='latin1')
         ws = wb.active
         cell = ws['A1']
         cell.value = self.test_string
 
 
-def test_style():
+def test_style(dummy_cell):
     from openpyxl.styles import Font, Style
-    wb = Workbook()
-    ws = wb.active
-    cell = ws['A1']
+    cell = dummy_cell
     new_style = Style(font=Font(bold=True))
     cell.style = new_style
-    assert new_style in wb.shared_styles
+    assert new_style in cell.parent.parent.shared_styles

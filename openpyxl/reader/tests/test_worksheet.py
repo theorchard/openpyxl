@@ -2,12 +2,56 @@
 
 import pytest
 
+from io import BytesIO
+from zipfile import ZipFile
+
 from lxml.etree import iterparse, fromstring
 
+from openpyxl.utils.exceptions import InvalidFileException
+from openpyxl import load_workbook
+from openpyxl.compat import unicode
 from openpyxl.xml.constants import SHEET_MAIN_NS
 from openpyxl.cell import Cell
-from openpyxl.collections import IndexedList
+from openpyxl.utils.indexed_list import IndexedList
 from openpyxl.styles import Style
+
+
+def test_get_xml_iter():
+    #1 file object
+    #2 stream (file-like)
+    #3 string
+    #4 zipfile
+    from openpyxl.reader.worksheet import _get_xml_iter
+    from tempfile import TemporaryFile
+
+    FUT = _get_xml_iter
+    s = b""
+    stream = FUT(s)
+    assert isinstance(stream, BytesIO), type(stream)
+
+    u = unicode(s)
+    stream = FUT(u)
+    assert isinstance(stream, BytesIO), type(stream)
+
+    f = TemporaryFile(mode='rb+', prefix='openpyxl.', suffix='.unpack.temp')
+    stream = FUT(f)
+    assert stream == f
+    f.close()
+
+    t = TemporaryFile()
+    z = ZipFile(t, mode="w")
+    z.writestr("test", "whatever")
+    stream = FUT(z.open("test"))
+    assert hasattr(stream, "read")
+    # z.close()
+    try:
+        z.close()
+    except IOError:
+        # you can't just close zipfiles in Windows
+        if z.fp is not None:
+            z.fp.close() # python 2.6
+        else:
+            z.close() # python 2.7
 
 
 @pytest.fixture
@@ -18,14 +62,31 @@ def Worksheet(Workbook):
         data_only = False
 
         def __init__(self):
-            self.shared_styles = IndexedList(range(28))
+            self.shared_styles = IndexedList()
+            self.shared_styles.extend((28*[DummyStyle()]))
             self.shared_styles.add(Style())
+            self._fonts = IndexedList()
+            self._fills = IndexedList()
+            self._number_formats = IndexedList()
+            self._borders = IndexedList()
+            self._alignments = IndexedList()
+            self._protections = IndexedList()
 
 
     from openpyxl.styles import numbers
 
     class DummyStyle:
         number_format = numbers.FORMAT_GENERAL
+        font = ""
+        fill = ""
+        border = ""
+        alignment = ""
+        protection = ""
+
+        def copy(self, **kw):
+            return self
+
+
 
 
     class DummyWorksheet:
@@ -120,6 +181,7 @@ def test_styled_row(datadir, Worksheet, WorkSheetParser):
     ws = Worksheet
     parser = WorkSheetParser
     parser.shared_strings = dict((i, i) for i in range(30))
+    parser.style_table = ws.parent.shared_styles
 
     with open("complex-styles-worksheet.xml", "rb") as src:
         rows = iterparse(src, tag='{%s}row' % SHEET_MAIN_NS)
@@ -272,6 +334,7 @@ def test_boolean(Worksheet, WorkSheetParser):
 def test_inline_string(Worksheet, WorkSheetParser, datadir):
     ws = Worksheet
     parser = WorkSheetParser
+    parser.style_table = ws.parent.shared_styles
     datadir.chdir()
 
     with open("Table1-XmlFromAccess.xml") as src:
@@ -286,6 +349,7 @@ def test_inline_string(Worksheet, WorkSheetParser, datadir):
 def test_inline_richtext(Worksheet, WorkSheetParser, datadir):
     ws = Worksheet
     parser = WorkSheetParser
+    parser.style_table = ws.parent.shared_styles
     datadir.chdir()
     with open("jasper_sheet.xml", "rb") as src:
         sheet = fromstring(src.read())
@@ -311,3 +375,9 @@ def test_data_validation(Worksheet, WorkSheetParser, datadir):
     dvs = ws._data_validations
     assert len(dvs) == 1
 
+
+def test_read_autofilter(datadir):
+    datadir.chdir()
+    wb = load_workbook("bug275.xlsx")
+    ws = wb.active
+    assert ws.auto_filter.ref == 'A1:B6'

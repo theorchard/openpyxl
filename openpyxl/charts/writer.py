@@ -1,31 +1,11 @@
 from __future__ import absolute_import
 # Copyright (c) 2010-2014 openpyxl
-#
-# Permission is hereby granted, free of charge, to any person obtaining a copy
-# of this software and associated documentation files (the "Software"), to deal
-# in the Software without restriction, including without limitation the rights
-# to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-# copies of the Software, and to permit persons to whom the Software is
-# furnished to do so, subject to the following conditions:
-#
-# The above copyright notice and this permission notice shall be included in
-# all copies or substantial portions of the Software.
-#
-# THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-# IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-# FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-# AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-# LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-# OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
-# THE SOFTWARE.
-#
-# @license: http://www.opensource.org/licenses/mit-license.php
-# @author: see AUTHORS file
 
 
 from openpyxl.xml.functions import (
     Element,
     SubElement,
+    ConditionalElement,
     tostring,
     )
 from openpyxl.xml.constants import (
@@ -38,7 +18,7 @@ from openpyxl.compat import (
     iteritems,
     safe_string
     )
-from openpyxl.charts import (
+from .import (
     ErrorBar,
     BarChart,
     LineChart,
@@ -141,66 +121,76 @@ class BaseChartWriter(object):
         SubElement(scaling, '{%s}orientation' % CHART_NS, {'val':axis.orientation})
         if axis.delete_axis:
             SubElement(scaling, '{%s}' % CHART_NS, {'val':'1'})
-        if axis.type == "valAx":
-            SubElement(scaling, '{%s}max' % CHART_NS, {'val':str(float(axis.max))})
-            SubElement(scaling, '{%s}min' % CHART_NS, {'val':str(float(axis.min))})
+        if axis.type == "valAx" and axis.auto_axis:
+            SubElement(scaling, '{%s}max' % CHART_NS, {'val':safe_string(axis.max)})
+            SubElement(scaling, '{%s}min' % CHART_NS, {'val':safe_string(axis.min)})
 
         SubElement(ax, '{%s}axPos' % CHART_NS, {'val':axis.position})
         if axis.type == "valAx":
             SubElement(ax, '{%s}majorGridlines' % CHART_NS)
-            SubElement(ax, '{%s}numFmt' % CHART_NS, {'formatCode':"General", 'sourceLinked':'1'})
+        SubElement(ax, '{%s}numFmt' % CHART_NS,
+                   {'formatCode':axis.number_format,
+                    'sourceLinked':safe_string(axis.sourceLinked)
+                    }
+                   )
         self._write_axis_title(axis, ax)
         SubElement(ax, '{%s}tickLblPos' % CHART_NS, {'val':axis.tick_label_position})
         SubElement(ax, '{%s}crossAx' % CHART_NS, {'val':str(axis.cross)})
         SubElement(ax, '{%s}crosses' % CHART_NS, {'val':axis.crosses})
         if axis.auto:
-            SubElement(ax, '{%s}auto' % CHART_NS, {'val':'1'})
+            SubElement(ax, '{%s}auto' % CHART_NS, {'val':safe_string(axis.auto)})
         if axis.label_align:
             SubElement(ax, '{%s}lblAlgn' % CHART_NS, {'val':axis.label_align})
         if axis.label_offset:
             SubElement(ax, '{%s}lblOffset' % CHART_NS, {'val':str(axis.label_offset)})
-        if axis.type == "valAx":
-            SubElement(ax, '{%s}crossBetween' % CHART_NS, {'val':axis.cross_between})
-            SubElement(ax, '{%s}majorUnit' % CHART_NS, {'val':safe_string(axis.unit)})
+
+        if axis.type == 'valAx':
+            SubElement(ax, '{%s}crossBetween' % CHART_NS, val=axis.cross_between)
+        if axis.unit:
+            SubElement(ax, '{%s}majorUnit' % CHART_NS, val=safe_string(axis.unit))
 
     def _write_series(self, subchart):
 
-        for i, serie in enumerate(self.chart):
+        for i, series in enumerate(self.chart):
             ser = SubElement(subchart, '{%s}ser' % CHART_NS)
             SubElement(ser, '{%s}idx' % CHART_NS, {'val':safe_string(i)})
             SubElement(ser, '{%s}order' % CHART_NS, {'val':safe_string(i)})
 
-            if serie.title:
+            if series.title:
                 tx = SubElement(ser, '{%s}tx' % CHART_NS)
-                SubElement(tx, '{%s}v' % CHART_NS).text = serie.title
+                SubElement(tx, '{%s}v' % CHART_NS).text = series.title
 
-            if serie.color:
+            if isinstance(self, LineChart):
+                marker = SubElement(ser, "{%s}marker" % CHART_NS)
+                SubElement(marker, "{%s}symbol" % CHART_NS, val=safe_string(series.marker))
+
+            if series.color:
                 sppr = SubElement(ser, '{%s}spPr' % CHART_NS)
-                self._write_series_color(sppr, serie)
+                self._write_series_color(sppr, series)
 
-            if serie.error_bar:
-                self._write_error_bar(ser, serie)
+            if series.error_bar:
+                self._write_error_bar(ser, series)
 
-            if serie.labels:
-                self._write_series_labels(ser, serie)
+            if series.labels:
+                self._write_series_labels(ser, series)
 
-            if serie.xvalues:
-                self._write_series_xvalues(ser, serie)
+            if series.xvalues:
+                self._write_series_xvalues(ser, series)
 
             val = SubElement(ser, self.series_type)
-            self._write_serial(val, serie.reference)
+            self._write_serial(val, series.reference)
 
-    def _write_series_color(self, node, serie):
+    def _write_series_color(self, node, series):
         # edge color
         ln = SubElement(node, '{%s}ln' % DRAWING_NS)
         fill = SubElement(ln, '{%s}solidFill' % DRAWING_NS)
-        SubElement(fill, '{%s}srgbClr' % DRAWING_NS, {'val':serie.color})
+        SubElement(fill, '{%s}srgbClr' % DRAWING_NS, {'val':series.color})
 
-    def _write_series_labels(self, node, serie):
+    def _write_series_labels(self, node, series):
         cat = SubElement(node, '{%s}cat' % CHART_NS)
-        self._write_serial(cat, serie.labels)
+        self._write_serial(cat, series.labels)
 
-    def _write_series_xvalues(self, node, serie):
+    def _write_series_xvalues(self, node, series):
         raise NotImplemented("""x values not possible for this chart type""")
 
     def _write_serial(self, node, reference, literal=False):
@@ -210,29 +200,26 @@ class BaseChartWriter(object):
 
         mapping = {'n':{'ref':'numRef', 'cache':'numCache'},
                    's':{'ref':'strRef', 'cache':'strCache'}}
-        #data = None
+        data = None
 
         if is_ref:
             ref = SubElement(node, '{%s}%s' %(CHART_NS, mapping[data_type]['ref']))
             SubElement(ref, '{%s}f' % CHART_NS).text = str(reference)
-            data = SubElement(ref, '{%s}%s' %(CHART_NS, mapping[data_type]['cache']))
-            values = reference.values
         else:
             data = SubElement(node, '{%s}numLit' % CHART_NS)
             values = (1,)
 
-        if data_type == 'n':
-            SubElement(data, '{%s}formatCode' % CHART_NS).text = number_format or 'General'
-
-        #if data is not None:
-        SubElement(data, '{%s}ptCount' % CHART_NS, {'val':str(len(values))})
-        for j, val in enumerate(values):
-            if val is not None:
-                val = safe_string(val)
-            else:
-                val = ''
-            point = SubElement(data, '{%s}pt' % CHART_NS, idx='%d' %j)
-            SubElement(point, '{%s}v' % CHART_NS).text = val
+        if data is not None:
+            if data_type == 'n':
+                SubElement(data, '{%s}formatCode' % CHART_NS).text = number_format or 'General'
+            SubElement(data, '{%s}ptCount' % CHART_NS, {'val':str(len(values))})
+            for j, val in enumerate(values):
+                if val is not None:
+                    val = safe_string(val)
+                else:
+                    val = ''
+                point = SubElement(data, '{%s}pt' % CHART_NS, idx='%d' %j)
+                SubElement(point, '{%s}v' % CHART_NS).text = val
 
     def _write_error_bar(self, node, serie):
 

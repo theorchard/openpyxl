@@ -91,3 +91,8 @@ class Font(HashableObject):
         self.condense = condense
         self.extend = extend
         self.scheme = scheme
+
+
+from . colors import Color
+
+DEFAULT_FONT = Font(color=Color(theme=1), scheme="minor")
