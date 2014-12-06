@@ -150,7 +150,7 @@ Styles are also applied to columns and rows::
 >>> row.style = Style()
 
 
-Edit Print Settings
+Edit Page Setup
 -------------------
 .. :: doctest
 
@@ -163,8 +163,20 @@ Edit Print Settings
 >>> ws.page_setup.paperSize = ws.PAPERSIZE_TABLOID
 >>> ws.page_setup.fitToHeight = 0
 >>> ws.page_setup.fitToWidth = 1
->>> ws.page_setup.horizontalCentered = True
->>> ws.page_setup.verticalCentered = True
+
+
+Edit Print Options
+-------------------
+.. :: doctest
+
+>>> from openpyxl.workbook import Workbook
+>>>
+>>> wb = Workbook()
+>>> ws = wb.active
+>>>
+>>> ws.print_options.horizontalCentered = True
+>>> ws.print_options.verticalCentered = True
+
 
 
 Header / Footer

@@ -3,6 +3,21 @@
 import pytest
 
 @pytest.fixture
+def Page_untuple():
+    from .. page import untuple
+    return untuple
+
+
+def test_untuple(Page_untuple):
+    value = 4
+    test = Page_untuple(value)
+    assert test == 4
+    value = (4,)
+    test = Page_untuple(value)
+    assert test == 4
+
+
+@pytest.fixture
 def PageMargins():
     from .. page import PageMargins
     return PageMargins
@@ -35,6 +50,20 @@ def test_page_setup(PageSetup):
     assert dict(p) == {}
     p.scale = 1
     assert p.scale == 1
+    p.paperHeight = "24.73mm"
+    assert p.paperHeight == "24.73mm"
+    assert p.cellComments == None
+    p.orientation = "default"
+    assert p.orientation == "default"
+    p.id = 'a12'
+    assert dict(p) == {'scale':'1', 'paperHeight': '24.73mm', 'orientation': 'default', '{http://schemas.openxmlformats.org/officeDocument/2006/relationships}id':'a12'}
+
+
+def test_wrong_page_setup(PageSetup):
+    p = PageSetup()
+    """ providing a not standard parameter """
+    with pytest.raises(ValueError):
+        p.orientation = "tagada"
 
 
 @pytest.fixture
