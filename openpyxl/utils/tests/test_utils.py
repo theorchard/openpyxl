@@ -11,31 +11,24 @@ from .. import (
     get_column_interval,
 )
 
-from ..exceptions import (
-    CellCoordinatesException,
-    )
-
 
 def test_coordinates():
-    column, row = coordinate_from_string('ZF46')
-    assert "ZF" == column
-    assert 46 == row
+    assert coordinate_from_string('ZF46') == ("ZF", 46)
 
 
-def test_invalid_coordinate():
+@pytest.mark.parametrize("value", ['AAA', "AQ0"])
+def test_invalid_coordinate(value):
+    from ..exceptions import CellCoordinatesException
     with pytest.raises(CellCoordinatesException):
-        coordinate_from_string('AAA')
+        coordinate_from_string(value)
 
-def test_zero_row():
-    with pytest.raises(CellCoordinatesException):
-        coordinate_from_string('AQ0')
 
 def test_absolute():
     assert '$ZF$51' == absolute_coordinate('ZF51')
 
 def test_absolute_multiple():
 
-    assert '$ZF$51:$ZF$53' == absolute_coordinate('ZF51:ZF$53')
+    assert '$ZF$51:$ZF$53' == absolute_coordinate('ZF51:ZF53')
 
 
 def test_column_interval():

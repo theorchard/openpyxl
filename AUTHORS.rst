@@ -51,6 +51,7 @@ I'd also like to greatly thank all those who participate in the project (in alph
 * ramn_se
 * Philip Roche
 * James Smagala
+* Wolfgane Scherer
 * Joseph Tate
 * Dieter Vandenbussche
 * Paul Van Der Linden

@@ -6,6 +6,7 @@ from openpyxl.descriptors import (
     Strict,
     Typed,
 )
+from .fills import PatternFill, GradientFill, Fill
 from . fonts import Font
 from . borders import Border
 from . alignment import Alignment
@@ -15,9 +16,9 @@ from . protection import Protection
 from openpyxl.xml.constants import SHEET_MAIN_NS
 
 
-class NamedStyle(object):
+class NamedStyle(Strict):
 
-    tag = '{%s}cellXfs' % SHEET_MAIN_NS
+    tag = '{%s}cellStyleXfs' % SHEET_MAIN_NS
 
     """
     Named and editable styles
@@ -29,6 +30,8 @@ class NamedStyle(object):
     alignment = Typed(expected_type=Alignment)
     number_format = NumberFormatDescriptor()
     protection = Typed(expected_type=Protection)
+
+    __fields__ = ("name", "font", "fill", "border", "number_format", "alignment", "protection")
 
     def __init__(self,
                  name,
@@ -46,3 +49,33 @@ class NamedStyle(object):
         self.alignment = alignment
         self.number_format = number_format
         self.protection = protection
+
+
+    def _make_key(self):
+        """Use a tuple of fields as the basis for a key"""
+        self._key = hash(tuple(getattr(self, x) for x in self.__fields__))
+
+    def __hash__(self):
+        if not hasattr(self, '_key'):
+            self._make_key()
+        return self._key
+
+
+    def __eq__(self, other):
+        if isinstance(other, self.__class__):
+            if not hasattr(self, '_key'):
+                self._make_key()
+            if not hasattr(other, '_key'):
+                other._make_key()
+            return self._key == other._key
+        return self._key == other
+
+    def __ne__(self, other):
+        return not self == other
+
+    def __repr__(self):
+        pieces = []
+        for k in self.__fields__:
+            value = getattr(self, k)
+            pieces.append('%s=%s' % (k, repr(value)))
+        return '%s(%s)' % (self.__class__.__name__, ', '.join(pieces))
