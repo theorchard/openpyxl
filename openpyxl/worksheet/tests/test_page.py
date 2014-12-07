@@ -50,7 +50,7 @@ def test_page_setup(PageSetup):
     p.orientation = "default"
     assert p.orientation == "default"
     p.id = 'a12'
-    assert dict(p) == {'scale':'1', 'paperHeight': '24.73mm', 'orientation': 'default', '{http://schemas.openxmlformats.org/officeDocument/2006/relationships}id':'a12'}
+    assert dict(p) == {'scale':'1', 'paperHeight': '24.73mm', 'orientation': 'default', 'id':'a12'}
 
 
 def test_wrong_page_setup(PageSetup):

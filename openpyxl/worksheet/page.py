@@ -107,17 +107,15 @@ class PageSetup(Strict):
                      "verticalDpi", "copies", "id"):
             value = getattr(self, attr)
             if value is not None:
-                if attr == "id":
-                    key = '{%s}id' % REL_NS
-                    yield key, safe_string(value)
-                else:
-                    yield attr, safe_string(value)
+                yield attr, safe_string(value)
 
     def write_xml_element(self):
 
-        el = Element(self.tag, dict(self))
-
-        return el
+        attrs = dict(self)
+        if 'id' in attrs:
+            attrs['{%s}id' % REL_NS] = attrs['id']
+            del attrs['id']
+        return Element(self.tag, attrs)
 
 
 class PrintOptions(Strict):
