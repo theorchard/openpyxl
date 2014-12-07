@@ -2,18 +2,12 @@
 
 import pytest
 
-@pytest.fixture
-def Page_untuple():
-    from .. page import untuple
-    return untuple
 
-
-def test_untuple(Page_untuple):
-    value = 4
-    test = Page_untuple(value)
+def test_untuple():
+    from .. page import flatten
+    test = Page_untuple(4)
     assert test == 4
-    value = (4,)
-    test = Page_untuple(value)
+    test = Page_untuple((4,))
     assert test == 4
 
 

@@ -30,7 +30,7 @@ from openpyxl.xml.constants import SHEET_MAIN_NS, REL_NS
 from openpyxl.compat import deprecated
 
 
-def untuple(value):
+def flatten(value):
     if isinstance(value, tuple):
         return value[0]
     else:
@@ -81,25 +81,25 @@ class PageSetup(Strict):
                  verticalDpi=None,
                  copies=None,
                  id=None):
-        self.orientation = untuple(orientation)
-        self.paperSize = untuple(paperSize)
-        self.scale = untuple(scale)
-        self.fitToHeight = untuple(fitToHeight)
-        self.fitToWidth = untuple(fitToWidth)
-        self.firstPageNumber = untuple(firstPageNumber)
-        self.useFirstPageNumber = untuple(useFirstPageNumber)
-        self.paperHeight = untuple(paperHeight)
-        self.paperWidth = untuple(paperWidth)
-        self.pageOrder = untuple(pageOrder)
-        self.usePrinterDefaults = untuple(usePrinterDefaults)
-        self.blackAndWhite = untuple(blackAndWhite)
-        self.draft = untuple(draft)
-        self.cellComments = untuple(cellComments)
-        self.errors = untuple(errors)
-        self.horizontalDpi = untuple(horizontalDpi)
-        self.verticalDpi = untuple(verticalDpi)
-        self.copies = untuple(copies)
-        self.id = untuple(id)
+        self.orientation = flatten(orientation)
+        self.paperSize = flatten(paperSize)
+        self.scale = flatten(scale)
+        self.fitToHeight = flatten(fitToHeight)
+        self.fitToWidth = flatten(fitToWidth)
+        self.firstPageNumber = flatten(firstPageNumber)
+        self.useFirstPageNumber = flatten(useFirstPageNumber)
+        self.paperHeight = flatten(paperHeight)
+        self.paperWidth = flatten(paperWidth)
+        self.pageOrder = flatten(pageOrder)
+        self.usePrinterDefaults = flatten(usePrinterDefaults)
+        self.blackAndWhite = flatten(blackAndWhite)
+        self.draft = flatten(draft)
+        self.cellComments = flatten(cellComments)
+        self.errors = flatten(errors)
+        self.horizontalDpi = flatten(horizontalDpi)
+        self.verticalDpi = flatten(verticalDpi)
+        self.copies = flatten(copies)
+        self.id = flatten(id)
 
     @deprecated("this property does not exists anymore")
     def setup(self):
