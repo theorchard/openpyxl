@@ -59,25 +59,25 @@ class PageSetup(Strict):
                  verticalDpi=None,
                  copies=None,
                  id=None):
-        self.orientation = flatten(orientation)
-        self.paperSize = flatten(paperSize)
-        self.scale = flatten(scale)
-        self.fitToHeight = flatten(fitToHeight)
-        self.fitToWidth = flatten(fitToWidth)
-        self.firstPageNumber = flatten(firstPageNumber)
-        self.useFirstPageNumber = flatten(useFirstPageNumber)
-        self.paperHeight = flatten(paperHeight)
-        self.paperWidth = flatten(paperWidth)
-        self.pageOrder = flatten(pageOrder)
-        self.usePrinterDefaults = flatten(usePrinterDefaults)
-        self.blackAndWhite = flatten(blackAndWhite)
-        self.draft = flatten(draft)
-        self.cellComments = flatten(cellComments)
-        self.errors = flatten(errors)
-        self.horizontalDpi = flatten(horizontalDpi)
-        self.verticalDpi = flatten(verticalDpi)
-        self.copies = flatten(copies)
-        self.id = flatten(id)
+        self.orientation = orientation
+        self.paperSize = paperSize
+        self.scale = scale
+        self.fitToHeight = fitToHeight
+        self.fitToWidth = fitToWidth
+        self.firstPageNumber = firstPageNumber
+        self.useFirstPageNumber = useFirstPageNumber
+        self.paperHeight = paperHeight
+        self.paperWidth = paperWidth
+        self.pageOrder = pageOrder
+        self.usePrinterDefaults = usePrinterDefaults
+        self.blackAndWhite = blackAndWhite
+        self.draft = draft
+        self.cellComments = cellComments
+        self.errors = errors
+        self.horizontalDpi = horizontalDpi
+        self.verticalDpi = verticalDpi
+        self.copies = copies
+        self.id = id
 
     @deprecated("this property does not exists anymore")
     def setup(self):
@@ -100,9 +100,11 @@ class PageSetup(Strict):
         pass
 
     def __iter__(self):
-        for attr in ("orientation", "paperSize", "scale", "fitToHeight", "fitToWidth", "firstPageNumber", "useFirstPageNumber"
-                     , "paperHeight", "paperWidth", "pageOrder", "usePrinterDefaults", "blackAndWhite", "draft", "cellComments", "errors"
-                     , "horizontalDpi", "verticalDpi", "copies", "id"):
+        for attr in ("orientation", "paperSize", "scale", "fitToHeight",
+                     "fitToWidth", "firstPageNumber", "useFirstPageNumber" ,
+                     "paperHeight", "paperWidth", "pageOrder", "usePrinterDefaults",
+                     "blackAndWhite", "draft", "cellComments", "errors" , "horizontalDpi",
+                     "verticalDpi", "copies", "id"):
             value = getattr(self, attr)
             if value is not None:
                 if attr == "id":
