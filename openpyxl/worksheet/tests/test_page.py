@@ -5,9 +5,9 @@ import pytest
 
 def test_untuple():
     from .. page import flatten
-    test = Page_untuple(4)
+    test = flatten(4)
     assert test == 4
-    test = Page_untuple((4,))
+    test = flatten((4,))
     assert test == 4
 
 
