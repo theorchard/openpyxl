@@ -8,6 +8,7 @@ Major changes
 * Charts will no longer try and calculate axes by default
 * Support for template file types - PR21
 * Moved ancillary functions and classes into utils package - single place of reference
+* `PR 34 <https://bitbucket.org/openpyxl/openpyxl/pull-request/34/>`_ Fully support page setup
 
 
 Minor changes
