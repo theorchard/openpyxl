@@ -8,13 +8,6 @@ from openpyxl.xml.constants import SHEET_MAIN_NS, REL_NS
 from openpyxl.compat import deprecated
 
 
-def flatten(value):
-    if isinstance(value, tuple):
-        return value[0]
-    else:
-        return value
-
-
 class PageSetup(Strict):
     """ Worksheet page setup """
 

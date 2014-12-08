@@ -3,14 +3,6 @@
 import pytest
 
 
-def test_untuple():
-    from .. page import flatten
-    test = flatten(4)
-    assert test == 4
-    test = flatten((4,))
-    assert test == 4
-
-
 @pytest.fixture
 def PageMargins():
     from .. page import PageMargins
