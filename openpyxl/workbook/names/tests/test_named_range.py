@@ -10,7 +10,7 @@ from openpyxl.compat import zip
 # package imports
 from .. named_range import split_named_range, NamedRange, NamedValue
 from openpyxl.workbook.names.named_range import read_named_ranges
-from openpyxl.exceptions import NamedRangeException
+from openpyxl.utils.exceptions import NamedRangeException
 from openpyxl.reader.excel import load_workbook
 
 

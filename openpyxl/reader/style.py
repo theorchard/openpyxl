@@ -4,9 +4,9 @@ from __future__ import absolute_import
 """Read shared style definitions"""
 
 # package imports
-from openpyxl.collections import IndexedList
-from openpyxl.xml.functions import fromstring, safe_iterator, localname
-from openpyxl.exceptions import MissingNumberFormat
+from openpyxl.compat import OrderedDict, zip
+from openpyxl.utils.indexed_list import IndexedList
+from openpyxl.utils.exceptions import MissingNumberFormat
 from openpyxl.styles import (
     Style,
     numbers,
@@ -20,6 +20,9 @@ from openpyxl.styles import (
     borders,
 )
 from openpyxl.styles.colors import COLOR_INDEX, Color
+from openpyxl.styles.proxy import StyleId
+from openpyxl.styles.named_styles import NamedStyle
+from openpyxl.xml.functions import fromstring, safe_iterator, localname
 from openpyxl.xml.constants import SHEET_MAIN_NS
 from copy import deepcopy
 
@@ -29,19 +32,25 @@ class SharedStylesParser(object):
     def __init__(self, xml_source):
         self.root = fromstring(xml_source)
         self.shared_styles = IndexedList()
+        self.cell_styles = IndexedList()
         self.cond_styles = []
         self.style_prop = {}
         self.color_index = COLOR_INDEX
+        self.font_list = IndexedList()
+        self.fill_list = IndexedList()
+        self.border_list = IndexedList()
+        self.alignments = IndexedList()
+        self.protections = IndexedList()
 
     def parse(self):
         self.parse_custom_num_formats()
         self.parse_color_index()
         self.style_prop['color_index'] = self.color_index
-        self.font_list = list(self.parse_fonts())
-        self.fill_list = list(self.parse_fills())
-        self.border_list = list(self.parse_borders())
+        self.font_list = IndexedList(self.parse_fonts())
+        self.fill_list = IndexedList(self.parse_fills())
+        self.border_list = IndexedList(self.parse_borders())
         self.parse_dxfs()
-        self.parse_cell_xfs()
+        self.parse_cell_styles()
 
     def parse_custom_num_formats(self):
         """Read in custom numeric formatting rules from the shared style table"""
@@ -62,7 +71,7 @@ class SharedStylesParser(object):
             indexedColors = colors.find('{%s}indexedColors' % SHEET_MAIN_NS)
             if indexedColors is not None:
                 color_nodes = safe_iterator(indexedColors, '{%s}rgbColor' % SHEET_MAIN_NS)
-                self.color_index = [node.get('rgb') for node in color_nodes]
+                self.color_index = IndexedList([node.get('rgb') for node in color_nodes])
 
     def parse_dxfs(self):
         """Read in the dxfs effects - used by conditional formatting."""
@@ -157,63 +166,103 @@ class SharedStylesParser(object):
                 border[side] = Side(**bside)
         return Border(**border)
 
-    def parse_cell_xfs(self):
-        """Read styles from the shared style table"""
-        cell_xfs = self.root.find('{%s}cellXfs' % SHEET_MAIN_NS)
-        _styles  = []
 
-        if cell_xfs is None:  # can happen on bad OOXML writers (e.g. Gnumeric)
-            return
+    def parse_named_styles(self):
+        """
+        Extract named styles
+        """
+        ns = []
+        styles_node = self.root.find("{%s}cellStyleXfs" % SHEET_MAIN_NS)
+        _styles, _ids = self._parse_xfs(styles_node)
+
+        for _name, idx in self._parse_style_names():
+            _id = _ids[idx]
+            style = NamedStyle(name=_name)
+            style.border = self.border_list[_id.border]
+            style.fill = self.fill_list[_id.fill]
+            style.font = self.font_list[_id.font]
+            if _id.alignment:
+                style.alignment = self.alignments[_id.alignment]
+            if _id.protection:
+                style.protection = self.protections[_id.protection]
+            ns.append(style)
+        self.named_styles = IndexedList(ns)
+
+
+    def _parse_style_names(self):
+        names_node = self.root.find("{%s}cellStyles" % SHEET_MAIN_NS)
+        for _name in names_node:
+            yield _name.get("name"), int(_name.get("xfId"))
+
+
+    def parse_cell_styles(self):
+        """
+        Extract individual cell styles
+        """
+        node = self.root.find('{%s}cellXfs' % SHEET_MAIN_NS)
+        if node is not None:
+            self.shared_styles, self.cell_styles = self._parse_xfs(node)
+
+
+    def _parse_xfs(self, node):
+        """Read styles from the shared style table"""
+        _styles  = []
+        _style_ids = []
 
         builtin_formats = numbers.BUILTIN_FORMATS
-        xfs = safe_iterator(cell_xfs, '{%s}xf' % SHEET_MAIN_NS)
+        xfs = safe_iterator(node, '{%s}xf' % SHEET_MAIN_NS)
         for index, xf in enumerate(xfs):
             _style = {}
 
-            num_fmt = xf.get('numFmtId')
-            if num_fmt is not None:
-                num_fmt = int(num_fmt)
-                if num_fmt < 164:
-                    format_code = builtin_formats.get(num_fmt, 'General')
+            alignmentId = protectionId = 0
+            numFmtId = int(xf.get("numFmtId", 0))
+            fontId = int(xf.get("fontId", 0))
+            fillId = int(xf.get("fillId", 0))
+            borderId = int(xf.get("borderId", 0))
+
+            if numFmtId < 164:
+                format_code = builtin_formats.get(numFmtId, 'General')
+            else:
+                fmt_code = self.custom_num_formats.get(numFmtId)
+                if fmt_code is not None:
+                    format_code = fmt_code
                 else:
-                    fmt_code = self.custom_num_formats.get(num_fmt)
-                    if fmt_code is not None:
-                        format_code = fmt_code
-                    else:
-                        raise MissingNumberFormat('%s' % num_fmt)
-                _style['number_format'] = format_code
+                    raise MissingNumberFormat('%s' % numFmtId)
+            _style['number_format'] = format_code
 
             if bool_attrib(xf, 'applyAlignment'):
-                alignment = {}
                 al = xf.find('{%s}alignment' % SHEET_MAIN_NS)
                 if al is not None:
-                    alignment = al.attrib
-                _style['alignment'] = Alignment(**alignment)
+                    alignment = Alignment(**al.attrib)
+                    alignmentId = self.alignments.add(alignment)
+                    _style['alignment'] = alignment
 
             if bool_attrib(xf, 'applyFont'):
-                _style['font'] = self.font_list[int(xf.get('fontId'))].copy()
+                _style['font'] = self.font_list[fontId]
 
             if bool_attrib(xf, 'applyFill'):
-                _style['fill'] = self.fill_list[int(xf.get('fillId'))].copy()
+                _style['fill'] = self.fill_list[fillId]
 
             if bool_attrib(xf, 'applyBorder'):
-                _style['border'] = self.border_list[int(xf.get('borderId'))].copy()
+                _style['border'] = self.border_list[borderId]
 
             if bool_attrib(xf, 'applyProtection'):
-                protection = {}
                 prot = xf.find('{%s}protection' % SHEET_MAIN_NS)
                 if prot is not None:
-                    protection.update(prot.attrib)
-                _style['protection'] = Protection(**protection)
-            _styles.append(Style(**_style))
+                    protection = Protection(**prot.attrib)
+                    protectionId = self.alignments.add(protection)
+                    _style['protection'] = protection
 
-        self.shared_styles = IndexedList(_styles)
+            _styles.append(Style(**_style))
+            _style_ids.append(StyleId(alignmentId, borderId, fillId, fontId, numFmtId, protectionId))
+
+        return IndexedList(_styles), IndexedList(_style_ids)
 
 
 def read_style_table(xml_source):
     p = SharedStylesParser(xml_source)
     p.parse()
-    return p.shared_styles, p.color_index, p.cond_styles
+    return p
 
 
 def bool_attrib(element, attr):
