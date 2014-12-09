@@ -230,7 +230,11 @@ def write_root_rels(workbook):
 
 def write_workbook(workbook):
     """Write the core workbook xml."""
+
     root = Element('{%s}workbook' % SHEET_MAIN_NS)
+    if LXML:
+        _nsmap = {'r':REL_NS}
+        root = Element('{%s}workbook' % SHEET_MAIN_NS, nsmap=_nsmap)
 
     wb_props = {}
     if workbook.code_name is not None:
