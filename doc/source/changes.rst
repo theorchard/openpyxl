@@ -17,7 +17,7 @@ Minor changes
 * Clean up tests in cells
 
 
-2.1.3 (unreleased)
+2.1.3 (2014-12-09)
 ==================
 
 
