@@ -1,0 +1,23 @@
+<?xml version="1.0" standalone="yes"?>
+<workbook xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main" xmlns:r="http://schemas.openxmlformats.org/officeDocument/2006/relationships">
+  <fileVersion appName="xl" lastEdited="5" lowestEdited="5" rupBuild="9303"/>
+  <workbookPr defaultThemeVersion="124226"/>
+  <bookViews>
+    <workbookView xWindow="3960" yWindow="1050" windowWidth="13200" windowHeight="9270"/>
+  </bookViews>
+  <sheets>
+    <sheet name="Sheet1" sheetId="1" r:id="rId1"/>
+    <sheet name="Sheet2" sheetId="2" r:id="rId2"/>
+    <sheet name="Sheet3" sheetId="3" r:id="rId3"/>
+  </sheets>
+  <externalReferences>
+    <externalReference r:id="rId4"/>
+  </externalReferences>
+  <definedNames>
+    <definedName name="B1namedrange">Sheet1!$A$1</definedName>
+    <definedName name="references_external_workbook">[1]Sheet1!$A$1</definedName>
+    <definedName name="references_nr_in_ext_wb">[1]!B2range</definedName>
+    <definedName name="references_other_named_range">B1namedrange</definedName>
+  </definedNames>
+  <calcPr calcId="145621"/>
+</workbook>
