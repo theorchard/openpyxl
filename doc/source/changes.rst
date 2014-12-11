@@ -15,6 +15,7 @@ Minor changes
 -------------
 * Use a 2-way cache for column index lookups
 * Clean up tests in cells
+* `PR 40 <https://bitbucket.org/openpyxl/openpyxl/pull-request/40/>`_Support frozen panes and autofilter in write-only mode
 
 
 2.1.3 (2014-12-09)
