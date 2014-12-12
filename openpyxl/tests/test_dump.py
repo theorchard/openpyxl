@@ -25,6 +25,7 @@
 from datetime import datetime, date
 from tempfile import NamedTemporaryFile
 import atexit
+import shutil
 import os.path
 
 import pytest
@@ -228,3 +229,14 @@ def test_dirty_style():
 
     wb = load_workbook(fn)
     assert wb[ws.title]['B1']._style == 0
+
+
+def test_write_single_equal():
+    workbook = Workbook(optimized_write=True)
+    ws = workbook.create_sheet()
+    ws.append(["="])
+    fn = _get_test_filename()
+    workbook.save(fn)
+
+    wb = load_workbook(fn)
+    assert wb[ws.title]['A1'].value == "="
