@@ -223,9 +223,12 @@ class DumpWorksheet(Worksheet):
 
             if isinstance(value, Cell):
                 cell = value
-                dirty_cell = True # cell may have other properties than a value
+                dirty_cell = True  # cell may have other properties than a value
             else:
                 cell.value = value
+
+            if cell._style:  # if cell has a style, it is not reusable
+                dirty_cell = True
 
             cell.coordinate = '%s%d' % (column, row_idx)
             if cell.comment is not None:
