@@ -1,3 +1,14 @@
+2.1.4 (2014-12-11)
+==================
+
+
+Bug fixes
+---------
+
+* `#394 <https://bitbucket.org/openpyxl/openpyxl/issue/394>`_ Date format is applied to all columns (while only first column contains dates)
+* `#395 <https://bitbucket.org/openpyxl/openpyxl/issue/395>`_ temporary files not cleaned properly
+
+
 2.1.3 (2014-12-09)
 ==================
 
