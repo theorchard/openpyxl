@@ -24,7 +24,7 @@
 # Python stdlib imports
 from datetime import datetime
 from tempfile import NamedTemporaryFile
-import os
+import atexit
 import os.path
 
 import pytest
@@ -39,12 +39,26 @@ from openpyxl.styles.fonts import Font
 from openpyxl.styles import Style
 from openpyxl.comments.comments import Comment
 
+ALL_TEMP_FILES = []
+
+
+@atexit.register
+def _openpyxl_shutdown():
+    global ALL_TEMP_FILES
+    for path in ALL_TEMP_FILES:
+        if os.path.exists(path):
+            os.remove(path)
+
 
 def _get_test_filename():
 
-    test_file = NamedTemporaryFile(mode='w', prefix='openpyxl.', suffix='.xlsx', delete=False)
+    test_file = NamedTemporaryFile(mode='w', prefix='openpyxl.',
+                                   suffix='.xlsx', delete=False)
     test_file.close()
-    return test_file.name
+    filename = test_file.name
+    ALL_TEMP_FILES.append(filename)
+    return filename
+
 
 def test_dump_sheet_title():
 
