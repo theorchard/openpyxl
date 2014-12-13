@@ -218,17 +218,12 @@ class DumpWorksheet(Worksheet):
         for col_idx, value in enumerate(row, 1):
             if value is None:
                 continue
-            dirty_cell = False
             column = get_column_letter(col_idx)
 
             if isinstance(value, Cell):
                 cell = value
-                dirty_cell = True  # cell may have other properties than a value
             else:
                 cell.value = value
-
-            if cell._style:  # if cell has a style, it is not reusable
-                dirty_cell = True
 
             cell.coordinate = '%s%d' % (column, row_idx)
             if cell.comment is not None:
@@ -237,8 +232,9 @@ class DumpWorksheet(Worksheet):
                 self._comments.append(comment)
 
             write_cell(doc, self, cell)
-            if dirty_cell:
+            if cell.has_style: # styled cell or datetime
                 cell = WriteOnlyCell(self)
+
         end_tag(doc, 'row')
 
 
