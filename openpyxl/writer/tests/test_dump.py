@@ -1,11 +1,12 @@
 from __future__ import absolute_import
 # Copyright (c) 2010-2014 openpyxl
 
-from datetime import datetime
+from datetime import datetime, date
 from tempfile import NamedTemporaryFile
 import os
 
 import pytest
+
 from openpyxl.tests.helper import compare_xml
 
 from openpyxl.utils.indexed_list import IndexedList
@@ -148,6 +149,21 @@ def test_append_cell_with_style(DumpWorksheet):
     assert diff is None, diff
 
 
+def test_dirty_cell(DumpWorksheet):
+    ws = DumpWorksheet
+    ws.append((date(2001, 1, 1), 1))
+    content = ws.get_temporary_file(ws._fileobj_content_name)
+    content.seek(0)
+    xml = content.read()
+    expected = """
+    <row r="1" spans="1:2">
+      <c r="A1" t="n" s="1"><v>36892</v></c>
+      <c r="B1" t="n"><v>1</v></c>
+      </row>"""
+    diff = compare_xml(xml, expected)
+    assert diff is None, diff
+
+
 @pytest.mark.parametrize("row", ("string", dict()))
 def test_invalid_append(DumpWorksheet, row):
     ws = DumpWorksheet
@@ -165,10 +181,48 @@ def test_write_only_cell():
 
 def test_close_content(DumpWorksheet):
     ws = DumpWorksheet
-    ws._close_content()
+    ws.close()
     content = open(ws._fileobj_content_name).read()
     expected = "</sheetData></worksheet>"
-    content == expected
+    assert content == expected
+
+
+def test_dump_with_comment(DumpWorksheet):
+    ws = DumpWorksheet
+    from openpyxl.writer.dump_worksheet import WriteOnlyCell
+    from openpyxl.comments import Comment
+
+    user_comment = Comment(text='hello world', author='me')
+    cell = WriteOnlyCell(ws, value="hello")
+    cell.comment = user_comment
+
+    ws.append([cell])
+    assert user_comment in ws._comments
+    ws.write_header()
+    header = ws.get_temporary_file(ws._fileobj_header_name)
+    header.write(b"<sheetData>") # well-formed XML needed
+    ws.close()
+    content = open(ws._fileobj_name).read()
+    expected = """
+    <worksheet xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main" xmlns:r="http://schemas.openxmlformats.org/officeDocument/2006/relationships">
+    <sheetPr>
+      <outlinePr summaryRight="1" summaryBelow="1"/>
+    </sheetPr>
+     <dimension ref="A1:A1"/>
+    <sheetViews>
+      <sheetView workbookViewId="0">
+        <selection activeCell="A1" sqref="A1"/>
+      </sheetView>
+    </sheetViews>
+    <sheetFormatPr defaultRowHeight="15" baseColWidth="10"/>
+    <sheetData>
+    <row r="1" spans="1:1"><c r="A1" t="s"><v>0</v></c></row>
+    </sheetData>
+    <legacyDrawing r:id="commentsvml"></legacyDrawing>
+    </worksheet>
+    """
+    diff = compare_xml(content, expected)
+    assert diff is None, diff
 
 def test_close(DumpWorksheet):
     ws = DumpWorksheet
@@ -216,7 +270,7 @@ def test_cannot_save_twice(DumpWorksheet):
         ws.get_temporary_file(fname)
 
 
-#Integration tests
+#Integration tests all default to using LXML backend!
 
 from openpyxl import Workbook, load_workbook
 from openpyxl.cell import get_column_letter
@@ -304,24 +358,6 @@ def test_dump_with_font(temp_file):
 
     ws.append([cell, 3.14, None])
     assert user_font in wb._fonts
-
-
-def test_dump_with_comment(temp_file):
-    from openpyxl.writer.dump_worksheet import WriteOnlyCell
-
-    wb = Workbook(optimized_write=True)
-    ws = wb.create_sheet()
-    user_comment = Comment(text='hello world', author='me')
-    cell = WriteOnlyCell(ws, value="hello")
-    cell.comment = user_comment
-
-    ws.append([cell, 3.14, None])
-    assert user_comment in ws._comments
-    wb.save(temp_file)
-
-    wb2 = load_workbook(temp_file)
-    ws2 = wb2[ws.title]
-    assert ws2['A1'].comment.text == 'hello world'
 
 
 @pytest.mark.parametrize("method",
