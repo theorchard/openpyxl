@@ -56,32 +56,32 @@ def get_version():
     raise RuntimeError("Unable to find version string.")
 
 setup(name='openpyxl',
-      packages=find_packages(),
-      # metadata
-      version=get_version(),
-      description="A Python library to read/write Excel 2007 xlsx/xlsm files",
-      long_description=README,
-      author=__author__,
-      author_email=__author_email__,
-      url=__url__,
-      license=__license__,
-      requires=[
-                'python (>=2.6.0)',
-                ],
-      install_requires=[
-                        'jdcal',
-                        ],
-      classifiers=[
-                   'Development Status :: 4 - Beta',
-                   'Development Status :: 5 - Production/Stable'
-                   'Operating System :: MacOS :: MacOS X',
-                   'Operating System :: Microsoft :: Windows',
-                   'Operating System :: POSIX',
-                   'License :: OSI Approved :: MIT License',
-                   'Programming Language :: Python',
-                   'Programming Language :: Python :: 2.6',
-                   'Programming Language :: Python :: 2.7',
-                   'Programming Language :: Python :: 3.3',
-                   'Programming Language :: Python :: 3.4',
-                   ],
-      )
+    packages=find_packages(),
+    # metadata
+    version=get_version(),
+    description="A Python library to read/write Excel 2007 xlsx/xlsm files",
+    long_description=README,
+    author=__author__,
+    author_email=__author_email__,
+    url=__url__,
+    license=__license__,
+    requires=[
+        'python (>=2.6.0)',
+        ],
+    install_requires=[
+        'jdcal',
+        ],
+    classifiers=[
+                 'Development Status :: 4 - Beta',
+                 'Development Status :: 5 - Production/Stable'
+                 'Operating System :: MacOS :: MacOS X',
+                 'Operating System :: Microsoft :: Windows',
+                 'Operating System :: POSIX',
+                 'License :: OSI Approved :: MIT License',
+                 'Programming Language :: Python',
+                 'Programming Language :: Python :: 2.6',
+                 'Programming Language :: Python :: 2.7',
+                 'Programming Language :: Python :: 3.3',
+                 'Programming Language :: Python :: 3.4',
+                 ],
+    )
