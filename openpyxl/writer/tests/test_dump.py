@@ -180,12 +180,31 @@ def test_dump_with_comment(DumpWorksheet):
 
     ws.append([cell])
     assert user_comment in ws._comments
+    ws.write_header()
+    header = ws.get_temporary_file(ws._fileobj_header_name)
+    header.write(b"<sheetData>") # well-formed XML needed
     ws.close()
     content = open(ws._fileobj_name).read()
-    expected = ("""<row r="1" spans="1:1"><c r="A1" t="s"><v>0</v></c></row>"""
-    """</sheetData>"""
-    """<legacyDrawing r:id="commentsvml"></legacyDrawing></worksheet>""")
-    assert content == expected
+    expected = """
+    <worksheet xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main" xmlns:r="http://schemas.openxmlformats.org/officeDocument/2006/relationships">
+    <sheetPr>
+      <outlinePr summaryRight="1" summaryBelow="1"/>
+    </sheetPr>
+     <dimension ref="A1:A1"/>
+    <sheetViews>
+      <sheetView workbookViewId="0">
+        <selection activeCell="A1" sqref="A1"/>
+      </sheetView>
+    </sheetViews>
+    <sheetFormatPr defaultRowHeight="15" baseColWidth="10"/>
+    <sheetData>
+    <row r="1" spans="1:1"><c r="A1" t="s"><v>0</v></c></row>
+    </sheetData>
+    <legacyDrawing r:id="commentsvml"></legacyDrawing>
+    </worksheet>
+    """
+    diff = compare_xml(content, expected)
+    assert diff is None, diff
 
 
 def test_close(DumpWorksheet):
