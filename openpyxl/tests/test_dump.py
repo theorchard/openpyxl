@@ -177,24 +177,6 @@ def test_dump_with_font():
     assert ws2['A1'].style == user_style
 
 
-def test_dump_with_comment():
-    from openpyxl.writer.dump_worksheet import WriteOnlyCell
-    test_filename = _get_test_filename()
-
-    wb = Workbook(optimized_write=True)
-    ws = wb.create_sheet()
-    user_comment = Comment(text='hello world', author='me')
-    cell = WriteOnlyCell(ws, value="hello")
-    cell.comment = user_comment
-
-    ws.append([cell, 3.14, None])
-    assert user_comment in ws._comments
-    wb.save(test_filename)
-
-    wb2 = load_workbook(test_filename)
-    ws2 = wb2[ws.title]
-    assert ws2['A1'].comment.text == 'hello world'
-
 @pytest.mark.parametrize("method", [
     '__getitem__', '__setitem__', 'cell', 'range', 'merge_cells']
                          )

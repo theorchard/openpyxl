@@ -163,10 +163,29 @@ def test_append_cell(DumpWorksheet):
 
 def test_close_content(DumpWorksheet):
     ws = DumpWorksheet
-    ws._close_content()
+    ws.close()
     content = open(ws._fileobj_content_name).read()
     expected = "</sheetData></worksheet>"
-    content == expected
+    assert content == expected
+
+
+def test_dump_with_comment(DumpWorksheet):
+    ws = DumpWorksheet
+    from openpyxl.writer.dump_worksheet import WriteOnlyCell
+    from openpyxl.comments import Comment
+
+    user_comment = Comment(text='hello world', author='me')
+    cell = WriteOnlyCell(ws, value="hello")
+    cell.comment = user_comment
+
+    ws.append([cell])
+    assert user_comment in ws._comments
+    ws.close()
+    content = open(ws._fileobj_name).read()
+    expected = ("""<row r="1" spans="1:1"><c r="A1" t="s"><v>0</v></c></row>"""
+    """</sheetData>"""
+    """<legacyDrawing r:id="commentsvml"></legacyDrawing></worksheet>""")
+    assert content == expected
 
 
 def test_close(DumpWorksheet):
