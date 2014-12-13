@@ -213,30 +213,3 @@ def test_save_empty_workbook():
 
     wb = load_workbook(fn)
     assert len(wb.worksheets) == 1
-
-
-def test_dirty_style():
-    wb = Workbook(write_only=True)
-    ws = wb.create_sheet()
-    fn = _get_test_filename()
-    rows = [(date(2001, 1, 1), 1),
-            (date(2001, 1, 2), 2),
-            (date(2001, 1, 3), 3), ]
-
-    for stamp, val in rows:
-        ws.append([stamp, val])
-    wb.save(fn)
-
-    wb = load_workbook(fn)
-    assert wb[ws.title]['B1']._style == 0
-
-
-def test_write_single_equal():
-    workbook = Workbook(optimized_write=True)
-    ws = workbook.create_sheet()
-    ws.append(["="])
-    fn = _get_test_filename()
-    workbook.save(fn)
-
-    wb = load_workbook(fn)
-    assert wb[ws.title]['A1'].value == "="

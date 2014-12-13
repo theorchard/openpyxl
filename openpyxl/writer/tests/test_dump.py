@@ -3,6 +3,8 @@ from __future__ import absolute_import
 
 import pytest
 
+from datetime import date
+
 from openpyxl.tests.helper import compare_xml
 
 from openpyxl.collections import IndexedList
@@ -108,6 +110,21 @@ def test_append_data(DumpWorksheet):
     content.seek(0)
     xml = content.read()
     expected = """<row r="1" spans="1:1"><c r="A1" t="n"><v>1</v></c></row>"""
+    diff = compare_xml(xml, expected)
+    assert diff is None, diff
+
+
+def test_dirty_cell(DumpWorksheet):
+    ws = DumpWorksheet
+    ws.append((date(2001, 1, 1), 1))
+    content = ws.get_temporary_file(ws._fileobj_content_name)
+    content.seek(0)
+    xml = content.read()
+    expected = """
+    <row r="1" spans="1:2">
+      <c r="A1" t="n" s="1"><v>36892</v></c>
+      <c r="B1" t="n"><v>1</v></c>
+      </row>"""
     diff = compare_xml(xml, expected)
     assert diff is None, diff
 
