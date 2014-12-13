@@ -174,6 +174,29 @@ def test_cell_comment(LXMLWorksheet):
     cell.comment = comment
     ws.append([cell])
     assert ws._comments == [comment]
+    ws.close()
+
+    with open(ws.filename) as src:
+        xml = src.read()
+    expected = """
+    <worksheet xmlns:r="http://schemas.openxmlformats.org/officeDocument/2006/relationships" xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main">
+    <sheetPr>
+      <outlinePr summaryRight="1" summaryBelow="1"/>
+    </sheetPr>
+    <sheetViews>
+      <sheetView workbookViewId="0">
+        <selection sqref="A1" activeCell="A1"/>
+      </sheetView>
+    </sheetViews>
+    <sheetFormatPr baseColWidth="10" defaultRowHeight="15"/>
+    <sheetData>
+    <row r="1" spans="1:1"><c r="A1" t="n"><v>1</v></c></row>
+    </sheetData>
+    <legacyDrawing r:id="commentsvml"></legacyDrawing>
+    </worksheet>
+    """
+    diff = compare_xml(xml, expected)
+    assert diff is None, diff
 
 
 @pytest.mark.lxml_required

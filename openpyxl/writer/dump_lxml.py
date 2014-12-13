@@ -23,6 +23,7 @@ from . lxml_worksheet import (
 
 from openpyxl.xml.constants import (
     SHEET_MAIN_NS,
+    REL_NS,
 )
 from openpyxl.xml.functions import XMLGenerator
 
@@ -72,6 +73,9 @@ class LXMLWorksheet(DumpWorksheet):
                             xf.write(r)
                     except GeneratorExit:
                         pass
+                if self._comments:
+                    comments = Element('legacyDrawing', {'{%s}id' % REL_NS: 'commentsvml'})
+                    xf.write(comments)
 
     def close(self):
         if self.__saved:
