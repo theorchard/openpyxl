@@ -8,6 +8,7 @@ from lxml.etree import xmlfile, Element, SubElement
 
 from openpyxl.compat import safe_string, range
 from openpyxl.cell import get_column_letter, Cell
+from openpyxl.worksheet.properties import write_sheetPr
 
 from . dump_worksheet import (
     DumpWorksheet,
@@ -19,6 +20,7 @@ from . lxml_worksheet import (
     write_format,
     write_sheetviews,
     write_cols,
+    write_autofilter
 )
 
 from openpyxl.xml.constants import (
@@ -51,13 +53,10 @@ class LXMLWorksheet(DumpWorksheet):
 
         with xmlfile(self.filename) as xf:
             with xf.element("worksheet", nsmap=NSMAP):
-                pr = Element('sheetPr')
-                SubElement(pr, 'outlinePr',
-                           {'summaryBelow':
-                            '%d' %  (self.show_summary_below),
-                            'summaryRight': '%d' % (self.show_summary_right)})
-                if self.page_setup.fitToPage:
-                    SubElement(pr, 'pageSetUpPr', {'fitToPage': '1'})
+
+                if self.sheet_properties:
+                    pr = write_sheetPr(self.sheet_properties)
+
                 xf.write(pr)
                 xf.write(write_sheetviews(self))
                 xf.write(write_format(self))
@@ -73,6 +72,9 @@ class LXMLWorksheet(DumpWorksheet):
                             xf.write(r)
                     except GeneratorExit:
                         pass
+                af = write_autofilter(self)
+                if af is not None:
+                    xf.write(af)
                 if self._comments:
                     comments = Element('legacyDrawing', {'{%s}id' % REL_NS: 'commentsvml'})
                     xf.write(comments)
@@ -98,7 +100,7 @@ class LXMLWorksheet(DumpWorksheet):
             not isinstance(row, (list, tuple, range))
             ):
             self._invalid_row(row)
-        cell = WriteOnlyCell(self) # singleton
+        cell = WriteOnlyCell(self)  # singleton
 
         self._max_row += 1
         row_idx = self._max_row
@@ -146,7 +148,7 @@ def write_cell(worksheet, cell):
     coordinate = cell.coordinate
     attributes = {'r': coordinate}
     if cell.has_style:
-        attributes['s'] = '%d' % cell._style
+        attributes['s'] = '%d' % cell.style_id
 
     if cell.data_type != 'f':
         attributes['t'] = cell.data_type
@@ -165,7 +167,7 @@ def write_cell(worksheet, cell):
                 value = None
         formula = SubElement(el, 'f', shared_formula)
         if value is not None:
-            formula.text= value[1:]
+            formula.text = value[1:]
             value = None
 
     if cell.data_type == 's':

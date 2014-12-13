@@ -62,7 +62,7 @@ def integer():
 
     class Dummy(Strict):
 
-        value =  Integer()
+        value = Integer()
 
     return Dummy()
 
@@ -95,7 +95,7 @@ def float():
 
     class Dummy(Strict):
 
-        value =  Float()
+        value = Float()
 
     return Dummy()
 
@@ -405,3 +405,30 @@ class TestSequence:
             Sequence.value = value
 
 
+@pytest.fixture
+def MatchPattern():
+    from . import MatchPattern, Strict
+
+    class Dummy(Strict):
+        """ 
+        This dummy test is related to page setup of a worksheet.
+        .. todo: 
+            test other pattern contexts when they will appear.
+        """
+        value = MatchPattern(pattern="[0-9]+(\.[0-9]+)?(mm|cm|in|pt|pc|pi)")
+
+    return Dummy()
+
+
+class TestMatchPattern:
+
+    def test_valid(self, MatchPattern):
+        for value in [24.73, 0, 24, '999']:
+            for item in ['mm', 'cm', 'in', 'pt', 'pc', 'pi']:
+                MatchPattern.value = "{0}{1}".format(value, item)
+                
+
+    def test_invalid(self, MatchPattern):
+        for value in [24.73, '24.73zz', "24.73 mm", None, "-24.73cm"]:
+            with pytest.raises(ValueError):
+                MatchPattern.value = "{0}".format(value)

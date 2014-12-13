@@ -60,6 +60,14 @@ openpyxl.charts.line module
     :undoc-members:
     :show-inheritance:
 
+openpyxl.charts.lineser module
+------------------------------
+
+.. automodule:: openpyxl.charts.lineser
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
 openpyxl.charts.pie module
 --------------------------
 
@@ -88,6 +96,14 @@ openpyxl.charts.series module
 -----------------------------
 
 .. automodule:: openpyxl.charts.series
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
+openpyxl.charts.writer module
+-----------------------------
+
+.. automodule:: openpyxl.charts.writer
     :members:
     :undoc-members:
     :show-inheritance:

@@ -1,7 +1,7 @@
 from __future__ import absolute_import
 # Copyright (c) 2010-2014 openpyxl
 
-from openpyxl.units import pixels_to_EMU
+from openpyxl.utils.units import pixels_to_EMU
 
 from .axis import CategoryAxis, ValueAxis
 from .chart import Chart
@@ -13,7 +13,7 @@ class GraphChart(Chart):
     x_axis = CategoryAxis
     y_axis = ValueAxis
 
-    def __init__(self, auto_axis=True):
+    def __init__(self, auto_axis=False):
         super(GraphChart, self).__init__()
         self.auto_axis = auto_axis
         self.x_axis = getattr(self, "x_axis")(auto_axis)

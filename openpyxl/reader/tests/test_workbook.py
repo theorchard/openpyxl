@@ -153,3 +153,13 @@ def test_missing_content_type(datadir, DummyArchive):
     sheets = list(detect_worksheets(archive))
     assert sheets == [{'path': 'xl/worksheets/sheet1.xml', 'title': 'Sheet 1', 'sheet_id':'1',
                        'type':'%s/worksheet' % REL_NS}]
+
+
+def test_read_workbook_with_no_core_properties(datadir, Workbook):
+    from openpyxl.workbook import DocumentProperties
+    from openpyxl.reader.excel import _load_workbook
+
+    datadir.chdir()
+    archive = ZipFile('empty_with_no_properties.xlsx')
+    wb = Workbook()
+    assert isinstance(wb.properties, DocumentProperties)

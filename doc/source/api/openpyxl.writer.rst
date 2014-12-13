@@ -4,14 +4,6 @@ openpyxl.writer package
 Submodules
 ----------
 
-openpyxl.writer.charts module
------------------------------
-
-.. automodule:: openpyxl.writer.charts
-    :members:
-    :undoc-members:
-    :show-inheritance:
-
 openpyxl.writer.comments module
 -------------------------------
 
