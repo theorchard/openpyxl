@@ -113,6 +113,12 @@ def test_formula(dummy_cell, value):
     assert cell.data_type == 'f'
 
 
+def test_not_formula(dummy_cell):
+    dummy_cell.value = "="
+    assert dummy_cell.data_type == 's'
+    assert dummy_cell.value == "="
+
+
 @pytest.mark.parametrize("value", [True, False])
 def test_boolean(dummy_cell, value):
     cell = dummy_cell
