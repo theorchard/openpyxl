@@ -183,6 +183,12 @@ class TestCellValueTypes(object):
         assert self.cell.data_type == 'f'
 
 
+    def test_not_formula(self):
+        self.cell.value = "="
+        assert self.cell.data_type == 's'
+        assert self.cell.value == "="
+
+
     @pytest.mark.parametrize("value", [True, False])
     def test_boolean(self, value):
         self.cell.value = True
