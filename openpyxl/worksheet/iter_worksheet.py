@@ -121,7 +121,13 @@ class IterableWorksheet(Worksheet):
                         # create missing cell
                         full_row.append(EMPTY_CELL)
             else:
-                full_row = tuple(cells)
+                full_row = list(cells)
+                first_cell = full_row[0]
+                if first_cell is not EMPTY_CELL:
+                    # left-pad row with empty cells
+                    _col = column_index_from_string(first_cell.column)
+                    missing = _col - min_col
+                    full_row = missing*[EMPTY_CELL] + full_row
             row_counter = row + 1
             yield tuple(full_row)
 

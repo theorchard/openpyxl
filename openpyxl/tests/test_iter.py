@@ -220,3 +220,25 @@ def test_read_style_iter(tmpdir):
     cell = ws_iter['A1']
 
     assert cell.style.font == ft
+
+
+def test_read_with_missing_cells(datadir):
+    datadir.join("reader").chdir()
+
+    class Workbook:
+        excel_base_date = None
+
+        def get_sheet_names(self):
+            return []
+
+    filename = "bug393-worksheet.xml"
+
+    from openpyxl.worksheet.iter_worksheet import IterableWorksheet
+    ws = IterableWorksheet(Workbook(), "Sheet", "", filename, [], [])
+    row = tuple(ws.get_squared_range(1, 2, None, 2))[0]
+    values = [c.value for c in row]
+    assert values == [None, None, 1, 2, 3]
+
+    row = tuple(ws.get_squared_range(1, 4, None, 4))[0]
+    values = [c.value for c in row]
+    #assert values == [1, 2, None, None, 3] # cells need padding
