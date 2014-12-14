@@ -170,9 +170,11 @@ class IterableWorksheet(Worksheet):
         """.iter_rows always returns a generator of rows each of which
         contains a generator of cells. This can be empty in which case
         return None"""
-        result = list(self.iter_rows(coordinate))
-        if result:
-            return result[0][0]
+        col, row = coordinate_from_string(coordinate)
+        col = column_index_from_string(col)
+        cell = tuple(self.get_cells(row, col, row, col))
+        if cell:
+            return cell[0]
 
     @property
     def rows(self):
