@@ -253,10 +253,10 @@ def test_read_with_missing_cells(datadir):
 
     from openpyxl.worksheet.iter_worksheet import IterableWorksheet
     ws = IterableWorksheet(Workbook(), "Sheet", "", filename, [], [])
-    row = tuple(ws.get_squared_range(1, 2, None, 2))[0]
+    row = tuple(ws._get_cells(2, 1, 2, None))
     values = [c.value for c in row]
     assert values == [None, None, 1, 2, 3]
 
-    row = tuple(ws.get_squared_range(1, 4, None, 4))[0]
+    row = tuple(ws._get_cells(4, 1, 4, None))
     values = [c.value for c in row]
     assert values == [1, 2, None, None, 3]
