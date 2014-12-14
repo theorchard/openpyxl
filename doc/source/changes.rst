@@ -35,7 +35,6 @@ Minor changes
 * Serialize comments relation in LXML-backend
 
 
->>>>>>> theirs
 2.1.3 (2014-12-09)
 ==================
 
