@@ -96,19 +96,20 @@ class IterableWorksheet(Worksheet):
         """
         if max_col is not None:
             expected_columns = [get_column_letter(ci) for ci in range(min_col, max_col + 1)]
+            empty_row = tuple(EMPTY_CELL for column in expected_columns)
         else:
             expected_columns = []
         row_counter = min_row
 
         # get cells row by row
-        for row, cells in groupby(self._get_cells(min_row, min_col,
-                                                 max_row, max_col),
-                                  operator.attrgetter('row')):
+
+        for cells in self._get_cells(min_row, min_col, max_row, max_col):
+            row = cells[0].row
             full_row = []
             if row_counter < row:
                 # Rows requested before those in the worksheet
                 for gap_row in range(row_counter, row):
-                    yield tuple(EMPTY_CELL for column in expected_columns)
+                    yield empty_row
                     row_counter = row
 
             if expected_columns:
@@ -126,6 +127,44 @@ class IterableWorksheet(Worksheet):
             row_counter = row + 1
             yield tuple(full_row)
 
+
+    def _get_row(self, element, min_col=1, max_col=None):
+        """Return cells from a particular row"""
+        col_counter = min_col
+
+        for cell in safe_iterator(element, CELL_TAG):
+            coord = cell.get('r')
+            column_str, row = coordinate_from_string(coord)
+            column = column_index_from_string(column_str)
+
+            if max_col is not None and column > max_col:
+                break
+
+            if min_col <= column:
+                for gap in range(col_counter, column):
+                    # pad row with missing cells
+                    yield ReadOnlyCell(self, row, None, None)
+
+                data_type = cell.get('t', 'n')
+                style_id = int(cell.get('s', 0))
+                formula = cell.findtext(FORMULA_TAG)
+                value = cell.find(VALUE_TAG)
+                if value is not None:
+                    value = value.text
+                if formula is not None:
+                    if not self.parent.data_only:
+                        data_type = Cell.TYPE_FORMULA
+                        value = "=%s" % formula
+
+                yield ReadOnlyCell(self, row, column_str,
+                                   value, data_type, self.parent._cell_styles[style_id])
+            col_counter = column + 1
+        if max_col is not None:
+            while col_counter <= max_col:
+                yield ReadOnlyCell(self, row, None, None)
+                col_counter += 1
+
+
     def _get_cells(self, min_row, min_col, max_row, max_col):
         p = iterparse(self.xml_source, tag=[ROW_TAG], remove_blank_text=True)
         col_counter = min_col
@@ -135,33 +174,7 @@ class IterableWorksheet(Worksheet):
                 if max_row is not None and row > max_row:
                     break
                 if min_row <= row:
-                    for cell in safe_iterator(element, CELL_TAG):
-                        coord = cell.get('r')
-                        column_str, row = coordinate_from_string(coord)
-                        column = column_index_from_string(column_str)
-
-                        while column > col_counter:
-                            # pad row with missing cells
-                            yield ReadOnlyCell(self, row, col_counter, None)
-                            col_counter += 1
-
-                        if max_col is not None and column > max_col:
-                            break
-                        if min_col <= column:
-                            data_type = cell.get('t', 'n')
-                            style_id = int(cell.get('s', 0))
-                            formula = cell.findtext(FORMULA_TAG)
-                            value = cell.find(VALUE_TAG)
-                            if value is not None:
-                                value = value.text
-                            if formula is not None:
-                                if not self.parent.data_only:
-                                    data_type = Cell.TYPE_FORMULA
-                                    value = "=%s" % formula
-
-                            yield ReadOnlyCell(self, row, column_str,
-                                               value, data_type, self.parent._cell_styles[style_id])
-                            col_counter += 1
+                    yield tuple(self._get_row(element, min_col, max_col))
 
             if element.tag in (CELL_TAG, VALUE_TAG, FORMULA_TAG):
                 # sub-elements of rows should be skipped
@@ -176,9 +189,10 @@ class IterableWorksheet(Worksheet):
         """Cells are returned by a generator which can be empty"""
         col, row = coordinate_from_string(coordinate)
         col = column_index_from_string(col)
-        cell = tuple(self._get_cells(row, col, row, col))
+        cell = next(self._get_cells(row, col, row, col))
         if cell:
             return cell[0]
+        return EMPTY_CELL
 
     @property
     def rows(self):

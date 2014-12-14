@@ -123,7 +123,7 @@ expected = [['This is cell A1 in Sheet 1', None, None, None, None, None, None],
 def test_read_fast_integrated_text(sample_workbook):
     wb = sample_workbook
     ws = wb['Sheet1 - Text']
-    for row, expected_row in zip(ws.iter_rows(), expected):
+    for row, expected_row in zip(ws.rows, expected):
         row_values = [x.value for x in row]
         assert row_values == expected_row
 
@@ -250,10 +250,37 @@ def test_read_with_missing_cells(datadir):
 
     from openpyxl.worksheet.iter_worksheet import IterableWorksheet
     ws = IterableWorksheet(Workbook(), "Sheet", "", filename, [], [])
-    row = tuple(ws._get_cells(2, 1, 2, None))
+    row = next(ws._get_cells(2, 1, 2, None))
     values = [c.value for c in row]
     assert values == [None, None, 1, 2, 3]
 
-    row = tuple(ws._get_cells(4, 1, 4, None))
+    row = next((ws._get_cells(4, 1, 4, None)))
     values = [c.value for c in row]
     assert values == [1, 2, None, None, 3]
+
+
+def test_read_row(datadir):
+    datadir.join("reader").chdir()
+
+    class Workbook:
+        excel_base_date = None
+        _cell_styles = [None]
+
+        def get_sheet_names(self):
+            return []
+
+    filename = "bug393-worksheet.xml"
+
+    from openpyxl.worksheet.iter_worksheet import IterableWorksheet
+    ws = IterableWorksheet(Workbook(), "Sheet", "", filename, [], [])
+    #row = tuple(ws._get_row(2))
+    #values = [c.value for c in row]
+    #assert values == [None, None, 1, 2, 3]
+
+    #row = tuple(ws._get_row(3, 1, 5))
+    #values = [c.value for c in row]
+    #assert values == [1, 2, 3, None, None]
+
+    #row = tuple(ws._get_row(4))
+    #values = [c.value for c in row]
+    #assert values == [1, 2, None, None, 3]
