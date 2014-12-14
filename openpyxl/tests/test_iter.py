@@ -241,4 +241,4 @@ def test_read_with_missing_cells(datadir):
 
     row = tuple(ws.get_squared_range(1, 4, None, 4))[0]
     values = [c.value for c in row]
-    #assert values == [1, 2, None, None, 3] # cells need padding
+    assert values == [1, 2, None, None, 3]

@@ -122,17 +122,13 @@ class IterableWorksheet(Worksheet):
                         full_row.append(EMPTY_CELL)
             else:
                 full_row = list(cells)
-                first_cell = full_row[0]
-                if first_cell is not EMPTY_CELL:
-                    # left-pad row with empty cells
-                    _col = column_index_from_string(first_cell.column)
-                    missing = _col - min_col
-                    full_row = missing*[EMPTY_CELL] + full_row
+
             row_counter = row + 1
             yield tuple(full_row)
 
     def get_cells(self, min_row, min_col, max_row, max_col):
         p = iterparse(self.xml_source, tag=[ROW_TAG], remove_blank_text=True)
+        col_counter = 0
         for _event, element in p:
             if element.tag == ROW_TAG:
                 row = int(element.get("r"))
@@ -140,12 +136,18 @@ class IterableWorksheet(Worksheet):
                     break
                 if min_row <= row:
                     for cell in safe_iterator(element, CELL_TAG):
+                        col_counter += 1
                         coord = cell.get('r')
                         column_str, row = coordinate_from_string(coord)
                         column = column_index_from_string(column_str)
+
                         if max_col is not None and column > max_col:
                             break
                         if min_col <= column:
+                            while column > col_counter:
+                                # pad row with missing cells
+                                yield ReadOnlyCell(self, row, col_counter, None)
+                                col_counter += 1
                             data_type = cell.get('t', 'n')
                             style_id = cell.get('s')
                             formula = cell.findtext(FORMULA_TAG)
