@@ -26,6 +26,7 @@ I'd also like to greatly thank all those who participate in the project (in alph
 * Jeff Holman
 * Brent Hoover
 * Eric Hurkman
+* Jean Pierre Huart
 * JarekPS
 * Heikki Junes
 * Chi Ho Kwok

@@ -114,3 +114,6 @@ class Border(HashableObject):
             if (key == "outline" and not value
                 or key != "outline" and value):
                 yield key, safe_string(value)
+
+
+DEFAULT_BORDER = Border()

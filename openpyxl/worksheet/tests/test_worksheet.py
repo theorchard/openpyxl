@@ -11,12 +11,15 @@ from openpyxl.workbook import Workbook
 from openpyxl.worksheet import Worksheet, Relationship, flatten
 from openpyxl.cell import Cell, coordinate_from_string
 from openpyxl.comments import Comment
-from openpyxl.exceptions import (
+from openpyxl.utils.exceptions import (
     CellCoordinatesException,
     SheetTitleException,
     InsufficientCoordinatesException,
     NamedRangeException
     )
+
+from openpyxl.styles.colors import Color
+from ..properties import WorksheetProperties
 
 
 @pytest.mark.parametrize('range_string, coords',
@@ -97,23 +100,23 @@ class TestWorksheet(object):
     def test_squared_range(self):
         ws = Worksheet(self.wb)
         expected = [
-            ('A1', 'B1', 'C1' ),
-            ('A2', 'B2', 'C2' ),
-            ('A3', 'B3', 'C3' ),
-            ('A4', 'B4', 'C4' ),
+            ('A1', 'B1', 'C1'),
+            ('A2', 'B2', 'C2'),
+            ('A3', 'B3', 'C3'),
+            ('A4', 'B4', 'C4'),
         ]
         rows = ws.get_squared_range(1, 1, 3, 4)
         for row, coord in zip(rows, expected):
             assert tuple(c.coordinate for c in row) == coord
 
 
-    def test_iter_rows(self, ):
+    def test_iter_rows(self,):
         ws = Worksheet(self.wb)
         expected = [
-            ('A1', 'B1', 'C1' ),
-            ('A2', 'B2', 'C2' ),
-            ('A3', 'B3', 'C3' ),
-            ('A4', 'B4', 'C4' ),
+            ('A1', 'B1', 'C1'),
+            ('A2', 'B2', 'C2'),
+            ('A3', 'B3', 'C3'),
+            ('A4', 'B4', 'C4'),
         ]
 
         rows = ws.iter_rows('A1:C4')
@@ -125,10 +128,10 @@ class TestWorksheet(object):
         ws = Worksheet(self.wb)
         rows = ws.iter_rows('A1:C4', 1, 3)
         expected = [
-            ('D2', 'E2', 'F2' ),
-            ('D3', 'E3', 'F3' ),
-            ('D4', 'E4', 'F4' ),
-            ('D5', 'E5', 'F5' ),
+            ('D2', 'E2', 'F2'),
+            ('D3', 'E3', 'F3'),
+            ('D4', 'E4', 'F4'),
+            ('D5', 'E5', 'F5'),
         ]
 
         for row, coord in zip(rows, expected):
@@ -311,7 +314,7 @@ class TestWorksheet(object):
         ws.cell('C9').value = 'last'
         assert ws.calculate_dimension() == 'A1:C9'
         rows = ws.iter_rows()
-        first_row = tuple(next(islice(rows, row-1, row)))
+        first_row = tuple(next(islice(rows, row - 1, row)))
         assert first_row[column].coordinate == coordinate
 
 

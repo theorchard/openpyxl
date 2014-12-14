@@ -7,52 +7,26 @@ from __future__ import absolute_import
 __docformat__ = "restructuredtext en"
 
 # Python stdlib imports
-import datetime
 import threading
 
 # package imports
-from openpyxl.collections import IndexedList
+from openpyxl.utils.indexed_list import IndexedList
+from openpyxl.utils.datetime  import CALENDAR_WINDOWS_1900
 from openpyxl.worksheet import Worksheet
 from openpyxl.writer.dump_worksheet import DumpWorksheet, save_dump
 from . names.named_range import NamedRange
 from openpyxl.styles import Style
+from openpyxl.styles.proxy import StyleId
 from openpyxl.writer.excel import save_workbook
-from openpyxl.exceptions import ReadOnlyWorkbookException
-from openpyxl.date_time import CALENDAR_WINDOWS_1900
+from openpyxl.utils.exceptions import ReadOnlyWorkbookException
 from openpyxl.xml import LXML
 from openpyxl.xml.functions import fromstring
 from openpyxl.xml.constants import SHEET_MAIN_NS
 from openpyxl.compat import deprecated
+from . properties import DocumentProperties, DocumentSecurity
 
 if LXML:
     from openpyxl.writer.dump_lxml import LXMLWorksheet as DumpWorksheet
-
-
-class DocumentProperties(object):
-    """High-level properties of the document."""
-
-    def __init__(self):
-        self.creator = 'Unknown'
-        self.last_modified_by = self.creator
-        self.modified = self.created = datetime.datetime.now()
-        self.title = 'Untitled'
-        self.subject = ''
-        self.description = ''
-        self.keywords = ''
-        self.category = ''
-        self.company = 'Microsoft Corporation'
-        self.excel_base_date = CALENDAR_WINDOWS_1900
-
-
-class DocumentSecurity(object):
-    """Security information about the document."""
-
-    def __init__(self):
-        self.lock_revision = False
-        self.lock_structure = False
-        self.lock_windows = False
-        self.revision_password = ''
-        self.workbook_password = ''
 
 
 class Workbook(object):
@@ -81,20 +55,53 @@ class Workbook(object):
         self.shared_strings = IndexedList()
         self.shared_styles = IndexedList()
         self.shared_styles.add(Style())
+        self._setup_styles()
         self.loaded_theme = None
         self._worksheet_class = worksheet_class
         self.vba_archive = None
+        self.is_template = False
         self.style_properties = None
         self._guess_types = guess_types
         self.data_only = data_only
         self.relationships = []
         self.drawings = []
-        self.code_name = u'ThisWorkbook'
-
+        self.code_name = None
+        self.excel_base_date = CALENDAR_WINDOWS_1900
         self.encoding = encoding
 
         if not self.write_only:
             self.worksheets.append(self._worksheet_class(parent_workbook=self))
+
+
+    def _setup_styles(self):
+        """Bootstrap styles"""
+        from openpyxl.styles.alignment import Alignment
+        from openpyxl.styles.borders import DEFAULT_BORDER
+        from openpyxl.styles.fills import DEFAULT_EMPTY_FILL, DEFAULT_GRAY_FILL
+        from openpyxl.styles.fonts import DEFAULT_FONT
+        from openpyxl.styles.protection import Protection
+
+        self._fonts = IndexedList()
+        self._fonts.add(DEFAULT_FONT)
+
+        self._alignments = IndexedList()
+        self._alignments.add(Alignment())
+
+        self._borders = IndexedList()
+        self._borders.add(DEFAULT_BORDER)
+
+        self._fills = IndexedList()
+        self._fills.add(DEFAULT_EMPTY_FILL)
+        self._fills.add(DEFAULT_GRAY_FILL)
+
+        self._number_formats = IndexedList()
+
+        self._protections = IndexedList()
+        self._protections.add(Protection())
+
+        self._colors = IndexedList()
+        self._cell_styles = IndexedList([StyleId(0, 0, 0, 0, 0, 0)])
+
 
     @deprecated('this method is private and should not be called directly')
     def read_workbook_settings(self, xml_source):
@@ -103,19 +110,13 @@ class Workbook(object):
     def _read_workbook_settings(self, xml_source):
         root = fromstring(xml_source)
         view = root.find('*/' '{%s}workbookView' % SHEET_MAIN_NS)
-        if view is None:
-            return
-
-        if 'activeTab' in view.attrib:
-            self.active = int(view.attrib['activeTab'])
+        if view is not None:
+            if 'activeTab' in view.attrib:
+                self.active = int(view.attrib['activeTab'])
 
     @property
     def _local_data(self):
         return self.__thread_local_data
-
-    @property
-    def excel_base_date(self):
-        return self.properties.excel_base_date
 
     @property
     def read_only(self):
@@ -187,16 +188,11 @@ class Workbook(object):
     def get_sheet_by_name(self, name):
         """Returns a worksheet by its name.
 
-        Returns None if no worksheet has the name specified.
-
         :param name: the name of the worksheet to look for
         :type name: string
 
         """
-        try:
-            return self[name]
-        except KeyError:
-            return
+        return self[name]
 
     def __contains__(self, key):
         return key in set(self.sheetnames)
