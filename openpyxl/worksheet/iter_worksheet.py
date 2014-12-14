@@ -167,9 +167,7 @@ class IterableWorksheet(Worksheet):
             element.clear()
 
     def _get_cell(self, coordinate):
-        """.iter_rows always returns a generator of rows each of which
-        contains a generator of cells. This can be empty in which case
-        return None"""
+        """Cells are returned by a generator which can be empty"""
         col, row = coordinate_from_string(coordinate)
         col = column_index_from_string(col)
         cell = tuple(self.get_cells(row, col, row, col))
