@@ -128,7 +128,7 @@ class IterableWorksheet(Worksheet):
 
     def _get_cells(self, min_row, min_col, max_row, max_col):
         p = iterparse(self.xml_source, tag=[ROW_TAG], remove_blank_text=True)
-        col_counter = 0
+        col_counter = min_col
         for _event, element in p:
             if element.tag == ROW_TAG:
                 row = int(element.get("r"))
@@ -136,7 +136,6 @@ class IterableWorksheet(Worksheet):
                     break
                 if min_row <= row:
                     for cell in safe_iterator(element, CELL_TAG):
-                        col_counter += 1
                         coord = cell.get('r')
                         column_str, row = coordinate_from_string(coord)
                         column = column_index_from_string(column_str)
@@ -161,6 +160,8 @@ class IterableWorksheet(Worksheet):
 
                             yield ReadOnlyCell(self, row, column_str,
                                                value, data_type, self.parent._cell_styles[style_id])
+                            col_counter += 1
+
             if element.tag in (CELL_TAG, VALUE_TAG, FORMULA_TAG):
                 # sub-elements of rows should be skipped
                 continue
