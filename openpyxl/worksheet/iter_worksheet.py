@@ -9,7 +9,7 @@ import operator
 from itertools import groupby
 
 # compatibility
-from openpyxl.compat import range
+from openpyxl.compat import range, deprecated
 from openpyxl.xml.functions import iterparse
 
 # package
@@ -101,7 +101,7 @@ class IterableWorksheet(Worksheet):
         row_counter = min_row
 
         # get cells row by row
-        for row, cells in groupby(self.get_cells(min_row, min_col,
+        for row, cells in groupby(self._get_cells(min_row, min_col,
                                                  max_row, max_col),
                                   operator.attrgetter('row')):
             full_row = []
@@ -126,7 +126,7 @@ class IterableWorksheet(Worksheet):
             row_counter = row + 1
             yield tuple(full_row)
 
-    def get_cells(self, min_row, min_col, max_row, max_col):
+    def _get_cells(self, min_row, min_col, max_row, max_col):
         p = iterparse(self.xml_source, tag=[ROW_TAG], remove_blank_text=True)
         col_counter = 0
         for _event, element in p:
@@ -166,11 +166,15 @@ class IterableWorksheet(Worksheet):
                 continue
             element.clear()
 
+    @deprecated("Method is private")
+    def get_cells(self, min_row, min_col, max_row, max_col):
+        return self._get_cells(min_row, min_col, max_row, max_col)
+
     def _get_cell(self, coordinate):
         """Cells are returned by a generator which can be empty"""
         col, row = coordinate_from_string(coordinate)
         col = column_index_from_string(col)
-        cell = tuple(self.get_cells(row, col, row, col))
+        cell = tuple(self._get_cells(row, col, row, col))
         if cell:
             return cell[0]
 
