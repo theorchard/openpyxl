@@ -75,13 +75,10 @@ def test_calculate_dimension(datadir):
                          ]
                          )
 def test_get_missing_cell(read_only, datadir):
-    """
-    Behaviour differs between implementations
-    """
     datadir.join("genuine").chdir()
     wb = load_workbook(filename="empty.xlsx", read_only=read_only)
     ws = wb['Sheet2 - Numbers']
-    assert (ws['A1'] is None) is read_only
+    assert ws['A1'].value is None
 
 
 def test_getitem(sample_workbook):

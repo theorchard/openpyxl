@@ -140,13 +140,14 @@ class IterableWorksheet(Worksheet):
                         column_str, row = coordinate_from_string(coord)
                         column = column_index_from_string(column_str)
 
+                        while column > col_counter:
+                            # pad row with missing cells
+                            yield ReadOnlyCell(self, row, col_counter, None)
+                            col_counter += 1
+
                         if max_col is not None and column > max_col:
                             break
                         if min_col <= column:
-                            while column > col_counter:
-                                # pad row with missing cells
-                                yield ReadOnlyCell(self, row, col_counter, None)
-                                col_counter += 1
                             data_type = cell.get('t', 'n')
                             style_id = int(cell.get('s', 0))
                             formula = cell.findtext(FORMULA_TAG)
