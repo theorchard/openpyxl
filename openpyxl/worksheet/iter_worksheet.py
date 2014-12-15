@@ -127,7 +127,7 @@ class IterableWorksheet(Worksheet):
             if min_col <= column:
                 for col_counter in range(max(col_counter, min_col), column):
                     # pad row with missing cells
-                    yield ReadOnlyCell(self, row, None, None)
+                    yield EMPTY_CELL
 
                 data_type = cell.get('t', 'n')
                 style_id = int(cell.get('s', 0))
@@ -145,7 +145,7 @@ class IterableWorksheet(Worksheet):
             col_counter = column + 1
         if max_col is not None:
             while col_counter <= max_col:
-                yield ReadOnlyCell(self, row, None, None)
+                yield EMPTY_CELL
                 col_counter += 1
 
 
