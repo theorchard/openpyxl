@@ -95,8 +95,7 @@ class IterableWorksheet(Worksheet):
         Missing cells will be created.
         """
         if max_col is not None:
-            expected_columns = [get_column_letter(ci) for ci in range(min_col, max_col + 1)]
-            empty_row = tuple(EMPTY_CELL for column in expected_columns)
+            empty_row = tuple(EMPTY_CELL for column in range(min_col, max_col + 1))
         else:
             expected_columns = []
         row_counter = min_row
