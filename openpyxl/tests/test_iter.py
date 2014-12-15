@@ -81,7 +81,7 @@ def test_get_missing_cell(read_only, datadir):
     datadir.join("genuine").chdir()
     wb = load_workbook(filename="empty.xlsx", read_only=read_only)
     ws = wb['Sheet2 - Numbers']
-    assert (ws['A1'] is None) is read_only
+    assert ws['A1'].value is None
 
 
 def test_getitem(sample_workbook):
@@ -224,9 +224,11 @@ def test_read_style_iter(tmpdir):
 
 def test_read_with_missing_cells(datadir):
     datadir.join("reader").chdir()
+    from openpyxl.styles import Style
 
     class Workbook:
         excel_base_date = None
+        shared_styles = [Style()]
 
         def get_sheet_names(self):
             return []
