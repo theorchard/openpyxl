@@ -1,9 +1,11 @@
 # Copyright (c) 2010-2014 openpyxl
 
 import datetime
+from io import BytesIO
 
 import pytest
 
+from openpyxl.xml.functions import fromstring
 from openpyxl.worksheet.iter_worksheet import read_dimension
 from openpyxl.reader.excel import load_workbook
 from openpyxl.compat import range, zip
@@ -269,18 +271,30 @@ def test_read_row(datadir):
         def get_sheet_names(self):
             return []
 
-    filename = "bug393-worksheet.xml"
+    src = b"""
+    <sheetData  xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main" >
+    <row r="1" spans="4:27">
+      <c r="D1">
+        <v>1</v>
+      </c>
+      <c r="K1">
+        <v>0.01</v>
+      </c>
+      <c r="AA1">
+        <v>100</v>
+      </c>
+    </row>
+    </sheetData>
+    """
 
     from openpyxl.worksheet.iter_worksheet import IterableWorksheet
-    ws = IterableWorksheet(Workbook(), "Sheet", "", filename, [], [])
-    #row = tuple(ws._get_row(2))
-    #values = [c.value for c in row]
-    #assert values == [None, None, 1, 2, 3]
+    ws = IterableWorksheet(Workbook(), "Sheet", "", "bug393-worksheet.xml", [], [])
 
-    #row = tuple(ws._get_row(3, 1, 5))
-    #values = [c.value for c in row]
-    #assert values == [1, 2, 3, None, None]
+    xml = fromstring(src)
+    row = tuple(ws._get_row(xml, 11, 11))
+    values = [c.value for c in row]
+    assert values == [0.01]
 
-    #row = tuple(ws._get_row(4))
-    #values = [c.value for c in row]
-    #assert values == [1, 2, None, None, 3]
+    row = tuple(ws._get_row(xml, 1, 11))
+    values = [c.value for c in row]
+    assert values == [None, None, None, 1, None, None, None, None, None, None, 0.01]

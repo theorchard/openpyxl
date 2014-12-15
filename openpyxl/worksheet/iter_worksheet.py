@@ -103,28 +103,14 @@ class IterableWorksheet(Worksheet):
 
         # get cells row by row
 
-        for row, cells in self._get_cells(min_row, min_col, max_row, max_col):
-            full_row = []
-            if row_counter < row:
+        for row_count, cells in self._get_cells(min_row, min_col, max_row, max_col):
+            if row_counter < row_count:
                 # Rows requested before those in the worksheet
-                for gap_row in range(row_counter, row):
+                for row_counter in range(row_counter, row_count):
                     yield empty_row
-                    row_counter = row
 
-            if expected_columns:
-                retrieved_columns = dict([(c.column, c) for c in cells])
-                for column in expected_columns:
-                    if column in retrieved_columns:
-                        cell = retrieved_columns[column]
-                        full_row.append(cell)
-                    else:
-                        # create missing cell
-                        full_row.append(EMPTY_CELL)
-            else:
-                full_row = cells
-
-            row_counter = row + 1
-            yield tuple(full_row)
+            row_counter += 1
+            yield cells
 
 
     def _get_row(self, element, min_col=1, max_col=None):
@@ -140,7 +126,7 @@ class IterableWorksheet(Worksheet):
                 break
 
             if min_col <= column:
-                for gap in range(col_counter, column):
+                for col_counter in range(max(col_counter, min_col), column):
                     # pad row with missing cells
                     yield ReadOnlyCell(self, row, None, None)
 
@@ -166,7 +152,6 @@ class IterableWorksheet(Worksheet):
 
     def _get_cells(self, min_row, min_col, max_row, max_col):
         p = iterparse(self.xml_source, tag=[ROW_TAG], remove_blank_text=True)
-        col_counter = min_col
         for _event, element in p:
             if element.tag == ROW_TAG:
                 row = int(element.get("r"))
