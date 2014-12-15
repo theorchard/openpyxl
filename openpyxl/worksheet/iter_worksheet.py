@@ -103,8 +103,7 @@ class IterableWorksheet(Worksheet):
 
         # get cells row by row
 
-        for cells in self._get_cells(min_row, min_col, max_row, max_col):
-            row = cells[0].row
+        for row, cells in self._get_cells(min_row, min_col, max_row, max_col):
             full_row = []
             if row_counter < row:
                 # Rows requested before those in the worksheet
@@ -174,7 +173,7 @@ class IterableWorksheet(Worksheet):
                 if max_row is not None and row > max_row:
                     break
                 if min_row <= row:
-                    yield tuple(self._get_row(element, min_col, max_col))
+                    yield row, tuple(self._get_row(element, min_col, max_col))
 
             if element.tag in (CELL_TAG, VALUE_TAG, FORMULA_TAG):
                 # sub-elements of rows should be skipped
@@ -189,7 +188,7 @@ class IterableWorksheet(Worksheet):
         """Cells are returned by a generator which can be empty"""
         col, row = coordinate_from_string(coordinate)
         col = column_index_from_string(col)
-        cell = next(self._get_cells(row, col, row, col))
+        _, cell = next(self._get_cells(row, col, row, col))
         if cell:
             return cell[0]
         return EMPTY_CELL

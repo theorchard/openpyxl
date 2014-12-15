@@ -250,11 +250,11 @@ def test_read_with_missing_cells(datadir):
 
     from openpyxl.worksheet.iter_worksheet import IterableWorksheet
     ws = IterableWorksheet(Workbook(), "Sheet", "", filename, [], [])
-    row = next(ws._get_cells(2, 1, 2, None))
+    id, row = next(ws._get_cells(2, 1, 2, None))
     values = [c.value for c in row]
     assert values == [None, None, 1, 2, 3]
 
-    row = next((ws._get_cells(4, 1, 4, None)))
+    id, row = next((ws._get_cells(4, 1, 4, None)))
     values = [c.value for c in row]
     assert values == [1, 2, None, None, 3]
 
