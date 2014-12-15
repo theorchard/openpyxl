@@ -100,16 +100,28 @@ class IterableWorksheet(Worksheet):
             expected_columns = []
         row_counter = min_row
 
-        # get cells row by row
+        p = iterparse(self.xml_source, tag=[ROW_TAG], remove_blank_text=True)
+        for _event, element in p:
+            if element.tag == ROW_TAG:
+                row_id = int(element.get("r"))
 
-        for row_count, cells in self._get_cells(min_row, min_col, max_row, max_col):
-            if row_counter < row_count:
-                # Rows requested before those in the worksheet
-                for row_counter in range(row_counter, row_count):
+                # got all the rows we need
+                if max_row is not None and row_id > max_row:
+                    break
+
+                # some rows are missing
+                for row_counter in range(row_counter, row_id):
                     yield empty_row
 
-            row_counter += 1
-            yield cells
+                # return cells from a row
+                if min_row <= row_id:
+                    yield tuple(self._get_row(element, min_col, max_col))
+                    row_counter += 1
+
+            if element.tag in (CELL_TAG, VALUE_TAG, FORMULA_TAG):
+                # sub-elements of rows should be skipped as handled within a cell
+                continue
+            element.clear()
 
 
     def _get_row(self, element, min_col=1, max_col=None):
@@ -148,31 +160,11 @@ class IterableWorksheet(Worksheet):
                 yield EMPTY_CELL
                 col_counter += 1
 
-
-    def _get_cells(self, min_row, min_col, max_row, max_col):
-        p = iterparse(self.xml_source, tag=[ROW_TAG], remove_blank_text=True)
-        for _event, element in p:
-            if element.tag == ROW_TAG:
-                row = int(element.get("r"))
-                if max_row is not None and row > max_row:
-                    break
-                if min_row <= row:
-                    yield row, tuple(self._get_row(element, min_col, max_col))
-
-            if element.tag in (CELL_TAG, VALUE_TAG, FORMULA_TAG):
-                # sub-elements of rows should be skipped
-                continue
-            element.clear()
-
-    @deprecated("Method is private")
-    def get_cells(self, min_row, min_col, max_row, max_col):
-        return self._get_cells(min_row, min_col, max_row, max_col)
-
     def _get_cell(self, coordinate):
         """Cells are returned by a generator which can be empty"""
         col, row = coordinate_from_string(coordinate)
         col = column_index_from_string(col)
-        _, cell = next(self._get_cells(row, col, row, col))
+        cell = tuple(self.get_squared_range(col, row, col, row))[0]
         if cell:
             return cell[0]
         return EMPTY_CELL
