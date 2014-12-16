@@ -15,115 +15,46 @@ __docformat__ = "restructuredtext en"
 import datetime
 import re
 
-from openpyxl.compat import NUMERIC_TYPES
-from openpyxl.compat import lru_cache, range, deprecated
-from openpyxl.units import (
+from openpyxl.compat import (
+    unicode,
+    basestring,
+    bytes,
+    NUMERIC_TYPES,
+    lru_cache,
+    range,
+    deprecated,
+)
+from openpyxl.utils.units import (
     DEFAULT_ROW_HEIGHT,
     DEFAULT_COLUMN_WIDTH
 )
-from openpyxl.compat import unicode, basestring, bytes
-from openpyxl.date_time import (
+from openpyxl.utils.datetime  import (
     to_excel,
     time_to_days,
     timedelta_to_days,
     from_excel
     )
-from openpyxl.exceptions import (
+from openpyxl.utils.exceptions import (
     CellCoordinatesException,
     IllegalCharacterError
 )
-from openpyxl.units import points_to_pixels
-from openpyxl.styles import is_date_format
-from openpyxl.styles import numbers
-
-
-# package imports
+from openpyxl.utils.units import points_to_pixels
+from openpyxl.utils import (
+    absolute_coordinate,
+    get_column_interval,
+    get_column_letter,
+    column_index_from_string,
+    coordinate_from_string,
+)
+from openpyxl.styles import numbers, is_date_format, Style
+from openpyxl.styles.proxy import StyledObject
 
 # constants
-COORD_RE = re.compile('^[$]?([A-Z]+)[$]?(\d+)$')
-ABSOLUTE_RE = re.compile(
-'''^[$]?
-(?P<min_col>[A-Z]+)
-[$]?
-(?P<min_row>\d+)
-(:[$]?
-(?P<max_col>[A-Z]+)
-[$]?
-(?P<max_row>\d+))?$''',
-re.VERBOSE)
-ILLEGAL_CHARACTERS_RE = re.compile(r'[\000-\010]|[\013-\014]|[\016-\037]')
+
 
 TIME_TYPES = (datetime.datetime, datetime.date, datetime.time, datetime.timedelta)
 STRING_TYPES = (basestring, unicode, bytes)
 KNOWN_TYPES = NUMERIC_TYPES + TIME_TYPES + STRING_TYPES + (bool, type(None))
-
-
-def get_column_interval(start, end):
-    if isinstance(start, basestring):
-        start = column_index_from_string(start)
-    if isinstance(end, basestring):
-        end = column_index_from_string(end)
-    return [get_column_letter(x) for x in range(start, end + 1)]
-
-def coordinate_from_string(coord_string):
-    """Convert a coordinate string like 'B12' to a tuple ('B', 12)"""
-    match = COORD_RE.match(coord_string.upper())
-    if not match:
-        msg = 'Invalid cell coordinates (%s)' % coord_string
-        raise CellCoordinatesException(msg)
-    column, row = match.groups()
-    row = int(row)
-    if not row:
-        msg = "There is no row 0 (%s)" % coord_string
-        raise CellCoordinatesException(msg)
-    return (column, row)
-
-
-def absolute_coordinate(coord_string):
-    """Convert a coordinate to an absolute coordinate string (B12 -> $B$12)"""
-    m = ABSOLUTE_RE.match(coord_string.upper())
-    if m:
-        parts = m.groups()
-        if all(parts[-2:]):
-            return '$%s$%s:$%s$%s' % (parts[0], parts[1], parts[3], parts[4])
-        else:
-            return '$%s$%s' % (parts[0], parts[1])
-    else:
-        return coord_string
-
-@lru_cache(maxsize=1000)
-def get_column_letter(col_idx):
-    """Convert a column number into a column letter (3 -> 'C')
-
-    Right shift the column col_idx by 26 to find column letters in reverse
-    order.  These numbers are 1-based, and can be converted to ASCII
-    ordinals by adding 64.
-
-    """
-    # these indicies corrospond to A -> ZZZ and include all allowed
-    # columns
-    if not 1 <= col_idx <= 18278:
-        raise ValueError("Invalid column index {0}".format(col_idx))
-    letters = []
-    while col_idx > 0:
-        col_idx, remainder = divmod(col_idx, 26)
-        # check for exact division and borrow if needed
-        if remainder == 0:
-            remainder = 26
-            col_idx -= 1
-        letters.append(chr(remainder+64))
-    return ''.join(reversed(letters))
-
-
-_COL_STRING_CACHE = dict((get_column_letter(i), i) for i in range(1, 18279))
-def column_index_from_string(str_col, cache=_COL_STRING_CACHE):
-    # we use a function argument to get indexed name lookup
-    col = cache.get(str_col.upper())
-    if col is None:
-        raise ValueError("{0} is not a valid column name".format(str_col))
-    return col
-del _COL_STRING_CACHE
-
 
 PERCENT_REGEX = re.compile(r'^\-?(?P<number>[0-9]*\.?[0-9]*\s?)\%$')
 TIME_REGEX = re.compile(r"""
@@ -138,9 +69,10 @@ TIME_REGEX = re.compile(r"""
 (?P<microsecond>\d{1,6}))
 """, re.VERBOSE)
 NUMBER_REGEX = re.compile(r'^-?([\d]|[\d]+\.[\d]*|\.[\d]+|[1-9][\d]+\.?[\d]*)((E|e)[-+]?[\d]+)?$')
+ILLEGAL_CHARACTERS_RE = re.compile(r'[\000-\010]|[\013-\014]|[\016-\037]')
 
 
-class Cell(object):
+class Cell(StyledObject):
     """Describes cell associated properties.
 
     Properties of interest include style, type, value, and address.
@@ -155,7 +87,14 @@ class Cell(object):
                  'xf_index',
                  '_hyperlink_rel',
                  '_comment',
-                 '_style',)
+                 '_style_id',
+                 '_font_id',
+                 '_fill_id',
+                 '_alignment_id',
+                 '_border_id',
+                 '_number_format_id',
+                 '_protection_id',
+                 )
 
     ERROR_CODES = ('#NULL!',
                    '#DIV/0!',
@@ -177,8 +116,10 @@ class Cell(object):
     VALID_TYPES = (TYPE_STRING, TYPE_FORMULA, TYPE_NUMERIC, TYPE_BOOL,
                    TYPE_NULL, TYPE_INLINE, TYPE_ERROR, TYPE_FORMULA_CACHE_STRING)
 
+
+
     def __init__(self, worksheet, column, row, value=None):
-        self._style = 0
+        super(Cell, self).__init__()
         self.column = column.upper()
         self.row = row
         self.coordinate = '%s%d' % (self.column, self.row)
@@ -191,6 +132,7 @@ class Cell(object):
             self.value = value
         self.xf_index = 0
         self._comment = None
+
 
     @property
     def encoding(self):
@@ -335,7 +277,10 @@ class Cell(object):
 
     def _cast_datetime(self, value):
         """Convert Python datetime to Excel and set formatting"""
-        if isinstance(value, datetime.date):
+        if isinstance(value, datetime.datetime):
+            value = to_excel(value, self.base_date)
+            self.number_format = numbers.FORMAT_DATE_DATETIME
+        elif isinstance(value, datetime.date):
             value = to_excel(value, self.base_date)
             self.number_format = numbers.FORMAT_DATE_YYYYMMDD2
         elif isinstance(value, datetime.time):
@@ -352,7 +297,7 @@ class Cell(object):
             ':rtype: depends on the value (string, float, int or '
             ':class:`datetime.datetime`)'"""
         value = self._value
-        if self.is_date() and value is not None:
+        if value is not None and self.is_date:
             value = from_excel(value, self.base_date)
         return value
 
@@ -392,52 +337,50 @@ class Cell(object):
                 self._hyperlink_rel.id or None
 
     @property
-    def number_format(self):
-        return self.style.number_format
-
-    @number_format.setter
-    def number_format(self, format_code):
-        """Set a new formatting code for numeric values"""
-        self.style = self.style.copy(number_format=format_code)
-
     def is_date(self):
         """Whether the value is formatted as a date
 
         :rtype: bool
         """
-        return (self.has_style
-                and is_date_format(self.number_format)
-                and self.data_type == self.TYPE_NUMERIC)
+        return self.data_type == self.TYPE_NUMERIC and is_date_format(self.number_format)
 
     @property
     def has_style(self):
         """Check if the parent worksheet has a style for this cell"""
-        return self._style != 0
+        return self.style_id is not 0
 
     @property
-    def style(self):
-        """Returns the :class:`openpyxl.style.Style` object for this cell"""
-        return self.parent.parent.shared_styles[self._style]
-
-    @style.setter
-    def style(self, new_style):
-        self._style = self.parent.parent.shared_styles.add(new_style)
+    def _alignments(self):
+        return self.parent.parent._alignments
 
     @property
-    def font(self):
-        return self.style.font
+    def _borders(self):
+        return self.parent.parent._borders
 
     @property
-    def fill(self):
-        return self.style.fill
+    def _fills(self):
+        return self.parent.parent._fills
 
     @property
-    def border(self):
-        return self.style.border
+    def _fonts(self):
+        return self.parent.parent._fonts
 
     @property
-    def alignment(self):
-        return self.style.alignment
+    def _number_formats(self):
+        return self.parent.parent._number_formats
+
+    @property
+    def _protections(self):
+        return self.parent.parent._protections
+
+    # legacy
+    @property
+    def _styles(self):
+        return self.parent.parent.shared_styles
+
+    @property
+    def _cell_styles(self):
+        return self.parent.parent._cell_styles
 
     def offset(self, row=0, column=0):
         """Returns a cell location relative to this cell.
@@ -450,10 +393,10 @@ class Cell(object):
 
         :rtype: :class:`openpyxl.cell.Cell`
         """
-        offset_column = get_column_letter(column_index_from_string(
-            self.column) + column)
+        offset_column = get_column_letter(
+            column_index_from_string(self.column) + column)
         offset_row = self.row + row
-        return self.parent.cell('%s%s' % (offset_column, offset_row))
+        return self.parent.cell(column=offset_column, row=offset_row)
 
     @property
     def anchor(self):
@@ -500,13 +443,6 @@ class Cell(object):
 
     @comment.setter
     def comment(self, value):
-        if (value is not None
-            and value._parent is not None
-            and value is not self.comment):
-            raise AttributeError(
-                "Comment already assigned to %s in worksheet %s. Cannot assign a comment to more than one cell" %
-                (value._parent.coordinate, value._parent.parent.title)
-                )
 
         # Ensure the number of comments for the parent worksheet is up-to-date
         if value is None and self._comment is not None:
@@ -514,10 +450,8 @@ class Cell(object):
         if value is not None and self._comment is None:
             self.parent._comment_count += 1
 
-        # orphan the old comment
-        if self._comment is not None:
-            self._comment._parent = None
-
-        self._comment = value
         if value is not None:
-            self._comment._parent = self
+            value.parent = self
+        elif value is None and self._comment:
+            self._comment.parent = None
+        self._comment = value

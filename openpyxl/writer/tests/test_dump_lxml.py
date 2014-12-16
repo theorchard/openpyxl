@@ -64,8 +64,8 @@ def test_write_cell(LXMLWorksheet, value, expected):
     from openpyxl.cell import Cell
     from .. dump_lxml import write_cell
     ws = LXMLWorksheet
-    c = Cell(ws, 'A', 1, value)
-    el = write_cell(ws, c)
+    cell = Cell(ws, 'A', 1, value)
+    el = write_cell(ws, cell)
     xml = tostring(el)
     diff = compare_xml(xml, expected)
     assert diff is None, diff
@@ -225,6 +225,58 @@ def test_close(LXMLWorksheet):
     <sheetViews>
       <sheetView workbookViewId="0">
         <selection sqref="A1" activeCell="A1"/>
+      </sheetView>
+    </sheetViews>
+    <sheetFormatPr baseColWidth="10" defaultRowHeight="15"/>
+    <sheetData/>
+    </worksheet>
+    """
+    diff = compare_xml(xml, expected)
+    assert diff is None, diff
+
+@pytest.mark.lxml_required
+def test_auto_filter(LXMLWorksheet):
+    ws = LXMLWorksheet
+    ws.auto_filter.ref = 'A1:F1'
+    ws.close()
+    with open(ws.filename) as src:
+        xml = src.read()
+    expected = """
+    <worksheet xmlns:r="http://schemas.openxmlformats.org/officeDocument/2006/relationships" xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main">
+    <sheetPr>
+      <outlinePr summaryRight="1" summaryBelow="1"/>
+    </sheetPr>
+    <sheetViews>
+      <sheetView workbookViewId="0">
+        <selection sqref="A1" activeCell="A1"/>
+      </sheetView>
+    </sheetViews>
+    <sheetFormatPr baseColWidth="10" defaultRowHeight="15"/>
+    <sheetData/>
+    <autoFilter ref="A1:F1"/>
+    </worksheet>
+    """
+    diff = compare_xml(xml, expected)
+    assert diff is None, diff
+
+@pytest.mark.lxml_required
+def test_frozen_panes(LXMLWorksheet):
+    ws = LXMLWorksheet
+    ws.freeze_panes = 'D4'
+    ws.close()
+    with open(ws.filename) as src:
+        xml = src.read()
+    expected = """
+    <worksheet xmlns:r="http://schemas.openxmlformats.org/officeDocument/2006/relationships" xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main">
+    <sheetPr>
+      <outlinePr summaryRight="1" summaryBelow="1"/>
+    </sheetPr>
+    <sheetViews>
+      <sheetView workbookViewId="0">
+        <pane xSplit="3" ySplit="3" topLeftCell="D4" activePane="bottomRight" state="frozen"/>
+        <selection pane="topRight"/>
+        <selection pane="bottomLeft"/>
+        <selection pane="bottomRight" activeCell="A1" sqref="A1"/>
       </sheetView>
     </sheetViews>
     <sheetFormatPr baseColWidth="10" defaultRowHeight="15"/>

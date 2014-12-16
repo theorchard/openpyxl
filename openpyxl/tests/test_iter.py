@@ -1,10 +1,11 @@
 # Copyright (c) 2010-2014 openpyxl
 
 import datetime
-import os.path
+from io import BytesIO
 
 import pytest
 
+from openpyxl.xml.functions import fromstring
 from openpyxl.worksheet.iter_worksheet import read_dimension
 from openpyxl.reader.excel import load_workbook
 from openpyxl.compat import range, zip
@@ -40,6 +41,7 @@ def test_get_max_cell(datadir, filename):
 
     class Workbook:
         excel_base_date = None
+        _cell_styles = [None]
 
         def get_sheet_names(self):
             return []
@@ -75,9 +77,6 @@ def test_calculate_dimension(datadir):
                          ]
                          )
 def test_get_missing_cell(read_only, datadir):
-    """
-    Behaviour differs between implementations
-    """
     datadir.join("genuine").chdir()
     wb = load_workbook(filename="empty.xlsx", read_only=read_only)
     ws = wb['Sheet2 - Numbers']
@@ -111,15 +110,22 @@ def test_max_column(sample_workbook, sheetname, col):
     assert ws.max_column == col
 
 
+def test_read_single_cell_range(sample_workbook):
+    wb = sample_workbook
+    ws = wb['Sheet1 - Text']
+    assert 'This is cell A1 in Sheet 1' == list(ws.iter_rows('A1'))[0][0].value
+
+
 expected = [['This is cell A1 in Sheet 1', None, None, None, None, None, None],
             [None, None, None, None, None, None, None],
             [None, None, None, None, None, None, None],
             [None, None, None, None, None, None, None],
             [None, None, None, None, None, None, 'This is cell G5'], ]
+
 def test_read_fast_integrated_text(sample_workbook):
     wb = sample_workbook
     ws = wb['Sheet1 - Text']
-    for row, expected_row in zip(ws.iter_rows(), expected):
+    for row, expected_row in zip(ws.rows, expected):
         row_values = [x.value for x in row]
         assert row_values == expected_row
 
@@ -210,7 +216,7 @@ def test_read_style_iter(tmpdir):
     wb = Workbook()
     ws = wb.worksheets[0]
     cell = ws.cell('A1')
-    cell.style = Style(font=ft)
+    cell.font = ft
 
     xlsx_file = "read_only_styles.xlsx"
     wb.save(xlsx_file)
@@ -222,13 +228,22 @@ def test_read_style_iter(tmpdir):
     assert cell.style.font == ft
 
 
+def test_read_hyperlinks_read_only(datadir, Workbook):
+    from openpyxl.worksheet.iter_worksheet import IterableWorksheet
+
+    datadir.join("reader").chdir()
+    filename = 'bug328_hyperlinks.xml'
+    ws = IterableWorksheet(Workbook(data_only=True, read_only=True), "Sheet",
+                           "", filename, ['SOMETEXT'], [])
+    assert ws['F2'].value is None
+
+
 def test_read_with_missing_cells(datadir):
     datadir.join("reader").chdir()
-    from openpyxl.styles import Style
 
     class Workbook:
         excel_base_date = None
-        shared_styles = [Style()]
+        _cell_styles = [None]
 
         def get_sheet_names(self):
             return []
@@ -238,6 +253,7 @@ def test_read_with_missing_cells(datadir):
     from openpyxl.worksheet.iter_worksheet import IterableWorksheet
     ws = IterableWorksheet(Workbook(), "Sheet", "", filename, [], [])
     rows = tuple(ws.rows)
+
     row = rows[1] # second row
     values = [c.value for c in row]
     assert values == [None, None, 1, 2, 3]
@@ -245,3 +261,42 @@ def test_read_with_missing_cells(datadir):
     row = rows[3] # fourth row
     values = [c.value for c in row]
     assert values == [1, 2, None, None, 3]
+
+
+def test_read_row(datadir):
+    datadir.join("reader").chdir()
+
+    class Workbook:
+        excel_base_date = None
+        _cell_styles = [None]
+
+        def get_sheet_names(self):
+            return []
+
+    src = b"""
+    <sheetData  xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main" >
+    <row r="1" spans="4:27">
+      <c r="D1">
+        <v>1</v>
+      </c>
+      <c r="K1">
+        <v>0.01</v>
+      </c>
+      <c r="AA1">
+        <v>100</v>
+      </c>
+    </row>
+    </sheetData>
+    """
+
+    from openpyxl.worksheet.iter_worksheet import IterableWorksheet
+    ws = IterableWorksheet(Workbook(), "Sheet", "", "bug393-worksheet.xml", [], [])
+
+    xml = fromstring(src)
+    row = tuple(ws._get_row(xml, 11, 11))
+    values = [c.value for c in row]
+    assert values == [0.01]
+
+    row = tuple(ws._get_row(xml, 1, 11))
+    values = [c.value for c in row]
+    assert values == [None, None, None, 1, None, None, None, None, None, None, 0.01]
