@@ -1,0 +1,7 @@
+prune openpyxl/tests
+prune openpyxl/sample
+prune openpyxl/benchmarks
+
+recursive-exclude openpyxl test_*.py tests/*.py
+
+include *.rst
