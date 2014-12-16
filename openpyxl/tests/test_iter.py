@@ -81,7 +81,7 @@ def test_get_missing_cell(read_only, datadir):
     datadir.join("genuine").chdir()
     wb = load_workbook(filename="empty.xlsx", read_only=read_only)
     ws = wb['Sheet2 - Numbers']
-    assert (ws['A1'] is None) is read_only
+    assert ws['A1'].value is None
 
 
 def test_getitem(sample_workbook):
@@ -116,10 +116,10 @@ expected = [['This is cell A1 in Sheet 1', None, None, None, None, None, None],
             [None, None, None, None, None, None, None],
             [None, None, None, None, None, None, None],
             [None, None, None, None, None, None, 'This is cell G5'], ]
-def test_read_fast_integrated(sample_workbook):
+def test_read_fast_integrated_text(sample_workbook):
     wb = sample_workbook
     ws = wb['Sheet1 - Text']
-    for row, expected_row in zip(ws.iter_rows(), self.expected):
+    for row, expected_row in zip(ws.iter_rows(), expected):
         row_values = [x.value for x in row]
         assert row_values == expected_row
 
@@ -130,7 +130,7 @@ def test_read_single_cell_range(sample_workbook):
     assert 'This is cell A1 in Sheet 1' == list(ws.iter_rows('A1'))[0][0].value
 
 
-def test_read_fast_integrated(sample_workbook):
+def test_read_fast_integrated_numbers(sample_workbook):
     wb = sample_workbook
     expected = [[x + 1] for x in range(30)]
     query_range = 'D1:D30'
@@ -140,7 +140,7 @@ def test_read_fast_integrated(sample_workbook):
         assert row_values == expected_row
 
 
-def test_read_fast_integrated(sample_workbook):
+def test_read_fast_integrated_numbers_2(sample_workbook):
     wb = sample_workbook
     query_range = 'K1:K30'
     expected = expected = [[(x + 1) / 100.0] for x in range(30)]
@@ -220,3 +220,28 @@ def test_read_style_iter(tmpdir):
     cell = ws_iter['A1']
 
     assert cell.style.font == ft
+
+
+def test_read_with_missing_cells(datadir):
+    datadir.join("reader").chdir()
+    from openpyxl.styles import Style
+
+    class Workbook:
+        excel_base_date = None
+        shared_styles = [Style()]
+
+        def get_sheet_names(self):
+            return []
+
+    filename = "bug393-worksheet.xml"
+
+    from openpyxl.worksheet.iter_worksheet import IterableWorksheet
+    ws = IterableWorksheet(Workbook(), "Sheet", "", filename, [], [])
+    rows = tuple(ws.rows)
+    row = rows[1] # second row
+    values = [c.value for c in row]
+    assert values == [None, None, 1, 2, 3]
+
+    row = rows[3] # fourth row
+    values = [c.value for c in row]
+    assert values == [1, 2, None, None, 3]

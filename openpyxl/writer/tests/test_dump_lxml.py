@@ -125,6 +125,38 @@ def test_append(LXMLWorksheet):
     assert diff is None, diff
 
 
+def test_dirty_cell(LXMLWorksheet):
+    ws = LXMLWorksheet
+
+    def _writer(doc):
+        with xmlfile(doc) as xf:
+            with xf.element('sheetData'):
+                try:
+                    while True:
+                        body = (yield)
+                        xf.write(body)
+                except GeneratorExit:
+                    pass
+
+    doc = BytesIO()
+    ws.writer = _writer(doc)
+    next(ws.writer)
+
+    ws.append((datetime.date(2001, 1, 1), 1))
+    ws.writer.close()
+    xml = doc.getvalue()
+    expected = """
+    <sheetData>
+    <row r="1" spans="1:2">
+      <c r="A1" t="n" s="1"><v>36892</v></c>
+      <c r="B1" t="n"><v>1</v></c>
+      </row>
+    </sheetData>
+    """
+    diff = compare_xml(xml, expected)
+    assert diff is None, diff
+
+
 @pytest.mark.parametrize("row", ("string", dict()))
 def test_invalid_append(LXMLWorksheet, row):
     ws = LXMLWorksheet
@@ -142,6 +174,29 @@ def test_cell_comment(LXMLWorksheet):
     cell.comment = comment
     ws.append([cell])
     assert ws._comments == [comment]
+    ws.close()
+
+    with open(ws.filename) as src:
+        xml = src.read()
+    expected = """
+    <worksheet xmlns:r="http://schemas.openxmlformats.org/officeDocument/2006/relationships" xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main">
+    <sheetPr>
+      <outlinePr summaryRight="1" summaryBelow="1"/>
+    </sheetPr>
+    <sheetViews>
+      <sheetView workbookViewId="0">
+        <selection sqref="A1" activeCell="A1"/>
+      </sheetView>
+    </sheetViews>
+    <sheetFormatPr baseColWidth="10" defaultRowHeight="15"/>
+    <sheetData>
+    <row r="1" spans="1:1"><c r="A1" t="n"><v>1</v></c></row>
+    </sheetData>
+    <legacyDrawing r:id="commentsvml"></legacyDrawing>
+    </worksheet>
+    """
+    diff = compare_xml(xml, expected)
+    assert diff is None, diff
 
 
 @pytest.mark.lxml_required

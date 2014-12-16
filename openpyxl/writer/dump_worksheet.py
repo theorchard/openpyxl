@@ -8,6 +8,7 @@ from fileinput import FileInput
 from inspect import isgenerator
 import os
 from tempfile import NamedTemporaryFile
+import atexit
 
 from openpyxl.compat import OrderedDict
 from openpyxl.cell import get_column_letter, Cell
@@ -35,6 +36,15 @@ from openpyxl.xml.constants import PACKAGE_WORKSHEETS
 
 DESCRIPTORS_CACHE_SIZE = 50
 BOUNDING_BOX_PLACEHOLDER = 'A1:%s%d' % (get_column_letter(MAX_COLUMN), MAX_ROW)
+ALL_TEMP_FILES = []
+
+
+@atexit.register
+def _openpyxl_shutdown():
+    global ALL_TEMP_FILES
+    for path in ALL_TEMP_FILES:
+        if os.path.exists(path):
+            os.remove(path)
 
 
 class CommentParentCell(object):
@@ -50,6 +60,7 @@ def create_temporary_file(suffix=''):
     fobj = NamedTemporaryFile(mode='w+', suffix=suffix,
                               prefix='openpyxl.', delete=False)
     filename = fobj.name
+    ALL_TEMP_FILES.append(filename)
     return filename
 
 
@@ -207,12 +218,10 @@ class DumpWorksheet(Worksheet):
         for col_idx, value in enumerate(row, 1):
             if value is None:
                 continue
-            dirty_cell = False
             column = get_column_letter(col_idx)
 
             if isinstance(value, Cell):
                 cell = value
-                dirty_cell = True # cell may have other properties than a value
             else:
                 cell.value = value
 
@@ -223,8 +232,9 @@ class DumpWorksheet(Worksheet):
                 self._comments.append(comment)
 
             write_cell(doc, self, cell)
-            if dirty_cell:
+            if cell.has_style: # styled cell or datetime
                 cell = WriteOnlyCell(self)
+
         end_tag(doc, 'row')
 
 

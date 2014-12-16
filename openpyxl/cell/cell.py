@@ -262,7 +262,7 @@ class Cell(object):
 
         elif isinstance(value, basestring):
             self.data_type = self.TYPE_STRING
-            if value.startswith("="):
+            if len(value) > 1 and value.startswith("="):
                 self.data_type = self.TYPE_FORMULA
             elif value in self.ERROR_CODES:
                 self.data_type = self.TYPE_ERROR

@@ -23,6 +23,7 @@ from . lxml_worksheet import (
 
 from openpyxl.xml.constants import (
     SHEET_MAIN_NS,
+    REL_NS,
 )
 from openpyxl.xml.functions import XMLGenerator
 
@@ -72,6 +73,9 @@ class LXMLWorksheet(DumpWorksheet):
                             xf.write(r)
                     except GeneratorExit:
                         pass
+                if self._comments:
+                    comments = Element('legacyDrawing', {'{%s}id' % REL_NS: 'commentsvml'})
+                    xf.write(comments)
 
     def close(self):
         if self.__saved:
@@ -107,12 +111,10 @@ class LXMLWorksheet(DumpWorksheet):
         for col_idx, value in enumerate(row, 1):
             if value is None:
                 continue
-            dirty_cell = False
             column = get_column_letter(col_idx)
 
             if isinstance(value, Cell):
                 cell = value
-                dirty_cell = True # cell may have other properties than a value
             else:
                 cell.value = value
 
@@ -124,8 +126,9 @@ class LXMLWorksheet(DumpWorksheet):
 
             tree = write_cell(self, cell)
             el.append(tree)
-            if dirty_cell:
+            if cell.has_style: # styled cell or datetime
                 cell = WriteOnlyCell(self)
+
         self._max_col = max(self._max_col, col_idx)
         el.set('spans', '1:%d' % col_idx)
         try:

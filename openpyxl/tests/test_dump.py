@@ -22,9 +22,10 @@
 # @author: see AUTHORS file
 
 # Python stdlib imports
-from datetime import datetime
+from datetime import datetime, date
 from tempfile import NamedTemporaryFile
-import os
+import atexit
+import shutil
 import os.path
 
 import pytest
@@ -39,12 +40,26 @@ from openpyxl.styles.fonts import Font
 from openpyxl.styles import Style
 from openpyxl.comments.comments import Comment
 
+ALL_TEMP_FILES = []
+
+
+@atexit.register
+def _openpyxl_shutdown():
+    global ALL_TEMP_FILES
+    for path in ALL_TEMP_FILES:
+        if os.path.exists(path):
+            os.remove(path)
+
 
 def _get_test_filename():
 
-    test_file = NamedTemporaryFile(mode='w', prefix='openpyxl.', suffix='.xlsx', delete=False)
+    test_file = NamedTemporaryFile(mode='w', prefix='openpyxl.',
+                                   suffix='.xlsx', delete=False)
     test_file.close()
-    return test_file.name
+    filename = test_file.name
+    ALL_TEMP_FILES.append(filename)
+    return filename
+
 
 def test_dump_sheet_title():
 
@@ -161,24 +176,6 @@ def test_dump_with_font():
     ws2 = wb2[ws.title]
     assert ws2['A1'].style == user_style
 
-
-def test_dump_with_comment():
-    from openpyxl.writer.dump_worksheet import WriteOnlyCell
-    test_filename = _get_test_filename()
-
-    wb = Workbook(optimized_write=True)
-    ws = wb.create_sheet()
-    user_comment = Comment(text='hello world', author='me')
-    cell = WriteOnlyCell(ws, value="hello")
-    cell.comment = user_comment
-
-    ws.append([cell, 3.14, None])
-    assert user_comment in ws._comments
-    wb.save(test_filename)
-
-    wb2 = load_workbook(test_filename)
-    ws2 = wb2[ws.title]
-    assert ws2['A1'].comment.text == 'hello world'
 
 @pytest.mark.parametrize("method", [
     '__getitem__', '__setitem__', 'cell', 'range', 'merge_cells']
