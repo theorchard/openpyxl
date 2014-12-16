@@ -16,6 +16,7 @@ Minor changes
 * Use a 2-way cache for column index lookups
 * Clean up tests in cells
 * `PR 40 <https://bitbucket.org/openpyxl/openpyxl/pull-request/40/>`_Support frozen panes and autofilter in write-only mode
+* Use ws.calculate_dimension(force=True) in read-only mode for unsized worksheets
 
 
 2.1.4 (2014-12-16)
