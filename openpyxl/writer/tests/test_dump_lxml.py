@@ -233,3 +233,44 @@ def test_close(LXMLWorksheet):
     """
     diff = compare_xml(xml, expected)
     assert diff is None, diff
+
+
+@pytest.mark.lxml_required
+def test_write_empty_row(LXMLWorksheet):
+    ws = LXMLWorksheet
+    ws.append(['1', '2', '3'])
+    ws.append([])
+    ws.close()
+
+    with open(ws.filename) as src:
+        xml = src.read()
+
+    expected = """
+    <worksheet xmlns:r="http://schemas.openxmlformats.org/officeDocument/2006/relationships" xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main">
+    <sheetPr>
+      <outlinePr summaryRight="1" summaryBelow="1"/>
+    </sheetPr>
+    <sheetViews>
+      <sheetView workbookViewId="0">
+        <selection sqref="A1" activeCell="A1"/>
+      </sheetView>
+    </sheetViews>
+    <sheetFormatPr baseColWidth="10" defaultRowHeight="15"/>
+    <sheetData>
+    <row r="1" spans="1:3">
+      <c r="A1" t="s">
+        <v>0</v>
+      </c>
+      <c r="B1" t="s">
+        <v>1</v>
+      </c>
+      <c r="C1" t="s">
+        <v>2</v>
+      </c>
+    </row>
+    <row r="2"/>
+    </sheetData>
+    </worksheet>
+    """
+    diff = compare_xml(xml, expected)
+    assert diff is None, diff

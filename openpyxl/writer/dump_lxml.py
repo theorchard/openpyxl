@@ -108,6 +108,7 @@ class LXMLWorksheet(DumpWorksheet):
 
         el = Element("row", r='%d' % self._max_row)
 
+        col_idx = None
         for col_idx, value in enumerate(row, 1):
             if value is None:
                 continue
@@ -129,8 +130,9 @@ class LXMLWorksheet(DumpWorksheet):
             if cell.has_style: # styled cell or datetime
                 cell = WriteOnlyCell(self)
 
-        self._max_col = max(self._max_col, col_idx)
-        el.set('spans', '1:%d' % col_idx)
+        if col_idx:
+            self._max_col = max(self._max_col, col_idx)
+            el.set('spans', '1:%d' % col_idx)
         try:
             self.writer.send(el)
         except StopIteration:
