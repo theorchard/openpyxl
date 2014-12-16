@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<worksheet xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main" xmlns:r="http://schemas.openxmlformats.org/officeDocument/2006/relationships" xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" xmlns:x14ac="http://schemas.microsoft.com/office/spreadsheetml/2009/9/ac" mc:Ignorable="x14ac">
+  <dimension ref="A1:D3"/>
+  <sheetViews>
+    <sheetView tabSelected="1" workbookViewId="0">
+      <selection activeCell="A4" sqref="A4"/>
+    </sheetView>
+  </sheetViews>
+  <sheetFormatPr baseColWidth="10" defaultRowHeight="16" x14ac:dyDescent="0"/>
+  <sheetData>
+    <row r="1" spans="1:4">
+      <c r="A1" t="s">
+        <v>0</v>
+      </c>
+      <c r="B1" t="s">
+        <v>1</v>
+      </c>
+      <c r="C1" t="s">
+        <v>2</v>
+      </c>
+      <c r="D1" t="s">
+        <v>3</v>
+      </c>
+    </row>
+    <row r="2" spans="1:4">
+      <c r="A2" s="1">
+        <f>SUM(1)</f>
+        <v>1</v>
+      </c>
+      <c r="B2" s="2">
+        <f t="shared" ref="B2:D2" si="0">SUM(1)</f>
+        <v>1</v>
+      </c>
+      <c r="C2">
+        <f t="shared" si="0"/>
+        <v>1</v>
+      </c>
+      <c r="D2" s="3">
+        <f t="shared" si="0"/>
+        <v>1</v>
+      </c>
+    </row>
+    <row r="3" spans="1:4">
+      <c r="A3">
+        <v>2</v>
+      </c>
+      <c r="B3" s="2">
+        <v>2</v>
+      </c>
+      <c r="C3" s="4">
+        <v>2</v>
+      </c>
+      <c r="D3" s="3">
+        <v>2</v>
+      </c>
+    </row>
+  </sheetData>
+  <sheetProtection password="DAA7" sheet="1" formatCells="0" formatColumns="0" formatRows="0" insertColumns="0" insertRows="0" insertHyperlinks="0" deleteColumns="0" deleteRows="0" sort="0" autoFilter="0" pivotTables="0"/>
+  <pageMargins left="0.75" right="0.75" top="1" bottom="1" header="0.5" footer="0.5"/>
+  <extLst>
+    <ext xmlns:mx="http://schemas.microsoft.com/office/mac/excel/2008/main" uri="{64002731-A6B0-56B0-2670-7721B7C09600}">
+      <mx:PLV Mode="0" OnePage="0" WScale="0"/>
+    </ext>
+  </extLst>
+</worksheet>
