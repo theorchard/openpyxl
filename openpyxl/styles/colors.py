@@ -41,6 +41,10 @@ aRGB_REGEX = re.compile("^([A-Fa-f0-9]{8}|[A-Fa-f0-9]{6})$")
 
 
 class RGB(Descriptor):
+    """
+    Descriptor for aRGB values
+    If not supplied alpha is 00
+    """
 
     def __set__(self, instance, value):
         m = aRGB_REGEX.match(value)

@@ -49,7 +49,7 @@ def write_worksheet(worksheet, shared_strings):
     with xmlfile(out) as xf:
         with xf.element('worksheet', nsmap=NSMAP):
 
-            props = write_properties(worksheet, worksheet.vba_code)
+            props = write_properties(worksheet)
             xf.write(props)
 
             dim = Element('dimension', {'ref': '%s' % worksheet.calculate_dimension()})
@@ -86,21 +86,22 @@ def write_worksheet(worksheet, shared_strings):
             if hyper is not None:
                 xf.write(hyper)
 
-            options = worksheet.page_setup.options
-            if options:
-                print_options = Element('printOptions', options)
-                xf.write(print_options)
-                del print_options
+
+            options = worksheet.print_options
+            if len(dict(options)) > 0:
+                new_element = options.write_xml_element()
+                xf.write(new_element)
+                del new_element
 
             margins = Element('pageMargins', dict(worksheet.page_margins))
             xf.write(margins)
             del margins
 
-            setup = worksheet.page_setup.setup
-            if setup:
-                page_setup = Element('pageSetup', setup)
-                xf.write(page_setup)
-                del page_setup
+            setup = worksheet.page_setup
+            if len(dict(setup)) > 0:
+                new_element = setup.write_xml_element()
+                xf.write(new_element)
+                del new_element
 
             hf = write_header_footer(worksheet)
             if hf is not None:
@@ -150,6 +151,8 @@ def write_rows(xf, worksheet):
 
                 row_cells = cells_by_row[row_idx]
                 for cell in sorted(row_cells, key=row_sort):
+                    if cell.value is None and not cell.has_style:
+                        continue
                     write_cell(xf, worksheet, cell)
 
 
@@ -158,7 +161,7 @@ def write_cell(xf, worksheet, cell):
     coordinate = cell.coordinate
     attributes = {'r': coordinate}
     if cell.has_style:
-        attributes['s'] = '%d' % cell._style
+        attributes['s'] = '%d' % cell.style_id
 
     if cell.data_type != 'f':
         attributes['t'] = cell.data_type

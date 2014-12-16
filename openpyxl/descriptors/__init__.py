@@ -7,6 +7,7 @@ http://chimera.labs.oreilly.com/books/1230000000393/ch08.html#_discussion_130
 """
 
 from openpyxl.compat import basestring, bytes
+import re
 
 class Descriptor(object):
 
@@ -236,7 +237,29 @@ class MetaStrict(type):
                 v.name = k
         return type.__new__(cls, clsname, bases, methods)
 
-Strict = MetaStrict('Strict', (object, ), {}
+Strict = MetaStrict('Strict', (object,), {}
                )
 
 del MetaStrict
+
+
+class MatchPattern(Descriptor):
+    """Values must match a regex pattern """
+    allow_none = False
+
+    def __init__(self, name=None, **kw):
+        if 'pattern' not in kw:
+            raise TypeError('missing pattern value')
+        
+        super(MatchPattern, self).__init__(name, **kw)
+        self.test_pattern = re.compile(self.pattern)
+        
+
+    def __set__(self, instance, value):
+
+        if ((self.allow_none and value is not None)
+            or not self.allow_none):
+            if not self.test_pattern.match(value):
+                raise ValueError('Value does not match pattern {0}'.format(self.pattern))
+
+        super(MatchPattern, self).__set__(instance, value)

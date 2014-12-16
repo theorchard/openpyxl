@@ -112,6 +112,14 @@ def rows(wb):
             pass
     print((r+1)* (c+1), "cells")
 
+
+def col_index1():
+    from openpyxl.cell import get_column_letter
+    for i in range(1, 18279):
+        c = get_column_letter(i)
+
+
+
 """
 Sample use
 import cProfile
@@ -119,15 +127,17 @@ ws = make_worksheet()
 cProfile.run("profiling.lxml_writer(ws)", sort="tottime")
 """
 
+
 if __name__ == '__main__':
     import cProfile
     ws = make_worksheet()
     #wb = read_workbook()
     #cProfile.run("rows(wb)", sort="tottime")
     #cProfile.run("make_worksheet()", sort="tottime")
-    cProfile.run("sax_writer(ws)", sort="tottime")
-    cProfile.run("lxml_writer(ws)", sort="tottime")
+    #cProfile.run("sax_writer(ws)", sort="tottime")
+    #cProfile.run("lxml_writer(ws)", sort="tottime")
     #generate_format_data()
     #cProfile.run("styled_sheet()", sort="tottime")
     #ws = make_dump_worksheet()
     #cProfile.run("dump_writer(ws)", sort="tottime")
+    cProfile.run("col_index1()", sort="tottime")

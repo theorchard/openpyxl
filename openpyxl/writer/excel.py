@@ -1,26 +1,5 @@
 from __future__ import absolute_import
 # Copyright (c) 2010-2014 openpyxl
-#
-# Permission is hereby granted, free of charge, to any person obtaining a copy
-# of this software and associated documentation files (the "Software"), to deal
-# in the Software without restriction, including without limitation the rights
-# to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-# copies of the Software, and to permit persons to whom the Software is
-# furnished to do so, subject to the following conditions:
-#
-# The above copyright notice and this permission notice shall be included in
-# all copies or substantial portions of the Software.
-#
-# THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-# IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-# FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-# AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-# LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-# OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
-# THE SOFTWARE.
-#
-# @license: http://www.opensource.org/licenses/mit-license.php
-# @author: see AUTHORS file
 
 """Write a .xlsx file."""
 
@@ -52,13 +31,13 @@ from openpyxl.writer.workbook import (
     write_root_rels,
     write_workbook_rels,
     write_properties_app,
-    write_properties_core,
     write_workbook
     )
+from openpyxl.workbook.properties import write_properties
 from openpyxl.writer.theme import write_theme
 from openpyxl.writer.styles import StyleWriter
 from openpyxl.writer.drawings import DrawingWriter, ShapeWriter
-from openpyxl.writer.charts import ChartWriter
+from openpyxl.charts.writer import ChartWriter
 from .relations import write_rels
 from openpyxl.writer.worksheet import write_worksheet
 from openpyxl.workbook.names.external import (
@@ -79,23 +58,20 @@ class ExcelWriter(object):
         self.workbook = workbook
         self.style_writer = StyleWriter(workbook)
 
-    def write_data(self, archive):
+    def write_data(self, archive, as_template=False):
         """Write the various xml files into the zip archive."""
         # cleanup all worksheets
 
-        archive.writestr(ARC_CONTENT_TYPES, write_content_types(self.workbook))
+        archive.writestr(ARC_CONTENT_TYPES, write_content_types(self.workbook,
+                                                                as_template=as_template))
         archive.writestr(ARC_ROOT_RELS, write_root_rels(self.workbook))
         archive.writestr(ARC_WORKBOOK_RELS, write_workbook_rels(self.workbook))
         archive.writestr(ARC_APP, write_properties_app(self.workbook))
-        archive.writestr(ARC_CORE, write_properties_core(self.workbook.properties))
+        archive.writestr(ARC_CORE, write_properties(self.workbook.properties))
         if self.workbook.loaded_theme:
             archive.writestr(ARC_THEME, self.workbook.loaded_theme)
         else:
             archive.writestr(ARC_THEME, write_theme())
-        for sheet in self.workbook.worksheets:
-            sheet.conditional_formatting.setDxfStyles(self.workbook)
-
-        archive.writestr(ARC_STYLE, self.style_writer.write_table())
         archive.writestr(ARC_WORKBOOK, write_workbook(self.workbook))
 
         if self.workbook.vba_archive:
@@ -106,9 +82,13 @@ class ExcelWriter(object):
                         archive.writestr(name, vba_archive.read(name))
                         break
 
+        for sheet in self.workbook.worksheets:
+            sheet.conditional_formatting._save_styles(self.workbook)
+
         self._write_worksheets(archive)
         self._write_string_table(archive)
         self._write_external_links(archive)
+        archive.writestr(ARC_STYLE, self.style_writer.write_table())
 
     def _write_string_table(self, archive):
         archive.writestr(ARC_SHARED_STRINGS,
@@ -191,14 +171,14 @@ class ExcelWriter(object):
             )
 
 
-    def save(self, filename):
+    def save(self, filename, as_template=False):
         """Write data into the archive."""
         archive = ZipFile(filename, 'w', ZIP_DEFLATED)
-        self.write_data(archive)
+        self.write_data(archive, as_template=as_template)
         archive.close()
 
 
-def save_workbook(workbook, filename):
+def save_workbook(workbook, filename, as_template=False):
     """Save the given workbook on the filesystem under the name filename.
 
     :param workbook: the workbook to save
@@ -211,17 +191,17 @@ def save_workbook(workbook, filename):
 
     """
     writer = ExcelWriter(workbook)
-    writer.save(filename)
+    writer.save(filename, as_template=as_template)
     return True
 
 
-def save_virtual_workbook(workbook):
+def save_virtual_workbook(workbook, as_template=False):
     """Return an in-memory workbook, suitable for a Django response."""
     writer = ExcelWriter(workbook)
     temp_buffer = BytesIO()
     try:
         archive = ZipFile(temp_buffer, 'w', ZIP_DEFLATED)
-        writer.write_data(archive)
+        writer.write_data(archive, as_template=as_template)
     finally:
         archive.close()
     virtual_workbook = temp_buffer.getvalue()
