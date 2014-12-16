@@ -11,6 +11,16 @@ from openpyxl.reader.excel import load_workbook
 from openpyxl.compat import range, zip
 
 
+@pytest.fixture
+def DummyWorkbook():
+    class Workbook:
+        excel_base_date = None
+        _cell_styles = [None]
+
+        def get_sheet_names(self):
+            return []
+    return Workbook()
+
 def test_open_many_sheets(datadir):
     datadir.join("reader").chdir()
     wb = load_workbook("bigfoot.xlsx", True) # if
@@ -29,6 +39,16 @@ def test_read_dimension(datadir, filename, expected):
     with open(filename) as handle:
         dimension = read_dimension(handle)
     assert dimension == expected
+
+
+def test_force_dimension(datadir, DummyWorkbook):
+    datadir.join("reader").chdir()
+    from openpyxl.worksheet.iter_worksheet import IterableWorksheet
+
+    ws = IterableWorksheet(DummyWorkbook, "Sheet", "", "sheet2_no_dimension.xml", [], [])
+    dims = ws.calculate_dimension(True)
+    assert dims == "A1:2730"
+
 
 
 @pytest.mark.parametrize("filename",

@@ -173,10 +173,25 @@ class IterableWorksheet(Worksheet):
     def rows(self):
         return self.iter_rows()
 
-    def calculate_dimension(self):
+    def calculate_dimension(self, force=False):
         if not all([self.max_col, self.max_row]):
-            raise ValueError("Worksheet is unsized, cannot calculate dimensions")
+            if force:
+                self._calculate_dimension()
+            else:
+                raise ValueError("Worksheet is unsized, use calculate_dimension(force=True)")
         return '%s%s:%s%s' % (self.min_col, self.min_row, self.max_col, self.max_row)
+
+    def _calculate_dimension(self):
+        """
+        Loop through all the cells to get the size of a worksheet.
+        Do this only if it is explicitly requested.
+        """
+        max_col = 0
+        for r in self.rows:
+            cell = r[-1]
+            max_col = max(max_col, column_index_from_string(cell.column))
+        self.max_row = cell.row
+        self.max_col = max_col
 
     def get_highest_column(self):
         if self.max_col is not None:
