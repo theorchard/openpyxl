@@ -245,3 +245,26 @@ def test_read_with_missing_cells(datadir):
     row = rows[3] # fourth row
     values = [c.value for c in row]
     assert values == [1, 2, None, None, 3]
+
+
+def test_read_empty_row(datadir):
+    from openpyxl.xml.functions import fromstring
+
+    class Workbook:
+        excel_base_date = None
+
+        def get_sheet_names(self):
+            return []
+
+    filename = "bug393-worksheet.xml"
+
+    src = """
+    <row r="2" xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main" />
+    """
+    element = fromstring(src)
+
+    from openpyxl.worksheet.iter_worksheet import IterableWorksheet
+    ws = IterableWorksheet(Workbook(), "Sheet", "", filename, [], [])
+    row = ws._get_row(element, max_col=10)
+    row = tuple(row)
+    assert len(row) == 10

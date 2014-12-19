@@ -127,7 +127,7 @@ class IterableWorksheet(Worksheet):
             yield tuple(full_row)
 
 
-    def _get_row(self, element, min_col=1, max_col=None):
+    def _get_row(self, element, min_col=1, max_col=None, row=None):
         """Return cells from a particular row"""
         col_counter = min_col
 
@@ -159,6 +159,8 @@ class IterableWorksheet(Worksheet):
                                    value, data_type, style_id)
             col_counter = column + 1
         if max_col is not None:
+            if row is None:
+                row = int(element.get("r")) # empty row
             while col_counter <= max_col:
                 yield ReadOnlyCell(self, row, None, None)
                 col_counter += 1
