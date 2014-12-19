@@ -9,18 +9,18 @@ import operator
 from itertools import groupby
 
 # compatibility
-from openpyxl.compat import range
+from openpyxl.compat import range, deprecated
 from openpyxl.xml.functions import iterparse
 
 # package
 from openpyxl.worksheet import Worksheet
-from openpyxl.cell import (
+from openpyxl.utils import (
     ABSOLUTE_RE,
     coordinate_from_string,
     column_index_from_string,
     get_column_letter,
-    Cell
 )
+from openpyxl.cell import Cell
 from openpyxl.cell.read_only import ReadOnlyCell, EMPTY_CELL
 from openpyxl.xml.functions import safe_iterator
 from openpyxl.xml.constants import SHEET_MAIN_NS
@@ -95,39 +95,36 @@ class IterableWorksheet(Worksheet):
         Missing cells will be created.
         """
         if max_col is not None:
-            expected_columns = [get_column_letter(ci) for ci in range(min_col, max_col + 1)]
-            empty_row = tuple(EMPTY_CELL for column in expected_columns)
+            empty_row = tuple(EMPTY_CELL for column in range(min_col, max_col + 1))
         else:
             expected_columns = []
         row_counter = min_row
 
-        # get cells row by row
+        p = iterparse(self.xml_source, tag=[ROW_TAG], remove_blank_text=True)
+        for _event, element in p:
+            if element.tag == ROW_TAG:
+                row_id = int(element.get("r"))
 
-        for row, cells in self._get_cells(min_row, min_col, max_row, max_col):
-            full_row = []
-            if row_counter < row:
-                # Rows requested before those in the worksheet
-                for gap_row in range(row_counter, row):
+                # got all the rows we need
+                if max_row is not None and row_id > max_row:
+                    break
+
+                # some rows are missing
+                for row_counter in range(row_counter, row_id):
                     yield empty_row
-                    row_counter = row
 
-            if expected_columns:
-                retrieved_columns = dict([(c.column, c) for c in cells])
-                for column in expected_columns:
-                    if column in retrieved_columns:
-                        cell = retrieved_columns[column]
-                        full_row.append(cell)
-                    else:
-                        # create missing cell
-                        full_row.append(EMPTY_CELL)
-            else:
-                full_row = cells
+                # return cells from a row
+                if min_row <= row_id:
+                    yield tuple(self._get_row(element, min_col, max_col))
+                    row_counter += 1
 
-            row_counter = row + 1
-            yield tuple(full_row)
+            if element.tag in (CELL_TAG, VALUE_TAG, FORMULA_TAG):
+                # sub-elements of rows should be skipped as handled within a cell
+                continue
+            element.clear()
 
 
-    def _get_row(self, element, min_col=1, max_col=None, row=None):
+    def _get_row(self, element, min_col=1, max_col=None):
         """Return cells from a particular row"""
         col_counter = min_col
 
@@ -140,9 +137,9 @@ class IterableWorksheet(Worksheet):
                 break
 
             if min_col <= column:
-                for gap in range(col_counter, column):
+                for col_counter in range(max(col_counter, min_col), column):
                     # pad row with missing cells
-                    yield ReadOnlyCell(self, row, None, None)
+                    yield EMPTY_CELL
 
                 data_type = cell.get('t', 'n')
                 style_id = int(cell.get('s', 0))
@@ -156,47 +153,45 @@ class IterableWorksheet(Worksheet):
                         value = "=%s" % formula
 
                 yield ReadOnlyCell(self, row, column_str,
-                                   value, data_type, style_id)
+                                   value, data_type, self.parent._cell_styles[style_id])
             col_counter = column + 1
         if max_col is not None:
-            if row is None:
-                row = int(element.get("r")) # empty row
             for _ in range(col_counter, max_col+1):
-                yield ReadOnlyCell(self, row, None, None)
+                yield EMPTY_CELL
 
-
-    def _get_cells(self, min_row, min_col, max_row, max_col):
-        p = iterparse(self.xml_source, tag=[ROW_TAG], remove_blank_text=True)
-        col_counter = min_col
-        for _event, element in p:
-            if element.tag == ROW_TAG:
-                row = int(element.get("r"))
-                if max_row is not None and row > max_row:
-                    break
-                if min_row <= row:
-                    yield row, tuple(self._get_row(element, min_col, max_col))
-
-            if element.tag in (CELL_TAG, VALUE_TAG, FORMULA_TAG):
-                # sub-elements of rows should be skipped
-                continue
-            element.clear()
 
     def _get_cell(self, coordinate):
-        """.iter_rows always returns a generator of rows each of which
-        contains a generator of cells. This can be empty in which case
-        return None"""
-        result = list(self.iter_rows(coordinate))
-        if result:
-            return result[0][0]
+        """Cells are returned by a generator which can be empty"""
+        col, row = coordinate_from_string(coordinate)
+        col = column_index_from_string(col)
+        cell = tuple(self.get_squared_range(col, row, col, row))[0]
+        if cell:
+            return cell[0]
+        return EMPTY_CELL
 
     @property
     def rows(self):
         return self.iter_rows()
 
-    def calculate_dimension(self):
+    def calculate_dimension(self, force=False):
         if not all([self.max_col, self.max_row]):
-            raise ValueError("Worksheet is unsized, cannot calculate dimensions")
+            if force:
+                self._calculate_dimension()
+            else:
+                raise ValueError("Worksheet is unsized, use calculate_dimension(force=True)")
         return '%s%s:%s%s' % (self.min_col, self.min_row, self.max_col, self.max_row)
+
+    def _calculate_dimension(self):
+        """
+        Loop through all the cells to get the size of a worksheet.
+        Do this only if it is explicitly requested.
+        """
+        max_col = 0
+        for r in self.rows:
+            cell = r[-1]
+            max_col = max(max_col, column_index_from_string(cell.column))
+        self.max_row = cell.row
+        self.max_col = max_col
 
     def get_highest_column(self):
         if self.max_col is not None:
