@@ -95,9 +95,9 @@ class CommentWriter(object):
                    {"gradientshapeok": "t",
                     "{%s}connecttype" % officens: "rect"})
 
-        for i, comment in enumerate(self.comments):
-            _ = self._write_comment_shape(comment, i)
-            root.append(_)
+        for i, comment in enumerate(self.comments, 1026):
+            shape = self._write_comment_shape(comment, i)
+            root.append(shape)
 
         return tostring(root)
 
@@ -112,7 +112,7 @@ class CommentWriter(object):
                  "z-index:1;visibility:hidden") % {'height': comment._height,
                                                    'width': comment._width}
         attrs = {
-            "id": "_x0000_s%s" % (idx + 1026),
+            "id": "_x0000_s%04d" % idx ,
             "type": "#_x0000_t202",
             "style": style,
             "fillcolor": "#ffffe1",

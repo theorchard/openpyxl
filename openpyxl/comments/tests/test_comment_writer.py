@@ -123,7 +123,7 @@ def test_write_only_cell_vml(datadir):
     xmlns:x="urn:schemas-microsoft-com:office:excel"
     xmlns:o="urn:schemas-microsoft-com:office:office"
     fillcolor="#ffffe1"
-    id="_x0000_s1027"
+    id="_x0000_s0001"
     style="position:absolute; margin-left:59.25pt;margin-top:1.5pt;width:108pt;height:59.25pt;z-index:1;visibility:hidden"
     type="#_x0000_t202"
     o:insetmode="auto">
