@@ -161,9 +161,8 @@ class IterableWorksheet(Worksheet):
         if max_col is not None:
             if row is None:
                 row = int(element.get("r")) # empty row
-            while col_counter <= max_col:
+            for _ in range(col_counter, max_col+1):
                 yield ReadOnlyCell(self, row, None, None)
-                col_counter += 1
 
 
     def _get_cells(self, min_row, min_col, max_row, max_col):
