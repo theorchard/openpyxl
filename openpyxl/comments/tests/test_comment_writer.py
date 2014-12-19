@@ -102,3 +102,47 @@ def test_write_comments_vml(datadir):
         assert set(correct_ids) == set(check_ids)
         diff = compare_xml(get_document_content(correct), get_document_content(check))
         assert diff is None, diff
+
+
+def test_write_only_cell_vml(datadir):
+    from openpyxl.xml.functions import Element, tostring
+    datadir.chdir()
+    wb = Workbook()
+    ws = wb.active
+    cell = ws['A1'] # write-only cells are always A1
+    cell.comment = Comment("Some text", "an author")
+    cell.coordinate = "B2" # coordinate calculcated on-demand
+
+    writer = CommentWriter(ws)
+    root = Element("root")
+    writer._write_comment_shape(root, cell.comment, 1)
+    xml = tostring(root)
+    expected = """
+    <root>
+    <v:shape
+    xmlns:v="urn:schemas-microsoft-com:vml"
+    xmlns:x="urn:schemas-microsoft-com:office:excel"
+    xmlns:o="urn:schemas-microsoft-com:office:office"
+    fillcolor="#ffffe1"
+    id="_x0000_s1027"
+    style="position:absolute; margin-left:59.25pt;margin-top:1.5pt;width:108pt;height:59.25pt;z-index:1;visibility:hidden"
+    type="#_x0000_t202"
+    o:insetmode="auto">
+      <v:fill color2="#ffffe1"/>
+      <v:shadow color="black" obscured="t"/>
+      <v:path o:connecttype="none"/>
+      <v:textbox style="mso-direction-alt:auto">
+        <div style="text-align:left"/>
+      </v:textbox>
+      <x:ClientData ObjectType="Note">
+        <x:MoveWithCells/>
+        <x:SizeWithCells/>
+        <x:AutoFill>False</x:AutoFill>
+        <x:Row>1</x:Row>
+        <x:Column>1</x:Column>
+      </x:ClientData>
+    </v:shape>
+    </root>
+    """
+    diff = compare_xml(xml, expected)
+    assert diff is None, diff

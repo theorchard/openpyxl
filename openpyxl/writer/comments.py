@@ -26,7 +26,7 @@ from openpyxl.collections import IndexedList
 from openpyxl.compat import iteritems
 from openpyxl.xml.constants import SHEET_MAIN_NS
 from openpyxl.xml.functions import Element, SubElement, tostring
-from openpyxl.cell import column_index_from_string
+from openpyxl.cell import column_index_from_string, coordinate_from_string
 
 vmlns = "urn:schemas-microsoft-com:vml"
 officens = "urn:schemas-microsoft-com:office:office"
@@ -102,8 +102,10 @@ class CommentWriter(object):
 
     def _write_comment_shape(self, root, comment, idx):
         # get zero-indexed coordinates of the comment
-        row = comment._parent.row - 1
-        column = column_index_from_string(comment._parent.column) - 1
+        col, row = coordinate_from_string(comment._parent.coordinate)
+        row -= 1
+        column = column_index_from_string(col) - 1
+
         style = ("position:absolute; margin-left:59.25pt;"
                  "margin-top:1.5pt;width:%(width)s;height:%(height)s;"
                  "z-index:1;visibility:hidden") % {'height': comment._height,

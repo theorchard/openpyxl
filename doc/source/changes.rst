@@ -1,3 +1,12 @@
+2.1.5 (unreleased)
+
+
+Bug fixes
+---------
+* `#403 <https://bitbucket.org/openpyxl/openpyxl/issue/403>`_ Cannot add comments in write-only mode
+
+
+
 2.1.4 (2014-12-16)
 ==================
 
