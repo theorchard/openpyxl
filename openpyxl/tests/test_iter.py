@@ -320,3 +320,19 @@ def test_read_row(datadir):
     row = tuple(ws._get_row(xml, 1, 11))
     values = [c.value for c in row]
     assert values == [None, None, None, 1, None, None, None, None, None, None, 0.01]
+
+
+def test_read_empty_row(datadir, DummyWorkbook):
+
+    filename = "bug393-worksheet.xml"
+
+    src = """
+    <row r="2" xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main" />
+    """
+    element = fromstring(src)
+
+    from openpyxl.worksheet.iter_worksheet import IterableWorksheet
+    ws = IterableWorksheet(DummyWorkbook, "Sheet", "", filename, [], [])
+    row = ws._get_row(element, max_col=10)
+    row = tuple(row)
+    assert len(row) == 10
