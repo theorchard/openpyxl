@@ -115,10 +115,9 @@ def test_write_only_cell_vml(datadir):
 
     writer = CommentWriter(ws)
     root = Element("root")
-    writer._write_comment_shape(root, cell.comment, 1)
-    xml = tostring(root)
+    xml = writer._write_comment_shape(cell.comment, 1)
+    xml = tostring(xml)
     expected = """
-    <root>
     <v:shape
     xmlns:v="urn:schemas-microsoft-com:vml"
     xmlns:x="urn:schemas-microsoft-com:office:excel"
@@ -142,7 +141,6 @@ def test_write_only_cell_vml(datadir):
         <x:Column>1</x:Column>
       </x:ClientData>
     </v:shape>
-    </root>
     """
     diff = compare_xml(xml, expected)
     assert diff is None, diff

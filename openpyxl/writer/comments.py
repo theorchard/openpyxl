@@ -96,11 +96,12 @@ class CommentWriter(object):
                     "{%s}connecttype" % officens: "rect"})
 
         for i, comment in enumerate(self.comments):
-            self._write_comment_shape(root, comment, i)
+            _ = self._write_comment_shape(comment, i)
+            root.append(_)
 
         return tostring(root)
 
-    def _write_comment_shape(self, root, comment, idx):
+    def _write_comment_shape(self, comment, idx):
         # get zero-indexed coordinates of the comment
         col, row = coordinate_from_string(comment._parent.coordinate)
         row -= 1
@@ -117,7 +118,7 @@ class CommentWriter(object):
             "fillcolor": "#ffffe1",
             "{%s}insetmode" % officens: "auto"
         }
-        shape = SubElement(root, "{%s}shape" % vmlns, attrs)
+        shape = Element("{%s}shape" % vmlns, attrs)
 
         SubElement(shape, "{%s}fill" % vmlns,
                    {"color2": "#ffffe1"})
@@ -133,5 +134,6 @@ class CommentWriter(object):
         SubElement(client_data, "{%s}MoveWithCells" % excelns)
         SubElement(client_data, "{%s}SizeWithCells" % excelns)
         SubElement(client_data, "{%s}AutoFill" % excelns).text = "False"
-        SubElement(client_data, "{%s}Row" % excelns).text = str(row)
-        SubElement(client_data, "{%s}Column" % excelns).text = str(column)
+        SubElement(client_data, "{%s}Row" % excelns).text = "%d" % row
+        SubElement(client_data, "{%s}Column" % excelns).text = "%d" % column
+        return shape
