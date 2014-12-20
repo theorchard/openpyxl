@@ -7,6 +7,11 @@ Bug fixes
 * `#401 <https://bitbucket.org/openpyxl/openpyxl/issue/401>`_ Creating cells in an empty row raises an exception
 
 
+Minor changes
+-------------
+* Allow cells to be appended to standard worksheets for code compatibility with write-only mode.
+
+
 2.1.4 (2014-12-16)
 ==================
 

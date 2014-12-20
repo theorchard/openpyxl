@@ -299,6 +299,19 @@ class TestWorksheet(object):
             assert e == tuple(v)
 
 
+    def test_append_cell(self):
+        from openpyxl.cell import Cell
+
+        cell = Cell(None, 'A', 1, 25)
+
+        ws = Worksheet(self.wb)
+        ws.append([])
+
+        ws.append([cell])
+
+        assert ws['A2'].value == 25
+
+
     @pytest.mark.parametrize("row, column, coordinate",
                              [
                                  (1, 0, 'A1'),

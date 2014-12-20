@@ -682,7 +682,15 @@ class Worksheet(object):
                 col = get_column_letter(col_idx)
                 if col not in self.column_dimensions:
                     self.column_dimensions[col] = ColumnDimension(worksheet=self, index=col)
-                cell = Cell(self, col, row_idx, content)
+                if isinstance(content, Cell):
+                    # compatible with write-only mode
+                    cell = content
+                    cell.parent = self
+                    cell.column = col
+                    cell.row = row_idx
+                    cell.coordinate = "%s%s" % (col, row_idx)
+                else:
+                    cell = Cell(self, col, row_idx, content)
                 self._cells['%s%d' % (col, row_idx)] = cell
 
         elif isinstance(iterable, dict):
