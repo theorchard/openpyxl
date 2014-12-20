@@ -13,6 +13,7 @@ from openpyxl import Workbook
 from .. worksheet import write_worksheet
 
 from openpyxl.tests.helper import compare_xml
+from openpyxl.worksheet.properties import PageSetupPr
 
 
 class DummyWorksheet:
@@ -720,11 +721,12 @@ def test_printer_settings(worksheet):
     ws = worksheet
     ws.page_setup.orientation = ws.ORIENTATION_LANDSCAPE
     ws.page_setup.paperSize = ws.PAPERSIZE_TABLOID
-    ws.page_setup.fitToPage = True
     ws.page_setup.fitToHeight = 0
     ws.page_setup.fitToWidth = 1
-    ws.page_setup.horizontalCentered = True
-    ws.page_setup.verticalCentered = True
+    ws.print_options.horizontalCentered = True
+    ws.print_options.verticalCentered = True
+    page_setup_prop = PageSetupPr(fitToPage=True)
+    ws.sheet_properties.pageSetUpPr = page_setup_prop
     xml = write_worksheet(ws, None)
     expected = """
     <worksheet xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main" xmlns:r="http://schemas.openxmlformats.org/officeDocument/2006/relationships">
@@ -772,7 +774,6 @@ def test_data_validation(worksheet):
 
 
 def test_vba(worksheet):
-    from openpyxl.xml.functions import fromstring
     ws = worksheet
     ws.vba_code = {"codeName":"Sheet1"}
     ws.vba_controls = "rId2"
@@ -848,3 +849,28 @@ def test_write_comments(out, worksheet):
     """
     diff = compare_xml(xml, expected)
     assert diff is None, diff
+
+def test_write_with_tab_color(worksheet):
+    ws = worksheet
+    ws.sheet_properties.tabColor = "F0F0F0"
+    xml = write_worksheet(ws, None)
+    expected = """
+    <worksheet xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main" xmlns:r="http://schemas.openxmlformats.org/officeDocument/2006/relationships">
+      <sheetPr>
+        <outlinePr summaryRight="1" summaryBelow="1"/>
+        <tabColor rgb="00F0F0F0"/>
+      </sheetPr>
+      <dimension ref="A1:A1"/>
+      <sheetViews>
+        <sheetView workbookViewId="0">
+          <selection sqref="A1" activeCell="A1"/>
+        </sheetView>
+      </sheetViews>
+      <sheetFormatPr baseColWidth="10" defaultRowHeight="15"/>
+      <sheetData/>
+      <pageMargins left="0.75" right="0.75" top="1" bottom="1" header="0.5" footer="0.5"/>
+    </worksheet>
+    """
+    diff = compare_xml(xml, expected)
+    assert diff is None, diff
+     

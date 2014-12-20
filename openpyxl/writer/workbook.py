@@ -9,7 +9,7 @@ from functools import partial
 
 from openpyxl import LXML
 from openpyxl.compat import safe_string
-from openpyxl.cell import absolute_coordinate
+from openpyxl.utils import absolute_coordinate
 from openpyxl.xml.functions import Element, SubElement
 from openpyxl.xml.constants import (
     ARC_CORE,
@@ -36,52 +36,47 @@ from openpyxl.xml.constants import (
     EXTERNAL_LINK,
 )
 from openpyxl.xml.functions import tostring, fromstring
-from openpyxl.date_time import datetime_to_W3CDTF
+from openpyxl.utils.datetime  import datetime_to_W3CDTF
 from openpyxl.worksheet import Worksheet
-from openpyxl.workbook.names.named_range import NamedRange, NamedValue
+from openpyxl.workbook.properties import write_properties
 
 
-def write_properties_core(properties):
-    """Write the core properties to xml."""
-    root = Element('{%s}coreProperties' % COREPROPS_NS)
-    SubElement(root, '{%s}creator' % DCORE_NS).text = properties.creator
-    SubElement(root, '{%s}lastModifiedBy' % COREPROPS_NS).text = properties.last_modified_by
-    SubElement(root, '{%s}created' % DCTERMS_NS,
-               {'{%s}type' % XSI_NS: '%s:W3CDTF' % DCTERMS_PREFIX}).text = \
-                   datetime_to_W3CDTF(properties.created)
-    SubElement(root, '{%s}modified' % DCTERMS_NS,
-               {'{%s}type' % XSI_NS: '%s:W3CDTF' % DCTERMS_PREFIX}).text = \
-                   datetime_to_W3CDTF(properties.modified)
-    SubElement(root, '{%s}title' % DCORE_NS).text = properties.title
-    SubElement(root, '{%s}description' % DCORE_NS).text = properties.description
-    SubElement(root, '{%s}subject' % DCORE_NS).text = properties.subject
-    SubElement(root, '{%s}keywords' % COREPROPS_NS).text = properties.keywords
-    SubElement(root, '{%s}category' % COREPROPS_NS).text = properties.category
-    return tostring(root)
-
+from openpyxl.xml.constants import (
+    THEME_TYPE,
+    STYLES_TYPE,
+    XLSX,
+    XLSM,
+    XLTM,
+    XLTX,
+    WORKSHEET_TYPE,
+    COMMENTS_TYPE,
+    SHARED_STRINGS,
+    DRAWING_TYPE,
+    CHART_TYPE,
+    CHARTSHAPE_TYPE
+)
 
 static_content_types_config = [
-    ('Override', ARC_THEME, 'application/vnd.openxmlformats-officedocument.theme+xml'),
-    ('Override', ARC_STYLE, 'application/vnd.openxmlformats-officedocument.spreadsheetml.styles+xml'),
+    ('Override', ARC_THEME, THEME_TYPE),
+    ('Override', ARC_STYLE, STYLES_TYPE),
 
     ('Default', 'rels', 'application/vnd.openxmlformats-package.relationships+xml'),
     ('Default', 'xml', 'application/xml'),
     ('Default', 'png', 'image/png'),
     ('Default', 'vml', 'application/vnd.openxmlformats-officedocument.vmlDrawing'),
 
-    ('Override', ARC_WORKBOOK,
-     'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet.main+xml'),
+    ('Override', ARC_WORKBOOK, XLSX),
     ('Override', ARC_APP,
      'application/vnd.openxmlformats-officedocument.extended-properties+xml'),
     ('Override', ARC_CORE,
      'application/vnd.openxmlformats-package.core-properties+xml'),
-    ('Override', ARC_SHARED_STRINGS,
-     'application/vnd.openxmlformats-officedocument.spreadsheetml.sharedStrings+xml'),
+    ('Override', ARC_SHARED_STRINGS, SHARED_STRINGS),
 ]
 
 
-def write_content_types(workbook):
+def write_content_types(workbook, as_template=False):
     """Write the content-types xml."""
+
     seen = set()
     if workbook.vba_archive:
         root = fromstring(workbook.vba_archive.read(ARC_CONTENT_TYPES))
@@ -95,7 +90,9 @@ def write_content_types(workbook):
             root = Element('{%s}Types' % CONTYPES_NS, nsmap=NSMAP)
         else:
             root = Element('{%s}Types' % CONTYPES_NS)
+
     for setting_type, name, content_type in static_content_types_config:
+
         attrib = {'ContentType': content_type}
         if setting_type == 'Override':
             if '/' + name not in seen:
@@ -105,8 +102,16 @@ def write_content_types(workbook):
         else:
             if name not in seen:
                 tag = '{%s}Default' % CONTYPES_NS
-                attrib['Extension'] =  name
+                attrib['Extension'] = name
                 SubElement(root, tag, attrib)
+
+    nodes = root.findall('{%s}Override' % CONTYPES_NS)
+    for wb_elem in nodes:
+        if wb_elem.get("PartName") == "/" + ARC_WORKBOOK:
+            ct = as_template and XLTX or XLSX
+            if workbook.vba_archive:
+                ct = as_template and XLTM or XLSM
+            wb_elem.set("ContentType", ct)
 
     drawing_id = 1
     chart_id = 1
@@ -115,37 +120,53 @@ def write_content_types(workbook):
     for sheet_id, sheet in enumerate(workbook.worksheets):
         name = '/xl/worksheets/sheet%d.xml' % (sheet_id + 1)
         if name not in seen:
-            SubElement(root, '{%s}Override' % CONTYPES_NS, {'PartName': name,
-                'ContentType': 'application/vnd.openxmlformats-officedocument.spreadsheetml.worksheet+xml'})
+            SubElement(root, '{%s}Override' % CONTYPES_NS, {
+                'PartName': name,
+                'ContentType': WORKSHEET_TYPE
+            })
+
         if sheet._charts or sheet._images:
             name = '/xl/drawings/drawing%d.xml' % drawing_id
             if name not in seen:
-                SubElement(root, '{%s}Override' % CONTYPES_NS, {'PartName' : name,
-                'ContentType' : 'application/vnd.openxmlformats-officedocument.drawing+xml'})
+                SubElement(root, '{%s}Override' % CONTYPES_NS, {
+                    'PartName': name,
+                    'ContentType': DRAWING_TYPE
+                })
+
             drawing_id += 1
 
             for chart in sheet._charts:
                 name = '/xl/charts/chart%d.xml' % chart_id
                 if name not in seen:
-                    SubElement(root, '{%s}Override' % CONTYPES_NS, {'PartName' : name,
-                    'ContentType' : 'application/vnd.openxmlformats-officedocument.drawingml.chart+xml'})
+                    SubElement(root, '{%s}Override' % CONTYPES_NS, {
+                        'PartName': name,
+                        'ContentType': CHART_TYPE
+                    })
+
                 chart_id += 1
+
                 if chart._shapes:
                     name = '/xl/drawings/drawing%d.xml' % drawing_id
                     if name not in seen:
-                        SubElement(root, '{%s}Override' % CONTYPES_NS, {'PartName' : name,
-                        'ContentType' : 'application/vnd.openxmlformats-officedocument.drawingml.chartshapes+xml'})
+                        SubElement(root, '{%s}Override' % CONTYPES_NS, {
+                            'PartName': name,
+                            'ContentType': CHARTSHAPE_TYPE
+                        })
+
                     drawing_id += 1
+
         if sheet._comment_count > 0:
-            SubElement(root, '{%s}Override' % CONTYPES_NS,
-                {'PartName': '/xl/comments%d.xml' % comments_id,
-                 'ContentType': 'application/vnd.openxmlformats-officedocument.spreadsheetml.comments+xml'})
+            SubElement(root, '{%s}Override' % CONTYPES_NS, {
+                'PartName': '/xl/comments%d.xml' % comments_id,
+                'ContentType': COMMENTS_TYPE
+            })
             comments_id += 1
 
     for idx, _ in enumerate(workbook._external_links, 1):
-        el = Element('{%s}Override' % CONTYPES_NS,
-                     {'PartName':'/xl/externalLinks/externalLink{0}.xml'.format(idx),
-                      'ContentType': EXTERNAL_LINK})
+        el = Element('{%s}Override' % CONTYPES_NS, {
+            'PartName': '/xl/externalLinks/externalLink{0}.xml'.format(idx),
+            'ContentType': EXTERNAL_LINK
+        })
         root.append(el)
 
     return tostring(root)
@@ -187,11 +208,11 @@ def write_root_rels(workbook):
     root = Element('{%s}Relationships' % PKG_REL_NS)
     relation_tag = '{%s}Relationship' % PKG_REL_NS
     SubElement(root, relation_tag, {'Id': 'rId1', 'Target': ARC_WORKBOOK,
-            'Type': '%s/officeDocument' % REL_NS})
+                                    'Type': '%s/officeDocument' % REL_NS})
     SubElement(root, relation_tag, {'Id': 'rId2', 'Target': ARC_CORE,
-            'Type': '%s/metadata/core-properties' % PKG_REL_NS})
+                                    'Type': '%s/metadata/core-properties' % PKG_REL_NS})
     SubElement(root, relation_tag, {'Id': 'rId3', 'Target': ARC_APP,
-            'Type': '%s/extended-properties' % REL_NS})
+                                    'Type': '%s/extended-properties' % REL_NS})
     if workbook.vba_archive is not None:
         # See if there was a customUI relation and reuse its id
         arc = fromstring(workbook.vba_archive.read(ARC_ROOT_RELS))
@@ -203,30 +224,28 @@ def write_root_rels(workbook):
                         break
         if rId is not None:
             SubElement(root, relation_tag, {'Id': rId, 'Target': ARC_CUSTOM_UI,
-                'Type': '%s' % CUSTOMUI_NS})
+                                            'Type': '%s' % CUSTOMUI_NS})
     return tostring(root)
 
 
 def write_workbook(workbook):
     """Write the core workbook xml."""
+
     root = Element('{%s}workbook' % SHEET_MAIN_NS)
     if LXML:
         _nsmap = {'r':REL_NS}
         root = Element('{%s}workbook' % SHEET_MAIN_NS, nsmap=_nsmap)
 
-    SubElement(root, '{%s}fileVersion' % SHEET_MAIN_NS,
-               {'appName': 'xl', 'lastEdited': '4', 'lowestEdited': '4', 'rupBuild': '4505'})
-    SubElement(root, '{%s}workbookPr' % SHEET_MAIN_NS,
-               {'defaultThemeVersion': '124226', 'codeName': workbook.code_name})
+    wb_props = {}
+    if workbook.code_name is not None:
+        wb_props['codeName'] = workbook.code_name
+    SubElement(root, '{%s}workbookPr' % SHEET_MAIN_NS, wb_props)
 
     # book views
     book_views = SubElement(root, '{%s}bookViews' % SHEET_MAIN_NS)
     SubElement(book_views, '{%s}workbookView' % SHEET_MAIN_NS,
-               {'activeTab': '%d' % workbook.get_index(workbook.get_active_sheet()),
-                'autoFilterDateGrouping': '1', 'firstSheet': '0', 'minimized': '0',
-                'showHorizontalScroll': '1', 'showSheetTabs': '1',
-                'showVerticalScroll': '1', 'tabRatio': '600',
-                'visibility': 'visible'})
+               {'activeTab': '%d' % workbook._active_sheet_index}
+               )
 
     # worksheets
     sheets = SubElement(root, '{%s}sheets' % SHEET_MAIN_NS)
@@ -267,7 +286,7 @@ def write_workbook(workbook):
                                  absolute_coordinate(auto_filter))
 
     SubElement(root, '{%s}calcPr' % SHEET_MAIN_NS,
-               {'calcId': '124519', 'calcMode': 'auto', 'fullCalcOnLoad': '1'})
+               {'calcId': '124519', 'fullCalcOnLoad': '1'})
     return tostring(root)
 
 
