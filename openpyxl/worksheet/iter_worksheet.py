@@ -4,15 +4,15 @@ from __future__ import absolute_import
 """ Iterators-based worksheet reader
 *Still very raw*
 """
-# stdlib
-import operator
-from itertools import groupby
 
 # compatibility
-from openpyxl.compat import range, deprecated
-from openpyxl.xml.functions import iterparse
+from openpyxl.compat import range
 
 # package
+from openpyxl.xml.functions import iterparse
+from openpyxl.xml.functions import safe_iterator
+from openpyxl.xml.constants import SHEET_MAIN_NS
+
 from openpyxl.worksheet import Worksheet
 from openpyxl.utils import (
     ABSOLUTE_RE,
@@ -20,13 +20,12 @@ from openpyxl.utils import (
     column_index_from_string,
     get_column_letter,
 )
-from openpyxl.cell import Cell
 from openpyxl.cell.read_only import ReadOnlyCell, EMPTY_CELL
-from openpyxl.xml.functions import safe_iterator
-from openpyxl.xml.constants import SHEET_MAIN_NS
 
 
 def read_dimension(source):
+    if hasattr(source, "encode"):
+        return
     min_row = min_col =  max_row = max_col = None
     DIMENSION_TAG = '{%s}dimension' % SHEET_MAIN_NS
     DATA_TAG = '{%s}sheetData' % SHEET_MAIN_NS
@@ -149,7 +148,7 @@ class IterableWorksheet(Worksheet):
                     value = value.text
                 if formula is not None:
                     if not self.parent.data_only:
-                        data_type = Cell.TYPE_FORMULA
+                        data_type = 'f'
                         value = "=%s" % formula
 
                 yield ReadOnlyCell(self, row, column_str,
