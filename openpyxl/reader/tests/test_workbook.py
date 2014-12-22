@@ -12,6 +12,10 @@ from openpyxl.xml.constants import (
     REL_NS,
 )
 
+from openpyxl.utils.datetime import (
+    CALENDAR_WINDOWS_1900,
+    CALENDAR_MAC_1904,
+)
 
 @pytest.fixture()
 def DummyArchive():
@@ -157,9 +161,22 @@ def test_missing_content_type(datadir, DummyArchive):
 
 def test_read_workbook_with_no_core_properties(datadir, Workbook):
     from openpyxl.workbook import DocumentProperties
-    from openpyxl.reader.excel import _load_workbook
+    from openpyxl.reader.excel import load_workbook
 
     datadir.chdir()
-    archive = ZipFile('empty_with_no_properties.xlsx')
-    wb = Workbook()
+    wb = load_workbook('empty_with_no_properties.xlsx')
     assert isinstance(wb.properties, DocumentProperties)
+
+
+@pytest.mark.parametrize("filename, epoch",
+                         [
+                             ("date_1900.xlsx", CALENDAR_WINDOWS_1900),
+                             ("date_1904.xlsx",  CALENDAR_MAC_1904),
+                         ]
+                         )
+def test_read_win_base_date(datadir, filename, epoch):
+    from .. workbook import read_excel_base_date
+    datadir.chdir()
+    archive = ZipFile(filename)
+    base_date = read_excel_base_date(archive)
+    assert base_date == epoch

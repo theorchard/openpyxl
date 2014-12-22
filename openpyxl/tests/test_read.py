@@ -86,22 +86,6 @@ def test_read_general_style(datadir, cell, number_format):
     assert ws[cell].number_format == number_format
 
 
-
-@pytest.mark.parametrize("filename, epoch",
-                         [
-                             ("date_1900.xlsx", CALENDAR_WINDOWS_1900),
-                             ("date_1904.xlsx",  CALENDAR_MAC_1904),
-                         ]
-                         )
-def test_read_win_base_date(datadir, filename, epoch):
-    datadir.join("reader").chdir()
-    wb = load_workbook(filename)
-    assert wb.excel_base_date == epoch
-    ws = wb["Sheet1"]
-    assert ws['A1'].value == datetime(2011, 10, 31)
-
-
-
 def test_read_no_theme(datadir):
     datadir.join("genuine").chdir()
     wb = load_workbook('libreoffice_nrt.xlsx')

@@ -218,7 +218,7 @@ def _load_workbook(wb, archive, filename, read_only, keep_vba):
         wb._fills = parsed_styles.fill_list
         wb._numbers = parsed_styles.custom_num_formats
 
-    wb.excel_base_date = read_excel_base_date(xml_source=archive.read(ARC_WORKBOOK))
+    wb.excel_base_date = read_excel_base_date(archive)
 
     # get worksheets
     wb.worksheets = []  # remove preset worksheet
