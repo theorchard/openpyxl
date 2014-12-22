@@ -2,12 +2,15 @@
 
 import pytest
 
+from io import BytesIO
+from zipfile import ZipFile
+
 # package imports
 from openpyxl.compat import safe_string, OrderedDict
 from openpyxl.reader.excel import load_workbook
-from openpyxl.reader.style import read_style_table
 
 from openpyxl.styles import (
+    borders,
     numbers,
     Color,
     Font,
@@ -17,7 +20,6 @@ from openpyxl.styles import (
     Side,
     Alignment
 )
-from openpyxl.styles import borders
 from openpyxl.xml.functions import Element
 
 
@@ -93,11 +95,13 @@ def test_unprotected_cell(StyleReader, datadir):
     assert style.protection.locked is False
 
 
-def test_read_cell_style(datadir):
+def test_read_cell_style(datadir, StyleReader):
     datadir.chdir()
     with open("empty-workbook-styles.xml") as content:
-        style_properties = read_style_table(content.read()).shared_styles
-        assert len(style_properties) == 2
+        reader = StyleReader(content.read())
+    reader.parse()
+    style_properties = reader.shared_styles
+    assert len(style_properties) == 2
 
 
 def test_read_xf_no_number_format(datadir, StyleReader):
@@ -117,21 +121,25 @@ def test_read_xf_no_number_format(datadir, StyleReader):
 
 
 
-def test_read_simple_style_mappings(datadir):
+def test_read_simple_style_mappings(datadir, StyleReader):
     datadir.chdir()
     with open("simple-styles.xml") as content:
-        style_properties = read_style_table(content.read()).shared_styles
-        assert len(style_properties) == 4
-        assert numbers.BUILTIN_FORMATS[9] == style_properties[1].number_format
-        assert 'yyyy-mm-dd' == style_properties[2].number_format
+        reader = StyleReader(content.read())
+    reader.parse()
+    style_properties = reader.shared_styles
+    assert len(style_properties) == 4
+    assert numbers.BUILTIN_FORMATS[9] == style_properties[1].number_format
+    assert 'yyyy-mm-dd' == style_properties[2].number_format
 
 
-def test_read_complex_style_mappings(datadir):
+def test_read_complex_style_mappings(datadir, StyleReader):
     datadir.chdir()
     with open("complex-styles.xml") as content:
-        style_properties = read_style_table(content.read()).shared_styles
-        assert len(style_properties) == 29
-        assert style_properties[-1].font.bold is False
+        reader = StyleReader(content.read())
+    reader.parse()
+    style_properties = reader.shared_styles
+    assert len(style_properties) == 29
+    assert style_properties[-1].font.bold is False
 
 
 def test_read_complex_style(datadir):
@@ -376,3 +384,8 @@ def test_named_styles(datadir, StyleReader):
     assert first_style.fill == DEFAULT_EMPTY_FILL
     assert first_style.border == Border()
 
+
+def test_no_styles():
+    from .. style import read_style_table
+    archive = ZipFile(BytesIO(), "a")
+    assert read_style_table(archive) is None

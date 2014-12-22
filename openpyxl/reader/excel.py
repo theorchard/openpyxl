@@ -206,16 +206,17 @@ def _load_workbook(wb, archive, filename, read_only, keep_vba):
     except KeyError:
         assert wb.loaded_theme == None, "even though the theme information is missing there is a theme object ?"
 
-    parsed_styles = read_style_table(archive.read(ARC_STYLE))
-    wb.shared_styles = parsed_styles.shared_styles
-    wb.style_properties = {'dxf_list': parsed_styles.cond_styles}
-    wb.cond_styles = parsed_styles.cond_styles
-    wb._cell_styles = parsed_styles.cell_styles
-    wb._colors = parsed_styles.color_index
-    wb._borders = parsed_styles.border_list
-    wb._fonts = parsed_styles.font_list
-    wb._fills = parsed_styles.fill_list
-    wb._numbers = parsed_styles.custom_num_formats
+    parsed_styles = read_style_table(archive)
+    if parsed_styles is not None:
+        wb.shared_styles = parsed_styles.shared_styles
+        wb.style_properties = {'dxf_list': parsed_styles.cond_styles}
+        wb.cond_styles = parsed_styles.cond_styles
+        wb._cell_styles = parsed_styles.cell_styles
+        wb._colors = parsed_styles.color_index
+        wb._borders = parsed_styles.border_list
+        wb._fonts = parsed_styles.font_list
+        wb._fills = parsed_styles.fill_list
+        wb._numbers = parsed_styles.custom_num_formats
 
     wb.excel_base_date = read_excel_base_date(xml_source=archive.read(ARC_WORKBOOK))
 

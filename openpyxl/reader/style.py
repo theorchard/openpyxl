@@ -23,7 +23,7 @@ from openpyxl.styles.colors import COLOR_INDEX, Color
 from openpyxl.styles.proxy import StyleId
 from openpyxl.styles.named_styles import NamedStyle
 from openpyxl.xml.functions import fromstring, safe_iterator, localname
-from openpyxl.xml.constants import SHEET_MAIN_NS
+from openpyxl.xml.constants import SHEET_MAIN_NS, ARC_STYLE
 from copy import deepcopy
 
 
@@ -259,7 +259,11 @@ class SharedStylesParser(object):
         return IndexedList(_styles), IndexedList(_style_ids)
 
 
-def read_style_table(xml_source):
+def read_style_table(archive):
+    if ARC_STYLE in archive.namelist():
+        xml_source = archive.read(ARC_STYLE)
+    else:
+        return
     p = SharedStylesParser(xml_source)
     p.parse()
     return p

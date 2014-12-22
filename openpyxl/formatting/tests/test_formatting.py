@@ -10,7 +10,7 @@ from openpyxl.compat import iteritems, OrderedDict
 from openpyxl import Workbook
 from openpyxl.formatting.rules import ColorScaleRule, CellIsRule, FormulaRule
 from openpyxl.reader.excel import load_workbook
-from openpyxl.reader.style import read_style_table
+from openpyxl.reader.style import SharedStylesParser
 from openpyxl.xml.constants import ARC_STYLE
 from openpyxl.xml.functions import tostring
 from openpyxl.writer.worksheet import write_conditional_formatting
@@ -878,7 +878,9 @@ def test_parse_dxfs(datadir):
     w = StyleWriter(wb)
     w._write_conditional_styles()
     write_xml = tostring(w._root)
-    read_style_prop = read_style_table(write_xml).cond_styles
+    reader = SharedStylesParser(write_xml)
+    reader.parse()
+    read_style_prop = reader.cond_styles
     assert len(read_style_prop) == len(wb.style_properties['dxf_list'])
     for i, dxf in enumerate(read_style_prop[2]):
         assert repr(wb.style_properties['dxf_list'][i] == dxf)
