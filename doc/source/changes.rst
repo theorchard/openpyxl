@@ -11,6 +11,11 @@ Major changes
 * `PR 34 <https://bitbucket.org/openpyxl/openpyxl/pull-request/34/>`_ Fully support page setup
 
 
+Bug fixes
+---------
+* `#387 <https://bitbucket.org/openpyxl/openpyxl/issue/387>`_ Cannot read files without styles.xml
+
+
 Minor changes
 -------------
 * Use a 2-way cache for column index lookups
