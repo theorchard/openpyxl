@@ -56,6 +56,9 @@ def test_get_xml_iter():
 
 @pytest.fixture
 def Worksheet(Workbook):
+    from openpyxl.styles import numbers
+    from openpyxl.worksheet.header_footer import HeaderFooter
+
     class DummyWorkbook:
 
         _guess_types = False
@@ -73,8 +76,6 @@ def Worksheet(Workbook):
             self._protections = IndexedList()
 
 
-    from openpyxl.styles import numbers
-
     class DummyStyle:
         number_format = numbers.FORMAT_GENERAL
         font = ""
@@ -85,8 +86,6 @@ def Worksheet(Workbook):
 
         def copy(self, **kw):
             return self
-
-
 
 
     class DummyWorksheet:
@@ -101,6 +100,7 @@ def Worksheet(Workbook):
             self._styles = {}
             self.cell = None
             self._data_validations = []
+            self.header_footer = HeaderFooter()
 
         def __getitem__(self, value):
             if self.cell is None:
@@ -381,3 +381,27 @@ def test_read_autofilter(datadir):
     wb = load_workbook("bug275.xlsx")
     ws = wb.active
     assert ws.auto_filter.ref == 'A1:B6'
+
+
+def test_header_footer(WorkSheetParser, datadir):
+    parser = WorkSheetParser
+    ws = parser.ws
+    datadir.chdir()
+
+    with open("header_footer.xml") as src:
+        sheet = fromstring(src.read())
+
+    element = sheet.find("{%s}headerFooter" % SHEET_MAIN_NS)
+    parser.parse_header_footer(element)
+
+    assert ws.header_footer.hasHeader()
+    assert ws.header_footer.left_header.font_name == "Lucida Grande,Standard"
+    assert ws.header_footer.left_header.font_color == "000000"
+    assert ws.header_footer.left_header.text == "Left top"
+    assert ws.header_footer.center_header.text== "Middle top"
+    assert ws.header_footer.right_header.text == "Right top"
+
+    assert ws.header_footer.hasFooter()
+    assert ws.header_footer.left_footer.text == "Left footer"
+    assert ws.header_footer.center_footer.text == "Middle Footer"
+    assert ws.header_footer.right_footer.text == "Right Footer"
