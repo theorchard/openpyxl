@@ -159,7 +159,7 @@ class HeaderFooter(object):
         return ''.join(t)
 
     def setHeader(self, item):
-        itemArray = [i.replace('#DOUBLEAMP#', '&&') for i in item.replace('&&', '#DOUBLEAMP#').split('&')]
+        itemArray = _split_string(item)
         l = itemArray.index('L') if 'L' in itemArray else None
         c = itemArray.index('C') if 'C' in itemArray else None
         r = itemArray.index('R') if 'R' in itemArray else None
@@ -179,7 +179,7 @@ class HeaderFooter(object):
             self.right_header.set(itemArray[r:])
 
     def setFooter(self, item):
-        itemArray = [i.replace('#DOUBLEAMP#', '&&') for i in item.replace('&&', '#DOUBLEAMP#').split('&')]
+        itemArray = _split_string(item)
         l = itemArray.index('L') if 'L' in itemArray else None
         c = itemArray.index('C') if 'C' in itemArray else None
         r = itemArray.index('R') if 'R' in itemArray else None
@@ -197,3 +197,9 @@ class HeaderFooter(object):
                 self.center_footer.set(itemArray[c:])
         if r:
             self.right_footer.set(itemArray[r:])
+
+
+def _split_string(text):
+    """Split the combined (decoded) string into left, center and right parts"""
+    itemArray = [i.replace('#DOUBLEAMP#', '&&') for i in text.replace('&&', '#DOUBLEAMP#').split('&')]
+    return itemArray
