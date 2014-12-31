@@ -203,3 +203,15 @@ def _split_string(text):
     """Split the combined (decoded) string into left, center and right parts"""
     itemArray = [i.replace('#DOUBLEAMP#', '&&') for i in text.replace('&&', '#DOUBLEAMP#').split('&')]
     return itemArray
+
+# See http://stackoverflow.com/questions/27711175/regex-with-multiple-optional-groups for discussion
+import re
+
+ITEM_REGEX = re.compile("""
+(&L(?P<left>.+?))?
+(&C(?P<center>.+?))?
+(&R(?P<right>.+?))?
+$""", re.VERBOSE)
+HEADER_REGEX = re.compile(r"(&[PNSXYBIODTUGEZAH\+\-])") # split part into commands
+FONT_REGEX = re.compile('&".+"')
+COLOR_REGEX = re.compile("&[A-F]{6}")

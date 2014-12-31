@@ -45,7 +45,12 @@ def test_splitter():
                      'K000000Middle top', 'R', '"Lucida Grande,Standard"',
                      'K000000Right top']
 
-def test_splitter_2():
-    from .. header_footer import _split_string
-    parts = _split_string("&Ltest header")
-    assert parts == ['', 'L', 'test header']
+
+def test_split_into_parts():
+    from .. header_footer import ITEM_REGEX
+    m = ITEM_REGEX.match("&Ltest header")
+    assert m.group('left') == "test header"
+    m = ITEM_REGEX.match("""&L&"Lucida Grande,Standard"&K000000Left top&C&"Lucida Grande,Standard"&K000000Middle top&R&"Lucida Grande,Standard"&K000000Right top""")
+    assert m.group('left') == '&"Lucida Grande,Standard"&K000000Left top'
+    assert m.group('center') == '&"Lucida Grande,Standard"&K000000Middle top'
+    assert m.group('right') == '&"Lucida Grande,Standard"&K000000Right top'
