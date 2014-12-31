@@ -13,6 +13,7 @@ Major changes
 
 Bug fixes
 ---------
+* `#392`<https://bitbucket.org/openpyxl/openpyxl/issue/392>`_ Worksheet header not read
 * `#387 <https://bitbucket.org/openpyxl/openpyxl/issue/387>`_ Cannot read files without styles.xml
 
 
