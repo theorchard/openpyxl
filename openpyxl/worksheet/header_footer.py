@@ -95,23 +95,29 @@ class HeaderFooterItem(object):
             t.append(text)
         return ''.join(t)
 
-    def set(self, itemArray):
-        textArray = []
-        for item in itemArray[1:]:
-            if len(item) and textArray:
-                textArray.append('&%s' % item)
-            elif len(item) and not textArray:
-                if item[0] == '"':
-                    self.font_name = item.replace('"', '')
-                elif item[0] == 'K':
-                    self.font_color = item[1:7]
-                    textArray.append(item[7:])
-                else:
-                    try:
-                        self.font_size = int(item)
-                    except:
-                        textArray.append('&%s' % item)
-        self.text = ''.join(textArray)
+    def set(self, text):
+        """
+        Convert a compound string into attributes
+        # incomplete because formatting commands can be nested
+        """
+        if text is None:
+            return
+        m = FONT_REGEX.search(text)
+        if m:
+            self.font_name = m.group('font')
+            text = FONT_REGEX.sub('', text)
+
+        m = SIZE_REGEX.search(text)
+        if m:
+            self.font_size = m.group(0)
+            text = SIZE_REGEX.sub('', text)
+
+        m = COLOR_REGEX.search(text)
+        if m:
+            self.font_color = m.group('color')
+            text = COLOR_REGEX.sub('', text)
+
+        self.text = text
 
 
 class HeaderFooter(object):
@@ -158,51 +164,28 @@ class HeaderFooter(object):
             t.append(self.right_footer.get())
         return ''.join(t)
 
+
     def setHeader(self, item):
-        itemArray = _split_string(item)
-        l = itemArray.index('L') if 'L' in itemArray else None
-        c = itemArray.index('C') if 'C' in itemArray else None
-        r = itemArray.index('R') if 'R' in itemArray else None
-        if l:
-            if c:
-                self.left_header.set(itemArray[l:c])
-            elif r:
-                self.left_header.set(itemArray[l:r])
-            else:
-                self.left_header.set(itemArray[l:])
-        if c:
-            if r:
-                self.center_header.set(itemArray[c:r])
-            else:
-                self.center_header.set(itemArray[c:])
-        if r:
-            self.right_header.set(itemArray[r:])
+        matches = _split_string(item)
+        l = matches['left']
+        c = matches['center']
+        r = matches['right']
+
+        self.left_header.set(l)
+        self.center_header.set(c)
+        self.right_header.set(r)
+
 
     def setFooter(self, item):
-        itemArray = _split_string(item)
-        l = itemArray.index('L') if 'L' in itemArray else None
-        c = itemArray.index('C') if 'C' in itemArray else None
-        r = itemArray.index('R') if 'R' in itemArray else None
-        if l:
-            if c:
-                self.left_footer.set(itemArray[l:c])
-            elif r:
-                self.left_footer.set(itemArray[l:r])
-            else:
-                self.left_footer.set(itemArray[l:])
-        if c:
-            if r:
-                self.center_footer.set(itemArray[c:r])
-            else:
-                self.center_footer.set(itemArray[c:])
-        if r:
-            self.right_footer.set(itemArray[r:])
+        matches = _split_string(item)
+        l = matches['left']
+        c = matches['center']
+        r = matches['right']
 
+        self.left_footer.set(l)
+        self.center_footer.set(c)
+        self.right_footer.set(r)
 
-def _split_string(text):
-    """Split the combined (decoded) string into left, center and right parts"""
-    itemArray = [i.replace('#DOUBLEAMP#', '&&') for i in text.replace('&&', '#DOUBLEAMP#').split('&')]
-    return itemArray
 
 # See http://stackoverflow.com/questions/27711175/regex-with-multiple-optional-groups for discussion
 import re
@@ -213,10 +196,12 @@ ITEM_REGEX = re.compile("""
 (&R(?P<right>.+?))?
 $""", re.VERBOSE)
 
-#def _split_string(text):
-    #m = ITEM_REGEX.match(text)
-    #return m.groupdict()
+def _split_string(text):
+    """Split the combined (decoded) string into left, center and right parts"""
+    m = ITEM_REGEX.match(text)
+    return m.groupdict()
 
 HEADER_REGEX = re.compile(r"(&[ABDEGHINOPSTUXYZ\+\-])") # split part into commands
 FONT_REGEX = re.compile('&"(?P<font>.+)"')
 COLOR_REGEX = re.compile("&K(?P<color>[A-F0-9]{6})")
+SIZE_REGEX = re.compile(r"&\d+")
