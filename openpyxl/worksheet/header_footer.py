@@ -212,6 +212,11 @@ ITEM_REGEX = re.compile("""
 (&C(?P<center>.+?))?
 (&R(?P<right>.+?))?
 $""", re.VERBOSE)
-HEADER_REGEX = re.compile(r"(&[PNSXYBIODTUGEZAH\+\-])") # split part into commands
-FONT_REGEX = re.compile('&".+"')
-COLOR_REGEX = re.compile("&[A-F]{6}")
+
+#def _split_string(text):
+    #m = ITEM_REGEX.match(text)
+    #return m.groupdict()
+
+HEADER_REGEX = re.compile(r"(&[ABDEGHINOPSTUXYZ\+\-])") # split part into commands
+FONT_REGEX = re.compile('&"(?P<font>.+)"')
+COLOR_REGEX = re.compile("&K(?P<color>[A-F0-9]{6})")
