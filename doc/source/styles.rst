@@ -62,7 +62,7 @@ alter anything below it.
 
 As you can see from the above box, there is a hierarchy between elements::
 
-    Style > (Font > Color / Fill > Color / Borders > Border > Color / Alignment / NumberFormat / Protection)
+        Style > (Font > Color / Fill > Color / Borders > Border > Color / Alignment / NumberFormat / Protection)
 
 So if you want to change the color of a Font, you have to redefine a Style, with a new Font, with a new Color::
 
@@ -207,10 +207,10 @@ Available fields for outline properties: "applyStyles", "summaryBelow", "summary
 
 see http://msdn.microsoft.com/en-us/library/documentformat.openxml.spreadsheet.sheetproperties%28v=office.14%29.aspx_ for details.
 
-..note:: 
-	By default, outline properties are intitialized so you can directly modify each of their 4 attributes, while page setup properties don't. 
-	If you want modify the latter, you should first initialize a PageSetupPr object with the required parameters. 
-	Once done, they can be directly modified by the routine later if needed.
+..note::
+        By default, outline properties are intitialized so you can directly modify each of their 4 attributes, while page setup properties don't.
+        If you want modify the latter, you should first initialize a PageSetupPr object with the required parameters.
+        Once done, they can be directly modified by the routine later if needed.
 
 
 .. :: doctest
