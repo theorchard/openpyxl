@@ -29,7 +29,7 @@ def test_ctor_header(HeaderFooter):
     assert header.hasFooter() is False
 
 
-def test_set_item(HeaderFooter):
+def test_set_header(HeaderFooter):
     header = HeaderFooter()
     header.setHeader('&L&"Lucida Grande,Standard"&K000000Left top')
     assert header.hasHeader() is True
