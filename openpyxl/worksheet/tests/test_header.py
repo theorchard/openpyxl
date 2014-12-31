@@ -37,6 +37,13 @@ def test_set_header(HeaderFooter):
     assert hf.text == "Left top"
 
 
+def test_set_item(HeaderFooterItem):
+    hf = HeaderFooterItem('L')
+    hf.set(['L', '"Lucida Grande,Standard"', 'K000000Left top'])
+    assert hf.text == "Left top"
+    assert hf.font_name == "Lucida Grande,Standard"
+
+
 def test_splitter():
     from .. header_footer import _split_string
     parts = _split_string("""&L&"Lucida Grande,Standard"&K000000Left top&C&"Lucida Grande,Standard"&K000000Middle top&R&"Lucida Grande,Standard"&K000000Right top""")
