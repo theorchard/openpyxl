@@ -42,6 +42,7 @@ def test_set_item(HeaderFooterItem):
     hf.set(['L', '"Lucida Grande,Standard"', 'K000000Left top'])
     assert hf.text == "Left top"
     assert hf.font_name == "Lucida Grande,Standard"
+    assert hf.font_color == "000000"
 
 
 def test_splitter():
