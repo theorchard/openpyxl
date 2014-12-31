@@ -84,8 +84,8 @@ However, if you have a Font you want to use multiple times, you are allowed to::
 Copying styles
 --------------
 
-There is also a `copy()` function, which creates a new style based on another one, by **completely** replacing
-sub-elements by others
+There is also a `copy()` function, which creates a new style based on another
+one, by **completely** replacing sub-elements by others
 
 .. :: doctest
 
@@ -181,6 +181,12 @@ Edit Print Options
 
 Header / Footer
 ---------------
+
+Headers and footers use their own formatting language. This is fully
+supported when writing them but, due to the complexity and the possibility of
+nesting, only partially when reading them.
+
+
 .. :: doctest
 
 >>> from openpyxl.workbook import Workbook
@@ -199,11 +205,17 @@ Header / Footer
 
 Worksheet Additional Properties
 -------------------------------
-These are advanced properties for particular behaviours, the most used ones are the "fitTopage" page setup property and the tabColor that define the background color of the worksheet tab.
 
-Available properties for worksheet: "codeName", "enableFormatConditionsCalculation", "filterMode", "published", "syncHorizontal", "syncRef", "syncVertical", "transitionEvaluation", "transitionEntry", "tabColor".
-Available fields for page setup properties: "autoPageBreaks", "fitToPage".
-Available fields for outline properties: "applyStyles", "summaryBelow", "summaryRight", "showOutlineSymbols".
+These are advanced properties for particular behaviours, the most used ones
+are the "fitTopage" page setup property and the tabColor that define the
+background color of the worksheet tab.
+
+Available properties for worksheet: "codeName",
+"enableFormatConditionsCalculation", "filterMode", "published",
+"syncHorizontal", "syncRef", "syncVertical", "transitionEvaluation",
+"transitionEntry", "tabColor". Available fields for page setup properties:
+"autoPageBreaks", "fitToPage". Available fields for outline properties:
+"applyStyles", "summaryBelow", "summaryRight", "showOutlineSymbols".
 
 see http://msdn.microsoft.com/en-us/library/documentformat.openxml.spreadsheet.sheetproperties%28v=office.14%29.aspx_ for details.
 
