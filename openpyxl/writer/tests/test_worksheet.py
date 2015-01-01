@@ -1,5 +1,5 @@
 from __future__ import absolute_import
-# Copyright (c) 2010-2014 openpyxl
+# Copyright (c) 2010-2015 openpyxl
 
 import datetime
 import decimal
@@ -873,4 +873,3 @@ def test_write_with_tab_color(worksheet):
     """
     diff = compare_xml(xml, expected)
     assert diff is None, diff
-     

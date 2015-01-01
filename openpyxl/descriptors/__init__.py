@@ -1,4 +1,5 @@
-# Copyright (c) 2010-2014 openpyxl
+from __future__ import absolute_import
+# Copyright (c) 2010-2015 openpyxl
 
 
 """
@@ -250,10 +251,10 @@ class MatchPattern(Descriptor):
     def __init__(self, name=None, **kw):
         if 'pattern' not in kw:
             raise TypeError('missing pattern value')
-        
+
         super(MatchPattern, self).__init__(name, **kw)
         self.test_pattern = re.compile(self.pattern)
-        
+
 
     def __set__(self, instance, value):
 

@@ -1,5 +1,5 @@
 from __future__ import absolute_import
-# Copyright (c) 2010-2014 openpyxl
+# Copyright (c) 2010-2015 openpyxl
 
 """Write worksheets to xml representations."""
 
@@ -299,7 +299,7 @@ def write_worksheet(worksheet, shared_strings):
         xml_file.write(tostring(hyper))
 
     options = worksheet.print_options
-    if len(dict(options)) > 0:      
+    if len(dict(options)) > 0:
         new_element = options.write_xml_element()
         xml_file.write(tostring(new_element))
 

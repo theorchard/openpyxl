@@ -28,6 +28,14 @@ openpyxl.worksheet.filters module
     :undoc-members:
     :show-inheritance:
 
+openpyxl.worksheet.header module
+--------------------------------
+
+.. automodule:: openpyxl.worksheet.header
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
 openpyxl.worksheet.header_footer module
 ---------------------------------------
 
