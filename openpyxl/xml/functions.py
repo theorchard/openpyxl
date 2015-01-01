@@ -117,28 +117,6 @@ def pretty_indent(elem, level=0):
             elem.tail = i
 
 
-def start_tag(doc, name, attr=None, body=None):
-    """Wrapper to start an xml tag."""
-    if attr is None:
-        attr = {}
-    doc.startElement(name, attr)
-    if body:
-        doc.characters(body)
-
-
-def end_tag(doc, name):
-    """Wrapper to close an xml tag."""
-    doc.endElement(name)
-
-
-def tag(doc, name, attr=None, body=None):
-    """Wrapper to print xml tags and comments."""
-    if attr is None:
-        attr = {}
-    start_tag(doc, name, attr, body)
-    end_tag(doc, name)
-
-
 def safe_iterator(node, tag=None):
     """Return an iterator that is compatible with Python 2.6"""
     if node is None:

@@ -5,25 +5,23 @@ from __future__ import absolute_import
 from io import BytesIO
 
 # package imports
-from openpyxl.xml.functions import start_tag, end_tag, tag, XMLGenerator
-
+from openpyxl.xml.constants import SHEET_MAIN_NS
+from openpyxl.xml.functions import Element, xmlfile, SubElement
 
 def write_string_table(string_table):
     """Write the string table xml."""
-    temp_buffer = BytesIO()
-    doc = XMLGenerator(out=temp_buffer)
-    start_tag(doc, 'sst', {'xmlns':
-            'http://schemas.openxmlformats.org/spreadsheetml/2006/main',
-            'uniqueCount': '%d' % len(string_table)})
-    for key in string_table:
-        start_tag(doc, 'si')
-        if key.strip() != key:
-            attr = {'xml:space': 'preserve'}
-        else:
-            attr = {}
-        tag(doc, 't', attr, key)
-        end_tag(doc, 'si')
-    end_tag(doc, 'sst')
-    string_table_xml = temp_buffer.getvalue()
-    temp_buffer.close()
-    return string_table_xml
+    out = BytesIO()
+    NSMAP = {None : SHEET_MAIN_NS}
+
+    with xmlfile(out) as xf:
+        with xf.element("sst", nsmap=NSMAP, uniqueCount="%d" % len(string_table)):
+
+            for key in string_table:
+                el = Element('si')
+                if key.strip() != key:
+                    el.set('xml:space', 'preserve')
+                text = SubElement(el, 't')
+                text.text = key
+                xf.write(el)
+
+    return  out.getvalue()
