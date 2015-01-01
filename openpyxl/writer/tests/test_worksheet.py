@@ -7,7 +7,7 @@ from io import BytesIO
 
 import pytest
 
-from openpyxl.xml.functions import XMLGenerator, tostring
+from openpyxl.xml.functions import tostring, xmlfile
 from openpyxl import Workbook
 
 from .. worksheet import write_worksheet
@@ -29,17 +29,6 @@ def worksheet():
     from openpyxl import Workbook
     wb = Workbook()
     return wb.active
-
-
-@pytest.fixture
-def out():
-    return BytesIO()
-
-
-@pytest.fixture
-def doc(out):
-    doc = XMLGenerator(out)
-    return doc
 
 
 @pytest.fixture
@@ -162,11 +151,15 @@ def test_outline_cols(write_cols, ColumnDimension, DummyWorksheet):
     assert diff is None, diff
 
 
-def test_write_formula(out, doc, datadir):
-    from .. worksheet import write_worksheet_data
-    datadir.chdir()
-    wb = Workbook()
-    ws = wb.create_sheet()
+@pytest.fixture
+def write_rows():
+    from .. worksheet import write_rows
+    return write_rows
+
+
+def test_write_formula(worksheet, write_rows):
+    ws = worksheet
+
     ws.cell('F1').value = 10
     ws.cell('F2').value = 32
     ws.cell('F3').value = '=F1+F2'
@@ -177,8 +170,10 @@ def test_write_formula(out, doc, datadir):
     ws.cell('C4').value = '=1'
     ws.formula_attributes['C4'] = {'t': 'shared', 'si': '0'}
 
-    write_worksheet_data(doc, ws)
-    doc.endDocument()
+    out = BytesIO()
+    with xmlfile(out) as xf:
+        write_rows(xf, ws)
+
     xml = out.getvalue()
     expected = """
     <sheetData>
@@ -218,16 +213,16 @@ def test_write_formula(out, doc, datadir):
     assert diff is None, diff
 
 
-def test_write_height(out, doc, worksheet):
-    from .. worksheet import write_worksheet_data
-
+def test_write_height(worksheet, write_rows):
     ws = worksheet
     ws.cell('F1').value = 10
     ws.row_dimensions[ws.cell('F1').row].height = 30
     ws.row_dimensions[ws.cell('F2').row].height = 30
     ws._garbage_collect()
 
-    write_worksheet_data(doc, ws)
+    out = BytesIO()
+    with xmlfile(out) as xf:
+        write_rows(xf, ws)
     xml = out.getvalue()
     expected = """
      <sheetData>
@@ -316,6 +311,30 @@ def test_auto_filter_sort_condition(worksheet, write_autofilter):
     assert diff is None, diff
 
 
+def test_auto_filter_worksheet(worksheet, write_worksheet):
+    worksheet.auto_filter.ref = 'A1:F1'
+    xml = write_worksheet(worksheet, None)
+    expected = """
+    <worksheet xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main">
+      <sheetPr>
+        <outlinePr summaryBelow="1" summaryRight="1"/>
+      </sheetPr>
+      <dimension ref="A1:A1"/>
+      <sheetViews>
+        <sheetView workbookViewId="0">
+          <selection activeCell="A1" sqref="A1"/>
+        </sheetView>
+      </sheetViews>
+      <sheetFormatPr baseColWidth="10" defaultRowHeight="15"/>
+      <sheetData/>
+      <autoFilter ref="A1:F1"/>
+      <pageMargins bottom="1" footer="0.5" header="0.5" left="0.75" right="0.75" top="1"/>
+    </worksheet>
+    """
+    diff = compare_xml(xml, expected)
+    assert diff is None, diff
+
+
 @pytest.fixture
 def write_sheetviews():
     from .. worksheet import write_sheetviews
@@ -373,6 +392,32 @@ def test_freeze_panes_both(worksheet, write_sheetviews):
         <selection pane="bottomRight" activeCell="A1" sqref="A1"/>
       </sheetView>
     </sheetViews>
+    """
+    diff = compare_xml(xml, expected)
+    assert diff is None, diff
+
+
+def test_frozen_panes_worksheet(worksheet, write_worksheet):
+    worksheet.freeze_panes = 'D4'
+    xml = write_worksheet(worksheet, None)
+    expected = """
+    <worksheet xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main">
+      <sheetPr>
+        <outlinePr summaryBelow="1" summaryRight="1"/>
+      </sheetPr>
+      <dimension ref="A1:A1"/>
+      <sheetViews>
+        <sheetView workbookViewId="0">
+          <pane xSplit="3" ySplit="3" topLeftCell="D4" activePane="bottomRight" state="frozen"/>
+          <selection pane="topRight"/>
+          <selection pane="bottomLeft"/>
+          <selection pane="bottomRight" activeCell="A1" sqref="A1"/>
+        </sheetView>
+      </sheetViews>
+      <sheetFormatPr baseColWidth="10" defaultRowHeight="15"/>
+      <sheetData/>
+      <pageMargins bottom="1" footer="0.5" header="0.5" left="0.75" right="0.75" top="1"/>
+    </worksheet>
     """
     diff = compare_xml(xml, expected)
     assert diff is None, diff
@@ -621,51 +666,13 @@ def test_formula_rule(worksheet_with_cf, write_conditional_formatting):
     assert diff is None, diff
 
 
-@pytest.mark.parametrize("value, expected",
-                         [
-                             (9781231231230, """<c t="n" r="A1"><v>9781231231230</v></c>"""),
-                             (decimal.Decimal('3.14'), """<c t="n" r="A1"><v>3.14</v></c>"""),
-                             (1234567890, """<c t="n" r="A1"><v>1234567890</v></c>"""),
-                             ("=sum(1+1)", """<c r="A1"><f>sum(1+1)</f><v></v></c>"""),
-                             (True, """<c t="b" r="A1"><v>1</v></c>"""),
-                             ("Hello", """<c t="s" r="A1"><v>0</v></c>"""),
-                             ("", """<c r="A1" t="s"></c>"""),
-                             (None, """<c r="A1" t="n"></c>"""),
-                             (datetime.date(2011, 12, 25), """<c r="A1" t="n" s="1"><v>40902</v></c>"""),
-                         ])
-def test_write_cell(out, doc, worksheet, value, expected):
-    from .. worksheet import write_cell
-
-    ws = worksheet
-    ws['A1'] = value
-    write_cell(doc, ws, ws['A1'])
-    doc.endDocument()
-    xml = out.getvalue()
-    diff = compare_xml(xml, expected)
-    assert diff is None, diff
-
-def test_write_cell_string(out, doc, worksheet):
-    from .. worksheet import write_cell
-
-    ws = worksheet
-    ws['A1'] = "Hello"
-    write_cell(doc, ws, ws['A1'])
-    assert ws.parent.shared_strings == ["Hello"]
-
-def test_write_sheetdata(out, doc, worksheet):
-    from .. worksheet import write_worksheet_data
-
-    ws = worksheet
-    ws['A1'] = 10
-    write_worksheet_data(doc, ws)
-    doc.endDocument()
-    xml = out.getvalue()
-    expected = """<sheetData><row r="1" spans="1:1"><c t="n" r="A1"><v>10</v></c></row></sheetData>"""
-    diff = compare_xml(xml, expected)
-    assert diff is None, diff
+@pytest.fixture
+def write_worksheet():
+    from .. worksheet import write_worksheet
+    return write_worksheet
 
 
-def test_write_empty(worksheet):
+def test_write_empty(worksheet, write_worksheet):
     ws = worksheet
     xml = write_worksheet(ws, None)
     expected = """
@@ -688,7 +695,7 @@ def test_write_empty(worksheet):
     assert diff is None, diff
 
 
-def test_page_margins(worksheet):
+def test_page_margins(worksheet, write_worksheet):
     ws = worksheet
     ws.page_margins.left = 2.0
     ws.page_margins.right = 2.0
@@ -717,7 +724,7 @@ def test_page_margins(worksheet):
     assert diff is None, diff
 
 
-def test_printer_settings(worksheet):
+def test_printer_settings(worksheet, write_worksheet):
     ws = worksheet
     ws.page_setup.orientation = ws.ORIENTATION_LANDSCAPE
     ws.page_setup.paperSize = ws.PAPERSIZE_TABLOID
@@ -773,7 +780,7 @@ def test_data_validation(worksheet):
     assert diff is None, diff
 
 
-def test_vba(worksheet):
+def test_vba(worksheet, write_worksheet):
     ws = worksheet
     ws.vba_code = {"codeName":"Sheet1"}
     ws.vba_controls = "rId2"
@@ -800,7 +807,7 @@ def test_vba(worksheet):
     assert diff is None, diff
 
 
-def test_protection(out, worksheet):
+def test_protection(worksheet, write_worksheet):
     ws = worksheet
     ws.protection.enable()
     xml = write_worksheet(ws, None)
@@ -825,7 +832,7 @@ def test_protection(out, worksheet):
     assert diff is None, diff
 
 
-def test_write_comments(out, worksheet):
+def test_write_comments(worksheet, write_worksheet):
     ws = worksheet
     worksheet._comment_count = 1
     xml = write_worksheet(ws, None)
@@ -850,7 +857,7 @@ def test_write_comments(out, worksheet):
     diff = compare_xml(xml, expected)
     assert diff is None, diff
 
-def test_write_with_tab_color(worksheet):
+def test_write_with_tab_color(worksheet, write_worksheet):
     ws = worksheet
     ws.sheet_properties.tabColor = "F0F0F0"
     xml = write_worksheet(ws, None)
@@ -873,3 +880,4 @@ def test_write_with_tab_color(worksheet):
     """
     diff = compare_xml(xml, expected)
     assert diff is None, diff
+

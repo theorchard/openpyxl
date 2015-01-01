@@ -29,7 +29,8 @@ if LXML is True:
     tostring,
     register_namespace,
     iterparse,
-    QName
+    QName,
+    xmlfile
     )
     from xml.etree.cElementTree import iterparse
 else:
@@ -54,6 +55,8 @@ else:
         QName
         )
     from .namespace import register_namespace
+    from xmlfile import xmlfile
+
 
 from openpyxl.xml.constants import (
     CHART_NS,

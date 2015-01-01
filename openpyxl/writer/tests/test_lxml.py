@@ -8,12 +8,11 @@ from io import BytesIO
 
 # package
 from openpyxl import Workbook
-from lxml.etree import xmlfile, tostring
+from lxml.etree import xmlfile
 
 # test imports
 import pytest
 from openpyxl.tests.helper import compare_xml
-from openpyxl.worksheet.properties import PageSetupPr
 
 
 @pytest.fixture
@@ -23,6 +22,7 @@ def worksheet():
     return wb.active
 
 
+@pytest.mark.lxml_required
 @pytest.mark.parametrize("value, expected",
                          [
                              (9781231231230, """<c t="n" r="A1"><v>9781231231230</v></c>"""),
@@ -48,6 +48,8 @@ def test_write_cell(worksheet, value, expected):
     diff = compare_xml(xml, expected)
     assert diff is None, diff
 
+
+@pytest.mark.lxml_required
 def test_write_cell_string(worksheet):
     from .. lxml_worksheet import write_cell
 
@@ -66,6 +68,7 @@ def write_rows():
     return write_rows
 
 
+@pytest.mark.lxml_required
 def test_write_sheetdata(worksheet, write_rows):
     ws = worksheet
     ws['A1'] = 10
@@ -79,6 +82,7 @@ def test_write_sheetdata(worksheet, write_rows):
     assert diff is None, diff
 
 
+@pytest.mark.lxml_required
 def test_write_formula(worksheet, write_rows):
     ws = worksheet
 
@@ -135,6 +139,7 @@ def test_write_formula(worksheet, write_rows):
     assert diff is None, diff
 
 
+@pytest.mark.lxml_required
 def test_row_height(worksheet, write_rows):
     ws = worksheet
     ws.cell('F1').value = 10
@@ -155,234 +160,6 @@ def test_row_height(worksheet, write_rows):
        </row>
        <row customHeight="1" ht="30" r="2" spans="1:6"></row>
      </sheetData>
-    """
-    diff = compare_xml(xml, expected)
-    assert diff is None, diff
-
-
-
-@pytest.fixture
-def write_worksheet():
-    from .. lxml_worksheet import write_worksheet
-    return write_worksheet
-
-
-@pytest.mark.lxml_required
-def test_empty_worksheet(worksheet, write_worksheet):
-    xml = write_worksheet(worksheet, None)
-    expected = """
-    <worksheet xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main">
-      <sheetPr>
-        <outlinePr summaryBelow="1" summaryRight="1"/>
-      </sheetPr>
-      <dimension ref="A1:A1"/>
-      <sheetViews>
-        <sheetView workbookViewId="0">
-          <selection activeCell="A1" sqref="A1"/>
-        </sheetView>
-      </sheetViews>
-      <sheetFormatPr baseColWidth="10" defaultRowHeight="15"/>
-      <sheetData/>
-      <pageMargins bottom="1" footer="0.5" header="0.5" left="0.75" right="0.75" top="1"/>
-    </worksheet>
-    """
-    diff = compare_xml(xml, expected)
-    assert diff is None, diff
-
-
-@pytest.mark.lxml_required
-def test_printer_settings(worksheet, write_worksheet):
-    ws = worksheet
-    ws.page_setup.orientation = ws.ORIENTATION_LANDSCAPE
-    ws.page_setup.paperSize = ws.PAPERSIZE_TABLOID
-#     ws.page_setup.fitToPage = True
-    ws.page_setup.fitToHeight = 0
-    ws.page_setup.fitToWidth = 1
-    ws.print_options.horizontalCentered = True
-    ws.print_options.verticalCentered = True
-    page_setup_prop = PageSetupPr(fitToPage=True)
-    ws.sheet_properties.pageSetUpPr = page_setup_prop
-    xml = write_worksheet(ws, None)
-    expected = """
-    <worksheet xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main">
-      <sheetPr>
-        <outlinePr summaryRight="1" summaryBelow="1"/>
-        <pageSetUpPr fitToPage="1"/>
-      </sheetPr>
-      <dimension ref="A1:A1"/>
-      <sheetViews>
-        <sheetView workbookViewId="0">
-          <selection sqref="A1" activeCell="A1"/>
-        </sheetView>
-      </sheetViews>
-      <sheetFormatPr baseColWidth="10" defaultRowHeight="15"/>
-      <sheetData/>
-      <printOptions horizontalCentered="1" verticalCentered="1"/>
-      <pageMargins left="0.75" right="0.75" top="1" bottom="1" header="0.5" footer="0.5"/>
-      <pageSetup orientation="landscape" paperSize="3" fitToHeight="0" fitToWidth="1"/>
-    </worksheet>
-    """
-    diff = compare_xml(xml, expected)
-    assert diff is None, diff
-
-
-@pytest.mark.lxml_required
-def test_page_margins(worksheet, write_worksheet):
-    ws = worksheet
-    ws.page_margins.left = 2.0
-    ws.page_margins.right = 2.0
-    ws.page_margins.top = 2.0
-    ws.page_margins.bottom = 2.0
-    ws.page_margins.header = 1.5
-    ws.page_margins.footer = 1.5
-    xml = write_worksheet(ws, None)
-    expected = """
-    <worksheet xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main">
-      <sheetPr>
-        <outlinePr summaryRight="1" summaryBelow="1"/>
-      </sheetPr>
-      <dimension ref="A1:A1"/>
-      <sheetViews>
-        <sheetView workbookViewId="0">
-          <selection sqref="A1" activeCell="A1"/>
-        </sheetView>
-      </sheetViews>
-      <sheetFormatPr baseColWidth="10" defaultRowHeight="15"/>
-      <sheetData/>
-      <pageMargins left="2" right="2" top="2" bottom="2" header="1.5" footer="1.5"/>
-    </worksheet>
-    """
-    diff = compare_xml(xml, expected)
-    assert diff is None, diff
-
-
-@pytest.mark.lxml_required
-def test_vba(worksheet, write_worksheet):
-    ws = worksheet
-    ws.vba_code = {"codeName":"Sheet1"}
-    ws.vba_controls = "rId2"
-
-    xml = write_worksheet(ws, None)
-    expected = """
-    <worksheet xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main"
-    xmlns:r="http://schemas.openxmlformats.org/officeDocument/2006/relationships">
-      <sheetPr codeName="Sheet1">
-        <outlinePr summaryBelow="1" summaryRight="1"/>
-      </sheetPr>
-      <dimension ref="A1:A1"/>
-      <sheetViews>
-        <sheetView workbookViewId="0">
-          <selection activeCell="A1" sqref="A1"/>
-        </sheetView>
-      </sheetViews>
-      <sheetFormatPr baseColWidth="10" defaultRowHeight="15"/>
-      <sheetData/>
-      <pageMargins bottom="1" footer="0.5" header="0.5" left="0.75" right="0.75" top="1"/>
-      <legacyDrawing r:id="rId2"/>
-    </worksheet>
-    """
-    diff = compare_xml(xml, expected)
-    assert diff is None, diff
-
-
-@pytest.mark.lxml_required
-def test_protection(worksheet, write_worksheet):
-    ws = worksheet
-    ws.protection.enable()
-    xml = write_worksheet(ws, None)
-    expected = """
-    <worksheet xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main">
-      <sheetPr>
-        <outlinePr summaryBelow="1" summaryRight="1"/>
-      </sheetPr>
-      <dimension ref="A1:A1"/>
-      <sheetViews>
-        <sheetView workbookViewId="0">
-          <selection activeCell="A1" sqref="A1"/>
-        </sheetView>
-      </sheetViews>
-      <sheetFormatPr baseColWidth="10" defaultRowHeight="15"/>
-      <sheetData/>
-      <sheetProtection sheet="1" objects="0" selectLockedCells="0" selectUnlockedCells="0" scenarios="0" formatCells="1" formatColumns="1" formatRows="1" insertColumns="1" insertRows="1" insertHyperlinks="1" deleteColumns="1" deleteRows="1" sort="1" autoFilter="1" pivotTables="1"/>
-      <pageMargins bottom="1" footer="0.5" header="0.5" left="0.75" right="0.75" top="1"/>
-    </worksheet>
-    """
-    diff = compare_xml(xml, expected)
-    assert diff is None, diff
-
-
-@pytest.mark.lxml_required
-def test_write_comments(worksheet, write_worksheet):
-    ws = worksheet
-    worksheet._comment_count = 1
-    xml = write_worksheet(ws, None)
-    expected = """
-    <worksheet xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main"
-    xmlns:r="http://schemas.openxmlformats.org/officeDocument/2006/relationships">
-      <sheetPr>
-        <outlinePr summaryBelow="1" summaryRight="1"/>
-      </sheetPr>
-      <dimension ref="A1:A1"/>
-      <sheetViews>
-        <sheetView workbookViewId="0">
-          <selection activeCell="A1" sqref="A1"/>
-        </sheetView>
-      </sheetViews>
-      <sheetFormatPr baseColWidth="10" defaultRowHeight="15"/>
-      <sheetData/>
-      <pageMargins bottom="1" footer="0.5" header="0.5" left="0.75" right="0.75" top="1"/>
-      <legacyDrawing r:id="commentsvml"></legacyDrawing>
-    </worksheet>
-    """
-    diff = compare_xml(xml, expected)
-    assert diff is None, diff
-
-@pytest.mark.lxml_required
-def test_auto_filter_worksheet(worksheet, write_worksheet):
-    worksheet.auto_filter.ref = 'A1:F1'
-    xml = write_worksheet(worksheet, None)
-    expected = """
-    <worksheet xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main">
-      <sheetPr>
-        <outlinePr summaryBelow="1" summaryRight="1"/>
-      </sheetPr>
-      <dimension ref="A1:A1"/>
-      <sheetViews>
-        <sheetView workbookViewId="0">
-          <selection activeCell="A1" sqref="A1"/>
-        </sheetView>
-      </sheetViews>
-      <sheetFormatPr baseColWidth="10" defaultRowHeight="15"/>
-      <sheetData/>
-      <autoFilter ref="A1:F1"/>
-      <pageMargins bottom="1" footer="0.5" header="0.5" left="0.75" right="0.75" top="1"/>
-    </worksheet>
-    """
-    diff = compare_xml(xml, expected)
-    assert diff is None, diff
-
-@pytest.mark.lxml_required
-def test_frozen_panes_worksheet(worksheet, write_worksheet):
-    worksheet.freeze_panes = 'D4'
-    xml = write_worksheet(worksheet, None)
-    expected = """
-    <worksheet xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main">
-      <sheetPr>
-        <outlinePr summaryBelow="1" summaryRight="1"/>
-      </sheetPr>
-      <dimension ref="A1:A1"/>
-      <sheetViews>
-        <sheetView workbookViewId="0">
-          <pane xSplit="3" ySplit="3" topLeftCell="D4" activePane="bottomRight" state="frozen"/>
-          <selection pane="topRight"/>
-          <selection pane="bottomLeft"/>
-          <selection pane="bottomRight" activeCell="A1" sqref="A1"/>
-        </sheetView>
-      </sheetViews>
-      <sheetFormatPr baseColWidth="10" defaultRowHeight="15"/>
-      <sheetData/>
-      <pageMargins bottom="1" footer="0.5" header="0.5" left="0.75" right="0.75" top="1"/>
-    </worksheet>
     """
     diff = compare_xml(xml, expected)
     assert diff is None, diff

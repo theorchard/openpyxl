@@ -39,99 +39,7 @@ from .worksheet import (
     write_pagebreaks,
 )
 
-
-def write_worksheet(worksheet, shared_strings):
-    """Write a worksheet to an xml file."""
-
-    out = BytesIO()
-    NSMAP = {None : SHEET_MAIN_NS}
-
-    with xmlfile(out) as xf:
-        with xf.element('worksheet', nsmap=NSMAP):
-
-            props = write_properties(worksheet)
-            xf.write(props)
-
-            dim = Element('dimension', {'ref': '%s' % worksheet.calculate_dimension()})
-            xf.write(dim)
-
-            xf.write(write_sheetviews(worksheet))
-            xf.write(write_format(worksheet))
-            cols = write_cols(worksheet)
-            if cols is not None:
-                xf.write(cols)
-            write_rows(xf, worksheet)
-
-            if worksheet.protection.sheet:
-                prot = Element('sheetProtection', dict(worksheet.protection))
-                xf.write(prot)
-
-            af = write_autofilter(worksheet)
-            if af is not None:
-                xf.write(af)
-
-            merge = write_mergecells(worksheet)
-            if merge is not None:
-                xf.write(merge)
-
-            cfs = write_conditional_formatting(worksheet)
-            for cf in cfs:
-                xf.write(cf)
-
-            dv = write_datavalidation(worksheet)
-            if dv is not None:
-                xf.write(dv)
-
-            hyper = write_hyperlinks(worksheet)
-            if hyper is not None:
-                xf.write(hyper)
-
-
-            options = worksheet.print_options
-            if len(dict(options)) > 0:
-                new_element = options.write_xml_element()
-                xf.write(new_element)
-                del new_element
-
-            margins = Element('pageMargins', dict(worksheet.page_margins))
-            xf.write(margins)
-            del margins
-
-            setup = worksheet.page_setup
-            if len(dict(setup)) > 0:
-                new_element = setup.write_xml_element()
-                xf.write(new_element)
-                del new_element
-
-            hf = write_header_footer(worksheet)
-            if hf is not None:
-                xf.write(hf)
-
-            if worksheet._charts or worksheet._images:
-                drawing = Element('drawing', {'{%s}id' % REL_NS: 'rId1'})
-                xf.write(drawing)
-                del drawing
-
-            # If vba is being preserved then add a legacyDrawing element so
-            # that any controls can be drawn.
-            if worksheet.vba_controls is not None:
-                xml = Element("{%s}legacyDrawing" % SHEET_MAIN_NS,
-                              {"{%s}id" % REL_NS : worksheet.vba_controls})
-                xf.write(xml)
-
-            pb = write_pagebreaks(worksheet)
-            if pb is not None:
-                xf.write(pb)
-
-            # add a legacyDrawing so that excel can draw comments
-            if worksheet._comment_count > 0:
-                comments = Element('legacyDrawing', {'{%s}id' % REL_NS: 'commentsvml'})
-                xf.write(comments)
-
-    xml = out.getvalue()
-    out.close()
-    return xml
-
+### LXML optimisation
 
 def write_rows(xf, worksheet):
     """Write worksheet data to xml."""
@@ -189,4 +97,3 @@ def write_cell(xf, worksheet, cell):
         with xf.element("v"):
             if value is not None:
                 xf.write(safe_string(value))
-

@@ -25,9 +25,6 @@ from openpyxl.xml.constants import SHEET_MAIN_NS
 from openpyxl.compat import deprecated
 from . properties import DocumentProperties, DocumentSecurity
 
-if LXML:
-    from openpyxl.writer.dump_lxml import LXMLWorksheet as DumpWorksheet
-
 
 class Workbook(object):
     """Workbook is the container for all other parts of the document."""

@@ -9,6 +9,9 @@ from io import BytesIO
 # compatibility imports
 
 from openpyxl.compat import safe_string, itervalues
+from openpyxl.compat.itertools import iteritems, iterkeys
+
+from openpyxl import LXML
 
 # package imports
 from openpyxl.utils import COORD_RE
@@ -17,20 +20,14 @@ from openpyxl.cell import (
     column_index_from_string,
 )
 from openpyxl.xml.functions import (
-    XMLGenerator,
-    start_tag,
-    end_tag,
-    tag,
-    fromstring,
-    tostring,
     Element,
     SubElement,
+    xmlfile,
 )
 from openpyxl.xml.constants import (
     SHEET_MAIN_NS,
     REL_NS,
 )
-from openpyxl.compat.itertools import iteritems, iterkeys
 from openpyxl.formatting import ConditionalFormatting
 from openpyxl.worksheet.datavalidation import writer
 from openpyxl.worksheet.properties import WorksheetProperties, write_sheetPr
@@ -249,92 +246,97 @@ def write_pagebreaks(worksheet):
 
 def write_worksheet(worksheet, shared_strings):
     """Write a worksheet to an xml file."""
+    if LXML is True:
+        from . lxml_worksheet import write_cell, write_rows
 
-    xml_file = BytesIO()
-    doc = XMLGenerator(out=xml_file)
-    start_tag(doc, 'worksheet',
-              {'xmlns': SHEET_MAIN_NS,
-               'xmlns:r': REL_NS})
+    out = BytesIO()
+    NSMAP = {None : SHEET_MAIN_NS}
 
-    props = write_properties(worksheet)
-    xml_file.write(tostring(props))
+    with xmlfile(out) as xf:
+        with xf.element('worksheet', nsmap=NSMAP):
 
-    dim = Element('dimension', {'ref': '%s' % worksheet.calculate_dimension()})
-    xml_file.write(tostring(dim))
+            props = write_properties(worksheet)
+            xf.write(props)
 
-    views = write_sheetviews(worksheet)
-    xml_file.write(tostring(views))
+            dim = Element('dimension', {'ref': '%s' % worksheet.calculate_dimension()})
+            xf.write(dim)
 
-    fmt = write_format(worksheet)
-    xml_file.write(tostring(fmt))
+            xf.write(write_sheetviews(worksheet))
+            xf.write(write_format(worksheet))
+            cols = write_cols(worksheet)
+            if cols is not None:
+                xf.write(cols)
+            write_rows(xf, worksheet)
 
-    cols = write_cols(worksheet)
-    if cols is not None:
-        xml_file.write(tostring(cols))
+            if worksheet.protection.sheet:
+                prot = Element('sheetProtection', dict(worksheet.protection))
+                xf.write(prot)
 
-    write_worksheet_data(doc, worksheet)
+            af = write_autofilter(worksheet)
+            if af is not None:
+                xf.write(af)
 
-    if worksheet.protection.sheet:
-        prot = Element('sheetProtection', dict(worksheet.protection))
-        xml_file.write(tostring(prot))
+            merge = write_mergecells(worksheet)
+            if merge is not None:
+                xf.write(merge)
 
-    af = write_autofilter(worksheet)
-    if af is not None:
-        xml_file.write(tostring(af))
+            cfs = write_conditional_formatting(worksheet)
+            for cf in cfs:
+                xf.write(cf)
 
-    merge = write_mergecells(worksheet)
-    if merge is not None:
-        xml_file.write(tostring(merge))
+            dv = write_datavalidation(worksheet)
+            if dv is not None:
+                xf.write(dv)
 
-    cfs = write_conditional_formatting(worksheet)
-    for cf in cfs:
-        xml_file.write(tostring(cf))
+            hyper = write_hyperlinks(worksheet)
+            if hyper is not None:
+                xf.write(hyper)
 
-    dvs = write_datavalidation(worksheet)
-    if dvs:
-        xml_file.write(tostring(dvs))
 
-    hyper = write_hyperlinks(worksheet)
-    if hyper is not None:
-        xml_file.write(tostring(hyper))
+            options = worksheet.print_options
+            if len(dict(options)) > 0:
+                new_element = options.write_xml_element()
+                xf.write(new_element)
+                del new_element
 
-    options = worksheet.print_options
-    if len(dict(options)) > 0:
-        new_element = options.write_xml_element()
-        xml_file.write(tostring(new_element))
+            margins = Element('pageMargins', dict(worksheet.page_margins))
+            xf.write(margins)
+            del margins
 
-    tag(doc, 'pageMargins', dict(worksheet.page_margins))
+            setup = worksheet.page_setup
+            if len(dict(setup)) > 0:
+                new_element = setup.write_xml_element()
+                xf.write(new_element)
+                del new_element
 
-    setup = worksheet.page_setup
-    if len(dict(setup)) > 0:
-        new_element = setup.write_xml_element()
-        xml_file.write(tostring(new_element))
+            hf = write_header_footer(worksheet)
+            if hf is not None:
+                xf.write(hf)
 
-    hf = write_header_footer(worksheet)
-    if hf is not None:
-        xml_file.write(tostring(hf))
+            if worksheet._charts or worksheet._images:
+                drawing = Element('drawing', {'{%s}id' % REL_NS: 'rId1'})
+                xf.write(drawing)
+                del drawing
 
-    if worksheet._charts or worksheet._images:
-        tag(doc, 'drawing', {'r:id': 'rId1'})
+            # If vba is being preserved then add a legacyDrawing element so
+            # that any controls can be drawn.
+            if worksheet.vba_controls is not None:
+                xml = Element("{%s}legacyDrawing" % SHEET_MAIN_NS,
+                              {"{%s}id" % REL_NS : worksheet.vba_controls})
+                xf.write(xml)
 
-    if worksheet.vba_controls is not None:
-        xml = Element("{%s}legacyDrawing" % SHEET_MAIN_NS,
-                      {"{%s}id" % REL_NS : worksheet.vba_controls})
-        xml_file.write(tostring(xml))
+            pb = write_pagebreaks(worksheet)
+            if pb is not None:
+                xf.write(pb)
 
-    breaks = write_pagebreaks(worksheet)
-    if breaks is not None:
-        xml_file.write(tostring(breaks))
+            # add a legacyDrawing so that excel can draw comments
+            if worksheet._comment_count > 0:
+                comments = Element('legacyDrawing', {'{%s}id' % REL_NS: 'commentsvml'})
+                xf.write(comments)
 
-    # add a legacyDrawing so that excel can draw comments
-    if worksheet._comment_count > 0:
-        tag(doc, 'legacyDrawing', {'r:id': 'commentsvml'})
-
-    end_tag(doc, 'worksheet')
-    doc.endDocument()
-    xml_string = xml_file.getvalue()
-    xml_file.close()
-    return xml_string
+    xml = out.getvalue()
+    out.close()
+    return xml
 
 
 def get_rows_to_write(worksheet):
@@ -356,68 +358,60 @@ def get_rows_to_write(worksheet):
 
     return cells_by_row
 
+### ElementTree
 
-def write_worksheet_data(doc, worksheet):
+def write_rows(xf, worksheet):
     """Write worksheet data to xml."""
 
     cells_by_row = get_rows_to_write(worksheet)
 
-    start_tag(doc, 'sheetData')
-    for row_idx in sorted(cells_by_row):
-        # row meta data
-        row_dimension = worksheet.row_dimensions[row_idx]
-        row_dimension.style = worksheet._styles.get(row_idx)
-        attrs = {'r': '%d' % row_idx,
-                 'spans': '1:%d' % worksheet.max_column}
-        attrs.update(dict(row_dimension))
+    with xf.element("sheetData"):
+        for row_idx in sorted(cells_by_row):
+            # row meta data
+            row_dimension = worksheet.row_dimensions[row_idx]
+            row_dimension.style = worksheet._styles.get(row_idx)
+            attrs = {'r': '%d' % row_idx,
+                     'spans': '1:%d' % worksheet.max_column}
+            attrs.update(dict(row_dimension))
 
-        start_tag(doc, 'row', attrs)
-        row_cells = cells_by_row[row_idx]
-        for cell in sorted(row_cells, key=row_sort):
-            if cell.value is None and not cell.has_style:
-                continue
-            write_cell(doc, worksheet, cell)
+            with xf.element("row", attrs):
 
-        end_tag(doc, 'row')
-    end_tag(doc, 'sheetData')
+                row_cells = cells_by_row[row_idx]
+                for cell in sorted(row_cells, key=row_sort):
+                    el = write_cell(worksheet, cell)
+                    xf.write(el)
 
 
-from openpyxl.styles import Style
-default = Style()
-
-def write_cell(doc, worksheet, cell):
+def write_cell(worksheet, cell):
     string_table = worksheet.parent.shared_strings
     coordinate = cell.coordinate
     attributes = {'r': coordinate}
     if cell.has_style:
         attributes['s'] = '%d' % cell.style_id
 
-    if cell.data_type != cell.TYPE_FORMULA:
+    if cell.data_type != 'f':
         attributes['t'] = cell.data_type
 
     value = cell.internal_value
-    if value in ('', None):
-        tag(doc, 'c', attributes)
-    else:
-        start_tag(doc, 'c', attributes)
-        if cell.data_type == cell.TYPE_STRING:
-            idx = string_table.add(value)
-            tag(doc, 'v', body='%s' % idx)
-        elif cell.data_type == cell.TYPE_FORMULA:
-            shared_formula = worksheet.formula_attributes.get(coordinate)
-            if shared_formula is not None:
-                attr = shared_formula
-                if 't' in attr and attr['t'] == 'shared' and 'ref' not in attr:
-                    # Don't write body for shared formula
-                    tag(doc, 'f', attr=attr)
-                else:
-                    tag(doc, 'f', attr=attr, body=value[1:])
-            else:
-                tag(doc, 'f', body=value[1:])
-            tag(doc, 'v')
-        elif cell.data_type in (cell.TYPE_NUMERIC, cell.TYPE_BOOL):
-            tag(doc, 'v', body=safe_string(value))
-        else:
-            tag(doc, 'v', body=value)
-        end_tag(doc, 'c')
 
+    el = Element("c", attributes)
+    if value in ('', None):
+        return el
+
+    if cell.data_type == 'f':
+        shared_formula = worksheet.formula_attributes.get(coordinate, {})
+        if shared_formula is not None:
+            if (shared_formula.get('t') == 'shared'
+                and 'ref' not in shared_formula):
+                value = None
+        formula = SubElement(el, 'f', shared_formula)
+        if value is not None:
+            formula.text = value[1:]
+            value = None
+
+    if cell.data_type == 's':
+        value = string_table.add(value)
+    cell_content = SubElement(el, 'v')
+    if value is not None:
+        cell_content.text = safe_string(value)
+    return el

@@ -13,29 +13,31 @@ import atexit
 from openpyxl.compat import OrderedDict
 from openpyxl.cell import get_column_letter, Cell
 from openpyxl.worksheet import Worksheet
+from openpyxl.worksheet.properties import write_sheetPr
 
-from openpyxl.xml.functions import (
-    XMLGenerator,
-    start_tag,
-    end_tag,
-    tag,
-    tostring
-)
-from openpyxl.xml.constants import MAX_COLUMN, MAX_ROW, PACKAGE_XL
 from openpyxl.utils.exceptions import WorkbookAlreadySaved
 from openpyxl.writer.excel import ExcelWriter
 from openpyxl.writer.comments import CommentWriter
 from .relations import write_rels
 from .worksheet import (
+    write_autofilter,
     write_cell,
     write_cols,
-    write_format
+    write_format,
+    write_sheetviews,
 )
-from openpyxl.xml.constants import PACKAGE_WORKSHEETS
+from openpyxl.xml.constants import (
+    PACKAGE_WORKSHEETS,
+    SHEET_MAIN_NS,
+    REL_NS,
+    MAX_COLUMN,
+    MAX_ROW,
+    PACKAGE_XL
+)
+from openpyxl.xml.functions import xmlfile, Element, SubElement
 
 
 DESCRIPTORS_CACHE_SIZE = 50
-BOUNDING_BOX_PLACEHOLDER = 'A1:%s%d' % (get_column_letter(MAX_COLUMN), MAX_ROW)
 ALL_TEMP_FILES = []
 
 
@@ -70,151 +72,99 @@ def WriteOnlyCell(ws=None, value=None):
 
 class DumpWorksheet(Worksheet):
     """
-    .. warning::
-
-        You shouldn't initialize this yourself, use :class:`openpyxl.workbook.Workbook` constructor instead,
-        with `optimized_write = True`.
+    Streaming worksheet using lxml
+    Optimised to reduce memory by writing rows just in time
+    Cells can be styled and have comments
+    Styles for rows and columns must be applied before writing cells
     """
+
+    __saved = False
+    writer = None
+
     def __init__(self, parent_workbook, title):
         Worksheet.__init__(self, parent_workbook, title)
-
-        self.__saved = False
 
         self._max_col = 0
         self._max_row = 0
         self._parent = parent_workbook
 
-        self._fileobj_header_name = create_temporary_file(suffix='.header')
-        self._fileobj_content_name = create_temporary_file(suffix='.content')
         self._fileobj_name = create_temporary_file()
 
         self._comments = []
 
-    def get_temporary_file(self, filename):
-        if self.__saved:
-            raise WorkbookAlreadySaved('this workbook has already been saved '
-                    'and cannot be modified or saved anymore.')
-
-        if filename in self._descriptors_cache:
-            fobj = self._descriptors_cache[filename]
-            # re-insert the value so it does not get evicted
-            # from cache soon
-            del self._descriptors_cache[filename]
-            self._descriptors_cache[filename] = fobj
-        else:
-            fobj = open(filename, 'rb+')
-            self._descriptors_cache[filename] = fobj
-            if len(self._descriptors_cache) > DESCRIPTORS_CACHE_SIZE:
-                filename, fileobj = self._descriptors_cache.popitem(last=False)
-                fileobj.close()
-        return fobj
-
-    @property
-    def _descriptors_cache(self):
-        try:
-            return self._parent._local_data.cache
-        except AttributeError:
-            self._parent._local_data.cache = OrderedDict()
-            return self._parent._local_data.cache
 
     @property
     def filename(self):
         return self._fileobj_name
 
-    def _cleanup(self):
+
+    def _write_header(self):
         """
-        Mark sheet as having been saved so no further changes are possible.
-        Remove file handlers from cache
+        Generator that creates the XML file and the sheet header
         """
-        for attr in ('_fileobj_content_name', '_fileobj_header_name', '_fileobj_name'):
-            obj = getattr(self, attr)
-            del self._descriptors_cache[obj]
-            os.remove(obj)
-            setattr(self, attr, None)
-        self.__saved = True
 
-    def write_header(self):
+        NSMAP = {None : SHEET_MAIN_NS}
 
-        fobj = self.get_temporary_file(filename=self._fileobj_header_name)
-        doc = XMLGenerator(fobj)
+        with xmlfile(self.filename) as xf:
+            with xf.element("worksheet", nsmap=NSMAP):
 
-        start_tag(doc, 'worksheet',
-                {
-                'xmlns': 'http://schemas.openxmlformats.org/spreadsheetml/2006/main',
-                'xmlns:r': 'http://schemas.openxmlformats.org/officeDocument/2006/relationships'})
-        start_tag(doc, 'sheetPr')
-        tag(doc, 'outlinePr',
-                {'summaryBelow': '1',
-                'summaryRight': '1'})
-        end_tag(doc, 'sheetPr')
-        tag(doc, 'dimension', {'ref': 'A1:%s' % (self.get_dimensions())})
-        start_tag(doc, 'sheetViews')
-        start_tag(doc, 'sheetView', {'workbookViewId': '0'})
-        tag(doc, 'selection', {'activeCell': 'A1',
-                'sqref': 'A1'})
-        end_tag(doc, 'sheetView')
-        end_tag(doc, 'sheetViews')
-        fmt = write_format(self)
-        fobj.write(tostring(fmt))
-        cols = write_cols(self)
-        if cols is not None:
-            fobj.write(tostring(cols))
+                if self.sheet_properties:
+                    pr = write_sheetPr(self.sheet_properties)
 
-        return doc
+                xf.write(pr)
+                xf.write(write_sheetviews(self))
+                xf.write(write_format(self))
+
+                cols = write_cols(self)
+                if cols is not None:
+                    xf.write(cols)
+
+                with xf.element("sheetData"):
+                    try:
+                        while True:
+                            r = (yield)
+                            xf.write(r)
+                    except GeneratorExit:
+                        pass
+                af = write_autofilter(self)
+                if af is not None:
+                    xf.write(af)
+                if self._comments:
+                    comments = Element('legacyDrawing', {'{%s}id' % REL_NS: 'commentsvml'})
+                    xf.write(comments)
 
     def close(self):
-        self._close_content()
-        files = [self._fileobj_header_name, self._fileobj_content_name]
-        for f in files:
-            self.get_temporary_file(f).close()
-        output = self.get_temporary_file(self.filename)
-        for line in FileInput(files, mode="rb"):
-            output.write(line)
-        output.close()
+        if self.__saved:
+            self._already_saved()
+        if self.writer is None:
+            self.writer = self._write_header()
+            next(self.writer)
+        self.writer.close()
+        self.__saved = True
 
-    def _close_content(self):
-        doc = self._get_content_generator()
-        end_tag(doc, 'sheetData')
-        if self._comments:
-            tag(doc, 'legacyDrawing', {'r:id': 'commentsvml'})
-        end_tag(doc, 'worksheet')
-
-    def get_dimensions(self):
-        if not self._max_col or not self._max_row:
-            return 'A1'
-        else:
-            return '%s%d' % (get_column_letter(self._max_col), (self._max_row))
-
-    def _get_content_generator(self):
-        """ XXX: this is ugly, but it allows to resume writing the file
-        even after the handle is closed"""
-
-        # restart XMLGenerator at the end of the file to prevent it being overwritten
-        handle = self.get_temporary_file(filename=self._fileobj_content_name)
-        handle.seek(0, 2)
-
-        return XMLGenerator(out=handle)
+    def _cleanup(self):
+        os.remove(self.filename)
 
     def append(self, row):
         """
         :param row: iterable containing values to append
         :type row: iterable
         """
-        if (not isinstance(row, (list, tuple, range))
-            and not isgenerator(row)):
+        if (not isgenerator(row) and
+            not isinstance(row, (list, tuple, range))
+            ):
             self._invalid_row(row)
-
-        doc = self._get_content_generator()
-        cell = WriteOnlyCell(self) # singleton
+        cell = WriteOnlyCell(self)  # singleton
 
         self._max_row += 1
-        span = len(row)
-        self._max_col = max(self._max_col, span)
         row_idx = self._max_row
-        attrs = {'r': '%d' % row_idx,
-                 'spans': '1:%d' % span}
-        start_tag(doc, 'row', attrs)
+        if self.writer is None:
+            self.writer = self._write_header()
+            next(self.writer)
 
+        el = Element("row", r='%d' % self._max_row)
+
+        col_idx = None
         for col_idx, value in enumerate(row, 1):
             if value is None:
                 continue
@@ -231,11 +181,22 @@ class DumpWorksheet(Worksheet):
                 comment._parent = CommentParentCell(cell)
                 self._comments.append(comment)
 
-            write_cell(doc, self, cell)
+            tree = write_cell(self, cell)
+            el.append(tree)
             if cell.has_style: # styled cell or datetime
                 cell = WriteOnlyCell(self)
 
-        end_tag(doc, 'row')
+        if col_idx:
+            self._max_col = max(self._max_col, col_idx)
+            el.set('spans', '1:%d' % col_idx)
+        try:
+            self.writer.send(el)
+        except StopIteration:
+            self._already_saved()
+
+
+    def _already_saved(self):
+        raise WorkbookAlreadySaved('Workbook has already been saved and cannot be modified or saved anymore.')
 
 
     def _invalid_row(self, iterable):
