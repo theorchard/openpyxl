@@ -26,7 +26,10 @@ class _FakeIncrementalFileWriter(object):
     @contextmanager
     def element(self, tag, attrib=None, nsmap=None, **_extra):
         """Create a new xml element using a context manager.
-        The elements are written when the top level context is left."""
+        The elements are written when the top level context is left.
+
+        This is for code compatibility only as it is quite slow.
+        """
 
         # __enter__ part
         self._have_root = True
