@@ -11,10 +11,9 @@ from openpyxl.xml.functions import Element, xmlfile, SubElement
 def write_string_table(string_table):
     """Write the string table xml."""
     out = BytesIO()
-    NSMAP = {None : SHEET_MAIN_NS}
 
     with xmlfile(out) as xf:
-        with xf.element("sst", nsmap=NSMAP, uniqueCount="%d" % len(string_table)):
+        with xf.element("sst", xmlns=SHEET_MAIN_NS, uniqueCount="%d" % len(string_table)):
 
             for key in string_table:
                 el = Element('si')
