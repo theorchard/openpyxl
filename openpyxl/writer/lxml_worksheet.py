@@ -1,10 +1,7 @@
 from __future__ import absolute_import
 # Copyright (c) 2010-2015 openpyxl
 
-# Experimental writer of worksheet data using lxml incremental API
-
 from io import BytesIO
-from lxml.etree import xmlfile, Element, SubElement, fromstring
 
 from openpyxl.compat import (
     itervalues,
@@ -38,8 +35,10 @@ from .worksheet import (
 )
 
 from .etree_worksheet import get_rows_to_write, row_sort
+from openpyxl.xml.functions import xmlfile, Element, SubElement
 
-### LXML optimisation
+
+### LXML optimisation using xf.element to reduce instance creation
 
 def write_rows(xf, worksheet):
     """Write worksheet data to xml."""
