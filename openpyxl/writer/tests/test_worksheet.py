@@ -153,7 +153,7 @@ def test_outline_cols(write_cols, ColumnDimension, DummyWorksheet):
 
 @pytest.fixture
 def write_rows():
-    from .. worksheet import write_rows
+    from .. etree_worksheet import write_rows
     return write_rows
 
 
@@ -239,7 +239,7 @@ def test_write_height(worksheet, write_rows):
 
 
 def test_get_rows_to_write(worksheet):
-    from .. worksheet import get_rows_to_write
+    from .. etree_worksheet import get_rows_to_write
 
     ws = worksheet
     ws.cell('A10').value = "test"

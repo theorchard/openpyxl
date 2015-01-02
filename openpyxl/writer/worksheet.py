@@ -8,14 +8,12 @@ from io import BytesIO
 
 # compatibility imports
 
-from openpyxl.compat import safe_string, itervalues
-from openpyxl.compat.itertools import iteritems, iterkeys
+from openpyxl.compat import safe_string, itervalues, iteritems
 
 from openpyxl import LXML
 
 # package imports
-from openpyxl.utils import COORD_RE
-from openpyxl.cell import (
+from openpyxl.utils import (
     coordinate_from_string,
     column_index_from_string,
 )
@@ -32,10 +30,7 @@ from openpyxl.formatting import ConditionalFormatting
 from openpyxl.worksheet.datavalidation import writer
 from openpyxl.worksheet.properties import WorksheetProperties, write_sheetPr
 
-
-def row_sort(cell):
-    """Translate column names for sorting."""
-    return column_index_from_string(cell.column)
+from .etree_worksheet import write_cell
 
 
 def write_properties(worksheet):
@@ -247,13 +242,14 @@ def write_pagebreaks(worksheet):
 def write_worksheet(worksheet, shared_strings):
     """Write a worksheet to an xml file."""
     if LXML is True:
-        from . lxml_worksheet import write_cell, write_rows
+        from .lxml_worksheet import write_cell, write_rows
+    else:
+        from .etree_worksheet import write_cell, write_rows
 
     out = BytesIO()
-    NSMAP = {None : SHEET_MAIN_NS}
 
     with xmlfile(out) as xf:
-        with xf.element('worksheet', nsmap=NSMAP):
+        with xf.element('worksheet', xmlns=SHEET_MAIN_NS):
 
             props = write_properties(worksheet)
             xf.write(props)
@@ -337,81 +333,3 @@ def write_worksheet(worksheet, shared_strings):
     xml = out.getvalue()
     out.close()
     return xml
-
-
-def get_rows_to_write(worksheet):
-    """Return all rows, and any cells that they contain"""
-    # Ensure a blank cell exists if it has a style
-    for styleCoord in iterkeys(worksheet._styles):
-        if isinstance(styleCoord, str) and COORD_RE.search(styleCoord):
-            worksheet.cell(styleCoord)
-
-    # create rows of cells
-    cells_by_row = {}
-    for cell in itervalues(worksheet._cells):
-        cells_by_row.setdefault(cell.row, []).append(cell)
-
-    # make sure rows that only have a height set are returned
-    for row_idx in worksheet.row_dimensions:
-        if row_idx not in cells_by_row:
-            cells_by_row[row_idx] = []
-
-    return cells_by_row
-
-### ElementTree
-
-def write_rows(xf, worksheet):
-    """Write worksheet data to xml."""
-
-    cells_by_row = get_rows_to_write(worksheet)
-
-    with xf.element("sheetData"):
-        for row_idx in sorted(cells_by_row):
-            # row meta data
-            row_dimension = worksheet.row_dimensions[row_idx]
-            row_dimension.style = worksheet._styles.get(row_idx)
-            attrs = {'r': '%d' % row_idx,
-                     'spans': '1:%d' % worksheet.max_column}
-            attrs.update(dict(row_dimension))
-
-            with xf.element("row", attrs):
-
-                row_cells = cells_by_row[row_idx]
-                for cell in sorted(row_cells, key=row_sort):
-                    el = write_cell(worksheet, cell)
-                    xf.write(el)
-
-
-def write_cell(worksheet, cell):
-    string_table = worksheet.parent.shared_strings
-    coordinate = cell.coordinate
-    attributes = {'r': coordinate}
-    if cell.has_style:
-        attributes['s'] = '%d' % cell.style_id
-
-    if cell.data_type != 'f':
-        attributes['t'] = cell.data_type
-
-    value = cell.internal_value
-
-    el = Element("c", attributes)
-    if value in ('', None):
-        return el
-
-    if cell.data_type == 'f':
-        shared_formula = worksheet.formula_attributes.get(coordinate, {})
-        if shared_formula is not None:
-            if (shared_formula.get('t') == 'shared'
-                and 'ref' not in shared_formula):
-                value = None
-        formula = SubElement(el, 'f', shared_formula)
-        if value is not None:
-            formula.text = value[1:]
-            value = None
-
-    if cell.data_type == 's':
-        value = string_table.add(value)
-    cell_content = SubElement(el, 'v')
-    if value is not None:
-        cell_content.text = safe_string(value)
-    return el

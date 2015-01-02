@@ -24,8 +24,6 @@ from openpyxl.formatting import ConditionalFormatting
 from openpyxl.worksheet.datavalidation import writer
 
 from .worksheet import (
-    row_sort,
-    get_rows_to_write,
     write_datavalidation,
     write_properties,
     write_sheetviews,
@@ -38,6 +36,8 @@ from .worksheet import (
     write_hyperlinks,
     write_pagebreaks,
 )
+
+from .etree_worksheet import get_rows_to_write, row_sort
 
 ### LXML optimisation
 
