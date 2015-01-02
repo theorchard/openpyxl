@@ -9,6 +9,7 @@ Major changes
 * Support for template file types - PR21
 * Moved ancillary functions and classes into utils package - single place of reference
 * `PR 34 <https://bitbucket.org/openpyxl/openpyxl/pull-request/34/>`_ Fully support page setup
+* Removed SAX-based XML Generator. Special thanks to Elias Rabel for implementing xmlfile for xml.etree
 
 
 Bug fixes
