@@ -20,14 +20,6 @@ openpyxl.writer.drawings module
     :undoc-members:
     :show-inheritance:
 
-openpyxl.writer.dump_lxml module
---------------------------------
-
-.. automodule:: openpyxl.writer.dump_lxml
-    :members:
-    :undoc-members:
-    :show-inheritance:
-
 openpyxl.writer.dump_worksheet module
 -------------------------------------
 
