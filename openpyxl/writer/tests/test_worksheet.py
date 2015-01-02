@@ -157,6 +157,31 @@ def write_rows():
     return write_rows
 
 
+
+@pytest.mark.parametrize("value, expected",
+                         [
+                             (9781231231230, """<c t="n" r="A1"><v>9781231231230</v></c>"""),
+                             (decimal.Decimal('3.14'), """<c t="n" r="A1"><v>3.14</v></c>"""),
+                             (1234567890, """<c t="n" r="A1"><v>1234567890</v></c>"""),
+                             ("=sum(1+1)", """<c r="A1"><f>sum(1+1)</f><v></v></c>"""),
+                             (True, """<c t="b" r="A1"><v>1</v></c>"""),
+                             ("Hello", """<c t="s" r="A1"><v>0</v></c>"""),
+                             ("", """<c r="A1" t="s"></c>"""),
+                             (None, """<c r="A1" t="n"></c>"""),
+                             (datetime.date(2011, 12, 25), """<c r="A1" t="n" s="1"><v>40902</v></c>"""),
+                         ])
+def test_write_cell(worksheet, value, expected):
+    from openpyxl.cell import Cell
+    from .. etree_worksheet import write_cell
+    ws = worksheet
+    ws['A1'] = value
+
+    el = write_cell(ws, ws['A1'])
+    xml = tostring(el)
+    diff = compare_xml(xml, expected)
+    assert diff is None, diff
+
+
 def test_write_formula(worksheet, write_rows):
     ws = worksheet
 
