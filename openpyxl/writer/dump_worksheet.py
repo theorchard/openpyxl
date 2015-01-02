@@ -237,10 +237,6 @@ class ExcelDumpWriter(ExcelWriter):
         comments_id = 1
 
         for i, sheet in enumerate(self.workbook.worksheets, 1):
-            header_doc = sheet.write_header() # written after worksheet body to include dimensions
-
-            start_tag(header_doc, 'sheetData')
-
             sheet.close()
             archive.write(sheet.filename, PACKAGE_WORKSHEETS + '/sheet%d.xml' % i)
             sheet._cleanup()
