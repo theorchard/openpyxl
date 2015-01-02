@@ -72,10 +72,9 @@ def write_cell(worksheet, cell):
 
     if cell.data_type == 'f':
         shared_formula = worksheet.formula_attributes.get(coordinate, {})
-        if shared_formula is not None:
-            if (shared_formula.get('t') == 'shared'
-                and 'ref' not in shared_formula):
-                value = None
+        if (shared_formula.get('t') == 'shared'
+            and 'ref' not in shared_formula):
+            value = None
         formula = SubElement(el, 'f', shared_formula)
         if value is not None:
             formula.text = value[1:]
