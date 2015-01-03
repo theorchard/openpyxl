@@ -103,10 +103,8 @@ class DumpWorksheet(Worksheet):
         Generator that creates the XML file and the sheet header
         """
 
-        NSMAP = {None : SHEET_MAIN_NS}
-
         with xmlfile(self.filename) as xf:
-            with xf.element("worksheet", nsmap=NSMAP):
+            with xf.element("worksheet", xmlns=SHEET_MAIN_NS):
 
                 if self.sheet_properties:
                     pr = write_sheetPr(self.sheet_properties)
