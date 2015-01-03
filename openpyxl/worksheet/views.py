@@ -208,7 +208,7 @@ class PivotAreaReferences(Strict):
     count = Integer()
 
     def __init__(self, count=None):
-                 count = count
+        count = count
 
 
 class PivotAreaReference(Strict):
@@ -272,4 +272,4 @@ class Index(Strict):
     v = Integer()
 
     def __init__(self, v=None):
-                 v = v
+        v = v
