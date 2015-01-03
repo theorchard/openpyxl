@@ -14,17 +14,6 @@ def make_worksheet():
     return ws
 
 
-def sax_writer(ws=None):
-    from openpyxl.writer.worksheet import write_worksheet_data
-    if ws is None:
-        ws = make_worksheet()
-    out = BytesIO()
-    doc = XMLGenerator(out)
-    write_worksheet_data(doc, ws)
-    #with open("sax_writer.xml", "wb") as dump:
-        #dump.write(out.getvalue())
-
-
 def lxml_writer(ws=None):
     from openpyxl.writer.lxml_worksheet import write_rows
     if ws is None:
@@ -134,7 +123,6 @@ if __name__ == '__main__':
     #wb = read_workbook()
     #cProfile.run("rows(wb)", sort="tottime")
     #cProfile.run("make_worksheet()", sort="tottime")
-    #cProfile.run("sax_writer(ws)", sort="tottime")
     #cProfile.run("lxml_writer(ws)", sort="tottime")
     #generate_format_data()
     #cProfile.run("styled_sheet()", sort="tottime")
