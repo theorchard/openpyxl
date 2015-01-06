@@ -29,7 +29,16 @@ mapping = {
     'xsd:byte':'MinMax',
     'xsd:long':'Integer',
     'xsd:token':'String',
-    's:ST_Panose':
+    's:ST_Panose':'HexBinary',
+    's:ST_Lang':'String',
+    'ST_Percentage':'String',
+    'ST_PositivePercentage':'Percentage',
+    'ST_TextPoint':'TextPoint',
+    'ST_UniversalMeasure':'UniversalMeasure',
+    'ST_Coordinate32':'Coordinate',
+    'ST_Coordinate':'Coordinate',
+    'ST_Coordinate32Unqualified':'Coordinate',
+    's:ST_Xstring':'String',
 }
 
 ST_REGEX = re.compile("(?P<schema>[a-z]:)(?P<typename>ST_[A-Za-z]+)")
