@@ -25,9 +25,9 @@ mapping = {
     'xsd:int':'Integer',
     'xsd:double':'Float',
     'xsd:string':'String',
-    'xsd:unsignedByte':'MinMax',
-    'xsd:byte':'MinMax',
-    'xsd:long':'Integer',
+    'xsd:unsignedByte':'Integer',
+    'xsd:byte':'Integer',
+    'xsd:long':'Float',
     'xsd:token':'String',
     's:ST_Panose':'HexBinary',
     's:ST_Lang':'String',
@@ -39,6 +39,7 @@ mapping = {
     'ST_Coordinate':'Coordinate',
     'ST_Coordinate32Unqualified':'Coordinate',
     's:ST_Xstring':'String',
+    'ST_Angle':'Integer',
 }
 
 ST_REGEX = re.compile("(?P<schema>[a-z]:)(?P<typename>ST_[A-Za-z]+)")
