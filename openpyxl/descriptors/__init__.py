@@ -57,7 +57,7 @@ class Max(Typed):
     expected_type = float
 
     def __init__(self, name=None, **kw):
-        if 'max' not in kw:
+        if 'max' not in kw and not hasattr(self, 'max'):
             raise TypeError('missing max value')
         super(Max, self).__init__(name, **kw)
 
@@ -77,7 +77,7 @@ class Min(Typed):
     expected_type = float
 
     def __init__(self, name=None, **kw):
-        if 'min' not in kw:
+        if 'min' not in kw and not hasattr(self, 'min'):
             raise TypeError('missing min value')
         super(Min, self).__init__(name, **kw)
 
@@ -249,7 +249,7 @@ class MatchPattern(Descriptor):
     allow_none = False
 
     def __init__(self, name=None, **kw):
-        if 'pattern' not in kw:
+        if 'pattern' not in kw and not hasattr(self, 'pattern'):
             raise TypeError('missing pattern value')
 
         super(MatchPattern, self).__init__(name, **kw)
