@@ -81,7 +81,7 @@ def classify(tagname, src=sheet_src, schema=None):
         if attr.get("type").startswith("ST_"):
             attr['type'] = simple(attr.get("type"), schema)
             types.add(attr['type'].split("(")[0])
-            s += "    {name} = Typed(expected_type={type})\n".format(**attr)
+            s += "    {name} = {type}\n".format(**attr)
         else:
             s += "    {name} = Typed(expected_type={type}, {use})\n".format(**attr)
 
