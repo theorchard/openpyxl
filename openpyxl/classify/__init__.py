@@ -5,6 +5,7 @@ from __future__ import absolute_import, print_function
 Generate Python classes from XML Schema
 """
 
+import argparse
 import re
 
 from openpyxl.tests.schema import (
@@ -187,6 +188,20 @@ class ClassMaker:
         return s
 
 
-if __name__ == "__main__":
-    cm = ClassMaker('CT_LineSer')
+def make(element, schema=sheet_src):
+    cm = ClassMaker(element, schema)
     print(cm)
+
+
+commands = argparse.ArgumentParser(description="Generate Python classes for a specific scheme element")
+commands.add_argument('element', help='The XML type to be converted')
+commands.add_argument('--schema',
+                      help='The relevant schema. The default is for worksheets',
+                      choices=["sheet_src", "chart_src", "shared_src"],
+                      default="sheet_src",
+                      )
+
+if __name__ == "__main__":
+    args = commands.parse_args()
+    schema = globals().get(args.schema)
+    make(args.element, schema)
