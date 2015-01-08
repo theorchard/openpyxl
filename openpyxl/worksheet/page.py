@@ -2,7 +2,15 @@ from __future__ import absolute_import
 # Copyright (c) 2010-2015 openpyxl
 
 from openpyxl.compat import safe_string
-from openpyxl.descriptors import Strict, Float, Typed, Bool, Integer, String, Set, MatchPattern
+from openpyxl.descriptors import (
+    Strict,
+    Float,
+    Typed,
+    Bool,
+    Integer,
+    String,
+    NoneSet,
+    )
 from openpyxl.descriptors.excel import UniversalMeasure
 from openpyxl.xml.functions import Element
 from openpyxl.xml.constants import SHEET_MAIN_NS, REL_NS
@@ -14,7 +22,7 @@ class PageSetup(Strict):
 
     tag = "{%s}pageSetup" % SHEET_MAIN_NS
 
-    orientation = Set(values=(None, "default", "portrait", "landscape"))
+    orientation = NoneSet(values=("default", "portrait", "landscape"))
     paperSize = Integer(allow_none=True)
     scale = Integer(allow_none=True)
     fitToHeight = Integer(allow_none=True)
@@ -23,12 +31,12 @@ class PageSetup(Strict):
     useFirstPageNumber = Bool(allow_none=True)
     paperHeight = UniversalMeasure(allow_none=True)
     paperWidth = UniversalMeasure(allow_none=True)
-    pageOrder = Set(values=(None, "downThenOver", "overThenDown"))
+    pageOrder = NoneSet(values=("downThenOver", "overThenDown"))
     usePrinterDefaults = Bool(allow_none=True)
     blackAndWhite = Bool(allow_none=True)
     draft = Bool(allow_none=True)
-    cellComments = Set(values=(None, "none", "asDisplayed", "atEnd"))
-    errors = Set(values=(None, "displayed", "blank", "dash", "NA"))
+    cellComments = NoneSet(values=("asDisplayed", "atEnd"))
+    errors = NoneSet(values=("displayed", "blank", "dash", "NA"))
     horizontalDpi = Integer(allow_none=True)
     verticalDpi = Integer(allow_none=True)
     copies = Integer(allow_none=True)
@@ -135,7 +143,8 @@ class PrintOptions(Strict):
         self.gridLinesSet = gridLinesSet
 
     def __iter__(self):
-        for attr in ("horizontalCentered", "verticalCentered", "headings", "gridLines", "gridLinesSet"):
+        for attr in ("horizontalCentered", "verticalCentered", "headings",
+                     "gridLines", "gridLinesSet"):
             value = getattr(self, attr)
             if value is not None:
                 yield attr, safe_string(value)
@@ -164,7 +173,8 @@ class PageMargins(Strict):
     header = Float()
     footer = Float()
 
-    def __init__(self, left=0.75, right=0.75, top=1, bottom=1, header=0.5, footer=0.5):
+    def __init__(self, left=0.75, right=0.75, top=1, bottom=1, header=0.5,
+                 footer=0.5):
         self.left = left
         self.right = right
         self.top = top

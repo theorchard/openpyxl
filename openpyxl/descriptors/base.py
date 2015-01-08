@@ -230,20 +230,6 @@ class Alias(Descriptor):
         return getattr(instance, self.alias)
 
 
-class MetaStrict(type):
-
-    def __new__(cls, clsname, bases, methods):
-        for k, v in methods.items():
-            if isinstance(v, Descriptor):
-                v.name = k
-        return type.__new__(cls, clsname, bases, methods)
-
-Strict = MetaStrict('Strict', (object,), {}
-               )
-
-del MetaStrict
-
-
 class MatchPattern(Descriptor):
     """Values must match a regex pattern """
     allow_none = False

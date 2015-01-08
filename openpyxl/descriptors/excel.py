@@ -10,7 +10,7 @@ from . import MatchPattern, MinMax
 
 class HexBinary(MatchPattern):
 
-    pattern = "[0-9a-fA-F]{2}"
+    pattern = "[0-9a-fA-F]+$"
 
 
 class UniversalMeasure(MatchPattern):

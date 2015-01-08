@@ -1,9 +1,12 @@
+from __future__ import absolute_import
+
 import pytest
 
+from .. import Strict
 
 class TestDescriptor:
 
-    from . import Descriptor
+    from ..base import Descriptor
 
     class Dummy:
         pass
@@ -23,7 +26,7 @@ class TestDescriptor:
 @pytest.fixture
 def boolean():
 
-    from . import Bool, Strict
+    from ..base import Bool
 
     class Dummy(Strict):
 
@@ -58,7 +61,7 @@ class TestBool:
 @pytest.fixture
 def integer():
 
-    from . import Integer, Strict
+    from ..base import Integer
 
     class Dummy(Strict):
 
@@ -91,7 +94,7 @@ class TestInt:
 @pytest.fixture
 def float():
 
-    from . import Float, Strict
+    from ..base import Float
 
     class Dummy(Strict):
 
@@ -125,7 +128,7 @@ class TestFloat:
 @pytest.fixture
 def allow_none():
 
-    from . import Float, Strict
+    from ..base import Float
 
     class Dummy(Strict):
 
@@ -143,7 +146,7 @@ class TestAllowNone:
 
 @pytest.fixture
 def maximum():
-    from . import Max, Strict
+    from ..base import Max
 
     class Dummy(Strict):
 
@@ -155,7 +158,7 @@ def maximum():
 class TestMax:
 
     def test_ctor(self):
-        from . import Strict, Max
+        from ..base import Max
 
         with pytest.raises(TypeError):
             class Dummy(Strict):
@@ -172,7 +175,7 @@ class TestMax:
 
 @pytest.fixture
 def minimum():
-    from . import Min, Strict
+    from ..base import Min
 
     class Dummy(Strict):
 
@@ -184,7 +187,7 @@ def minimum():
 class TestMin:
 
     def test_ctor(self):
-        from . import Strict, Min
+        from ..base import Min
 
         with pytest.raises(TypeError):
             class Dummy(Strict):
@@ -203,7 +206,7 @@ class TestMin:
 
 @pytest.fixture
 def min_max():
-    from . import MinMax, Strict
+    from ..base import MinMax
 
     class Dummy(Strict):
 
@@ -215,7 +218,7 @@ def min_max():
 class TestMinMax:
 
     def test_ctor(self):
-        from . import MinMax, Strict
+        from ..base import MinMax
 
         with pytest.raises(TypeError):
 
@@ -240,7 +243,7 @@ class TestMinMax:
 
 @pytest.fixture
 def set():
-    from . import Set, Strict
+    from ..base import Set
 
     class Dummy(Strict):
 
@@ -252,7 +255,7 @@ def set():
 class TestValues:
 
     def test_ctor(self):
-        from . import Set, Strict
+        from ..base import Set
 
         with pytest.raises(TypeError):
             class Dummy(Strict):
@@ -271,7 +274,7 @@ class TestValues:
 
 
 def test_noneset():
-    from . import NoneSet, Strict
+    from ..base import NoneSet
     class Dummy(Strict):
 
         value = NoneSet(values=[1, 2, 3])
@@ -286,7 +289,7 @@ def test_noneset():
 @pytest.fixture
 def ascii():
 
-    from . import ASCII, Strict
+    from ..base import ASCII
 
     class Dummy(Strict):
 
@@ -317,7 +320,7 @@ class TestASCII:
 @pytest.fixture
 def string():
 
-    from . import String, Strict
+    from ..base import String
 
     class Dummy(Strict):
 
@@ -340,7 +343,7 @@ class TestString:
 
 @pytest.fixture
 def Tuple():
-    from . import Tuple, Strict
+    from ..base import Tuple, Strict
 
     class Dummy(Strict):
 
@@ -362,7 +365,7 @@ class TestTuple:
 
 @pytest.fixture
 def Length():
-    from . import Length, Strict
+    from ..base import Length
 
     class Dummy(Strict):
 
@@ -383,7 +386,7 @@ class TestLength:
 
 @pytest.fixture
 def Sequence():
-    from . import Sequence, Strict
+    from ..base import Sequence
 
     class Dummy(Strict):
 
@@ -403,32 +406,3 @@ class TestSequence:
     def test_invalid_container(self, Sequence, value):
         with pytest.raises(TypeError):
             Sequence.value = value
-
-
-@pytest.fixture
-def MatchPattern():
-    from . import MatchPattern, Strict
-
-    class Dummy(Strict):
-        """ 
-        This dummy test is related to page setup of a worksheet.
-        .. todo: 
-            test other pattern contexts when they will appear.
-        """
-        value = MatchPattern(pattern="[0-9]+(\.[0-9]+)?(mm|cm|in|pt|pc|pi)")
-
-    return Dummy()
-
-
-class TestMatchPattern:
-
-    def test_valid(self, MatchPattern):
-        for value in [24.73, 0, 24, '999']:
-            for item in ['mm', 'cm', 'in', 'pt', 'pc', 'pi']:
-                MatchPattern.value = "{0}{1}".format(value, item)
-                
-
-    def test_invalid(self, MatchPattern):
-        for value in [24.73, '24.73zz', "24.73 mm", None, "-24.73cm"]:
-            with pytest.raises(ValueError):
-                MatchPattern.value = "{0}".format(value)
