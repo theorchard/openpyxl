@@ -3,6 +3,7 @@ from __future__ import absolute_import
 
 from openpyxl.compat import safe_string
 from openpyxl.descriptors import Strict, Float, Typed, Bool, Integer, String, Set, MatchPattern
+from openpyxl.descriptors.excel import UniversalMeasure
 from openpyxl.xml.functions import Element
 from openpyxl.xml.constants import SHEET_MAIN_NS, REL_NS
 from openpyxl.compat import deprecated
@@ -20,8 +21,8 @@ class PageSetup(Strict):
     fitToWidth = Integer(allow_none=True)
     firstPageNumber = Integer(allow_none=True)
     useFirstPageNumber = Bool(allow_none=True)
-    paperHeight = MatchPattern(pattern="[0-9]+(\.[0-9]+)?(mm|cm|in|pt|pc|pi)", allow_none=True)  # ST_PositiveUniversalMeasure
-    paperWidth = MatchPattern(pattern="[0-9]+(\.[0-9]+)?(mm|cm|in|pt|pc|pi)", allow_none=True)  # ST_PositiveUniversalMeasure
+    paperHeight = UniversalMeasure(allow_none=True)
+    paperWidth = UniversalMeasure(allow_none=True)
     pageOrder = Set(values=(None, "downThenOver", "overThenDown"))
     usePrinterDefaults = Bool(allow_none=True)
     blackAndWhite = Bool(allow_none=True)
