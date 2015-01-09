@@ -60,3 +60,32 @@ class TestHexBinary:
     def test_invalid(self, HexBinary, value):
         with pytest.raises(ValueError):
             HexBinary.value = value
+
+
+@pytest.fixture
+def TextPoint():
+    from ..excel import TextPoint
+
+    class Dummy(Strict):
+
+        value = TextPoint()
+
+    return Dummy()
+
+
+class TestTextPoint:
+
+    @pytest.mark.parametrize("value",
+                             [-400000, "400000", 0]
+                             )
+    def test_valid(self, TextPoint, value):
+        TextPoint.value = value
+        assert TextPoint.value == int(value)
+
+    def test_invalid_value(self, TextPoint):
+        with pytest.raises(ValueError):
+            TextPoint.value = -400001
+
+    def test_invalid_type(self, TextPoint):
+        with pytest.raises(TypeError):
+            TextPoint.value = "40pt"

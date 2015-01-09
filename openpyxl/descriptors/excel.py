@@ -5,7 +5,8 @@ from __future__ import absolute_import
 Excel specific descriptors
 """
 
-from . import MatchPattern, MinMax
+from openpyxl.compat import basestring
+from . import MatchPattern, MinMax, Integer
 
 
 class HexBinary(MatchPattern):
@@ -18,10 +19,15 @@ class UniversalMeasure(MatchPattern):
     pattern = "[0-9]+(\.[0-9]+)?(mm|cm|in|pt|pc|pi)"
 
 
-class TextPoint(UniversalMeasure, MinMax):
+class TextPoint(MinMax):
+    """
+    Size in hundredths of points.
+    In theory other units of measurement can be used but these are unbounded
+    """
+    expected_type = int
 
-    min = -40000
-    max = 40000
+    min = -400000
+    max = 400000
 
 
 class Coordinate(MinMax):
