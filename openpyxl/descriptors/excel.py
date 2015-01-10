@@ -30,14 +30,7 @@ class TextPoint(MinMax):
     max = 400000
 
 
-class Coordinate(MinMax):
-
-    """union of unqualified coordinate and universal measure types
-    see worksheet properties for universal measure
-    """
-
-    min= -27273042329600
-    max= 27273042316900
+Coordinate = Integer
 
 
 class Percentage(MatchPattern):
