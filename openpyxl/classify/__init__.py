@@ -79,9 +79,7 @@ def classify(tagname, src=sheet_src, schema=None):
         if 'ref' in attr:
             continue
         attrs.append(attr['name'])
-        if attr['type'] in simple_mapping:
-            attr['type'] = simple_mapping[attr['type']]
-            types.add(attr['type'])
+
         if attr.get("use") == "optional":
             attr["use"] = "allow_none=True"
         else:
@@ -91,7 +89,12 @@ def classify(tagname, src=sheet_src, schema=None):
             types.add(attr['type'].split("(")[0])
             s += "    {name} = {type}\n".format(**attr)
         else:
-            s += "    {name} = Typed(expected_type={type}, {use})\n".format(**attr)
+            if attr['type'] in simple_mapping:
+                attr['type'] = simple_mapping[attr['type']]
+                types.add(attr['type'])
+                s += "    {name} = {type}({use})\n".format(**attr)
+            else:
+                s += "    {name} = Typed(expected_type={type}, {use})\n".format(**attr)
 
     children = []
     for el in node.iterfind("{%s}sequence/{%s}element" % (XSD, XSD)):
