@@ -89,3 +89,31 @@ class TestTextPoint:
     def test_invalid_type(self, TextPoint):
         with pytest.raises(TypeError):
             TextPoint.value = "40pt"
+
+
+@pytest.fixture
+def Percentage():
+    from ..excel import Percentage
+
+    class Dummy(Strict):
+
+        value = Percentage()
+
+    return Dummy()
+
+
+class TestPercentage:
+
+    @pytest.mark.parametrize("value",
+                             ["15%", "15.5%"]
+                             )
+    def test_valid(self, Percentage, value):
+        Percentage.value = value
+        assert Percentage.value == value
+
+    @pytest.mark.parametrize("value",
+                             ["15", "101%", "-1%"]
+                             )
+    def test_valid(self, Percentage, value):
+        with pytest.raises(ValueError):
+            Percentage.value = value
