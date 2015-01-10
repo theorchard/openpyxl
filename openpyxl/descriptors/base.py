@@ -26,6 +26,7 @@ class Typed(Descriptor):
 
     expected_type = type(None)
     allow_none = False
+    nested = False
 
     def __set__(self, instance, value):
         if not isinstance(value, self.expected_type):

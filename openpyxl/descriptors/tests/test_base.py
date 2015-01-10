@@ -58,6 +58,18 @@ class TestBool:
         assert boolean.value == expected
 
 
+def test_nested():
+    from ..base import Bool
+
+    class DummyNested(Strict):
+
+        value = Bool(nested=True)
+
+    dummy = DummyNested()
+    dummy.value = True
+    assert dummy.__class__.value.nested == True
+
+
 @pytest.fixture
 def integer():
 
@@ -343,7 +355,7 @@ class TestString:
 
 @pytest.fixture
 def Tuple():
-    from ..base import Tuple, Strict
+    from ..base import Tuple
 
     class Dummy(Strict):
 
