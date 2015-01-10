@@ -20,7 +20,7 @@ from lxml.etree import parse
 
 XSD = "http://www.w3.org/2001/XMLSchema"
 
-mapping = {
+simple_mapping = {
     'xsd:boolean':'Bool',
     'xsd:unsignedInt':'Integer',
     'xsd:int':'Integer',
@@ -42,6 +42,13 @@ mapping = {
     's:ST_Xstring':'String',
     'ST_Angle':'Integer',
 }
+
+complex_mapping = {
+    'Boolean':'Bool',
+    'Double':'Float',
+    'Long':'Integer',
+}
+
 
 ST_REGEX = re.compile("(?P<schema>[a-z]:)(?P<typename>ST_[A-Za-z]+)")
 
@@ -72,8 +79,8 @@ def classify(tagname, src=sheet_src, schema=None):
         if 'ref' in attr:
             continue
         attrs.append(attr['name'])
-        if attr['type'] in mapping:
-            attr['type'] = mapping[attr['type']]
+        if attr['type'] in simple_mapping:
+            attr['type'] = simple_mapping[attr['type']]
             types.add(attr['type'])
         if attr.get("use") == "optional":
             attr["use"] = "allow_none=True"
@@ -93,7 +100,7 @@ def classify(tagname, src=sheet_src, schema=None):
         typename = el.get("type")
         match = ST_REGEX.match(typename)
         if typename.startswith("xsd:"):
-            attr['type'] = mapping[typename]
+            attr['type'] = simple_mapping[typename]
             types.add(attr['type'])
         elif match is not None:
             src = srcs_mapping[match.group('schema')]
@@ -112,7 +119,11 @@ def classify(tagname, src=sheet_src, schema=None):
         if el.get("minOccurs") == "0":
             attr['use'] = "allow_none=True"
         attrs.append(attr['name'])
-        s += "    {name} = Typed(expected_type={type}, {use})\n".format(**attr)
+        if attr['type'] in complex_mapping:
+            attr['type'] = complex_mapping[attr['type']]
+            s += "    {name} = {type}(nested=True, {use})\n".format(**attr)
+        else:
+            s += "    {name} = Typed(expected_type={type}, {use})\n".format(**attr)
 
     if attrs:
         s += "\n    def __init__(self,\n"
@@ -136,7 +147,7 @@ def simple(tagname, schema, use=""):
     if constraint is None:
         return "unknown defintion for {0}".format(tagname)
     typ = constraint.get("base")
-    typ = "{0}()".format(mapping.get(typ, typ))
+    typ = "{0}()".format(simple_mapping.get(typ, typ))
     values = constraint.findall("{%s}enumeration" % XSD)
     values = [v.get('value') for v in values]
     if values:
