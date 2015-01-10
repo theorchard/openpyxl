@@ -80,7 +80,7 @@ def classify(tagname, src=sheet_src, schema=None):
         else:
             attr["use"] = ""
         if attr.get("type").startswith("ST_"):
-            attr['type'] = simple(attr.get("type"), schema)
+            attr['type'] = simple(attr.get("type"), schema, attr['use'])
             types.add(attr['type'].split("(")[0])
             s += "    {name} = {type}\n".format(**attr)
         else:
@@ -127,7 +127,7 @@ def classify(tagname, src=sheet_src, schema=None):
     return s, types, children
 
 
-def simple(tagname, schema):
+def simple(tagname, schema, use=""):
 
     for node in schema.iterfind("{%s}simpleType" % XSD):
         if node.get("name") == tagname:
@@ -140,7 +140,12 @@ def simple(tagname, schema):
     values = constraint.findall("{%s}enumeration" % XSD)
     values = [v.get('value') for v in values]
     if values:
-        typ = "Set(values=({0}))".format(values)
+        s = "Set"
+        if "none" in values:
+            idx = values.index("none")
+            del values[idx]
+            s = "NoneSet"
+        typ = s + "(values=({0}))".format(values)
     return typ
 
 srcs_mapping = {'a:':drawing_main_src, 's:':shared_src}
