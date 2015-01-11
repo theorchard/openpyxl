@@ -18,16 +18,16 @@ class Font(HashableObject):
     UNDERLINE_SINGLE_ACCOUNTING = 'singleAccounting'
 
 
-    name = String()
+    name = String(nested=True)
     charset = Integer(allow_none=True, nested=True)
-    family = MinMax(min=0, max=14)
-    sz = Float()
+    family = MinMax(min=0, max=14, nested=True)
+    sz = Float(nested=True)
     size = Alias("sz")
     b = Bool(nested=True)
     bold = Alias("b")
     i = Bool(nested=True)
     italic = Alias("i")
-    strike = Bool()
+    strike = Bool(nested=True)
     strikethrough = Alias("strike")
     outline = Bool(nested=True)
     shadow = Bool(nested=True)
@@ -42,9 +42,9 @@ class Font(HashableObject):
                 nested=True
                 )
     underline = Alias("u")
-    vertAlign = NoneSet(values=('superscript', 'subscript', 'baseline'))
+    vertAlign = NoneSet(values=('superscript', 'subscript', 'baseline'), nested=True)
     color = ColorDescriptor()
-    scheme = NoneSet(values=("major", "minor"))
+    scheme = NoneSet(values=("major", "minor"), nested=True)
 
     tagname = "font"
 
