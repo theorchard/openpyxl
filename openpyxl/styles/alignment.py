@@ -1,7 +1,9 @@
 from __future__ import absolute_import
 # Copyright (c) 2010-2015 openpyxl
 
-from openpyxl.descriptors import Set, Bool, MinMax, Min, Alias
+from openpyxl.compat import safe_string
+
+from openpyxl.descriptors import Set, Bool, MinMax, Min, Alias, NoneSet
 
 from .hashable import HashableObject
 
@@ -26,23 +28,23 @@ class Alignment(HashableObject):
                   'justifyLastLine',
                   'readingOrder',
                   )
-    horizontal = Set(values=horizontal_alignments)
-    vertical = Set(values=vertical_aligments)
-    textRotation = Set(values=range(181))
+    horizontal = NoneSet(values=horizontal_alignments)
+    vertical = NoneSet(values=vertical_aligments)
+    textRotation = NoneSet(values=range(181))
     textRotation.values.add(255)
     text_rotation = Alias('textRotation')
-    wrapText = Bool()
+    wrapText = Bool(allow_none=True)
     wrap_text = Alias('wrapText')
-    shrinkToFit = Bool()
+    shrinkToFit = Bool(allow_none=True)
     shrink_to_fit = Alias('shrinkToFit')
     indent = Min(min=0)
     relativeIndent = Min(min=0)
-    justifyLastLine = Bool()
+    justifyLastLine = Bool(allow_none=True)
     readingOrder = Min(min=0)
 
     def __init__(self, horizontal='general', vertical='bottom',
-                 textRotation=0, wrapText=False, shrinkToFit=False, indent=0, relativeIndent=0,
-                 justifyLastLine=False, readingOrder=0, text_rotation=None,
+                 textRotation=0, wrapText=None, shrinkToFit=None, indent=0, relativeIndent=0,
+                 justifyLastLine=None, readingOrder=0, text_rotation=None,
                  wrap_text=None, shrink_to_fit=None) :
         self.horizontal = horizontal
         self.vertical = vertical
@@ -60,3 +62,10 @@ class Alignment(HashableObject):
         if shrink_to_fit is not None:
             shrinkToFit = shrink_to_fit
         self.shrinkToFit = shrinkToFit
+
+
+    def __iter__(self):
+        for attr in self.__attrs__:
+            value = getattr(self, attr)
+            if value is not None and value != 0:
+                yield attr, safe_string(value)
