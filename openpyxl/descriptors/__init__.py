@@ -23,14 +23,14 @@ class MetaSerialisable(type):
             if isinstance(v, Descriptor):
                 if getattr(v, 'nested', False):
                     nested.append(k)
-                elif issubclass(v.__class__, Typed):
-                    if not hasattr(v.expected_type, 'serialise'):
-                        attrs.append(k)
-                    else:
+                elif isinstance(v, Typed):
+                    if hasattr(v.expected_type, 'serialise'):
                         elements.append(k)
+                    else:
+                        attrs.append(k)
                 else:
                     if not isinstance(v, Alias):
-                        elements.append(k)
+                        attrs.append(k)
         methods['__attrs__'] = tuple(attrs)
         methods['__nested__'] = tuple(nested)
         methods['__elements__'] = tuple(elements)
