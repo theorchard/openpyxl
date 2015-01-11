@@ -1,8 +1,6 @@
 from __future__ import absolute_import
 # copyright openpyxl 2010-2015
 
-from abc import abstractproperty
-
 from . import _Serialiasable
 
 from openpyxl.compat import safe_string
@@ -22,10 +20,9 @@ class Serialisable(_Serialiasable):
     __nested__ = None
     __elements__ = None
 
-
-    @abstractproperty
+    @property
     def tagname(self):
-        pass
+        raise(NotImplemented)
 
     def serialise(self):
         attrs = dict(self)
