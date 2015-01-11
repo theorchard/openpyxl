@@ -32,8 +32,8 @@ class MetaSerialisable(type):
                     if not isinstance(v, Alias):
                         attrs.append(k)
         methods['__attrs__'] = tuple(attrs)
-        methods['__nested__'] = tuple(nested)
-        methods['__elements__'] = tuple(elements)
+        methods['__nested__'] = tuple(sorted(nested))
+        methods['__elements__'] = tuple(sorted(elements))
         return MetaStrict.__new__(cls, clsname, bases, methods)
 
 
