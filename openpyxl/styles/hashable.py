@@ -4,12 +4,14 @@ from __future__ import absolute_import
 
 import inspect
 from openpyxl.compat import unicode, basestring, safe_string, zip
-from openpyxl.descriptors import Descriptor, Strict
+from openpyxl.descriptors import Descriptor
+from openpyxl.descriptors.serialisable import Serialisable
+
 
 BASE_TYPES = (str, unicode, float, int)
 
 
-class HashableObject(Strict):
+class HashableObject(Serialisable):
     """Define how to hash property classes."""
     __fields__ = ()
     __slots__ = ('_key',) + __fields__

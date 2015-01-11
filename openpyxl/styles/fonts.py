@@ -19,31 +19,34 @@ class Font(HashableObject):
 
 
     name = String()
-    charset = Integer(allow_none=True)
+    charset = Integer(allow_none=True, nested=True)
     family = MinMax(min=0, max=14)
     sz = Float()
     size = Alias("sz")
-    b = Bool()
+    b = Bool(nested=True)
     bold = Alias("b")
-    i = Bool()
+    i = Bool(nested=True)
     italic = Alias("i")
     strike = Bool()
     strikethrough = Alias("strike")
-    outline = Bool()
-    shadow = Bool()
-    condense = Bool()
-    extend = Bool()
+    outline = Bool(nested=True)
+    shadow = Bool(nested=True)
+    condense = Bool(nested=True)
+    extend = Bool(nested=True)
     u = NoneSet(values=(
         UNDERLINE_DOUBLE,
         UNDERLINE_DOUBLE_ACCOUNTING,
         UNDERLINE_SINGLE,
         UNDERLINE_SINGLE_ACCOUNTING
-    )
+    ),
+                nested=True
                 )
     underline = Alias("u")
     vertAlign = NoneSet(values=('superscript', 'subscript', 'baseline'))
     color = ColorDescriptor()
     scheme = NoneSet(values=("major", "minor"))
+
+    tagname = "font"
 
     __fields__ = ('name',
                   'sz',
