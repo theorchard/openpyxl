@@ -443,11 +443,11 @@ def test_empty_workbook():
       <numFmts count="0"/>
       <fonts count="1">
         <font>
+          <family val="2"/>
+          <name val="Calibri"/>
+          <scheme val="minor"/>
           <sz val="11"/>
           <color theme="1"/>
-          <name val="Calibri"/>
-          <family val="2"/>
-          <scheme val="minor"/>
         </font>
       </fonts>
       <fills count="2">
