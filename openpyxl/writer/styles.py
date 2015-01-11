@@ -167,6 +167,7 @@ class StyleWriter(object):
                 al = self.alignments[st.alignment]
                 self._write_alignment(node, al)
 
+
             if st.protection != 0:
                 node.set('applyProtection', '1')
                 prot = self.protections[st.protection]
@@ -174,12 +175,8 @@ class StyleWriter(object):
 
 
     def _write_alignment(self, node, alignment):
-        values = dict(alignment)
-        if values.get('horizontal', 'general') == 'general':
-            del values['horizontal']
-        if values.get('vertical', 'bottom') == 'bottom':
-            del values['vertical']
-        SubElement(node, 'alignment', values)
+        el = alignment.serialise()
+        node.append(el)
 
 
     def _write_protection(self, node, protection):

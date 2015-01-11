@@ -3,20 +3,21 @@ from __future__ import absolute_import
 
 from openpyxl.compat import safe_string
 
-from openpyxl.descriptors import Set, Bool, MinMax, Min, Alias, NoneSet
+from openpyxl.descriptors import Bool, MinMax, Min, Alias, NoneSet
 
 from .hashable import HashableObject
 
 horizontal_alignments = (
     "general", "left", "center", "right", "fill", "justify", "centerContinuous",
-    "distributed", None
-)
+    "distributed", )
 vertical_aligments = (
-    "top", "center", "bottom", "justify", "distributed", None
+    "top", "center", "bottom", "justify", "distributed",
 )
 
 class Alignment(HashableObject):
     """Alignment options for use in styles."""
+
+    tagname = "alignment"
 
     __fields__ = ('horizontal',
                   'vertical',
@@ -42,7 +43,7 @@ class Alignment(HashableObject):
     justifyLastLine = Bool(allow_none=True)
     readingOrder = Min(min=0)
 
-    def __init__(self, horizontal='general', vertical='bottom',
+    def __init__(self, horizontal=None, vertical=None,
                  textRotation=0, wrapText=None, shrinkToFit=None, indent=0, relativeIndent=0,
                  justifyLastLine=None, readingOrder=0, text_rotation=None,
                  wrap_text=None, shrink_to_fit=None) :
