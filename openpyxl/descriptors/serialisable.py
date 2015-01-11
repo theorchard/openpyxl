@@ -42,5 +42,3 @@ class Serialisable(_Serialiasable):
             value = getattr(self, attr)
             if value is not None:
                 yield attr, safe_string(value)
-
-
