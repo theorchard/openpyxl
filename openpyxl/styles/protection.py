@@ -10,6 +10,8 @@ from .hashable import HashableObject
 class Protection(HashableObject):
     """Protection options for use in styles."""
 
+    tagname = "protection"
+
     __fields__ = ('locked',
                   'hidden')
     locked = Bool()
@@ -18,12 +20,3 @@ class Protection(HashableObject):
     def __init__(self, locked=True, hidden=False):
         self.locked = locked
         self.hidden = hidden
-
-    def __iter__(self):
-        """
-        Dictionary interface for easier serialising.
-        All values converted to strings
-        """
-        for key in self.__fields__:
-            value = getattr(self, key)
-            yield key, safe_string(value)

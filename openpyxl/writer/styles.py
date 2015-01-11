@@ -168,15 +168,11 @@ class StyleWriter(object):
                 el = al.serialise()
                 node.append(el)
 
-
             if st.protection != 0:
                 node.set('applyProtection', '1')
                 prot = self.protections[st.protection]
-                self._write_protection(node, prot)
-
-
-    def _write_protection(self, node, protection):
-        SubElement(node, 'protection', dict(protection))
+                el = prot.serialise()
+                node.append(el)
 
 
     def _write_style_names(self):
