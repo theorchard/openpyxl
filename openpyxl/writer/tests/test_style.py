@@ -298,34 +298,6 @@ class TestStyleWriter(object):
         assert root.find('color').attrib == expected
 
 
-    def test_alignment(self):
-        w = StyleWriter(self.workbook)
-        al = Alignment(horizontal='center', vertical='center')
-        w._write_alignment(w._root, al)
-        xml = tostring(w._root)
-        expected = """
-        <styleSheet xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main">
-        <alignment horizontal="center" vertical="center"/>
-        </styleSheet>
-        """
-        diff = compare_xml(xml, expected)
-        assert diff is None, diff
-
-
-    def test_alignment_default(self):
-        w = StyleWriter(self.workbook)
-        al = Alignment()
-        w._write_alignment(w._root, al)
-        xml = tostring(w._root)
-        expected = """
-        <styleSheet xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main">
-        <alignment/>
-        </styleSheet>
-        """
-        diff = compare_xml(xml, expected)
-        assert diff is None, diff
-
-
     def test_write_dxf(self):
         redFill = PatternFill(start_color=Color('FFEE1111'),
                        end_color=Color('FFEE1111'),

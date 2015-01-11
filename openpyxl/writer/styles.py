@@ -165,18 +165,14 @@ class StyleWriter(object):
             if st.alignment != 0:
                 node.set("applyProtection", '1')
                 al = self.alignments[st.alignment]
-                self._write_alignment(node, al)
+                el = al.serialise()
+                node.append(el)
 
 
             if st.protection != 0:
                 node.set('applyProtection', '1')
                 prot = self.protections[st.protection]
                 self._write_protection(node, prot)
-
-
-    def _write_alignment(self, node, alignment):
-        el = alignment.serialise()
-        node.append(el)
 
 
     def _write_protection(self, node, protection):
