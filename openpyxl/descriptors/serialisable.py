@@ -22,7 +22,7 @@ class Serialisable(_Serialiasable):
 
     @property
     def tagname(self):
-        raise(NotImplemented)
+        raise(NotImplementedError)
 
     def serialise(self):
         attrs = dict(self)
