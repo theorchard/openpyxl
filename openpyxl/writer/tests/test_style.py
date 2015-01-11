@@ -122,13 +122,13 @@ def test_write_font():
     <styleSheet xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main">
     <fonts count="1">
         <font>
-          <vertAlign val="superscript"></vertAlign>
-          <sz val="11"></sz>
-          <color rgb="00000000"></color>
-          <name val="Calibri"></name>
-          <family val="2"></family>
-          <u></u>
           <charset val="204"></charset>
+          <family val="2"></family>
+          <name val="Calibri"></name>
+          <sz val="11"></sz>
+          <u val="single"/>
+          <vertAlign val="superscript"></vertAlign>
+          <color rgb="00000000"></color>
          </font>
     </fonts>
     </styleSheet>
