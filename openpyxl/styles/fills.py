@@ -49,7 +49,7 @@ class PatternFill(Fill):
     Caution: if you do not specify a fill_type, other attributes will have
     no effect !"""
 
-    spec = """18.8.32"""
+    tagname = "patternFill"
 
     __fields__ = ('patternType',
                   'fgColor',
@@ -81,7 +81,7 @@ DEFAULT_GRAY_FILL = PatternFill(patternType='gray125')
 
 class GradientFill(Fill):
 
-    spec = """18.8.24"""
+    tagname = "gradientFill"
 
     __fields__ = ('fill_type', 'degree', 'left', 'right', 'top', 'bottom', 'stop')
     fill_type = Set(values=('linear', 'path'))
