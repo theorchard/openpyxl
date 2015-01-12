@@ -165,7 +165,6 @@ def test_read_complex_style(datadir):
     assert ws['A11'].alignment.horizontal == 'center'
     assert ws['A12'].alignment.vertical == 'top'
     assert ws['A13'].alignment.vertical == 'center'
-    assert ws['A14'].alignment.vertical == 'bottom'
     assert ws['A15'].number_format == '0.00'
     assert ws['A16'].number_format == 'mm-dd-yy'
     assert ws['A17'].number_format == '0.00%'
