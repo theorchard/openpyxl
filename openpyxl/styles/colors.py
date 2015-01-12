@@ -76,7 +76,7 @@ class Color(HashableObject):
             indexed = index
         if indexed is not None:
             self.type = 'indexed'
-            self.indexed = int(indexed)
+            self.indexed = indexed
         elif theme is not None:
             self.type = 'theme'
             self.theme = theme
