@@ -2,7 +2,7 @@ from __future__ import absolute_import
 # Copyright (c) 2010-2015 openpyxl
 
 from openpyxl.compat import safe_string
-from openpyxl.descriptors import Set, Typed, Bool, Alias
+from openpyxl.descriptors import NoneSet, Typed, Bool, Alias
 
 from .colors import ColorDescriptor
 from .hashable import HashableObject
@@ -36,10 +36,10 @@ class Side(HashableObject):
                   'color')
 
     color = ColorDescriptor(allow_none=True)
-    style = Set(values=(BORDER_NONE, BORDER_DASHDOT, BORDER_DASHDOTDOT,
-                        BORDER_DASHED, BORDER_DOTTED, BORDER_DOUBLE, BORDER_HAIR, BORDER_MEDIUM,
-                        BORDER_MEDIUMDASHDOT, BORDER_MEDIUMDASHDOTDOT, BORDER_MEDIUMDASHED,
-                        BORDER_SLANTDASHDOT, BORDER_THICK, BORDER_THIN))
+    style = NoneSet(values=('dashDot','dashDotDot', 'dashed','dotted',
+                            'double','hair', 'medium', 'mediumDashDot', 'mediumDashDotDot',
+                            'mediumDashed', 'slantDashDot', 'thick', 'thin')
+                    )
     border_style = Alias('style')
 
     def __init__(self, style=None, color=None, border_style=None):
