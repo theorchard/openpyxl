@@ -83,7 +83,7 @@ class SharedStylesParser(object):
                 dxf_item = {}
                 font_node = dxf.find('{%s}font' % SHEET_MAIN_NS)
                 if font_node is not None:
-                    dxf_item['font'] = self.parse_font(font_node)
+                    dxf_item['font'] = Font.create(font_node)
                 fill_node = dxf.find('{%s}fill' % SHEET_MAIN_NS)
                 if fill_node is not None:
                     dxf_item['fill'] = self.parse_fill(fill_node)
