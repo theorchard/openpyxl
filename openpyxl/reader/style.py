@@ -98,22 +98,7 @@ class SharedStylesParser(object):
         fonts = self.root.find('{%s}fonts' % SHEET_MAIN_NS)
         if fonts is not None:
             for node in safe_iterator(fonts, '{%s}font' % SHEET_MAIN_NS):
-                yield self.parse_font(node)
-
-    def parse_font(self, font_node):
-        """Read individual font"""
-        font = {}
-        for child in safe_iterator(font_node):
-            if child is not font_node:
-                tag = localname(child)
-                font[tag] = child.get("val", True)
-        underline = font_node.find('{%s}u' % SHEET_MAIN_NS)
-        if underline is not None:
-            font['u'] = underline.get('val', 'single')
-        color = font_node.find('{%s}color' % SHEET_MAIN_NS)
-        if color is not None:
-            font['color'] = Color(**dict(color.attrib))
-        return Font(**font)
+                yield Font.create(node)
 
     def parse_fills(self):
         """Read in the list of fills"""

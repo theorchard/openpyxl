@@ -33,13 +33,8 @@ class Font(HashableObject):
     shadow = Bool(nested=True)
     condense = Bool(nested=True)
     extend = Bool(nested=True)
-    u = NoneSet(values=(
-        UNDERLINE_DOUBLE,
-        UNDERLINE_DOUBLE_ACCOUNTING,
-        UNDERLINE_SINGLE,
-        UNDERLINE_SINGLE_ACCOUNTING
-    ),
-                nested=True
+    u = NoneSet(values=('single', 'double', 'singleAccounting',
+                        'doubleAccounting'), nested=True
                 )
     underline = Alias("u")
     vertAlign = NoneSet(values=('superscript', 'subscript', 'baseline'), nested=True)
@@ -63,6 +58,12 @@ class Font(HashableObject):
                   'extend',
                   'family',
                   )
+
+    @classmethod
+    def _create_nested(cls, el, tag):
+        if tag == "u":
+            return el.get("val", "single")
+        return super(Font, cls)._create_nested(el, tag)
 
     def __init__(self, name='Calibri', sz=11, b=False, i=False, charset=None,
                  u=None, strike=False, color=BLACK, scheme=None, family=2, size=None,
