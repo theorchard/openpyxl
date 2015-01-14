@@ -7,6 +7,8 @@ from openpyxl.compat import safe_string
 from .colors import ColorDescriptor, Color
 from .hashable import HashableObject
 
+from openpyxl.xml.functions import SubElement
+
 
 FILL_NONE = 'none'
 FILL_SOLID = 'solid'
@@ -116,3 +118,13 @@ class GradientFill(Fill):
             value = getattr(self, key)
             if bool(value):
                 yield key, safe_string(value)
+
+    def serialise(self):
+        """
+        Colors need special handling
+        """
+        el = super(GradientFill, self).serialise()
+        for idx, color in enumerate(self.stop):
+            stop = SubElement(el, "stop", position=str(idx))
+            stop.append(color.serialise())
+        return el
