@@ -32,7 +32,7 @@ Sheets are given a name automatically when they are created.
 They are numbered in sequence (Sheet, Sheet1, Sheet2, ...).
 You can change this name at any time with the `title` property::
 
-    ws.title = "New Title"  
+    ws.title = "New Title"
 
 The background color of the tab holding this title is white by default.
 You can change this providing an RRGGBB color code to the sheet_properties.tabColor property::
@@ -50,7 +50,7 @@ using the :func:`openpyxl.workbook.Workbook.get_sheet_by_name` method ::
 You can review the names of all worksheets of the workbook with the
 :func:`openpyxl.workbook.Workbook.get_sheet_names` method ::
 
-    >>> print()wb.get_sheet_names())
+    >>> print(wb.get_sheet_names())
     ['Sheet2', 'New Title', 'Sheet1']
 
 You can loop through worksheets ::
@@ -243,7 +243,10 @@ the document template (or document) as document.
     for saving documents in the document templates and vice versa,
     otherwise the result table engine can not open the document.
 
-    Fail:
+.. note::
+
+    The following will fail:
+
     >>> wb = load_workbook('document.xlsx')# doctest: +SKIP
     >>> # Need to save with the extension *.xlsx
     >>> wb.save('new_document.xlsm')# doctest: +SKIP
