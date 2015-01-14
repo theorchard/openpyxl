@@ -100,12 +100,6 @@ class StyleWriter(object):
         if fill.end_color != DEFAULTS.fill.end_color:
             self._write_color(node, fill.end_color, 'bgColor')
 
-    def _write_gradient_fill(self, node, fill):
-        node = SubElement(node, 'gradientFill', dict(fill))
-        for idx, color in enumerate(fill.stop):
-            stop = SubElement(node, "stop", {"position":safe_string(idx)})
-            self._write_color(stop, color)
-
     def _write_fills(self):
         fills_node = SubElement(self._root, 'fills', count="%d" % len(self.fills))
         for fill in self.fills:
@@ -113,7 +107,7 @@ class StyleWriter(object):
             if isinstance(fill, PatternFill):
                 self._write_pattern_fill(fill_node, fill)
             else:
-                self._write_gradient_fill(fill_node, fill)
+                fill_node.append(fill.serialise())
 
     def _write_borders(self):
         """Write the child elements for an individual border section"""

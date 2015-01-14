@@ -49,27 +49,6 @@ class DummyWorkbook:
     _borders = set()
 
 
-def test_write_gradient_fill():
-    fill = GradientFill(degree=90, stop=[Color(theme=0), Color(theme=4)])
-    writer = StyleWriter(DummyWorkbook())
-    writer._write_gradient_fill(writer._root, fill)
-    xml = tostring(writer._root)
-    expected = """
-    <styleSheet xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main">
-      <gradientFill degree="90" type="linear">
-        <stop position="0">
-          <color theme="0"/>
-        </stop>
-        <stop position="1">
-          <color theme="4"/>
-        </stop>
-      </gradientFill>
-    </styleSheet>
-    """
-    diff = compare_xml(xml, expected)
-    assert diff is None, diff
-
-
 def test_write_pattern_fill():
     fill = PatternFill(fill_type='solid',
                        start_color=Color(colors.DARKYELLOW))
