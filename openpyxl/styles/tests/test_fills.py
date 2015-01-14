@@ -118,3 +118,17 @@ class TestPatternFill:
         """
         diff = compare_xml(xml, expected)
         assert diff is None, None
+
+
+    def test_create(self, PatternFill):
+        src = """
+        <patternFill xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main" patternType="solid">
+            <bgColor rgb="00FFFF00"/>
+            <fgColor rgb="00FF0000"/>
+        </patternFill>
+        """
+        xml = fromstring(src)
+        pf = PatternFill.create(xml)
+        assert pf.patternType == "solid"
+        assert pf.fgColor == Color("00FF0000")
+        assert pf.bgColor == Color("00FFFF00")
