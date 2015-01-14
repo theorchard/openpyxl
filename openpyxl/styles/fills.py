@@ -7,7 +7,8 @@ from openpyxl.compat import safe_string
 from .colors import ColorDescriptor, Color
 from .hashable import HashableObject
 
-from openpyxl.xml.functions import Element
+from openpyxl.xml.functions import Element, safe_iterator
+from openpyxl.xml.constants import SHEET_MAIN_NS
 
 
 FILL_NONE = 'none'
@@ -117,11 +118,11 @@ class GradientFill(Fill):
 
 
     @classmethod
-    def _create_nested(cls, el, tag):
+    def create(cls, node):
         colors = []
-        for color in el:
+        for color in safe_iterator(node, "{%s}color" % SHEET_MAIN_NS):
             colors.append(Color.create(color))
-        return colors
+        return cls(stop=colors, **node.attrib)
 
 
     def _serialise_nested(self, sequence):

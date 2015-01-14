@@ -84,3 +84,4 @@ class TestGradientFill:
         """
         xml = fromstring(src)
         fill = GradientFill.create(xml)
+        assert fill.stop == (Color(theme=0), Color(theme=4))
