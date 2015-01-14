@@ -31,15 +31,17 @@ class Serialisable(_Serialiasable):
         Create object from XML
         """
         attrib = dict(node.attrib)
-        for el in safe_iterator(node):
-            if el is not node:
-                tag = localname(el)
-                desc = getattr(cls, tag)
-                if tag in cls.__nested__:
-                    attrib[tag] = cls._create_nested(el, tag)
-                else:
-                    attrib[tag] = desc.expected_type.create(el)
+        for el in node:
+            tag = localname(el)
+            desc = getattr(cls, tag, None)
+            if desc is None:
+                continue
+            if tag in cls.__nested__:
+                attrib[tag] = cls._create_nested(el, tag)
+            else:
+                attrib[tag] = desc.expected_type.create(el)
         return cls(**attrib)
+
 
     @classmethod
     def _create_nested(cls, el, tag):
@@ -49,6 +51,7 @@ class Serialisable(_Serialiasable):
         """
         return el.get("val", True)
 
+
     def serialise(self, tagname=None):
         if tagname is None:
             tagname = self.tagname
@@ -57,14 +60,16 @@ class Serialisable(_Serialiasable):
         for n in self.__nested__:
             value = getattr(self, n)
             if isinstance(value, tuple):
-                el.extend(self._serialise_nested(value))
+                if hasattr(el, 'extend'):
+                    el.extend(self._serialise_nested(value))
+                else: # py26 nolxml
+                    for _ in self._serialise_nested(value):
+                        el.append(_)
             elif value:
                 SubElement(el, n, val=safe_string(value))
         for c in self.__elements__:
             obj = getattr(self, c)
-            if isinstance(obj, tuple):
-                el.extend(self._serialise_sequence(obj))
-            elif obj is not None:
+            if obj is not None:
                 el.append(obj.serialise())
         return el
 
