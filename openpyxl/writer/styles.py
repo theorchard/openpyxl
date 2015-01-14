@@ -90,8 +90,8 @@ class StyleWriter(object):
             fonts_node.append(font.serialise())
 
     def _write_pattern_fill(self, node, fill):
-        pattern = fill.patternType or "none"
-        node = SubElement(node, 'patternFill', patternType=pattern)
+        node = SubElement(node, 'patternFill',
+                          patternType=safe_string(fill.patternType))
 
         if fill.start_color != DEFAULTS.fill.start_color:
             self._write_color(node, fill.start_color, 'fgColor')
