@@ -56,7 +56,9 @@ class Serialisable(_Serialiasable):
         el = Element(tagname, attrs)
         for n in self.__nested__:
             value = getattr(self, n)
-            if value:
+            if isinstance(value, tuple):
+                el.extend(self._serialise_nested(value))
+            elif value:
                 SubElement(el, n, val=safe_string(value))
         for c in self.__elements__:
             obj = getattr(self, c)
@@ -67,7 +69,7 @@ class Serialisable(_Serialiasable):
         return el
 
 
-    def _serialise_sequence(self, sequence):
+    def _serialise_nested(self, sequence):
         """
         Allow special handling of sequences which themselves are not directly serialisable
         """

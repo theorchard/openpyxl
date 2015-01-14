@@ -93,7 +93,7 @@ class GradientFill(Fill):
     right = Float()
     top = Float()
     bottom = Float()
-    stop = Sequence(expected_type=Color)
+    stop = Sequence(expected_type=Color, nested=True)
 
 
     def __init__(self, type="linear", degree=0, left=0, right=0, top=0,
@@ -116,7 +116,7 @@ class GradientFill(Fill):
                 yield attr, safe_string(value)
 
 
-    def _serialise_sequence(self, sequence):
+    def _serialise_nested(self, sequence):
         """
         Colors need special handling
         """
