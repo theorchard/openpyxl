@@ -7,7 +7,7 @@ from openpyxl.compat import safe_string
 from .colors import ColorDescriptor, Color
 from .hashable import HashableObject
 
-from openpyxl.xml.functions import SubElement
+from openpyxl.xml.functions import Element
 
 
 FILL_NONE = 'none'
@@ -85,9 +85,9 @@ class GradientFill(Fill):
 
     tagname = "gradientFill"
 
-    __fields__ = ('fill_type', 'degree', 'left', 'right', 'top', 'bottom', 'stop')
-    fill_type = Set(values=('linear', 'path'))
-    type = Alias("fill_type")
+    __fields__ = ('type', 'degree', 'left', 'right', 'top', 'bottom', 'stop')
+    type = Set(values=('linear', 'path'))
+    fill_type = Alias("type")
     degree = Float()
     left = Float()
     right = Float()
@@ -96,35 +96,31 @@ class GradientFill(Fill):
     stop = Sequence(expected_type=Color)
 
 
-    def __init__(self, fill_type="linear", degree=0, left=0, right=0, top=0,
-                 bottom=0, stop=(), type=None):
+    def __init__(self, type="linear", degree=0, left=0, right=0, top=0,
+                 bottom=0, stop=(), fill_type=None):
         self.degree = degree
         self.left = left
         self.right = right
         self.top = top
         self.bottom = bottom
         self.stop = stop
-        # cannot use type attribute but allow it is an argument (ie. when parsing)
-        if type is not None:
-            fill_type = type
-        self.fill_type = fill_type
+        if fill_type is not None:
+            type = fill_type
+        self.type = type
+
 
     def __iter__(self):
-        """
-        Dictionary interface for easier serialising.
-        All values converted to strings
-        """
-        for key in ('type', 'degree', 'left', 'right', 'top', 'bottom'):
-            value = getattr(self, key)
-            if bool(value):
-                yield key, safe_string(value)
+        for attr in self.__attrs__:
+            value = getattr(self, attr)
+            if value:
+                yield attr, safe_string(value)
 
-    def serialise(self):
+
+    def _serialise_sequence(self, sequence):
         """
         Colors need special handling
         """
-        el = super(GradientFill, self).serialise()
-        for idx, color in enumerate(self.stop):
-            stop = SubElement(el, "stop", position=str(idx))
+        for idx, color in enumerate(sequence):
+            stop = Element("stop", position=str(idx))
             stop.append(color.serialise())
-        return el
+            yield stop

@@ -18,7 +18,7 @@ class TestGradientFill:
 
     def test_empty_ctor(self, GradientFill):
         gf = GradientFill()
-        assert gf.fill_type == 'linear'
+        assert gf.type == 'linear'
         assert gf.degree == 0
         assert gf.left == 0
         assert gf.right == 0
