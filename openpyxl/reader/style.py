@@ -114,7 +114,7 @@ class SharedStylesParser(object):
         if pattern is not None:
             return self.parse_pattern_fill(pattern)
         if gradient is not None:
-            return self.parse_gradient_fill(gradient)
+            return GradientFill.create(gradient)
 
     def parse_pattern_fill(self, node):
         fill = dict(node.attrib)
@@ -124,11 +124,6 @@ class SharedStylesParser(object):
                 fill[tag] = Color(**dict(child.attrib))
         return PatternFill(**fill)
 
-    def parse_gradient_fill(self, node):
-        fill = dict(node.attrib)
-        color_nodes = safe_iterator(node, "{%s}color" % SHEET_MAIN_NS)
-        fill['stop'] = tuple(Color(**dict(node.attrib)) for node in color_nodes)
-        return GradientFill(**fill)
 
     def parse_borders(self):
         """Read in the boarders"""

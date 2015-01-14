@@ -69,17 +69,6 @@ def test_read_pattern_fill(StyleReader, datadir):
             assert val == exp
 
 
-def test_read_gradient_fill(StyleReader, datadir):
-    datadir.chdir()
-    expected = [
-        GradientFill(degree=90, stop=(Color(theme=0), Color(theme=4)))
-    ]
-    with open("bug284-styles.xml") as src:
-        reader = StyleReader(src.read())
-        assert list(reader.parse_fills()) == expected
-
-
-
 def test_unprotected_cell(StyleReader, datadir):
     datadir.chdir()
     with open ("worksheet_unprotected_style.xml") as src:
