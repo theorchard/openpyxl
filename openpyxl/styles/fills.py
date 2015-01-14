@@ -116,6 +116,14 @@ class GradientFill(Fill):
                 yield attr, safe_string(value)
 
 
+    @classmethod
+    def _create_nested(cls, el, tag):
+        colors = []
+        for color in el:
+            colors.append(Color.create(color))
+        return colors
+
+
     def _serialise_nested(self, sequence):
         """
         Colors need special handling

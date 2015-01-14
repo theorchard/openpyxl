@@ -4,7 +4,7 @@ from __future__ import absolute_import
 import pytest
 
 from openpyxl.styles.colors import BLACK, WHITE, Color
-from openpyxl.xml.functions import tostring
+from openpyxl.xml.functions import tostring, fromstring
 
 from openpyxl.tests.helper import compare_xml
 
@@ -69,3 +69,18 @@ class TestGradientFill:
         """
         diff = compare_xml(xml, expected)
         assert diff is None, diff
+
+
+    def test_create(self, GradientFill):
+        src = """
+        <gradientFill xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main" degree="90">
+        <stop position="0">
+          <color theme="0"/>
+        </stop>
+        <stop position="1">
+          <color theme="4"/>
+        </stop>
+      </gradientFill>
+        """
+        xml = fromstring(src)
+        fill = GradientFill.create(xml)
