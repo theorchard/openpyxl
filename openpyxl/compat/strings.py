@@ -29,6 +29,8 @@ def safe_string(value):
     """Safely and consistently format numeric values"""
     if isinstance(value, NUMERIC_TYPES):
         value = "%.16g" % value
+    elif value is None:
+        value = "none"
     elif not isinstance(value, basestring):
         value = str(value)
     return value

@@ -8,7 +8,7 @@ import pytest
                           ('s', 's'),
                           (2.0/3, '0.6666666666666666'),
                           (1, '1'),
-                          (None, 'None')
+                          (None, 'none')
                          ]
                          )
 def test_safe_string(value, result):
