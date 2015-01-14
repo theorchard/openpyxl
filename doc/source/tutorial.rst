@@ -45,7 +45,7 @@ using the :func:`openpyxl.workbook.Workbook.get_sheet_by_name` method ::
 You can review the names of all worksheets of the workbook with the
 :func:`openpyxl.workbook.Workbook.get_sheet_names` method ::
 
-    >>> print()wb.get_sheet_names())
+    >>> print(wb.get_sheet_names())
     ['Sheet2', 'New Title', 'Sheet1']
 
 You can loop through worksheets ::
