@@ -264,7 +264,7 @@ the document template (or document) as document.
     >>> wb = load_workbook('document.xltm', keep_vba=True)# doctest: +SKIP
     >>> # If us need template document, then we need specify extension as *.xltm.
     >>> # If us need document, then we need specify attribute as_template=False.
-    >>> wb.save('new_document.xlsm', as_template=True)
+    >>> wb.save('new_document.xlsm', as_template=True)# doctest: +SKIP
     >>> # MS Excel can't open the document
 
 
