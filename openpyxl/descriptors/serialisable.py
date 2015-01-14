@@ -49,9 +49,11 @@ class Serialisable(_Serialiasable):
         """
         return el.get("val", True)
 
-    def serialise(self):
+    def serialise(self, tagname=None):
+        if tagname is None:
+            tagname = self.tagname
         attrs = dict(self)
-        el = Element(self.tagname, attrs)
+        el = Element(tagname, attrs)
         for n in self.__nested__:
             value = getattr(self, n)
             if value:
