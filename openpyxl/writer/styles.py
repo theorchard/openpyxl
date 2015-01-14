@@ -89,23 +89,12 @@ class StyleWriter(object):
         for font in self.fonts:
             fonts_node.append(font.serialise())
 
-    def _write_pattern_fill(self, node, fill):
-        node = SubElement(node, 'patternFill',
-                          patternType=safe_string(fill.patternType))
-
-        if fill.start_color != DEFAULTS.fill.start_color:
-            self._write_color(node, fill.start_color, 'fgColor')
-        if fill.end_color != DEFAULTS.fill.end_color:
-            self._write_color(node, fill.end_color, 'bgColor')
 
     def _write_fills(self):
         fills_node = SubElement(self._root, 'fills', count="%d" % len(self.fills))
         for fill in self.fills:
             fill_node = SubElement(fills_node, 'fill')
-            if isinstance(fill, PatternFill):
-                self._write_pattern_fill(fill_node, fill)
-            else:
-                fill_node.append(fill.serialise())
+            fill_node.append(fill.serialise())
 
     def _write_borders(self):
         """Write the child elements for an individual border section"""

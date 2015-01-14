@@ -85,3 +85,36 @@ class TestGradientFill:
         xml = fromstring(src)
         fill = GradientFill.create(xml)
         assert fill.stop == (Color(theme=0), Color(theme=4))
+
+
+@pytest.fixture
+def PatternFill():
+    from ..fills import PatternFill
+    return PatternFill
+
+
+class TestPatternFill:
+
+    def test_ctor(self, PatternFill):
+        pf = PatternFill()
+        assert pf.patternType is None
+        assert pf.fgColor == Color()
+        assert pf.bgColor == Color()
+
+
+    def test_dict_interface(self, PatternFill):
+        pf = PatternFill(fill_type='solid')
+        assert dict(pf) == {'patternType':'solid'}
+
+
+    def test_serialise(self, PatternFill):
+        pf = PatternFill('solid', 'FF0000', 'FFFF00')
+        xml = tostring(pf.serialise())
+        expected = """
+        <patternFill patternType="solid">
+            <bgColor rgb="00FFFF00"/>
+            <fgColor rgb="00FF0000"/>
+        </patternFill>
+        """
+        diff = compare_xml(xml, expected)
+        assert diff is None, None

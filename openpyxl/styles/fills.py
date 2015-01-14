@@ -78,6 +78,15 @@ class PatternFill(Fill):
         self.bgColor = bgColor
 
 
+    def serialise(self, tagname=None):
+        el = Element(self.tagname, patternType=safe_string(self.patternType))
+        for c in self.__elements__:
+            value = getattr(self, c)
+            if value != Color():
+                el.append(value.serialise(c))
+        return el
+
+
 DEFAULT_EMPTY_FILL = PatternFill()
 DEFAULT_GRAY_FILL = PatternFill(patternType='gray125')
 
