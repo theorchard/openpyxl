@@ -23,7 +23,7 @@ class MetaSerialisable(type):
             if isinstance(v, Descriptor):
                 if getattr(v, 'nested', False):
                     nested.append(k)
-                elif isinstance(v, Typed):
+                elif isinstance(v, (Typed, Sequence)):
                     if hasattr(v.expected_type, 'serialise'):
                         elements.append(k)
                     else:

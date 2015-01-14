@@ -60,9 +60,19 @@ class Serialisable(_Serialiasable):
                 SubElement(el, n, val=safe_string(value))
         for c in self.__elements__:
             obj = getattr(self, c)
-            if obj is not None:
+            if isinstance(obj, tuple):
+                el.extend(self._serialise_sequence(obj))
+            elif obj is not None:
                 el.append(obj.serialise())
         return el
+
+
+    def _serialise_sequence(self, sequence):
+        """
+        Allow special handling of sequences which themselves are not directly serialisable
+        """
+        for obj in sequence:
+            yield obj.serialise()
 
 
     def __iter__(self):
