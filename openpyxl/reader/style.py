@@ -84,9 +84,13 @@ class SharedStylesParser(object):
                 font_node = dxf.find('{%s}font' % SHEET_MAIN_NS)
                 if font_node is not None:
                     dxf_item['font'] = Font.create(font_node)
-                fill_node = dxf.find('{%s}fill' % SHEET_MAIN_NS)
-                if fill_node is not None:
-                    dxf_item['fill'] = self.parse_fill(fill_node)
+                pattern = dxf.find('{%s}fill/{%s}patternFill' % (SHEET_MAIN_NS, SHEET_MAIN_NS))
+                if pattern is not None:
+                    dxf_item['fill'] = PatternFill.create(pattern)
+                gradient = dxf.find('{%s}fill/{%s}gradientFill' % (SHEET_MAIN_NS, SHEET_MAIN_NS))
+                if gradient is not None:
+                    dxf_item['fill'] = GradientFill.create(gradient)
+
                 border_node = dxf.find('{%s}border' % SHEET_MAIN_NS)
                 if border_node is not None:
                     dxf_item['border'] = self.parse_border(border_node)
@@ -102,28 +106,16 @@ class SharedStylesParser(object):
 
     def parse_fills(self):
         """Read in the list of fills"""
+
         fills = self.root.find('{%s}fills' % SHEET_MAIN_NS)
+        pattern = '{%s}patternFill' % SHEET_MAIN_NS
+        gradient = '{%s}gradientFill' % SHEET_MAIN_NS
         if fills is not None:
-            for fill_node in safe_iterator(fills, '{%s}fill' % SHEET_MAIN_NS):
-                yield self.parse_fill(fill_node)
-
-    def parse_fill(self, fill_node):
-        """Read individual fill"""
-        pattern = fill_node.find('{%s}patternFill' % SHEET_MAIN_NS)
-        gradient = fill_node.find('{%s}gradientFill' % SHEET_MAIN_NS)
-        if pattern is not None:
-            return self.parse_pattern_fill(pattern)
-        if gradient is not None:
-            return GradientFill.create(gradient)
-
-    def parse_pattern_fill(self, node):
-        fill = dict(node.attrib)
-        for child in safe_iterator(node):
-            if child is not node:
-                tag = localname(child)
-                fill[tag] = Color(**dict(child.attrib))
-        return PatternFill(**fill)
-
+            for node in safe_iterator(fills):
+                if node.tag == pattern:
+                    yield PatternFill.create(node)
+                elif node.tag == gradient:
+                    yield GradientFill.create(gradient)
 
     def parse_borders(self):
         """Read in the boarders"""
