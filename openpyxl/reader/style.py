@@ -99,10 +99,9 @@ class SharedStylesParser(object):
 
     def parse_fonts(self):
         """Read in the fonts"""
-        fonts = self.root.find('{%s}fonts' % SHEET_MAIN_NS)
-        if fonts is not None:
-            for node in safe_iterator(fonts, '{%s}font' % SHEET_MAIN_NS):
-                yield Font.create(node)
+        fonts = self.root.findall('{%s}fonts/{%s}font' % (SHEET_MAIN_NS, SHEET_MAIN_NS))
+        for node in fonts:
+            yield Font.create(node)
 
     def parse_fills(self):
         """Read in the list of fills"""
