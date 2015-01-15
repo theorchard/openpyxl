@@ -87,18 +87,6 @@ def test_read_xf_no_number_format(datadir, StyleReader):
     assert styles[2].number_format == 'mm-dd-yy'
 
 
-
-def test_read_simple_style_mappings(datadir, StyleReader):
-    datadir.chdir()
-    with open("simple-styles.xml") as content:
-        reader = StyleReader(content.read())
-    reader.parse()
-    style_properties = reader.shared_styles
-    assert len(style_properties) == 4
-    assert numbers.BUILTIN_FORMATS[9] == style_properties[1].number_format
-    assert 'yyyy-mm-dd' == style_properties[2].number_format
-
-
 def test_read_complex_style_mappings(datadir, StyleReader):
     datadir.chdir()
     with open("complex-styles.xml") as content:
@@ -133,6 +121,17 @@ def test_read_complex_borders(datadir, StyleReader):
         reader = StyleReader(content.read())
     borders = list(reader.parse_borders())
     assert len(borders) == 7
+
+
+def test_read_simple_style_mappings(datadir, StyleReader):
+    datadir.chdir()
+    with open("simple-styles.xml") as content:
+        reader = StyleReader(content.read())
+    reader.parse()
+    style_properties = reader.shared_styles
+    assert len(style_properties) == 4
+    assert numbers.BUILTIN_FORMATS[9] == style_properties[1].number_format
+    assert 'yyyy-mm-dd' == style_properties[2].number_format
 
 
 def test_read_complex_style(datadir):
