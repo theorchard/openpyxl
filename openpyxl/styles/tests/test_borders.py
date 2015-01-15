@@ -58,10 +58,6 @@ class TestBorder:
         xml = tostring(bd.serialise())
         expected = """
         <border>
-          <bottom style="medium">
-             <color rgb="000000FF"></color>
-           </bottom>
-           <diagonal />
           <left style="medium">
             <color rgb="000000FF"></color>
           </left>
@@ -71,6 +67,10 @@ class TestBorder:
           <top style="medium">
             <color rgb="000000FF"></color>
            </top>
+          <bottom style="medium">
+             <color rgb="000000FF"></color>
+           </bottom>
+           <diagonal />
         </border>
         """
         diff = compare_xml(xml, expected)

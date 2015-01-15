@@ -60,11 +60,15 @@ class Border(HashableObject):
                   'diagonal_direction',
                   'vertical',
                   'horizontal')
+    __elements__ = ('start', 'end', 'left', 'right', 'top', 'bottom',
+                    'diagonal', 'vertical', 'horizontal')
 
     # child elements
-    left = Typed(expected_type=Side)
-    right = Typed(expected_type=Side)
-    top = Typed(expected_type=Side)
+    start = Typed(expected_type=Side, allow_none=True)
+    end = Typed(expected_type=Side, allow_none=True)
+    left = Typed(expected_type=Side, allow_none=True)
+    right = Typed(expected_type=Side, allow_none=True)
+    top = Typed(expected_type=Side, allow_none=True)
     bottom = Typed(expected_type=Side)
     diagonal = Typed(expected_type=Side, allow_none=True)
     vertical = Typed(expected_type=Side, allow_none=True)
@@ -77,7 +81,7 @@ class Border(HashableObject):
     def __init__(self, left=Side(), right=Side(), top=Side(),
                  bottom=Side(), diagonal=Side(), diagonal_direction=None,
                  vertical=None, horizontal=None, diagonalUp=False, diagonalDown=False,
-                 outline=True):
+                 outline=True, start=None, end=None):
         self.left = left
         self.right = right
         self.top = top
@@ -89,6 +93,8 @@ class Border(HashableObject):
         self.diagonalUp = diagonalUp
         self.diagonalDown = diagonalDown
         self.outline = outline
+        self.start = start
+        self.end = end
 
     def __iter__(self):
         for attr in self.__attrs__:

@@ -344,11 +344,11 @@ def test_empty_workbook():
       </fills>
       <borders count="1">
         <border>
-          <bottom/>
-          <diagonal/>
           <left/>
           <right/>
           <top/>
+          <bottom/>
+          <diagonal/>
         </border>
       </borders>
       <cellStyleXfs count="1">
