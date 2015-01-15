@@ -112,12 +112,12 @@ class TestPatternFill:
         xml = tostring(pf.serialise())
         expected = """
         <patternFill patternType="solid">
-            <bgColor rgb="00FFFF00"/>
             <fgColor rgb="00FF0000"/>
+            <bgColor rgb="00FFFF00"/>
         </patternFill>
         """
         diff = compare_xml(xml, expected)
-        assert diff is None, None
+        assert diff is None, diff
 
     @pytest.mark.parametrize("src, args",
                              [

@@ -58,6 +58,8 @@ class PatternFill(Fill):
                   'fgColor',
                   'bgColor')
 
+    __elements__ = ('fgColor', 'bgColor')
+
     patternType = NoneSet(values=fills)
     fill_type = Alias("patternType")
     fgColor = ColorDescriptor()
