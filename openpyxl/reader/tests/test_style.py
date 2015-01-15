@@ -109,15 +109,11 @@ def test_read_complex_style_mappings(datadir, StyleReader):
     assert style_properties[-1].font.bold is False
 
 
-def test_read_complex_fonts(datadir):
+def test_read_complex_fonts(datadir, StyleReader):
     from openpyxl.styles import Font
-    from openpyxl.xml.functions import fromstring
-    from openpyxl.xml.constants import SHEET_MAIN_NS
     datadir.chdir()
     with open("complex-styles.xml") as content:
-        xml = fromstring(content.read())
-    fonts = xml.findall("{%s}fonts/{%s}font" % (SHEET_MAIN_NS, SHEET_MAIN_NS))
-    fonts = [Font.create(node) for node in fonts]
+        reader = StyleReader(content.read())
     assert len(fonts) == 8
     assert fonts[7] == Font(size=12, color=Color(theme=9), name="Calibri", scheme="minor")
 
