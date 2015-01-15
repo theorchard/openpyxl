@@ -103,19 +103,6 @@ class SharedStylesParser(object):
         for node in fonts:
             yield Font.create(node)
 
-    def parse_fills(self):
-        """Read in the list of fills"""
-
-        fills = self.root.find('{%s}fills' % SHEET_MAIN_NS)
-        pattern = '{%s}patternFill' % SHEET_MAIN_NS
-        gradient = '{%s}gradientFill' % SHEET_MAIN_NS
-        if fills is not None:
-            for node in safe_iterator(fills):
-                if node.tag == pattern:
-                    yield PatternFill.create(node)
-                elif node.tag == gradient:
-                    yield GradientFill.create(gradient)
-
 
     def parse_fills(self):
         """Read in the list of fills"""
@@ -132,10 +119,10 @@ class SharedStylesParser(object):
 
     def parse_borders(self):
         """Read in the boarders"""
-        borders = self.root.find('{%s}borders' % SHEET_MAIN_NS)
-        if borders is not None:
-            for border_node in safe_iterator(borders, '{%s}border' % SHEET_MAIN_NS):
-                yield Border.create(border_node)
+        borders = self.root.findall('{%s}borders/{%s}border' % (SHEET_MAIN_NS, SHEET_MAIN_NS))
+        for border_node in borders:
+            yield Border.create(border_node)
+
 
     def parse_named_styles(self):
         """

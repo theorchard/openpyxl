@@ -120,12 +120,19 @@ def test_read_complex_fonts(datadir, StyleReader):
 
 
 def test_read_complex_fills(datadir, StyleReader):
-    from openpyxl.styles import Font
     datadir.chdir()
     with open("complex-styles.xml") as content:
         reader = StyleReader(content.read())
     fills = list(reader.parse_fills())
     assert len(fills) == 6
+
+
+def test_read_complex_borders(datadir, StyleReader):
+    datadir.chdir()
+    with open("complex-styles.xml") as content:
+        reader = StyleReader(content.read())
+    borders = list(reader.parse_borders())
+    assert len(borders) == 7
 
 
 def test_read_complex_style(datadir):
