@@ -37,13 +37,13 @@ class TestFont:
         xml = tostring(ft.serialise())
         expected = """
         <font>
+          <name val="Calibri"></name>
           <charset val="204"></charset>
           <family val="2"></family>
-          <name val="Calibri"></name>
+          <color rgb="00000000"></color>
           <sz val="11"></sz>
           <u val="single"/>
-          <vertAlign val="superscript"></vertAlign>
-          <color rgb="00000000"></color>
+          <vertAlign val="superscript" />
          </font>
         """
         diff = compare_xml(xml, expected)

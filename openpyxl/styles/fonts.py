@@ -6,6 +6,9 @@ from openpyxl.descriptors import Float, Integer, Set, Bool, String, Alias, MinMa
 from .hashable import HashableObject
 from .colors import ColorDescriptor, BLACK
 
+from openpyxl.compat import safe_string
+from openpyxl.xml.functions import Element, SubElement
+
 
 class Font(HashableObject):
     """Font options used in styles."""
@@ -43,27 +46,31 @@ class Font(HashableObject):
 
     tagname = "font"
 
-    __fields__ = ('name',
-                  'sz',
-                  'b',
-                  'i',
-                  'u',
-                  'strike',
-                  'color',
-                  'vertAlign',
-                  'charset',
-                  'outline',
-                  'shadow',
-                  'condense',
-                  'extend',
-                  'family',
-                  )
+    __nested__ = ('name', 'charset', 'family', 'b', 'i', 'strike', 'outline',
+                  'shadow', 'condense', 'extend', 'sz', 'u', 'vertAlign',
+                  'scheme')
+
+    __fields__ = __nested__
 
     @classmethod
     def _create_nested(cls, el, tag):
         if tag == "u":
             return el.get("val", "single")
         return super(Font, cls)._create_nested(el, tag)
+
+    def serialise(self):
+        el = Element(self.tagname)
+        attrs = list(self.__nested__)
+        attrs.insert(10, 'color')
+        for attr in attrs:
+            value = getattr(self, attr)
+            if value:
+                if attr == 'color':
+                    color = value.serialise()
+                    el.append(color)
+                else:
+                    SubElement(el, attr, val=safe_string(value))
+        return el
 
     def __init__(self, name='Calibri', sz=11, b=False, i=False, charset=None,
                  u=None, strike=False, color=BLACK, scheme=None, family=2, size=None,

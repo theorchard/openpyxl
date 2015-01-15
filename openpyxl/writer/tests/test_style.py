@@ -327,11 +327,11 @@ def test_empty_workbook():
       <numFmts count="0"/>
       <fonts count="1">
         <font>
-          <family val="2"/>
           <name val="Calibri"/>
-          <scheme val="minor"/>
-          <sz val="11"/>
+          <family val="2"/>
           <color theme="1"/>
+          <sz val="11"/>
+          <scheme val="minor"/>
         </font>
       </fonts>
       <fills count="2">
