@@ -45,29 +45,6 @@ def test_bool_attrib(value, expected):
     el = Element("root", value=value)
     assert bool_attrib(el, "value") is expected
 
-def test_read_pattern_fill(StyleReader, datadir):
-    datadir.chdir()
-    expected = [
-        PatternFill(),
-        PatternFill(fill_type='gray125'),
-        PatternFill(fill_type='solid',
-             start_color=Color(theme=0, tint=-0.14999847407452621),
-             end_color=Color(indexed=64)
-             ),
-        PatternFill(fill_type='solid',
-             start_color=Color(theme=0),
-             end_color=Color(indexed=64)
-             ),
-        PatternFill(fill_type='solid',
-             start_color=Color(indexed=62),
-             end_color=Color(indexed=64)
-             )
-    ]
-    with open("bug311-styles.xml") as src:
-        reader = StyleReader(src.read())
-        for val, exp in zip(reader.parse_fills(), expected):
-            assert val == exp
-
 
 def test_unprotected_cell(StyleReader, datadir):
     datadir.chdir()

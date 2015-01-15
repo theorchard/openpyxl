@@ -119,16 +119,37 @@ class TestPatternFill:
         diff = compare_xml(xml, expected)
         assert diff is None, None
 
-
-    def test_create(self, PatternFill):
-        src = """
-        <patternFill xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main" patternType="solid">
-            <bgColor rgb="00FFFF00"/>
-            <fgColor rgb="00FF0000"/>
-        </patternFill>
-        """
+    @pytest.mark.parametrize("src, args",
+                             [
+                                 ("""<patternFill xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main" patternType="solid">
+                                   <fgColor theme="0" tint="-0.14999847407452621"/>
+                                   <bgColor indexed="64"/>
+                                 </patternFill>""",
+                                dict(patternType='solid',
+                                     start_color=Color(theme=0, tint=-0.14999847407452621),
+                                     end_color=Color(indexed=64)
+                                     )
+                                ),
+                                 ("""<patternFill xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main" patternType="solid">
+                                   <fgColor theme="0"/>
+                                   <bgColor indexed="64"/>
+                                 </patternFill>""",
+                                dict(patternType='solid',
+                                     start_color=Color(theme=0),
+                                     end_color=Color(indexed=64)
+                                     )
+                                ),
+                                 ("""<patternFill xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main" patternType="solid">
+                                   <fgColor indexed="62"/>
+                                   <bgColor indexed="64"/>
+                                 </patternFill>""",
+                                dict(patternType='solid',
+                                     start_color=Color(indexed=62),
+                                     end_color=Color(indexed=64)
+                                     )
+                                ),
+                             ]
+                             )
+    def test_create(self, PatternFill, src, args):
         xml = fromstring(src)
-        pf = PatternFill.create(xml)
-        assert pf.patternType == "solid"
-        assert pf.fgColor == Color("00FF0000")
-        assert pf.bgColor == Color("00FFFF00")
+        assert PatternFill.create(xml) == PatternFill(**args)
