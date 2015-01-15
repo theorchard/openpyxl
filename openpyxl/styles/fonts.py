@@ -50,7 +50,9 @@ class Font(HashableObject):
                   'shadow', 'condense', 'extend', 'sz', 'u', 'vertAlign',
                   'scheme')
 
-    __fields__ = __nested__
+    __fields__ = ('name', 'charset', 'family', 'b', 'i', 'strike', 'outline',
+                  'shadow', 'condense', 'extend', 'sz', 'u', 'vertAlign',
+                  'scheme', 'color')
 
     @classmethod
     def _create_nested(cls, el, tag):
