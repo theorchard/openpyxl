@@ -109,13 +109,26 @@ def test_read_complex_style_mappings(datadir, StyleReader):
     assert style_properties[-1].font.bold is False
 
 
+def test_read_complex_fonts(datadir):
+    from openpyxl.styles import Font
+    from openpyxl.xml.functions import fromstring
+    from openpyxl.xml.constants import SHEET_MAIN_NS
+    datadir.chdir()
+    with open("complex-styles.xml") as content:
+        xml = fromstring(content.read())
+    fonts = xml.findall("{%s}fonts/{%s}font" % (SHEET_MAIN_NS, SHEET_MAIN_NS))
+    fonts = [Font.create(node) for node in fonts]
+    assert len(fonts) == 8
+    assert fonts[7] == Font(size=12, color=Color(theme=9), name="Calibri", scheme="minor")
+
+
 def test_read_complex_style(datadir):
     datadir.chdir()
     wb = load_workbook("complex-styles.xlsx")
     ws = wb.get_active_sheet()
     assert ws.column_dimensions['A'].width == 31.1640625
 
-    assert ws.column_dimensions['I'].style.font == Font(sz=12.0, color='FF3300FF')
+    assert ws.column_dimensions['I'].style.font == Font(sz=12.0, color='FF3300FF', scheme='minor')
     assert ws.column_dimensions['I'].style.fill == PatternFill(patternType='solid', fgColor='FF006600', bgColor=Color(indexed=64))
 
     assert ws['A2'].font == Font(sz=10, name='Arial', color=Color(theme=1))
@@ -346,7 +359,7 @@ def test_named_styles(datadir, StyleReader):
     assert len(reader.named_styles) == 11
     first_style = reader.named_styles[0]
     assert first_style.name == "Followed Hyperlink"
-    assert first_style.font == Font(size=12, color=Color(theme=11), underline="single")
+    assert first_style.font == Font(size=12, color=Color(theme=11), underline="single", scheme="minor")
     assert first_style.fill == DEFAULT_EMPTY_FILL
     assert first_style.border == Border()
 

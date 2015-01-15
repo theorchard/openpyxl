@@ -59,8 +59,10 @@ class TestFont:
           <sz val="11"></sz>
           <u val="single"/>
           <vertAlign val="superscript"></vertAlign>
-          <color rgb="00000000"></color>
+          <color rgb="FF3300FF"></color>
          </font>"""
         xml = fromstring(src)
         ft = Font.create(xml)
-        assert ft == Font(name='Calibri', charset=204, vertAlign='superscript', underline='single')
+        assert ft == Font(name='Calibri', charset=204, vertAlign='superscript', underline='single', color="FF3300FF")
+
+
