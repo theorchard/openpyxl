@@ -49,33 +49,6 @@ class DummyWorkbook:
     _borders = set()
 
 
-def test_write_font():
-    wb = DummyWorkbook()
-    from openpyxl.styles import Font
-    ft = Font(name='Calibri', charset=204, vertAlign='superscript', underline=Font.UNDERLINE_SINGLE)
-    wb._fonts.add(ft)
-    writer = StyleWriter(wb)
-    writer._write_fonts()
-    xml = tostring(writer._root)
-    expected = """
-    <styleSheet xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main">
-    <fonts count="1">
-        <font>
-          <charset val="204"></charset>
-          <family val="2"></family>
-          <name val="Calibri"></name>
-          <sz val="11"></sz>
-          <u val="single"/>
-          <vertAlign val="superscript"></vertAlign>
-          <color rgb="00000000"></color>
-         </font>
-    </fonts>
-    </styleSheet>
-    """
-    diff = compare_xml(xml, expected)
-    assert diff is None, diff
-
-
 def test_write_number_formats():
     wb = DummyWorkbook()
     wb._number_formats = ['YYYY']
