@@ -114,8 +114,18 @@ def test_read_complex_fonts(datadir, StyleReader):
     datadir.chdir()
     with open("complex-styles.xml") as content:
         reader = StyleReader(content.read())
+    fonts = list(reader.parse_fonts())
     assert len(fonts) == 8
     assert fonts[7] == Font(size=12, color=Color(theme=9), name="Calibri", scheme="minor")
+
+
+def test_read_complex_fills(datadir, StyleReader):
+    from openpyxl.styles import Font
+    datadir.chdir()
+    with open("complex-styles.xml") as content:
+        reader = StyleReader(content.read())
+    fills = list(reader.parse_fills())
+    assert len(fills) == 6
 
 
 def test_read_complex_style(datadir):
