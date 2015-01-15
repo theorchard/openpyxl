@@ -70,7 +70,7 @@ class Serialisable(_Serialiasable):
         for c in self.__elements__:
             obj = getattr(self, c)
             if obj is not None:
-                el.append(obj.serialise())
+                el.append(obj.serialise(tagname=c))
         return el
 
 
