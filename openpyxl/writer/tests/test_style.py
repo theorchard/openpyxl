@@ -49,29 +49,6 @@ class DummyWorkbook:
     _borders = set()
 
 
-def test_write_borders():
-    wb = DummyWorkbook()
-    wb._borders.add(Border())
-    writer = StyleWriter(DummyWorkbook())
-    writer._write_borders()
-    xml = tostring(writer._root)
-    expected = """
-    <styleSheet xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main">
-      <borders count="1">
-      <border>
-        <left/>
-        <right/>
-        <top/>
-        <bottom/>
-        <diagonal/>
-      </border>
-      </borders>
-    </styleSheet>
-    """
-    diff = compare_xml(xml, expected)
-    assert diff is None, diff
-
-
 def test_write_font():
     wb = DummyWorkbook()
     from openpyxl.styles import Font
@@ -394,11 +371,11 @@ def test_empty_workbook():
       </fills>
       <borders count="1">
         <border>
+          <bottom/>
+          <diagonal/>
           <left/>
           <right/>
           <top/>
-          <bottom/>
-          <diagonal/>
         </border>
       </borders>
       <cellStyleXfs count="1">

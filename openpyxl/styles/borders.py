@@ -26,8 +26,6 @@ BORDER_THIN = 'thin'
 
 class Side(HashableObject):
 
-    spec = """Actually to BorderPr 18.8.6"""
-
     """Border options for use in styles.
     Caution: if you do not specify a border_style, other attributes will
     have no effect !"""
@@ -48,16 +46,11 @@ class Side(HashableObject):
         self.style = style
         self.color = color
 
-    def __iter__(self):
-        for key in ("style",):
-            value = getattr(self, key)
-            if value:
-                yield key, safe_string(value)
-
 
 class Border(HashableObject):
     """Border positioning for use in styles."""
 
+    tagname = "border"
 
     __fields__ = ('left',
                   'right',
@@ -97,23 +90,12 @@ class Border(HashableObject):
         self.diagonalDown = diagonalDown
         self.outline = outline
 
-    @property
-    def children(self):
-        for key in ('left', 'right', 'top', 'bottom', 'diagonal', 'vertical',
-                    'horizontal'):
-            value = getattr(self, key)
-            if value is not None:
-                yield key, value
-
     def __iter__(self):
-        """
-        Unset outline defaults to True, others default to False
-        """
-        for key in ('diagonalUp', 'diagonalDown', 'outline'):
-            value = getattr(self, key)
-            if (key == "outline" and not value
-                or key != "outline" and value):
-                yield key, safe_string(value)
-
+        for attr in self.__attrs__:
+            value = getattr(self, attr)
+            if value and attr != "outline":
+                yield attr, value
+            elif attr == "outline" and not value:
+                yield attr, value
 
 DEFAULT_BORDER = Border()

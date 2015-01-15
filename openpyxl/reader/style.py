@@ -93,7 +93,7 @@ class SharedStylesParser(object):
 
                 border_node = dxf.find('{%s}border' % SHEET_MAIN_NS)
                 if border_node is not None:
-                    dxf_item['border'] = self.parse_border(border_node)
+                    dxf_item['border'] = Border.create(border_node)
                 dxf_list.append(dxf_item)
         self.cond_styles = dxf_list
 
@@ -122,22 +122,7 @@ class SharedStylesParser(object):
         borders = self.root.find('{%s}borders' % SHEET_MAIN_NS)
         if borders is not None:
             for border_node in safe_iterator(borders, '{%s}border' % SHEET_MAIN_NS):
-                yield self.parse_border(border_node)
-
-    def parse_border(self, border_node):
-        """Read individual border"""
-        border = dict(border_node.attrib)
-
-        for side in ('left', 'right', 'top', 'bottom', 'diagonal'):
-            node = border_node.find('{%s}%s' % (SHEET_MAIN_NS, side))
-            if node is not None:
-                bside = dict(node.attrib)
-                color = node.find('{%s}color' % SHEET_MAIN_NS)
-                if color is not None:
-                    bside['color'] = Color(**dict(color.attrib))
-                border[side] = Side(**bside)
-        return Border(**border)
-
+                yield Border.create(border_node)
 
     def parse_named_styles(self):
         """

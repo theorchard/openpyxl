@@ -100,11 +100,7 @@ class StyleWriter(object):
         """Write the child elements for an individual border section"""
         borders_node = SubElement(self._root, 'borders', count="%d" % len(self.borders))
         for border in self.borders:
-            border_node = SubElement(borders_node, 'border', dict(border))
-            for tag, elem in border.children:
-                side = SubElement(border_node, tag, dict(elem))
-                if elem.color is not None:
-                    self._write_color(side, elem.color)
+            borders_node.append(border.serialise())
 
     def _write_named_styles(self):
         cell_style_xfs = SubElement(self._root, 'cellStyleXfs', {'count':'1'})
