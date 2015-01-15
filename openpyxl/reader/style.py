@@ -116,6 +116,20 @@ class SharedStylesParser(object):
                 elif node.tag == gradient:
                     yield GradientFill.create(gradient)
 
+
+    def parse_fills(self):
+        """Read in the list of fills"""
+        fills = self.root.findall('{%s}fills/{%s}fill' % (SHEET_MAIN_NS, SHEET_MAIN_NS))
+        pattern = '{%s}patternFill' % SHEET_MAIN_NS
+        gradient = '{%s}gradientFill' % SHEET_MAIN_NS
+        for fill in fills:
+            for node in fill:
+                if node.tag == pattern:
+                    yield PatternFill.create(node)
+                elif node.tag == gradient:
+                    yield GradientFill.create(node)
+
+
     def parse_borders(self):
         """Read in the boarders"""
         borders = self.root.find('{%s}borders' % SHEET_MAIN_NS)
