@@ -209,69 +209,6 @@ class TestStyleWriter(object):
         assert root.find('color') is not None
         assert root.find('color').attrib == expected
 
-
-    def test_write_dxf(self):
-        redFill = PatternFill(start_color=Color('FFEE1111'),
-                       end_color=Color('FFEE1111'),
-                       fill_type=fills.FILL_SOLID)
-        whiteFont = Font(color=Color("FFFFFFFF"),
-                         bold=True, italic=True, underline='single',
-                         strikethrough=True)
-        medium_blue = Side(border_style='medium', color=Color(colors.BLUE))
-        blueBorder = Border(left=medium_blue,
-                             right=medium_blue,
-                             top=medium_blue,
-                             bottom=medium_blue)
-        cf = ConditionalFormatting()
-        cf.add('A1:A2', FormulaRule(formula="[A1=1]", font=whiteFont, border=blueBorder, fill=redFill))
-        cf._save_styles(self.workbook)
-        assert len(self.workbook.style_properties) == 1
-
-        w = StyleWriter(self.workbook)
-        w._write_conditional_styles()
-        xml = tostring(w._root)
-
-        diff = compare_xml(xml, """
-        <styleSheet xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main">
-          <dxfs count="1">
-            <dxf>
-              <font>
-                <name val="Calibri" />
-                <family val="2" />
-                <b val="1" />
-                <i val="1" />
-                <strike val="1"/>
-                <color rgb="FFFFFFFF" />
-                <sz val="11" />
-                <u val="single" />
-              </font>
-              <fill>
-                <patternFill patternType="solid">
-                  <fgColor rgb="FFEE1111" />
-                  <bgColor rgb="FFEE1111" />
-                </patternFill>
-              </fill>
-              <border>
-                <left style="medium">
-                    <color rgb="000000FF"></color>
-                </left>
-                <right style="medium">
-                    <color rgb="000000FF"></color>
-                </right>
-                <top style="medium">
-                    <color rgb="000000FF"></color>
-                </top>
-                <bottom style="medium">
-                    <color rgb="000000FF"></color>
-                </bottom>
-                <diagonal />
-            </border>
-            </dxf>
-          </dxfs>
-        </styleSheet>
-        """)
-        assert diff is None, diff
-
     def test_protection(self):
         cell = self.worksheet.cell('A1')
         cell.protection = Protection(locked=True, hidden=True)
