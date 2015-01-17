@@ -7,7 +7,7 @@ from openpyxl.compat import safe_string
 from .colors import ColorDescriptor, Color
 from .hashable import HashableObject
 
-from openpyxl.xml.functions import Element, safe_iterator
+from openpyxl.xml.functions import Element, localname, safe_iterator
 from openpyxl.xml.constants import SHEET_MAIN_NS
 
 
@@ -44,7 +44,15 @@ class Fill(HashableObject):
 
     """Base class"""
 
-    pass
+    tagname = "fill"
+
+    @classmethod
+    def create(cls, el):
+        child = [c for c in el][0]
+        if "patternFill" in child.tag:
+            return PatternFill._create(child)
+        else:
+            return GradientFill._create(child)
 
 
 class PatternFill(Fill):
@@ -78,6 +86,14 @@ class PatternFill(Fill):
         if end_color is not None:
             bgColor = end_color
         self.bgColor = bgColor
+
+    @classmethod
+    def _create(cls, el):
+        attrib = dict(el.attrib)
+        for child in el:
+            desc = localname(child)
+            attrib[desc] = Color.create(child)
+        return cls(**attrib)
 
 
     def serialise(self, tagname=None):
@@ -129,7 +145,7 @@ class GradientFill(Fill):
 
 
     @classmethod
-    def create(cls, node):
+    def _create(cls, node):
         colors = []
         for color in safe_iterator(node, "{%s}color" % SHEET_MAIN_NS):
             colors.append(Color.create(color))

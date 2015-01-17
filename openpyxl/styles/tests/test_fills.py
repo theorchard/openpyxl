@@ -73,6 +73,7 @@ class TestGradientFill:
 
     def test_create(self, GradientFill):
         src = """
+        <fill>
         <gradientFill xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main" degree="90">
         <stop position="0">
           <color theme="0"/>
@@ -80,7 +81,8 @@ class TestGradientFill:
         <stop position="1">
           <color theme="4"/>
         </stop>
-      </gradientFill>
+        </gradientFill>
+        </fill>
         """
         xml = fromstring(src)
         fill = GradientFill.create(xml)
@@ -121,28 +123,40 @@ class TestPatternFill:
 
     @pytest.mark.parametrize("src, args",
                              [
-                                 ("""<patternFill xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main" patternType="solid">
+                                 ("""
+                                 <fill>
+                                 <patternFill xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main" patternType="solid">
                                    <fgColor theme="0" tint="-0.14999847407452621"/>
                                    <bgColor indexed="64"/>
-                                 </patternFill>""",
+                                 </patternFill>
+                                 </fill>
+                                 """,
                                 dict(patternType='solid',
                                      start_color=Color(theme=0, tint=-0.14999847407452621),
                                      end_color=Color(indexed=64)
                                      )
                                 ),
-                                 ("""<patternFill xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main" patternType="solid">
+                                 ("""
+                                 <fill>
+                                 <patternFill xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main" patternType="solid">
                                    <fgColor theme="0"/>
                                    <bgColor indexed="64"/>
-                                 </patternFill>""",
+                                 </patternFill>
+                                 </fill>
+                                 """,
                                 dict(patternType='solid',
                                      start_color=Color(theme=0),
                                      end_color=Color(indexed=64)
                                      )
                                 ),
-                                 ("""<patternFill xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main" patternType="solid">
+                                 ("""
+                                 <fill>
+                                 <patternFill xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main" patternType="solid">
                                    <fgColor indexed="62"/>
                                    <bgColor indexed="64"/>
-                                 </patternFill>""",
+                                 </patternFill>
+                                 </fill>
+                                 """,
                                 dict(patternType='solid',
                                      start_color=Color(indexed=62),
                                      end_color=Color(indexed=64)

@@ -59,24 +59,6 @@ class ConditionalFormat(Serialisable):
         self.extLst = extLst
 
 
-    @classmethod
-    def create(cls, node):
-        attrib = {}
-        for el in node:
-            tag = localname(el)
-            if tag == "fill":
-                el = [c for c in el][0]
-                if "patternFill" in el.tag:
-                    obj = PatternFill.create(el)
-                elif "gradientFill" in el.tag:
-                    obj = GradientFill.create(el)
-            else:
-                desc = getattr(cls, tag, None)
-                obj = desc.expected_type.create(el)
-            attrib[tag] = obj
-        return cls(**attrib)
-
-
     def serialise(self):
         el = Element(self.tagname)
         for attr in self.__elements__:
