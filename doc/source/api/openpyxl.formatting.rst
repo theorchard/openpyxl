@@ -4,6 +4,14 @@ openpyxl.formatting package
 Submodules
 ----------
 
+openpyxl.formatting.conditional module
+--------------------------------------
+
+.. automodule:: openpyxl.formatting.conditional
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
 openpyxl.formatting.rules module
 --------------------------------
 
