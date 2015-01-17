@@ -160,7 +160,7 @@ class StyleWriter(object):
     def _write_conditional_styles(self):
         idx = 0
         dxfs = SubElement(self._root, "dxfs")
-        for idx, fmt in enumerate(self.wb.style_properties, 1):
+        for idx, fmt in enumerate(self.wb.conditional_formats, 1):
             dxfs.append(fmt.serialise())
         dxfs.set("count", str(idx))
         return dxfs

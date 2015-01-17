@@ -80,8 +80,6 @@ class ConditionalFormatting(object):
 
         :param wb: the workbook
         """
-        if not wb.style_properties:
-            wb.style_properties = []
 
         for rules in self.cf_rules.values():
             for rule in rules:
@@ -95,7 +93,7 @@ class ConditionalFormatting(object):
                     if 'fill' in rule['dxf'] and isinstance(rule['dxf']['fill'], PatternFill):
                         dxf.fill = rule['dxf']['fill']
 
-                    wb.style_properties.append(dxf)
+                    wb.conditional_formats.append(dxf)
                     rule.pop('dxf')
-                    rule['dxfId'] = len(wb.style_properties) - 1
+                    rule['dxfId'] = len(wb.conditional_formats) - 1
 

@@ -231,15 +231,19 @@ class TestRule:
         assert r.items() == [('stopIfTrue', False)]
 
 
+class WB():
+
+    def __init__(self):
+        self.conditional_formats = []
+        self.shared_styles = IndexedList()
+        self.worksheets = []
+
+
 class TestConditionalFormatting(object):
 
-    class WB():
-        style_properties = None
-        shared_styles = IndexedList()
-        worksheets = []
 
     def setup(self):
-        self.workbook = self.WB()
+        self.workbook = WB()
 
     def test_conditional_formatting_customRule(self):
         class WS():
@@ -276,11 +280,11 @@ class TestConditionalFormatting(object):
         cf.add('C1:C10', FormulaRule(formula=['ISBLANK(C1)'], font=font, border=border, fill=fill))
         cf.add('D1:D10', FormulaRule(formula=['ISBLANK(D1)'], fill=fill))
         cf._save_styles(self.workbook)
-        assert len(self.workbook.style_properties) == 2
-        assert self.workbook.style_properties[0].font == font
-        assert self.workbook.style_properties[0].border == border
-        assert self.workbook.style_properties[0].fill == fill
-        assert self.workbook.style_properties[1].fill == fill
+        assert len(self.workbook.conditional_formats) == 2
+        assert self.workbook.conditional_formats[0].font == font
+        assert self.workbook.conditional_formats[0].border == border
+        assert self.workbook.conditional_formats[0].fill == fill
+        assert self.workbook.conditional_formats[1].fill == fill
 
     def test_conditional_formatting_update(self):
         class WS():
@@ -344,12 +348,8 @@ class TestConditionalFormatting(object):
 
 class TestColorScaleRule(object):
 
-    class WB():
-        style_properties = None
-        worksheets = []
-
     def setup(self):
-        self.workbook = self.WB()
+        self.workbook = WB()
 
     def test_two_colors(self):
         cf = ConditionalFormatting()
@@ -386,12 +386,8 @@ class TestColorScaleRule(object):
 
 class TestCellIsRule(object):
 
-    class WB():
-        style_properties = None
-        worksheets = []
-
     def setup(self):
-        self.workbook = self.WB()
+        self.workbook = WB()
 
     def test_greaterThan(self):
         cf = ConditionalFormatting()
@@ -596,12 +592,9 @@ class TestCellIsRule(object):
 
 
 class TestFormulaRule(object):
-    class WB():
-        style_properties = None
-        worksheets = []
 
     def setup(self):
-        self.workbook = self.WB()
+        self.workbook = WB()
 
     def test_formula_rule(self):
         class WS():
@@ -840,7 +833,7 @@ def test_parse_dxfs(datadir):
 
     # Verify length
     assert '<dxfs count="164">' in str(read_xml)
-    assert len(wb.style_properties) == 164
+    assert len(wb.conditional_formats) == 164
 
     # Verify first dxf style
     reference_file = 'dxf_style.xml'
@@ -848,7 +841,7 @@ def test_parse_dxfs(datadir):
         diff = compare_xml(read_xml, expected.read())
         assert diff is None, diff
 
-    cond_styles = wb.style_properties[0]
+    cond_styles = wb.conditional_formats[0]
     assert cond_styles.font.color == Color('FF9C0006')
     assert not cond_styles.font.bold
     assert not cond_styles.font.italic
@@ -862,6 +855,6 @@ def test_parse_dxfs(datadir):
     reader = SharedStylesParser(write_xml)
     reader.parse()
     read_style_prop = reader.cond_styles
-    assert len(read_style_prop) == len(wb.style_properties)
+    assert len(read_style_prop) == len(wb.conditional_formats)
     for i, dxf in enumerate(read_style_prop[2]):
-        assert repr(wb.style_properties[i] == dxf)
+        assert repr(wb.conditional_formats[i] == dxf)
