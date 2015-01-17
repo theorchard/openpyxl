@@ -57,18 +57,3 @@ class ConditionalFormat(Serialisable):
         self.border = border
         self.protection = protection
         self.extLst = extLst
-
-
-    def serialise(self):
-        el = Element(self.tagname)
-        for attr in self.__elements__:
-            obj = getattr(self, attr)
-            if obj is None:
-                continue
-            if attr == "fill":
-                xml = Element("fill")
-                xml.append(obj.serialise())
-            else:
-                xml = obj.serialise()
-            el.append(xml)
-        return el

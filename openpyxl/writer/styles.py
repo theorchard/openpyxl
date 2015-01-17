@@ -93,8 +93,7 @@ class StyleWriter(object):
     def _write_fills(self):
         fills_node = SubElement(self._root, 'fills', count="%d" % len(self.fills))
         for fill in self.fills:
-            fill_node = SubElement(fills_node, 'fill')
-            fill_node.append(fill.serialise())
+            fills_node.append(fill.serialise())
 
     def _write_borders(self):
         """Write the child elements for an individual border section"""

@@ -60,7 +60,7 @@ class Font(HashableObject):
             return el.get("val", "single")
         return super(Font, cls)._create_nested(el, tag)
 
-    def serialise(self):
+    def serialise(self, tagname=None):
         el = Element(self.tagname)
         attrs = list(self.__nested__)
         attrs.insert(10, 'color')

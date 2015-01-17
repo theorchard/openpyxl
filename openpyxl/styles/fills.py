@@ -97,12 +97,14 @@ class PatternFill(Fill):
 
 
     def serialise(self, tagname=None):
+        parent = Element("fill")
         el = Element(self.tagname, patternType=safe_string(self.patternType))
         for c in self.__elements__:
             value = getattr(self, c)
             if value != Color():
                 el.append(value.serialise(c))
-        return el
+        parent.append(el)
+        return parent
 
 
 DEFAULT_EMPTY_FILL = PatternFill()
@@ -160,3 +162,10 @@ class GradientFill(Fill):
             stop = Element("stop", position=str(idx))
             stop.append(color.serialise())
             yield stop
+
+
+    def serialise(self, tagname=None):
+        parent = Element("fill")
+        el = super(GradientFill, self).serialise()
+        parent.append(el)
+        return parent

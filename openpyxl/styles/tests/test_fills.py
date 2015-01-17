@@ -58,6 +58,7 @@ class TestGradientFill:
         gf = GradientFill(degree=90, left=1, right=2, top=3, bottom=4, stop=[Color(BLACK), Color(WHITE)])
         xml = tostring(gf.serialise())
         expected = """
+        <fill>
         <gradientFill bottom="4" degree="90" left="1" right="2" top="3" type="linear">
            <stop position="0">
               <color rgb="00000000"></color>
@@ -66,6 +67,7 @@ class TestGradientFill:
               <color rgb="00FFFFFF"></color>
             </stop>
         </gradientFill>
+        </fill>
         """
         diff = compare_xml(xml, expected)
         assert diff is None, diff
@@ -113,10 +115,12 @@ class TestPatternFill:
         pf = PatternFill('solid', 'FF0000', 'FFFF00')
         xml = tostring(pf.serialise())
         expected = """
+        <fill>
         <patternFill patternType="solid">
             <fgColor rgb="00FF0000"/>
             <bgColor rgb="00FFFF00"/>
         </patternFill>
+        </fill>
         """
         diff = compare_xml(xml, expected)
         assert diff is None, diff

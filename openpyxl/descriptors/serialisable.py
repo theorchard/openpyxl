@@ -67,10 +67,10 @@ class Serialisable(_Serialiasable):
                         el.append(_)
             elif value:
                 SubElement(el, n, val=safe_string(value))
-        for c in self.__elements__:
-            obj = getattr(self, c)
+        for child in self.__elements__:
+            obj = getattr(self, child)
             if obj is not None:
-                el.append(obj.serialise(tagname=c))
+                el.append(obj.serialise(tagname=child))
         return el
 
 
