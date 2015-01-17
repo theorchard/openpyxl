@@ -276,9 +276,11 @@ class TestConditionalFormatting(object):
         cf.add('C1:C10', FormulaRule(formula=['ISBLANK(C1)'], font=font, border=border, fill=fill))
         cf.add('D1:D10', FormulaRule(formula=['ISBLANK(D1)'], fill=fill))
         cf._save_styles(self.workbook)
-        assert len(self.workbook.style_properties['dxf_list']) == 2
-        assert self.workbook.style_properties['dxf_list'][0] == {'font': font, 'border': border, 'fill': fill}
-        assert self.workbook.style_properties['dxf_list'][1] == {'fill': fill}
+        assert len(self.workbook.style_properties) == 2
+        assert self.workbook.style_properties[0].font == font
+        assert self.workbook.style_properties[0].border == border
+        assert self.workbook.style_properties[0].fill == fill
+        assert self.workbook.style_properties[1].fill == fill
 
     def test_conditional_formatting_update(self):
         class WS():
@@ -319,8 +321,9 @@ class TestConditionalFormatting(object):
                        end_color=Color('FFEE1111'),
                        patternType=fills.FILL_SOLID)
         whiteFont = Font(color=Color("FFFFFFFF"))
-        worksheet.conditional_formatting.add('A1:A3', CellIsRule(operator='equal', formula=['"Fail"'], stopIfTrue=False,
-                                                                 font=whiteFont, fill=redFill))
+        worksheet.conditional_formatting.add('A1:A3',
+                                             CellIsRule(operator='equal', formula=['"Fail"'], stopIfTrue=False,
+                                                        font=whiteFont, fill=redFill))
         worksheet.conditional_formatting._save_styles(self.workbook)
 
         # First, verify conditional formatting xml
@@ -335,29 +338,6 @@ class TestConditionalFormatting(object):
             <formula>"Fail"</formula>
           </cfRule>
         </conditionalFormatting>
-        """)
-        assert diff is None, diff
-
-        # Second, verify conditional formatting dxf styles
-        w = StyleWriter(self.workbook)
-        w._write_conditional_styles()
-        xml = tostring(w._root)
-        diff = compare_xml(xml, """
-        <styleSheet xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main">
-          <dxfs count="1">
-            <dxf>
-              <font>
-                <color rgb="FFFFFFFF" />
-              </font>
-              <fill>
-                <patternFill patternType="solid">
-                  <fgColor rgb="FFEE1111" />
-                  <bgColor rgb="FFEE1111" />
-                </patternFill>
-              </fill>
-            </dxf>
-          </dxfs>
-        </styleSheet>
         """)
         assert diff is None, diff
 
@@ -860,7 +840,7 @@ def test_parse_dxfs(datadir):
 
     # Verify length
     assert '<dxfs count="164">' in str(read_xml)
-    assert len(wb.style_properties['dxf_list']) == 164
+    assert len(wb.style_properties) == 164
 
     # Verify first dxf style
     reference_file = 'dxf_style.xml'
@@ -868,12 +848,12 @@ def test_parse_dxfs(datadir):
         diff = compare_xml(read_xml, expected.read())
         assert diff is None, diff
 
-    cond_styles = wb.style_properties['dxf_list'][0]
-    assert cond_styles['font'].color == Color('FF9C0006')
-    assert not cond_styles['font'].bold
-    assert not cond_styles['font'].italic
+    cond_styles = wb.style_properties[0]
+    assert cond_styles.font.color == Color('FF9C0006')
+    assert not cond_styles.font.bold
+    assert not cond_styles.font.italic
     f = PatternFill(end_color=Color('FFFFC7CE'))
-    assert cond_styles['fill'] == f
+    assert cond_styles.fill == f
 
     # Verify that the dxf styles stay the same when they're written and read back in.
     w = StyleWriter(wb)
@@ -882,6 +862,6 @@ def test_parse_dxfs(datadir):
     reader = SharedStylesParser(write_xml)
     reader.parse()
     read_style_prop = reader.cond_styles
-    assert len(read_style_prop) == len(wb.style_properties['dxf_list'])
+    assert len(read_style_prop) == len(wb.style_properties)
     for i, dxf in enumerate(read_style_prop[2]):
-        assert repr(wb.style_properties['dxf_list'][i] == dxf)
+        assert repr(wb.style_properties[i] == dxf)

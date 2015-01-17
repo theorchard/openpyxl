@@ -225,10 +225,7 @@ class TestStyleWriter(object):
         cf = ConditionalFormatting()
         cf.add('A1:A2', FormulaRule(formula="[A1=1]", font=whiteFont, border=blueBorder, fill=redFill))
         cf._save_styles(self.workbook)
-        assert len(self.workbook.style_properties['dxf_list']) == 1
-        assert 'font' in self.workbook.style_properties['dxf_list'][0]
-        assert 'border' in self.workbook.style_properties['dxf_list'][0]
-        assert 'fill' in self.workbook.style_properties['dxf_list'][0]
+        assert len(self.workbook.style_properties) == 1
 
         w = StyleWriter(self.workbook)
         w._write_conditional_styles()
@@ -239,11 +236,14 @@ class TestStyleWriter(object):
           <dxfs count="1">
             <dxf>
               <font>
-                <color rgb="FFFFFFFF" />
+                <name val="Calibri" />
+                <family val="2" />
                 <b val="1" />
                 <i val="1" />
+                <strike val="1"/>
+                <color rgb="FFFFFFFF" />
+                <sz val="11" />
                 <u val="single" />
-                <strike />
               </font>
               <fill>
                 <patternFill patternType="solid">
@@ -264,6 +264,7 @@ class TestStyleWriter(object):
                 <bottom style="medium">
                     <color rgb="000000FF"></color>
                 </bottom>
+                <diagonal />
             </border>
             </dxf>
           </dxfs>

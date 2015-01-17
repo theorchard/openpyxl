@@ -19,6 +19,7 @@ from openpyxl.styles import (
     Alignment,
     borders,
 )
+from openpyxl.formatting.conditional import ConditionalFormat
 from openpyxl.styles.colors import COLOR_INDEX, Color
 from openpyxl.styles.proxy import StyleId
 from openpyxl.styles.named_styles import NamedStyle
@@ -75,27 +76,29 @@ class SharedStylesParser(object):
 
     def parse_dxfs(self):
         """Read in the dxfs effects - used by conditional formatting."""
-        dxf_list = []
-        dxfs = self.root.find('{%s}dxfs' % SHEET_MAIN_NS)
-        if dxfs is not None:
-            nodes = dxfs.findall('{%s}dxf' % SHEET_MAIN_NS)
-            for dxf in nodes:
-                dxf_item = {}
-                font_node = dxf.find('{%s}font' % SHEET_MAIN_NS)
-                if font_node is not None:
-                    dxf_item['font'] = Font.create(font_node)
-                pattern = dxf.find('{%s}fill/{%s}patternFill' % (SHEET_MAIN_NS, SHEET_MAIN_NS))
-                if pattern is not None:
-                    dxf_item['fill'] = PatternFill.create(pattern)
-                gradient = dxf.find('{%s}fill/{%s}gradientFill' % (SHEET_MAIN_NS, SHEET_MAIN_NS))
-                if gradient is not None:
-                    dxf_item['fill'] = GradientFill.create(gradient)
+        for node in self.root.findall("{%s}dxfs/{%s}dxf" % (SHEET_MAIN_NS, SHEET_MAIN_NS) ):
+            self.cond_styles.append(ConditionalFormat.create(node))
+        #dxf_list = []
+        #dxfs = self.root.find('{%s}dxfs' % SHEET_MAIN_NS)
+        #if dxfs is not None:
+            #nodes = dxfs.findall('{%s}dxf' % SHEET_MAIN_NS)
+            #for dxf in nodes:
+                #dxf_item = {}
+                #font_node = dxf.find('{%s}font' % SHEET_MAIN_NS)
+                #if font_node is not None:
+                    #dxf_item['font'] = Font.create(font_node)
+                #pattern = dxf.find('{%s}fill/{%s}patternFill' % (SHEET_MAIN_NS, SHEET_MAIN_NS))
+                #if pattern is not None:
+                    #dxf_item['fill'] = PatternFill.create(pattern)
+                #gradient = dxf.find('{%s}fill/{%s}gradientFill' % (SHEET_MAIN_NS, SHEET_MAIN_NS))
+                #if gradient is not None:
+                    #dxf_item['fill'] = GradientFill.create(gradient)
 
-                border_node = dxf.find('{%s}border' % SHEET_MAIN_NS)
-                if border_node is not None:
-                    dxf_item['border'] = Border.create(border_node)
-                dxf_list.append(dxf_item)
-        self.cond_styles = dxf_list
+                #border_node = dxf.find('{%s}border' % SHEET_MAIN_NS)
+                #if border_node is not None:
+                    #dxf_item['border'] = Border.create(border_node)
+                #dxf_list.append(dxf_item)
+        #self.cond_styles = dxf_list
 
     def parse_fonts(self):
         """Read in the fonts"""

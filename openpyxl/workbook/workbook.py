@@ -57,7 +57,7 @@ class Workbook(object):
         self._worksheet_class = worksheet_class
         self.vba_archive = None
         self.is_template = False
-        self.style_properties = None
+        self.style_properties = []
         self._guess_types = guess_types
         self.data_only = data_only
         self.relationships = []

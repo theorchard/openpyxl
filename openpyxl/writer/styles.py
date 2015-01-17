@@ -158,48 +158,12 @@ class StyleWriter(object):
             {'name':"Normal", 'xfId':"0", 'builtinId':"0"})
 
     def _write_conditional_styles(self):
-        if self.wb.style_properties and 'dxf_list' in self.wb.style_properties:
-            dxfs = SubElement(self._root, 'dxfs', {'count': str(len(self.wb.style_properties['dxf_list']))})
-            for d in self.wb.style_properties['dxf_list']:
-                dxf = SubElement(dxfs, 'dxf')
-                if 'font' in d and d['font'] is not None:
-                    font_node = SubElement(dxf, 'font')
-                    if d['font'].color is not None:
-                        self._write_color(font_node, d['font'].color)
-                    ConditionalElement(font_node, 'b', d['font'].bold, 'val')
-                    ConditionalElement(font_node, 'i', d['font'].italic, 'val')
-                    ConditionalElement(font_node, 'u', d['font'].underline,
-                                       {'val': d['font'].underline})
-                    ConditionalElement(font_node, 'strike', d['font'].strikethrough)
-
-
-                if 'fill' in d:
-                    f = d['fill']
-                    fill = SubElement(dxf, 'fill')
-                    if f.fill_type:
-                        node = SubElement(fill, 'patternFill', {'patternType': f.fill_type})
-                    else:
-                        node = SubElement(fill, 'patternFill')
-                    if f.start_color != DEFAULTS.fill.start_color:
-                        self._write_color(node, f.start_color, 'fgColor')
-
-                    if f.end_color != DEFAULTS.fill.end_color:
-                        self._write_color(node, f.end_color, 'bgColor')
-
-                if 'border' in d:
-                    borders = d['border']
-                    border = SubElement(dxf, 'border')
-                    # caution: respect this order
-                    for side in ('left', 'right', 'top', 'bottom'):
-                        obj = getattr(borders, side)
-                        if obj.border_style is None or obj.border_style == 'none':
-                            node = SubElement(border, side)
-                        else:
-                            node = SubElement(border, side, {'style': obj.border_style})
-                            self._write_color(node, obj.color)
-        else:
-            dxfs = SubElement(self._root, 'dxfs', {'count': '0'})
+        dxfs = SubElement(self._root, "dxfs", count="0")
+        for idx, fmt in enumerate(self.wb.style_properties, 1):
+            dxfs.append(fmt.serialise())
+            dxfs.set("count", str(idx))
         return dxfs
+
 
     def _write_table_styles(self):
 
