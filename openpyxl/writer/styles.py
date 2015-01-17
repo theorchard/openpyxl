@@ -157,12 +157,11 @@ class StyleWriter(object):
         SubElement(cell_styles, 'cellStyle',
             {'name':"Normal", 'xfId':"0", 'builtinId':"0"})
 
+
     def _write_conditional_styles(self):
-        idx = 0
-        dxfs = SubElement(self._root, "dxfs")
-        for idx, fmt in enumerate(self.wb.conditional_formats, 1):
+        dxfs = SubElement(self._root, "dxfs", count=len(self.wb.conditional_formats))
+        for fmt in self.wb.conditional_formats:
             dxfs.append(fmt.serialise())
-        dxfs.set("count", str(idx))
         return dxfs
 
 
