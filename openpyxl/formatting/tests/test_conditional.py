@@ -37,6 +37,7 @@ def test_serialise(ConditionalFormat):
     cond.fill = PatternFill()
     xml = tostring(cond.serialise())
     expected = """
+    <dxf>
     <font>
     <name val="Calibri"></name>
     <family val="2"></family>
