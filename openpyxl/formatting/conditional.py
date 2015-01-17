@@ -12,7 +12,7 @@ from openpyxl.styles import (
     Protection,
     )
 
-from openpyxl.xml.functions import localname
+from openpyxl.xml.functions import localname, Element
 
 
 class NumFmt(Serialisable):
@@ -76,3 +76,17 @@ class ConditionalFormat(Serialisable):
             attrib[tag] = obj
         return cls(**attrib)
 
+
+    def serialise(self):
+        el = Element(self.tagname)
+        for attr in self.__elements__:
+            obj = getattr(self, attr)
+            if obj is None:
+                continue
+            if attr == "fill":
+                xml = Element("fill")
+                xml.append(obj.serialise())
+            else:
+                xml = obj.serialise()
+            el.append(xml)
+        return el
