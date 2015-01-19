@@ -380,3 +380,14 @@ def test_no_styles():
     from .. style import read_style_table
     archive = ZipFile(BytesIO(), "a")
     assert read_style_table(archive) is None
+
+
+def test_rgb_colors(StyleReader, datadir):
+    datadir.chdir()
+    with open("rgb_colors.xml") as src:
+        reader = StyleReader(src.read())
+
+    reader.parse_color_index()
+    assert len(reader.color_index) == 64
+    assert reader.color_index[0] == "00000000"
+    assert reader.color_index[-1] == "00333333"
