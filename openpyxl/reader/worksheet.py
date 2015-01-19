@@ -186,8 +186,7 @@ class WorkSheetParser(object):
         self.ws.print_options = PrintOptions(**element.attrib)
 
     def parse_margins(self, element):
-        margins = dict(element.items())
-        self.page_margins = PageMargins(**margins)
+        self.page_margins = PageMargins(**element.attrib)
 
     def parse_page_setup(self, element):
         id_key = '{%s}id' % REL_NS
