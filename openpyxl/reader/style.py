@@ -57,13 +57,11 @@ class SharedStylesParser(object):
     def parse_custom_num_formats(self):
         """Read in custom numeric formatting rules from the shared style table"""
         custom_formats = {}
-        num_fmts = self.root.find('{%s}numFmts' % SHEET_MAIN_NS)
-        if num_fmts is not None:
-            num_fmt_nodes = safe_iterator(num_fmts, '{%s}numFmt' % SHEET_MAIN_NS)
-            for num_fmt_node in num_fmt_nodes:
-                fmt_id = int(num_fmt_node.get('numFmtId'))
-                fmt_code = num_fmt_node.get('formatCode').lower()
-                custom_formats[fmt_id] = fmt_code
+        num_fmts = self.root.findall('{%s}numFmts/{%s}numFmt' % (SHEET_MAIN_NS, SHEET_MAIN_NS))
+        for num_fmt_node in num_fmts:
+            fmt_id = int(num_fmt_node.get('numFmtId'))
+            fmt_code = num_fmt_node.get('formatCode').lower()
+            custom_formats[fmt_id] = fmt_code
         self.custom_num_formats = custom_formats
 
     def parse_color_index(self):
