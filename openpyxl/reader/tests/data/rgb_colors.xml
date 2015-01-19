@@ -1817,7 +1817,7 @@
   <cellStyles count="6">
     <cellStyle name="Normal" xfId="0" builtinId="0"/>
     <cellStyle name="Normal 2" xfId="1"/>
-    <cellStyle name="Normal_CI list simplifiée" xfId="2"/>
+    <cellStyle name="Normal_CI list simplifiee" xfId="2"/>
     <cellStyle name="Normal_Rev PLC P S&amp;A - Review Tool Topics" xfId="3"/>
     <cellStyle name="Normal_S-A_ICI_Review_Questions" xfId="4"/>
     <cellStyle name="Normal_WP_list_with lifecycle" xfId="5"/>
