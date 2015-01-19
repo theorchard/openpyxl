@@ -64,14 +64,14 @@ class SharedStylesParser(object):
             custom_formats[fmt_id] = fmt_code
         self.custom_num_formats = custom_formats
 
+
     def parse_color_index(self):
         """Read in the list of indexed colors"""
-        colors = self.root.find('{%s}colors' % SHEET_MAIN_NS)
-        if colors is not None:
-            indexedColors = colors.find('{%s}indexedColors' % SHEET_MAIN_NS)
-            if indexedColors is not None:
-                color_nodes = safe_iterator(indexedColors, '{%s}rgbColor' % SHEET_MAIN_NS)
-                self.color_index = IndexedList([node.get('rgb') for node in color_nodes])
+        colors =\
+            self.root.findall('{%s}colors/{%s}indexedColors/{%s}rgbColor' %
+                              (SHEET_MAIN_NS, SHEET_MAIN_NS, SHEET_MAIN_NS))
+        self.color_index = IndexedList([node.get('rgb') for node in colors])
+
 
     def parse_dxfs(self):
         """Read in the dxfs effects - used by conditional formatting."""
