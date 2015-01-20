@@ -46,7 +46,12 @@ class Cfvo(Serialisable):
         self.extLst = extLst
 
 
-class IconSet(Serialisable):
+class RuleType(Serialisable):
+
+    cfvo = Sequence(expected_type=Cfvo)
+
+
+class IconSet(RuleType):
 
     iconSet = NoneSet(values=(['3Arrows', '3ArrowsGray', '3Flags',
                            '3TrafficLights1', '3TrafficLights2', '3Signs', '3Symbols', '3Symbols2',
@@ -55,7 +60,6 @@ class IconSet(Serialisable):
     showValue = Bool(allow_none=True)
     percent = Bool()
     reverse = Bool(allow_none=True)
-    cfvo = Typed(expected_type=Cfvo, )
 
     def __init__(self,
                  iconSet=None,
@@ -71,13 +75,12 @@ class IconSet(Serialisable):
         self.cfvo = cfvo
 
 
-class DataBar(Serialisable):
+class DataBar(RuleType):
 
     minLength = Integer(allow_none=True)
     maxLength = Integer(allow_none=True)
     showValue = Bool(allow_none=True)
-    cfvo = Typed(expected_type=Cfvo, )
-    color = Typed(expected_type=Color, )
+    color = Sequence(expected_type=Color)
 
     def __init__(self,
                  minLength=None,
@@ -93,10 +96,9 @@ class DataBar(Serialisable):
         self.color = color
 
 
-class ColorScale(Serialisable):
+class ColorScale(RuleType):
 
-    cfvo = Typed(expected_type=Cfvo, )
-    color = Typed(expected_type=Color, )
+    color = Sequence(expected_type=Color)
 
     def __init__(self,
                  cfvo=None,
@@ -116,7 +118,7 @@ class Rule(Serialisable):
                         'notContainsBlanks', 'containsErrors', 'notContainsErrors', 'timePeriod',
                         'aboveAverage']))
     dxfId = Integer(allow_none=True)
-    priority = Integer()
+    priority = Integer(allow_none=True)
     stopIfTrue = Bool(allow_none=True)
     aboveAverage = Bool(allow_none=True)
     percent = Bool(allow_none=True)
@@ -177,37 +179,3 @@ class Rule(Serialisable):
         self.dataBar = dataBar
         self.iconSet = iconSet
         self.extLst = extLst
-
-
-    @classmethod
-    def create(cls, node):
-        attrib = dict(node.attrib)
-        formula = []
-        for el in node:
-            tag = localname(el)
-            descriptor = getattr(cls, tag, None)
-            if descriptor is None:
-                continue
-            if tag == "formula":
-                formula.append(el.text)
-            else:
-                attrib[tag] = descriptor.expected_type.create(el)
-        attrib['formula'] = formula
-        return cls(**attrib)
-
-
-    def serialise(self, tagname=None):
-        attrib = dict(self)
-        del attrib['formula']
-        el = Element(self.tagname, attrib)
-
-        for child in self.__elements__:
-            obj = getattr(self, child)
-            if obj is None:
-                continue
-            if child == "formula":
-                for value in obj:
-                    SubElement(el, "formula").text = value
-            else:
-                el.append(obj.serialise)
-        return el

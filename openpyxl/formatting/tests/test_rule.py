@@ -15,31 +15,33 @@ def Rule():
     return Rule
 
 
-def test_create(Rule, datadir):
-    datadir.chdir()
-    with open("worksheet.xml") as src:
-        xml = fromstring(src.read())
+class TestRule:
 
-    rules = []
-    for el in xml.findall("{%s}conditionalFormatting/{%s}cfRule" % (SHEET_MAIN_NS, SHEET_MAIN_NS)):
-        rules.append(Rule.create(el))
+    def test_create(self, Rule, datadir):
+        datadir.chdir()
+        with open("worksheet.xml") as src:
+            xml = fromstring(src.read())
 
-    assert len(rules) == 30
-    assert rules[17].formula == ('2', '7')
-    assert rules[-1].formula == ("AD1>3",)
+        rules = []
+        for el in xml.findall("{%s}conditionalFormatting/{%s}cfRule" % (SHEET_MAIN_NS, SHEET_MAIN_NS)):
+            rules.append(Rule.create(el))
+
+        assert len(rules) == 30
+        assert rules[17].formula == ('2', '7')
+        assert rules[-1].formula == ("AD1>3",)
 
 
-def test_serialise(Rule):
+    def test_serialise(self, Rule):
 
-    rule = Rule(type="cellIs", dxfId="26", priority="13", operator="between")
-    rule.formula = ["2", "7"]
+        rule = Rule(type="cellIs", dxfId="26", priority="13", operator="between")
+        rule.formula = ["2", "7"]
 
-    xml = tostring(rule.serialise())
-    expected = """
-    <cfRule type="cellIs" dxfId="26" priority="13" operator="between">
-    <formula>2</formula>
-    <formula>7</formula>
-    </cfRule>
-    """
-    diff = compare_xml(xml, expected)
-    assert diff is None, diff
+        xml = tostring(rule.serialise())
+        expected = """
+        <cfRule type="cellIs" dxfId="26" priority="13" operator="between">
+        <formula>2</formula>
+        <formula>7</formula>
+        </cfRule>
+        """
+        diff = compare_xml(xml, expected)
+        assert diff is None, diff
