@@ -27,3 +27,19 @@ def test_create(Rule, datadir):
     assert len(rules) == 30
     assert rules[17].formula == ('2', '7')
     assert rules[-1].formula == ("AD1>3",)
+
+
+def test_serialise(Rule):
+
+    rule = Rule(type="cellIs", dxfId="26", priority="13", operator="between")
+    rule.formula = ["2", "7"]
+
+    xml = tostring(rule.serialise())
+    expected = """
+    <cfRule type="cellIs" dxfId="26" priority="13" operator="between">
+    <formula>2</formula>
+    <formula>7</formula>
+    </cfRule>
+    """
+    diff = compare_xml(xml, expected)
+    assert diff is None, diff

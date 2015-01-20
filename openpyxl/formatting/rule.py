@@ -15,7 +15,12 @@ from openpyxl.descriptors import (
 from openpyxl.descriptors.excel import HexBinary
 from openpyxl.styles import Color
 
-from openpyxl.xml.functions import localname
+from openpyxl.xml.functions import (
+    localname,
+    Element,
+    SubElement,
+)
+
 
 class ExtensionList(Serialisable):
 
@@ -126,11 +131,13 @@ class Rule(Serialisable):
     rank = Integer(allow_none=True)
     stdDev = Integer(allow_none=True)
     equalAverage = Bool(allow_none=True)
-    formula = Sequence(expected_type=str, allow_none=True)
+    formula = Sequence(expected_type=str)
     colorScale = Typed(expected_type=ColorScale, allow_none=True)
     dataBar = Typed(expected_type=DataBar, allow_none=True)
     iconSet = Typed(expected_type=IconSet, allow_none=True)
     extLst = Typed(expected_type=ExtensionList, allow_none=True)
+
+    __elements__ = ('colorScale', 'dataBar', 'extLst', 'iconSet', 'formula')
 
     def __init__(self,
                  type,
@@ -146,7 +153,7 @@ class Rule(Serialisable):
                  rank=None,
                  stdDev=None,
                  equalAverage=None,
-                 formula=None,
+                 formula=[],
                  colorScale=None,
                  dataBar=None,
                  iconSet=None,
@@ -187,3 +194,20 @@ class Rule(Serialisable):
                 attrib[tag] = descriptor.expected_type.create(el)
         attrib['formula'] = formula
         return cls(**attrib)
+
+
+    def serialise(self, tagname=None):
+        attrib = dict(self)
+        del attrib['formula']
+        el = Element(self.tagname, attrib)
+
+        for child in self.__elements__:
+            obj = getattr(self, child)
+            if obj is None:
+                continue
+            if child == "formula":
+                for value in obj:
+                    SubElement(el, "formula").text = value
+            else:
+                el.append(obj.serialise)
+        return el
