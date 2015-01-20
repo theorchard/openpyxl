@@ -1,7 +1,7 @@
 from __future__ import absolute_import
 # copyright openpyxl 2010-2015
 
-from . import _Serialiasable
+from . import _Serialiasable, Sequence
 
 from openpyxl.compat import safe_string
 from openpyxl.xml.functions import Element, SubElement, safe_iterator, localname
@@ -39,7 +39,16 @@ class Serialisable(_Serialiasable):
             if tag in cls.__nested__:
                 attrib[tag] = cls._create_nested(el, tag)
             else:
-                attrib[tag] = desc.expected_type.create(el)
+                if hasattr(desc.expected_type, "create"):
+                    obj = desc.expected_type.create(el)
+                else:
+                    obj = el.text
+                if isinstance(desc, Sequence):
+                    if tag not in attrib:
+                        attrib[tag] = []
+                    attrib[tag].append(obj)
+                else:
+                    attrib[tag] = obj
         return cls(**attrib)
 
 
@@ -69,7 +78,13 @@ class Serialisable(_Serialiasable):
                 SubElement(el, n, val=safe_string(value))
         for child in self.__elements__:
             obj = getattr(self, child)
-            if obj is not None:
+            if isinstance(obj, tuple):
+                for v in obj:
+                    if hasattr(v, 'serialisable'):
+                        el.append(v.serialise(tagname=child))
+                    else:
+                        SubElement(el, child).text = v
+            elif obj is not None:
                 el.append(obj.serialise(tagname=child))
         return el
 
