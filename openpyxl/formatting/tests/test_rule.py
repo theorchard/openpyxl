@@ -19,5 +19,11 @@ def test_create(Rule, datadir):
     datadir.chdir()
     with open("worksheet.xml") as src:
         xml = fromstring(src.read())
+
+    rules = []
     for el in xml.findall("{%s}conditionalFormatting/{%s}cfRule" % (SHEET_MAIN_NS, SHEET_MAIN_NS)):
-        rule = Rule.create(el)
+        rules.append(Rule.create(el))
+
+    assert len(rules) == 30
+    assert rules[17].formula == ('2', '7')
+    assert rules[-1].formula == ("AD1>3",)
