@@ -27,7 +27,9 @@ class ExtensionList(Serialisable):
     pass
 
 
-class Cfvo(Serialisable):
+class FormatObject(Serialisable):
+
+    tagname = "cfvo"
 
     type = Set(values=(['num', 'percent', 'max', 'min', 'formula', 'percentile']))
     val = String(allow_none=True)
@@ -48,10 +50,12 @@ class Cfvo(Serialisable):
 
 class RuleType(Serialisable):
 
-    cfvo = Sequence(expected_type=Cfvo)
+    cfvo = Sequence(expected_type=FormatObject)
 
 
 class IconSet(RuleType):
+
+    tagname = "iconSet"
 
     iconSet = NoneSet(values=(['3Arrows', '3ArrowsGray', '3Flags',
                            '3TrafficLights1', '3TrafficLights2', '3Signs', '3Symbols', '3Symbols2',
@@ -77,6 +81,8 @@ class IconSet(RuleType):
 
 class DataBar(RuleType):
 
+    tagname = "dataBar"
+
     minLength = Integer(allow_none=True)
     maxLength = Integer(allow_none=True)
     showValue = Bool(allow_none=True)
@@ -98,6 +104,8 @@ class DataBar(RuleType):
 
 class ColorScale(RuleType):
 
+    tagname = "colorScale"
+
     color = Sequence(expected_type=Color)
 
     def __init__(self,
@@ -118,7 +126,7 @@ class Rule(Serialisable):
                         'notContainsBlanks', 'containsErrors', 'notContainsErrors', 'timePeriod',
                         'aboveAverage']))
     dxfId = Integer(allow_none=True)
-    priority = Integer(allow_none=True)
+    priority = Integer()
     stopIfTrue = Bool(allow_none=True)
     aboveAverage = Bool(allow_none=True)
     percent = Bool(allow_none=True)
