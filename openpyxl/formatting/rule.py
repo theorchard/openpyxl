@@ -108,6 +108,8 @@ class ColorScale(RuleType):
 
     color = Sequence(expected_type=Color)
 
+    __elements__ = ('cfvo', 'color')
+
     def __init__(self,
                  cfvo=None,
                  color=None,

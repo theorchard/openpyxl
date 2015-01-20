@@ -5,6 +5,7 @@ import pytest
 
 from openpyxl.xml.functions import fromstring, tostring
 from openpyxl.xml.constants import SHEET_MAIN_NS
+from openpyxl.styles import Color
 
 from openpyxl.tests.helper import compare_xml
 
@@ -33,14 +34,52 @@ class TestFormatObject:
         assert diff is None, diff
 
 
+@pytest.fixture
+def ColorScale():
+    from ..rule import ColorScale
+    return ColorScale
+
+
 class TestColorScale:
 
-    def test_create(self):
-        pass
+    def test_create(self, ColorScale):
+        src = """
+        <colorScale xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main">
+        <cfvo type="min"/>
+        <cfvo type="max"/>
+        <color rgb="FFFF7128"/>
+        <color rgb="FFFFEF9C"/>
+        </colorScale>
+        """
+        xml = fromstring(src)
+        cs = ColorScale.create(xml)
+        assert len(cs.cfvo) == 2
+        assert len(cs.color) == 2
 
 
-    def test_serialise(self):
-        pass
+    def test_serialise(self, ColorScale, FormatObject):
+        fo1 = FormatObject(type="min", val="0")
+        fo2 = FormatObject(type="percent", val="50")
+        fo3 = FormatObject(type="max", val="0")
+
+        col1 = Color(rgb="FFFF0000")
+        col2 = Color(rgb="FFFFFF00")
+        col3 = Color(rgb="FF00B050")
+
+        cs = ColorScale(cfvo=[fo1, fo2, fo3], color=[col1, col2, col3])
+        xml = tostring(cs.serialise())
+        expected = """
+        <colorScale>
+        <cfvo type="min" val="0"/>
+        <cfvo type="percent" val="50"/>
+        <cfvo type="max" val="0"/>
+        <color rgb="FFFF0000"/>
+        <color rgb="FFFFFF00"/>
+        <color rgb="FF00B050"/>
+        </colorScale>
+        """
+        diff = compare_xml(xml, expected)
+        assert diff is None, diff
 
 
 class TestDataBar:
