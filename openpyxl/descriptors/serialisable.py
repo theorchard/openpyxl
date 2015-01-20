@@ -80,7 +80,7 @@ class Serialisable(_Serialiasable):
             obj = getattr(self, child)
             if isinstance(obj, tuple):
                 for v in obj:
-                    if hasattr(v, 'serialisable'):
+                    if hasattr(v, 'serialise'):
                         el.append(v.serialise(tagname=child))
                     else:
                         SubElement(el, child).text = v
