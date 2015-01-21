@@ -8,6 +8,8 @@ from io import BytesIO
 from openpyxl.xml.constants import SHEET_MAIN_NS
 from openpyxl.xml.functions import Element, xmlfile, SubElement
 
+PRESERVE_SPACE = '{%s}space' % "http://www.w3.org/XML/1998/namespace"
+
 def write_string_table(string_table):
     """Write the string table xml."""
     out = BytesIO()
@@ -18,7 +20,7 @@ def write_string_table(string_table):
             for key in string_table:
                 el = Element('si')
                 if key.strip() != key:
-                    el.set('xml:space', 'preserve')
+                    el.set(PRESERVE_SPACE, 'preserve')
                 text = SubElement(el, 't')
                 text.text = key
                 xf.write(el)
