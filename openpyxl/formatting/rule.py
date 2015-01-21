@@ -32,7 +32,7 @@ class FormatObject(Serialisable):
     tagname = "cfvo"
 
     type = Set(values=(['num', 'percent', 'max', 'min', 'formula', 'percentile']))
-    val = String(allow_none=True)
+    val = Integer(allow_none=True)
     gte = Bool(allow_none=True)
     extLst = Typed(expected_type=ExtensionList, allow_none=True)
 

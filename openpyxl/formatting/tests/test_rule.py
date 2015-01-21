@@ -22,12 +22,12 @@ class TestFormatObject:
         xml = fromstring("""<cfvo type="num" val="3"/>""")
         cfvo = FormatObject.create(xml)
         assert cfvo.type == "num"
-        assert cfvo.val == "3"
+        assert cfvo.val == 3
         assert cfvo.gte is None
 
 
     def test_serialise(self, FormatObject):
-        cfvo = FormatObject(type="percent", val="4")
+        cfvo = FormatObject(type="percent", val=4)
         xml = tostring(cfvo.serialise())
         expected = """<cfvo type="percent" val="4"/>"""
         diff = compare_xml(xml, expected)
