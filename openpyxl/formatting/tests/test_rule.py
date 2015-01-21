@@ -120,14 +120,48 @@ class TestDataBar:
         assert diff is None, diff
 
 
-class TesIconSet:
+@pytest.fixture
+def IconSet():
+    from ..rule import IconSet
+    return IconSet
 
-    def test_create(self):
-        pass
+
+class TestIconSet:
+
+    def test_create(self, IconSet):
+        src = """
+        <iconSet iconSet="5Rating" xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main">
+          <cfvo type="percent" val="0"/>
+          <cfvo type="percentile" val="20"/>
+          <cfvo type="percentile" val="40"/>
+          <cfvo type="percentile" val="60"/>
+          <cfvo type="percentile" val="80"/>
+        </iconSet>
+        """
+        xml = fromstring(src)
+        icon = IconSet.create(xml)
+        assert icon.iconSet == "5Rating"
+        assert len(icon.cfvo) == 5
 
 
-    def test_serialise(self):
-        pass
+    def test_serialise(self, IconSet, FormatObject):
+        fo1 = FormatObject(type="num", val="2")
+        fo2 = FormatObject(type="num", val="4")
+        fo3 = FormatObject(type="num", val="6")
+        fo4 = FormatObject(type="percent", val="0")
+        icon = IconSet(cfvo=[fo1, fo2, fo3, fo4], iconSet="4ArrowsGray", reverse=True, showValue=False)
+        xml = tostring(icon.serialise())
+        expected = """
+        <iconSet iconSet="4ArrowsGray" showValue="0" reverse="1">
+          <cfvo type="num" val="2"/>
+          <cfvo type="num" val="4"/>
+          <cfvo type="num" val="6"/>
+          <cfvo type="percent" val="0"/>
+        </iconSet>
+        """
+        diff = compare_xml(xml, expected)
+        assert diff is None, diff
+
 
 
 @pytest.fixture

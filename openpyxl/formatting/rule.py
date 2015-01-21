@@ -62,8 +62,10 @@ class IconSet(RuleType):
                            '4Arrows', '4ArrowsGray', '4RedToBlack', '4Rating', '4TrafficLights',
                            '5Arrows', '5ArrowsGray', '5Rating', '5Quarters']))
     showValue = Bool(allow_none=True)
-    percent = Bool()
+    percent = Bool(allow_none=True)
     reverse = Bool(allow_none=True)
+
+    __elements__ = ("cfvo",)
 
     def __init__(self,
                  iconSet=None,
