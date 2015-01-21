@@ -54,10 +54,10 @@ class ExternalRange(Strict):
     """
 
     name = String()
-    refersTo = String()
+    refersTo = String(allow_none=True)
     sheetId = String(allow_none=True)
 
-    def __init__(self, name, refersTo, sheetId=None):
+    def __init__(self, name, refersTo=None, sheetId=None):
         self.name = name
         self.refersTo = refersTo
         self.sheetId = sheetId
