@@ -82,17 +82,45 @@ class TestColorScale:
         assert diff is None, diff
 
 
-class TestDataBar:
-
-    def test_create(self):
-        pass
-
-
-    def test_serialise(self):
-        pass
+@pytest.fixture
+def DataBar():
+    from ..rule import DataBar
+    return DataBar
 
 
 class TestDataBar:
+
+    def test_create(self, DataBar):
+        src = """
+        <dataBar xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main">
+        <cfvo type="min"/>
+        <cfvo type="max"/>
+        <color rgb="FF638EC6"/>
+        </dataBar>
+        """
+        xml = fromstring(src)
+        db = DataBar.create(xml)
+        assert len(db.cfvo) == 2
+        assert db.color.value == "FF638EC6"
+
+
+    def test_serialise(self, DataBar, FormatObject):
+        fo1 = FormatObject(type="min", val="0")
+        fo2 = FormatObject(type="percent", val="50")
+        db = DataBar(minLength=4, maxLength=10, cfvo=[fo1, fo2], color="FF2266", showValue=True)
+        xml = tostring(db.serialise())
+        expected = """
+        <dataBar maxLength="10" minLength="4" showValue="1">
+          <cfvo type="min" val="0"></cfvo>
+          <cfvo type="percent" val="50"></cfvo>
+          <color rgb="00FF2266"></color>
+         </dataBar>
+        """
+        diff = compare_xml(xml, expected)
+        assert diff is None, diff
+
+
+class TesIconSet:
 
     def test_create(self):
         pass

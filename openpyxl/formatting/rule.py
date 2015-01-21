@@ -13,7 +13,7 @@ from openpyxl.descriptors import (
     Set,
     Integer,)
 from openpyxl.descriptors.excel import HexBinary
-from openpyxl.styles import Color
+from openpyxl.styles.colors import Color, ColorDescriptor
 
 from openpyxl.xml.functions import (
     localname,
@@ -86,7 +86,9 @@ class DataBar(RuleType):
     minLength = Integer(allow_none=True)
     maxLength = Integer(allow_none=True)
     showValue = Bool(allow_none=True)
-    color = Sequence(expected_type=Color)
+    color = ColorDescriptor()
+
+    __elements__ = ('cfvo', 'color')
 
     def __init__(self,
                  minLength=None,
