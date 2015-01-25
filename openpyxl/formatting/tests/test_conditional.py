@@ -12,27 +12,27 @@ from openpyxl.tests.helper import compare_xml
 
 
 @pytest.fixture
-def ConditionalFormat():
-    from ..conditional import ConditionalFormat
-    return ConditionalFormat
+def ConditionalStyle():
+    from ..conditional import ConditionaStyle
+    return ConditionaStyle
 
 
-def test_parse(ConditionalFormat, datadir):
+def test_parse(ConditionalStyle, datadir):
     datadir.chdir()
     with open("dxf_style.xml") as content:
         src = content.read()
     xml = fromstring(src)
     formats = []
     for node in xml.findall("{%s}dxfs/{%s}dxf" % (SHEET_MAIN_NS, SHEET_MAIN_NS) ):
-        formats.append(ConditionalFormat.create(node))
+        formats.append(ConditionalStyle.create(node))
     assert len(formats) == 164
     cond = formats[1]
     assert cond.font == Font(underline="double", color=Color(auto=1), strikethrough=True, italic=True)
     assert cond.fill == PatternFill(end_color='FFFFC7CE')
 
 
-def test_serialise(ConditionalFormat):
-    cond = ConditionalFormat()
+def test_serialise(ConditionalStyle):
+    cond = ConditionalStyle()
     cond.font = Font()
     cond.fill = PatternFill()
     xml = tostring(cond.serialise())

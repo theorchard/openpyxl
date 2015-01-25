@@ -22,6 +22,9 @@ from openpyxl.xml.functions import (
 )
 
 
+from .conditional import ConditionaStyle
+
+
 class ExtensionList(Serialisable):
 
     pass
@@ -152,6 +155,7 @@ class Rule(Serialisable):
     dataBar = Typed(expected_type=DataBar, allow_none=True)
     iconSet = Typed(expected_type=IconSet, allow_none=True)
     extLst = Typed(expected_type=ExtensionList, allow_none=True)
+    style = Typed(expected_type=ConditionaStyle, allow_none=True)
 
     __elements__ = ('colorScale', 'dataBar', 'extLst', 'iconSet', 'formula')
 
@@ -174,6 +178,7 @@ class Rule(Serialisable):
                  dataBar=None,
                  iconSet=None,
                  extLst=None,
+                 style=None,
                 ):
         self.type = type
         self.dxfId = dxfId
@@ -193,3 +198,4 @@ class Rule(Serialisable):
         self.dataBar = dataBar
         self.iconSet = iconSet
         self.extLst = extLst
+        self.style = style

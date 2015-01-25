@@ -20,7 +20,7 @@ from openpyxl.styles import (
     Alignment,
     borders,
 )
-from openpyxl.formatting.conditional import ConditionalFormat
+from openpyxl.formatting.conditional import ConditionaStyle
 from openpyxl.styles.colors import COLOR_INDEX, Color
 from openpyxl.styles.proxy import StyleId
 from openpyxl.styles.named_styles import NamedStyle
@@ -76,7 +76,7 @@ class SharedStylesParser(object):
     def parse_dxfs(self):
         """Read in the dxfs effects - used by conditional formatting."""
         for node in self.root.findall("{%s}dxfs/{%s}dxf" % (SHEET_MAIN_NS, SHEET_MAIN_NS) ):
-            self.cond_styles.append(ConditionalFormat.create(node))
+            self.cond_styles.append(ConditionaStyle.create(node))
 
 
     def parse_fonts(self):

@@ -28,7 +28,7 @@ class NumFmt(Serialisable):
         self.formatCode = formatCode
 
 
-class ConditionalFormat(Serialisable):
+class ConditionaStyle(Serialisable):
 
     tagname = "dxf"
 

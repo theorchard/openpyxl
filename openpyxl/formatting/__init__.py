@@ -5,7 +5,7 @@ from openpyxl.compat import iteritems, OrderedDict, deprecated
 
 from openpyxl.styles import Font, PatternFill, Border
 from .rules import CellIsRule, ColorScaleRule, FormatRule, FormulaRule
-from .conditional import ConditionalFormat
+from .conditional import ConditionaStyle
 
 
 def unpack_rules(cfRules):
@@ -84,7 +84,7 @@ class ConditionalFormatting(object):
         for rules in self.cf_rules.values():
             for rule in rules:
                 if 'dxf' in rule:
-                    dxf = ConditionalFormat()
+                    dxf = ConditionaStyle()
                     if 'font' in rule['dxf'] and isinstance(rule['dxf']['font'], Font):
                         # DXF font is limited to color, bold, italic, underline and strikethrough
                         dxf.font = rule['dxf']['font']
