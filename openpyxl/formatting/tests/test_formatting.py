@@ -393,31 +393,15 @@ def test_operator_expansion(value, expansion):
     assert cf2.operator == expansion
 
 
-class TestFormulaRule(object):
+def test_formula_rule():
 
-    def setup(self):
-        self.workbook = WB()
-
-    def test_formula_rule(self):
-        class WS():
-            conditional_formatting = ConditionalFormatting()
-        worksheet = WS()
-        worksheet.conditional_formatting.add('C1:C10', FormulaRule(formula=['ISBLANK(C1)'], stopIfTrue=True))
-        worksheet.conditional_formatting._save_styles(self.workbook)
-
-        cfs = write_conditional_formatting(worksheet)
-        xml = b""
-        for cf in cfs:
-            xml += tostring(cf)
-
-        diff = compare_xml(xml, """
-        <conditionalFormatting sqref="C1:C10">
-          <cfRule dxfId="0" type="expression" stopIfTrue="1" priority="1">
-            <formula>ISBLANK(C1)</formula>
-          </cfRule>
-        </conditionalFormatting>
-        """)
-        assert diff is None, diff
+    cf1 = FormulaRule(formula=['ISBLANK(C1)'], stopIfTrue=True)
+    assert cf1.rule == {'dxf':
+                        {'border': None, 'fill': None, 'font': None},
+                        'formula': ['ISBLANK(C1)'],
+                        'stopIfTrue': '1',
+                        'type': 'expression'
+                        }
 
 
 def test_conditional_formatting_read(datadir):
