@@ -349,40 +349,28 @@ class TestConditionalFormatting(object):
 
 class TestColorScaleRule(object):
 
-    def setup(self):
-        self.workbook = WB()
-
     def test_two_colors(self):
-        cf = ConditionalFormatting()
-
         cfRule = ColorScaleRule(start_type='min', start_value=None, start_color='FFAA0000',
                                 end_type='max', end_value=None, end_color='FF00AA00')
-        cf.add('A1:A10', cfRule)
-        rules = cf.cf_rules
-        assert 'A1:A10' in rules
-        assert len(cf.cf_rules['A1:A10']) == 1
-        assert rules['A1:A10'][0]['priority'] == 1
-        assert rules['A1:A10'][0]['type'] == 'colorScale'
-        assert rules['A1:A10'][0]['colorScale']['cfvo'][0]['type'] == 'min'
-        assert rules['A1:A10'][0]['colorScale']['cfvo'][1]['type'] == 'max'
+        assert dict(cfRule) == {'colorScale':
+                                {'cfvo': [{'type': 'min'}, {'type': 'max'}],
+                                'color': ['FFAA0000', 'FF00AA00']},
+                                'type': 'colorScale'
+                                }
+
 
     def test_three_colors(self):
-        cf = ConditionalFormatting()
         cfRule = ColorScaleRule(start_type='percentile', start_value=10, start_color='FFAA0000',
                                 mid_type='percentile', mid_value=50, mid_color='FF0000AA',
                                 end_type='percentile', end_value=90, end_color='FF00AA00')
-        cf.add('B1:B10', cfRule)
-        rules = cf.cf_rules
-        assert 'B1:B10' in rules
-        assert len(cf.cf_rules['B1:B10']) == 1
-        assert rules['B1:B10'][0]['priority'] == 1
-        assert rules['B1:B10'][0]['type'] == 'colorScale'
-        assert rules['B1:B10'][0]['colorScale']['cfvo'][0]['type'] == 'percentile'
-        assert rules['B1:B10'][0]['colorScale']['cfvo'][0]['val'] == '10'
-        assert rules['B1:B10'][0]['colorScale']['cfvo'][1]['type'] == 'percentile'
-        assert rules['B1:B10'][0]['colorScale']['cfvo'][1]['val'] == '50'
-        assert rules['B1:B10'][0]['colorScale']['cfvo'][2]['type'] == 'percentile'
-        assert rules['B1:B10'][0]['colorScale']['cfvo'][2]['val'] == '90'
+        assert dict(cfRule) == {'colorScale':
+                                {'cfvo': [
+                                    {'type': 'percentile', 'val':'10'},
+                                    {'type': 'percentile', 'val':'50'},
+                                    {'type': 'percentile', 'val':'90'}],
+                                'color': ['FFAA0000', 'FF0000AA', 'FF00AA00']},
+                                'type': 'colorScale'
+                                }
 
 
 @pytest.mark.parametrize("value, expansion",
