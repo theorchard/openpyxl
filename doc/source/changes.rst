@@ -35,6 +35,7 @@ Bug fixes
 ---------
 * `#403 <https://bitbucket.org/openpyxl/openpyxl/issue/403>`_ Cannot add comments in write-only mode
 * `#401 <https://bitbucket.org/openpyxl/openpyxl/issue/401>`_ Creating cells in an empty row raises an exception
+* `#409 <https://bitbucket.org/openpyxl/openpyxl/issue/409>`_ refersTo is an optional attribute
 
 
 Minor changes
@@ -199,8 +200,10 @@ Bug fixes
 ==================
 
 2.0.1 (2014-05-13)  brown bag
+=============================
 
 2.0.0 (2014-05-13)  brown bag
+=============================
 
 
 Major changes
