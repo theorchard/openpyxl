@@ -58,7 +58,7 @@ StyleId = namedtuple("StyleId", "alignment border fill font number_format protec
 
 class StyledObject(object):
     """
-    Mixin Class for stylable objects implementing proxy and lookup functions
+    Mixin Class for read only styled objects implementing proxy and lookup functions
     """
 
     @abstractmethod
@@ -81,10 +81,6 @@ class StyledObject(object):
         if fo is not None:
             return StyleProxy(fo)
 
-    @font.setter
-    def font(self, value):
-        self._font_id = self._fonts.add(value)
-
 
     @abstractproperty
     def _fills(self):
@@ -94,10 +90,6 @@ class StyledObject(object):
     def fill(self):
         fo = self._fills[self._fill_id]
         return StyleProxy(fo)
-
-    @fill.setter
-    def fill(self, value):
-        self._fill_id = self._fills.add(value)
 
 
     @abstractproperty
@@ -109,10 +101,6 @@ class StyledObject(object):
         fo = self._borders[self._border_id]
         return StyleProxy(fo)
 
-    @border.setter
-    def border(self, value):
-        self._border_id = self._borders.add(value)
-
 
     @abstractproperty
     def _alignments(self):
@@ -122,10 +110,6 @@ class StyledObject(object):
     def alignment(self):
         fo = self._alignments[self._alignment_id]
         return StyleProxy(fo)
-
-    @alignment.setter
-    def alignment(self, value):
-        self._alignment_id = self._alignments.add(value)
 
 
     @abstractproperty
@@ -137,10 +121,6 @@ class StyledObject(object):
         fo = self._protections[self._protection_id]
         return StyleProxy(fo)
 
-    @protection.setter
-    def protection(self, value):
-        self._protection_id = self._protections.add(value)
-
 
     @abstractproperty
     def _styles(self):
@@ -151,10 +131,6 @@ class StyledObject(object):
         fo = self._styles[self._style_id]
         if fo is not None:
             return StyleProxy(fo)
-
-    @style.setter
-    def style(self, value):
-        self._style_id = self._styles.add(value)
 
 
     @abstractproperty
@@ -190,7 +166,42 @@ class StyledObject(object):
             return BUILTIN_FORMATS.get(self._number_format_id, "General")
         return self._number_formats[self._number_format_id - 164]
 
-    @number_format.setter
+
+class StyleableObject(StyledObject):
+    """A styled object that can be modified"""
+
+
+    @StyledObject.font.setter
+    def font(self, value):
+        self._font_id = self._fonts.add(value)
+
+
+    @StyledObject.fill.setter
+    def fill(self, value):
+        self._fill_id = self._fills.add(value)
+
+
+    @StyledObject.border.setter
+    def border(self, value):
+        self._border_id = self._borders.add(value)
+
+
+    @StyledObject.alignment.setter
+    def alignment(self, value):
+        self._alignment_id = self._alignments.add(value)
+
+
+    @StyledObject.protection.setter
+    def protection(self, value):
+        self._protection_id = self._protections.add(value)
+
+
+    @StyledObject.style.setter
+    def style(self, value):
+        self._style_id = self._styles.add(value)
+
+
+    @StyledObject.number_format.setter
     def number_format(self, value):
         _id = BUILTIN_FORMATS_REVERSE.get(value)
         if _id is None:
