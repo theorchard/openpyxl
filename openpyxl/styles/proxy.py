@@ -55,6 +55,25 @@ class StyleProxy(object):
 StyleId = namedtuple("StyleId", "alignment border fill font number_format protection")
 
 
+class _DummyWorkbook(object):
+    """Bootstrap object for StyleObjects"""
+
+    __slots__ = ()
+
+    _fonts = IndexedList()
+    _fills = IndexedList()
+    _borders = IndexedList()
+    _alignments = IndexedList()
+    _protections = IndexedList()
+    _number_formats = IndexedList()
+
+
+class _DummyWorksheet(object):
+    """Bootstrap object for StyleObjects"""
+
+    __slots__ = ()
+    parent = _DummyWorkbook()
+
 
 class StyledObject(object):
     """
@@ -62,7 +81,7 @@ class StyledObject(object):
     """
 
     @abstractmethod
-    def __init__(self):
+    def __init__(self, sheet=None):
         self._font_id = 0
         self._fill_id = 0
         self._border_id = 0
@@ -70,10 +89,11 @@ class StyledObject(object):
         self._protection_id = 0
         self._number_format_id = 0
         self._style_id = 0
+        self.parent = sheet or _DummyWorksheet()
 
-    @abstractproperty
+    @property
     def _fonts(self):
-        return IndexedList()
+        return self.parent.parent._fonts
 
     @property
     def font(self):
@@ -81,20 +101,18 @@ class StyledObject(object):
         if fo is not None:
             return StyleProxy(fo)
 
-
-    @abstractproperty
+    @property
     def _fills(self):
-        return IndexedList()
+        return self.parent.parent._fills
 
     @property
     def fill(self):
         fo = self._fills[self._fill_id]
         return StyleProxy(fo)
 
-
-    @abstractproperty
+    @property
     def _borders(self):
-        return IndexedList()
+        return self.parent.parent._borders
 
     @property
     def border(self):
@@ -102,19 +120,19 @@ class StyledObject(object):
         return StyleProxy(fo)
 
 
-    @abstractproperty
+    @property
     def _alignments(self):
-        return IndexedList()
+        return self.parent.parent._alignments
 
     @property
     def alignment(self):
         fo = self._alignments[self._alignment_id]
         return StyleProxy(fo)
 
-
-    @abstractproperty
+    @property
     def _protections(self):
-        return IndexedList()
+        return self.parent.parent._protections
+
 
     @property
     def protection(self):
@@ -122,9 +140,10 @@ class StyledObject(object):
         return StyleProxy(fo)
 
 
-    @abstractproperty
+    # legacy
+    @property
     def _styles(self):
-        return IndexedList()
+        return self.parent.parent.shared_styles
 
     @property
     def style(self):
@@ -133,9 +152,9 @@ class StyledObject(object):
             return StyleProxy(fo)
 
 
-    @abstractproperty
+    @property
     def _cell_styles(self):
-        return IndexedList()
+        return self.parent.parent._cell_styles
 
     @property
     def style_id(self):
@@ -156,9 +175,10 @@ class StyledObject(object):
                or self._number_format_id \
                or self._protection_id \
 
-    @abstractproperty
+    @property
     def _number_formats(self):
-        return IndexedList()
+        return self.parent.parent._number_formats
+
 
     @property
     def number_format(self):

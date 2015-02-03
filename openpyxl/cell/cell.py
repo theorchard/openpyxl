@@ -351,39 +351,6 @@ class Cell(StyleableObject):
         """
         return self.data_type == self.TYPE_NUMERIC and is_date_format(self.number_format)
 
-    @property
-    def _alignments(self):
-        return self.parent.parent._alignments
-
-    @property
-    def _borders(self):
-        return self.parent.parent._borders
-
-    @property
-    def _fills(self):
-        return self.parent.parent._fills
-
-    @property
-    def _fonts(self):
-        return self.parent.parent._fonts
-
-    @property
-    def _number_formats(self):
-        return self.parent.parent._number_formats
-
-    @property
-    def _protections(self):
-        return self.parent.parent._protections
-
-    # legacy
-    @property
-    def _styles(self):
-        return self.parent.parent.shared_styles
-
-    @property
-    def _cell_styles(self):
-        return self.parent.parent._cell_styles
-
     def offset(self, row=0, column=0):
         """Returns a cell location relative to this cell.
 
