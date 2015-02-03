@@ -467,9 +467,11 @@ class TestWorksheet(object):
         wb = Workbook()
         ws = wb.active
         scope = wb._active_sheet_index
-        print_title = ws.add_print_title(1, rows_or_cols='rows')
-        named_range = wb.create_named_range('_xlnm.Print_Titles', ws, '$1:$1', scope)
-        assert print_title == named_range
+        ws.add_print_title(1, rows_or_cols='rows')
+        print_titles = wb.get_named_range('_xlnm.Print_Titles')
+        assert print_titles.name == '_xlnm.Print_Titles'
+        assert str(print_titles.destinations) == """[(<Worksheet "Sheet">, '$1:$1')]"""
+        assert print_titles.scope == scope
 
 
 class TestPositioning(object):
