@@ -461,6 +461,15 @@ class TestWorksheet(object):
         ws = Worksheet(self.wb)
         ws._merged_cells = ["A1:D4"]
         ws.unmerge_cells(start_row=1, start_column=1, end_row=4, end_column=4)
+        
+    
+    def test_print_titles(self):
+        wb = Workbook()
+        ws = wb.active
+        scope = wb._active_sheet_index
+        print_title = ws.add_print_title(1, rows_or_cols='rows')
+        named_range = wb.create_named_range('_xlnm.Print_Titles', ws, '$1:$1', scope)
+        assert print_title == named_range
 
 
 class TestPositioning(object):
