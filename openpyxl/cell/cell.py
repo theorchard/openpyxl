@@ -126,7 +126,7 @@ class Cell(StyledObject):
         # _value is the stored value, while value is the displayed value
         self._value = None
         self._hyperlink_rel = None
-        self.data_type = self.TYPE_NULL
+        self.data_type = 'n'
         self.parent = worksheet
         if value is not None:
             self.value = value
@@ -188,13 +188,15 @@ class Cell(StyledObject):
 
     def _bind_value(self, value):
         """Given a value, infer the correct data type"""
-        if not isinstance(value, KNOWN_TYPES):
-            raise ValueError("Cannot convert {0} to Excel".format(value))
 
-        self.data_type = self.TYPE_NUMERIC
+        self.data_type = "n"
 
         if isinstance(value, bool):
             self.data_type = self.TYPE_BOOL
+
+        elif isinstance(value, NUMERIC_TYPES):
+            pass
+
         elif isinstance(value, NUMERIC_TYPES):
             self.data_type = self.TYPE_NUMERIC
 
@@ -202,7 +204,8 @@ class Cell(StyledObject):
             self.data_type = self.TYPE_NUMERIC
             value = self._cast_datetime(value)
 
-        elif isinstance(value, basestring):
+        elif isinstance(value, STRING_TYPES):
+            value = self.check_string(value)
             self.data_type = self.TYPE_STRING
             if len(value) > 1 and value.startswith("="):
                 self.data_type = self.TYPE_FORMULA
@@ -210,7 +213,11 @@ class Cell(StyledObject):
                 self.data_type = self.TYPE_ERROR
             elif self.guess_types:
                 value = self._infer_value(value)
-        self.set_explicit_value(value, self.data_type)
+
+        elif value is not None:
+            raise ValueError("Cannot convert {0} to Excel".format(value))
+
+        self._value = value
 
 
     @deprecated("Method is private")
