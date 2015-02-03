@@ -152,7 +152,7 @@ class IterableWorksheet(Worksheet):
                         value = "=%s" % formula
 
                 yield ReadOnlyCell(self, row, column_str,
-                                   value, data_type, self.parent._cell_styles[style_id])
+                                   value, data_type, style_id)
             col_counter = column + 1
         if max_col is not None:
             for _ in range(col_counter, max_col+1):

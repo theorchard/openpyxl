@@ -226,9 +226,9 @@ def test_read_style_iter(tmpdir):
     '''
     Test if cell styles are read properly in iter mode.
     '''
-    tmpdir.chdir()
+    #tmpdir.chdir()
     from openpyxl import Workbook
-    from openpyxl.styles import Style, Font
+    from openpyxl.styles import Font
 
     FONT_NAME = "Times New Roman"
     FONT_SIZE = 15
@@ -246,7 +246,7 @@ def test_read_style_iter(tmpdir):
     ws_iter = wb_iter.worksheets[0]
     cell = ws_iter['A1']
 
-    assert cell.style.font == ft
+    assert cell.font == ft
 
 
 def test_read_hyperlinks_read_only(datadir, Workbook):

@@ -93,7 +93,7 @@ def DummyCell(dummy_sheet):
 
     dummy_sheet.parent._number_formats.add('d-mmm-yy')
     dummy_sheet.parent._cell_styles.add(DummyStyle())
-    cell = ReadOnlyCell(dummy_sheet, None, None, "23596", 'n', DummyStyle)
+    cell = ReadOnlyCell(dummy_sheet, None, None, "23596", 'n', 1)
     return cell
 
 

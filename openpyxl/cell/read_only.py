@@ -8,13 +8,17 @@ from openpyxl.cell import Cell
 from openpyxl.utils.datetime  import from_excel
 from openpyxl.styles import is_date_format, Style
 from openpyxl.styles.numbers import BUILTIN_FORMATS
+from openpyxl.styles.proxy import StyledObject
 
 
-class ReadOnlyCell(object):
+class ReadOnlyCell(StyledObject):
 
-    __slots__ = ('sheet', 'row', 'column', '_value', 'data_type', '_style_id')
+    __slots__ = ('sheet', 'row', 'column', '_value', 'data_type', '_style_id',
+                 '_font_id', '_border_id', '_fill_id', '_alignment_id', '_protection_id',
+                 '_number_format_id')
 
     def __init__(self, sheet, row, column, value, data_type=Cell.TYPE_NULL, style_id=None):
+        super(ReadOnlyCell, self).__init__(sheet=sheet)
         self._value = None
         self.row = row
         self.column = column
@@ -34,11 +38,11 @@ class ReadOnlyCell(object):
 
     @property
     def shared_strings(self):
-        return self.sheet.shared_strings
+        return self.parent.shared_strings
 
     @property
     def base_date(self):
-        return self.sheet.base_date
+        return self.parent.base_date
 
     @property
     def coordinate(self):
@@ -52,17 +56,42 @@ class ReadOnlyCell(object):
 
     @property
     def number_format(self):
-        if self.style_id is None:
+        if not self.style_id:
             return
-        nf = self.style_id.number_format
-        if nf < 164:
-            return BUILTIN_FORMATS.get(nf, "General")
-        else:
-            return self.sheet.parent._number_formats[nf - 164]
+        self._number_format_id = self.style_id.number_format
+        return super(ReadOnlyCell, self).number_format
 
     @property
     def style_id(self):
-        return self._style_id
+        if not self._style_id:
+            return
+        return self.parent.parent._cell_styles[self._style_id]
+
+    @property
+    def font(self):
+        self._font_id = self.style_id.font
+        return super(ReadOnlyCell, self).font
+
+    @property
+    def fill(self):
+        self._fill_id = self.style_id.fill
+        return super(ReadOnlyCell, self).fill
+
+    @property
+    def border(self):
+        self._border_id = self.style_id.border
+        return super(ReadOnlyCell, self).border
+
+    @property
+    def alignment(self):
+        self._alignment_id = self.style_id.alignment
+        return super(ReadOnlyCell, self).alignment
+
+    @property
+    def protection(self):
+        self._protection_id = self.style_id.protection
+        return super(ReadOnlyCell, self).protection
+
 
     @property
     def internal_value(self):
@@ -97,7 +126,7 @@ class ReadOnlyCell(object):
 
     @property
     def style(self):
-        wb = self.sheet.parent
+        wb = self.parent.parent
         font = wb._fonts[self.style_id.font]
         fill = wb._fills[self.style_id.fill]
         alignment = wb._alignments[self.style_id.alignment]
