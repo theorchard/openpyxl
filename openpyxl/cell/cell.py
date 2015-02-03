@@ -119,7 +119,7 @@ class Cell(StyleableObject):
 
 
     def __init__(self, worksheet, column, row, value=None):
-        super(Cell, self).__init__()
+        super(Cell, self).__init__(sheet=worksheet)
         self.column = column
         self.row = row
         self.coordinate = '%s%d' % (self.column, self.row)
@@ -127,7 +127,6 @@ class Cell(StyleableObject):
         self._value = None
         self._hyperlink_rel = None
         self.data_type = 'n'
-        self.parent = worksheet
         if value is not None:
             self.value = value
         self.xf_index = 0
