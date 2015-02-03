@@ -1,10 +1,8 @@
 from __future__ import absolute_import
 # Copyright (c) 2010-2015 openpyxl
 
-from abc import abstractmethod, abstractproperty
 from collections import namedtuple
 
-from openpyxl.compat.abc import ABC
 from openpyxl.utils.indexed_list import IndexedList
 
 from .numbers import BUILTIN_FORMATS, BUILTIN_FORMATS_REVERSE
@@ -80,7 +78,6 @@ class StyledObject(object):
     Mixin Class for read only styled objects implementing proxy and lookup functions
     """
 
-    @abstractmethod
     def __init__(self, sheet=None):
         self._font_id = 0
         self._fill_id = 0
