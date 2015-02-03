@@ -56,7 +56,7 @@ StyleId = namedtuple("StyleId", "alignment border fill font number_format protec
 
 
 
-class StyledObject(ABC):
+class StyledObject(object):
     """
     Mixin Class for stylable objects implementing proxy and lookup functions
     """
@@ -163,11 +163,17 @@ class StyledObject(ABC):
 
     @property
     def style_id(self):
-        style = StyleId(self._alignment_id, self._border_id,
-                            self._fill_id, self._font_id, self._number_format_id,
-                            self._protection_id)
+        style = StyleId(self._alignment_id,
+                        self._border_id,
+                        self._fill_id,
+                        self._font_id,
+                        self._number_format_id,
+                        self._protection_id)
         return self._cell_styles.add(style)
 
+    @property
+    def has_style(self):
+        return self._style_id != 0
 
     @abstractproperty
     def _number_formats(self):
