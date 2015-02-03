@@ -23,6 +23,7 @@ I'd also like to greatly thank all those who participate in the project (in alph
 * Brice Gelineau
 * Alex Gronholm
 * Yaroslav Halchenko
+* Josh Haywood
 * Jeff Holman
 * Brent Hoover
 * Eric Hurkman
