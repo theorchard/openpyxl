@@ -47,7 +47,7 @@ from openpyxl.utils import (
     coordinate_from_string,
 )
 from openpyxl.styles import numbers, is_date_format, Style
-from openpyxl.styles.proxy import StyledObject
+from openpyxl.styles.proxy import StyleableObject
 
 # constants
 
@@ -72,7 +72,7 @@ NUMBER_REGEX = re.compile(r'^-?([\d]|[\d]+\.[\d]*|\.[\d]+|[1-9][\d]+\.?[\d]*)((E
 ILLEGAL_CHARACTERS_RE = re.compile(r'[\000-\010]|[\013-\014]|[\016-\037]')
 
 
-class Cell(StyledObject):
+class Cell(StyleableObject):
     """Describes cell associated properties.
 
     Properties of interest include style, type, value, and address.
