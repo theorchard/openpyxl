@@ -120,7 +120,7 @@ class Cell(StyledObject):
 
     def __init__(self, worksheet, column, row, value=None):
         super(Cell, self).__init__()
-        self.column = column.upper()
+        self.column = column
         self.row = row
         self.coordinate = '%s%d' % (self.column, self.row)
         # _value is the stored value, while value is the displayed value
