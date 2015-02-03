@@ -352,11 +352,6 @@ class Cell(StyledObject):
         return self.data_type == self.TYPE_NUMERIC and is_date_format(self.number_format)
 
     @property
-    def has_style(self):
-        """Check if the parent worksheet has a style for this cell"""
-        return self.style_id is not 0
-
-    @property
     def _alignments(self):
         return self.parent.parent._alignments
 

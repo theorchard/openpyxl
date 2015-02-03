@@ -173,7 +173,12 @@ class StyledObject(object):
 
     @property
     def has_style(self):
-        return self._style_id != 0
+        return self._alignment_id \
+               or self._border_id \
+               or self._fill_id \
+               or self._font_id \
+               or self._number_format_id \
+               or self._protection_id \
 
     @abstractproperty
     def _number_formats(self):
