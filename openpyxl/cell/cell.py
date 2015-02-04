@@ -118,8 +118,8 @@ class Cell(StyleableObject):
 
 
 
-    def __init__(self, worksheet, column, row, value=None):
-        super(Cell, self).__init__(sheet=worksheet)
+    def __init__(self, worksheet, column, row, value=None, **kw):
+        super(Cell, self).__init__(sheet=worksheet, **kw)
         self.column = column
         self.row = row
         self.coordinate = '%s%d' % (self.column, self.row)

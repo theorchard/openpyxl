@@ -187,6 +187,15 @@ class StyledObject(object):
 class StyleableObject(StyledObject):
     """A styled object that can be modified"""
 
+    def __init__(self, sheet=None, font=0, fill=0, border=0, alignment=0, protection=0, number_format=0):
+        self._font_id = font
+        self._fill_id = fill
+        self._border_id = border
+        self._alignment_id = alignment
+        self._protection_id = protection
+        self._number_format_id = number_format
+        self.parent = sheet or _DummyWorksheet()
+
 
     @StyledObject.font.setter
     def font(self, value):
