@@ -165,12 +165,12 @@ class StyledObject(object):
 
     @property
     def has_style(self):
-        return self._alignment_id \
-               or self._border_id \
-               or self._fill_id \
-               or self._font_id \
-               or self._number_format_id \
-               or self._protection_id \
+        return bool(self._alignment_id
+               or self._border_id
+               or self._fill_id
+               or self._font_id
+               or self._number_format_id
+               or self._protection_id)
 
     @property
     def _number_formats(self):
@@ -213,9 +213,15 @@ class StyleableObject(StyledObject):
         self._protection_id = self._protections.add(value)
 
 
+    #legacy
     @StyledObject.style.setter
     def style(self, value):
         self._style_id = self._styles.add(value)
+
+
+    @StyledObject.style_id.setter
+    def style_id(self, value):
+        self._style_id = int(value)
 
 
     @StyledObject.number_format.setter
