@@ -268,7 +268,7 @@ class Worksheet(object):
         This adds n rows or columns at the top or left of the sheet
         """
         
-        scope = self.parent._active_sheet_index
+        scope = self.parent.get_index(self)
         
         if rows_or_cols == 'cols':
             r = '$A:$%s' % get_column_letter(n)
