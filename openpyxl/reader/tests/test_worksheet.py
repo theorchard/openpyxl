@@ -67,6 +67,8 @@ def Worksheet(Workbook):
         data_only = False
 
         def __init__(self):
+            self.shared_strings = IndexedList()
+            self.shared_strings.add("hello world")
             self.shared_styles = IndexedList()
             self.shared_styles.extend((28*[DummyStyle()]))
             self.shared_styles.add(Style())
@@ -106,13 +108,17 @@ def Worksheet(Workbook):
             self.row_dimensions = {}
             self._styles = {}
             self.cell = None
+            self._cells = {}
             self._data_validations = []
             self.header_footer = HeaderFooter()
 
         def __getitem__(self, value):
-            if self.cell is None:
-                self.cell = Cell(self, 'A', 1)
-            return self.cell
+            cell = self._cells.get(value)
+
+            if cell is None:
+                cell = Cell(self, 'A', 1)
+                self._cells[value] = cell
+            return cell
 
         def get_style(self, coordinate):
             return DummyStyle()
@@ -365,9 +371,9 @@ def test_inline_richtext(Worksheet, WorkSheetParser, datadir):
     element = sheet.find("{%s}sheetData/{%s}row[2]/{%s}c[18]" % (SHEET_MAIN_NS, SHEET_MAIN_NS, SHEET_MAIN_NS))
     assert element.get("r") == 'R2'
     parser.parse_cell(element)
-    cell = ws['B2'].style = ws.get_style(coordinate='')
-    assert ws['B2'].data_type == 's'
-    assert ws['B2'].value == "11 de September de 2014"
+    cell = ws['R2']
+    assert cell.data_type == 's'
+    assert cell.value == "11 de September de 2014"
 
 
 def test_data_validation(Worksheet, WorkSheetParser, datadir):
@@ -413,3 +419,18 @@ def test_header_footer(WorkSheetParser, datadir):
     assert ws.header_footer.left_footer.text == "Left footer"
     assert ws.header_footer.center_footer.text == "Middle Footer"
     assert ws.header_footer.right_footer.text == "Right Footer"
+
+
+def test_cell(WorkSheetParser, datadir):
+    datadir.chdir()
+    parser = WorkSheetParser
+    ws = parser.ws
+    parser.shared_strings[1] = "Arial Font, 10"
+
+    with open("complex-styles-worksheet.xml") as src:
+        sheet = fromstring(src.read())
+
+    element = sheet.find("{%s}sheetData/{%s}row[2]/{%s}c[1]" % (SHEET_MAIN_NS, SHEET_MAIN_NS, SHEET_MAIN_NS))
+    assert element.get('r') == 'A2'
+    parser.parse_cell(element)
+    #assert ws['A2']._font_id == 3

@@ -8,7 +8,7 @@ from io import BytesIO
 from openpyxl.xml.functions import iterparse
 
 # package imports
-from openpyxl.cell import get_column_letter
+from openpyxl.cell import Cell
 from openpyxl.worksheet import Worksheet, ColumnDimension, RowDimension
 from openpyxl.worksheet.iter_worksheet import IterableWorksheet
 from openpyxl.worksheet.page import PageMargins, PrintOptions, PageSetup
@@ -18,6 +18,11 @@ from openpyxl.xml.functions import safe_iterator
 from openpyxl.styles import Color
 from openpyxl.formatting import ConditionalFormatting
 from openpyxl.worksheet.properties import parse_sheetPr
+from openpyxl.utils import (
+    coordinate_from_string,
+    get_column_letter,
+    column_index_from_string
+    )
 
 
 def _get_xml_iter(xml_source):
@@ -115,16 +120,21 @@ class WorkSheetParser(object):
                 if ref:
                     self.ws.formula_attributes[coordinate]['ref'] = ref
 
-        cell = self.ws[coordinate]
+        styles = {}
+        style = None
         if style_id is not None:
-            cell._style_id = int(style_id)
-            style = self.style_table[cell._style_id]
-            cell.font = style.font
-            cell.fill = style.fill
-            cell.border = style.border
-            cell.alignment = style.alignment
+            style_id = int(style_id)
+            style = self.ws.parent.shared_styles[style_id]
+            style_id = self.ws.parent._cell_styles[style_id]
+
+        cell = self.ws[coordinate]
+        if style is not None:
+            cell._font_id = style_id.font
+            cell._border_id = style_id.border
+            cell._fill_id = style_id.fill
             cell.number_format = style.number_format
             cell.protection = style.protection
+            cell.alignment = style.alignment
 
         if value is not None:
             if data_type == 'n':
