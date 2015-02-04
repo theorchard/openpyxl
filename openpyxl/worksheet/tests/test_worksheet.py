@@ -233,8 +233,8 @@ class TestWorksheet(object):
         ws = Worksheet(self.wb)
         ws.append(['value'])
         assert ws['A1'].value == "value"
-        assert ws.row_dimensions[1].worksheet is ws
-        assert ws.column_dimensions['A'].worksheet is ws
+        assert ws.row_dimensions[1].parent is ws
+        assert ws.column_dimensions['A'].parent is ws
 
 
     def test_append_list(self):

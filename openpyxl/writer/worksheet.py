@@ -92,7 +92,6 @@ def write_cols(worksheet):
     """
     cols = []
     for label, dimension in iteritems(worksheet.column_dimensions):
-        dimension.style = worksheet._styles.get(label)
         col_def = dict(dimension)
         if col_def == {}:
             continue

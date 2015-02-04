@@ -58,6 +58,7 @@ def test_get_xml_iter():
 @pytest.fixture
 def Worksheet(Workbook):
     from openpyxl.styles import numbers
+    from openpyxl.styles.proxy import StyleId
     from openpyxl.worksheet.header_footer import HeaderFooter
 
     class DummyWorkbook:
@@ -75,6 +76,11 @@ def Worksheet(Workbook):
             self._borders = IndexedList()
             self._alignments = IndexedList()
             self._protections = IndexedList()
+            self._cell_styles = IndexedList()
+            for i in range(29):
+                self._cell_styles.add((StyleId(i, i, i, i, i, i)))
+            self._cell_styles.add(StyleId(number_format=0, font=0, fill=4, border=6, alignment=1, protection=0))
+
 
 
     class DummyStyle:
@@ -131,6 +137,7 @@ def test_col_width(datadir, Worksheet, WorkSheetParser):
         for _, col in cols:
             parser.parse_column_dimensions(col)
     assert set(ws.column_dimensions.keys()) == set(['A', 'C', 'E', 'I', 'G'])
+    assert ws.column_dimensions['A'].style_id == 0
     assert dict(ws.column_dimensions['A']) == {'max': '1', 'min': '1',
                                                'customWidth': '1',
                                                'width': '31.1640625'}
@@ -146,7 +153,8 @@ def test_hidden_col(datadir, Worksheet, WorkSheetParser):
         for _, col in cols:
             parser.parse_column_dimensions(col)
     assert 'D' in ws.column_dimensions
-    assert dict(ws.column_dimensions['D']) == {'customWidth': '1', 'hidden': '1', 'max': '4', 'min': '4'}
+    assert dict(ws.column_dimensions['D']) == {'customWidth': '1', 'hidden':
+                                               '1', 'max': '4', 'min': '4'}
 
 
 def test_styled_col(datadir, Worksheet, WorkSheetParser):
@@ -159,8 +167,7 @@ def test_styled_col(datadir, Worksheet, WorkSheetParser):
             parser.parse_column_dimensions(col)
     assert 'I' in ws.column_dimensions
     cd = ws.column_dimensions['I']
-    assert cd._style == 28
-    assert cd.style == Style()
+    assert cd.style_id == 28
     assert dict(cd) ==  {'customWidth': '1', 'max': '9', 'min': '9', 'width': '25', 'style':'28'}
 
 
@@ -190,7 +197,7 @@ def test_styled_row(datadir, Worksheet, WorkSheetParser):
             parser.parse_row_dimensions(row)
     assert 23 in ws.row_dimensions
     rd = ws.row_dimensions[23]
-    assert rd._style == 28
+    assert rd.style_id == 28
     assert rd.style == Style()
     assert dict(rd) == {'s':'28', 'customFormat':'1'}
 

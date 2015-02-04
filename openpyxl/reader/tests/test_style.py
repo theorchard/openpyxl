@@ -140,8 +140,8 @@ def test_read_complex_style(datadir):
     ws = wb.get_active_sheet()
     assert ws.column_dimensions['A'].width == 31.1640625
 
-    assert ws.column_dimensions['I'].style.font == Font(sz=12.0, color='FF3300FF', scheme='minor')
-    assert ws.column_dimensions['I'].style.fill == PatternFill(patternType='solid', fgColor='FF006600', bgColor=Color(indexed=64))
+    assert ws.column_dimensions['I'].font == Font(sz=12.0, color='FF3300FF', scheme='minor')
+    assert ws.column_dimensions['I'].fill == PatternFill(patternType='solid', fgColor='FF006600', bgColor=Color(indexed=64))
 
     assert ws['A2'].font == Font(sz=10, name='Arial', color=Color(theme=1))
     assert ws['A3'].font == Font(sz=12, name='Arial', bold=True, color=Color(theme=1))
