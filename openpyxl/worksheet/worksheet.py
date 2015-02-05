@@ -311,17 +311,32 @@ class Worksheet(object):
 
         return self._get_cell(coordinate)
 
-    def _get_cell(self, coordinate):
 
+    def _get_cell(self, coordinate):
+        """
+        Internal method for getting a cell from a worksheet.
+        Will create a new cell if one doesn't already exist.
+        """
+        coordinate = coordinate.upper()
         if not coordinate in self._cells:
             column, row = coordinate_from_string(coordinate)
             new_cell = Cell(self, column, row)
-            self._cells[coordinate] = new_cell
-            if column not in self.column_dimensions:
-                self.column_dimensions[column] = ColumnDimension(index=column, worksheet=self)
-            if row not in self.row_dimensions:
-                self.row_dimensions[row] = RowDimension(index=row, worksheet=self)
+            self._add_cell(new_cell)
         return self._cells[coordinate]
+
+
+    def _add_cell(self, cell):
+        """
+        Internal method for adding cell objects.
+        """
+        column = cell.column
+        row = cell.row
+        self._cells[cell.coordinate] = cell
+        if column not in self.column_dimensions:
+            self.column_dimensions[column] = ColumnDimension(index=column, worksheet=self)
+        if row not in self.row_dimensions:
+            self.row_dimensions[row] = RowDimension(index=row, worksheet=self)
+
 
     def __getitem__(self, key):
         """Convenience access by Excel style address"""
