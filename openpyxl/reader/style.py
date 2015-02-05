@@ -43,6 +43,7 @@ class SharedStylesParser(object):
         self.border_list = IndexedList()
         self.alignments = IndexedList()
         self.protections = IndexedList()
+        self.number_formats = IndexedList()
 
     def parse(self):
         self.parse_custom_num_formats()
@@ -61,6 +62,7 @@ class SharedStylesParser(object):
         for num_fmt_node in num_fmts:
             fmt_id = int(num_fmt_node.get('numFmtId'))
             fmt_code = num_fmt_node.get('formatCode').lower()
+            self.number_formats.append(fmt_code)
             custom_formats[fmt_id] = fmt_code
         self.custom_num_formats = custom_formats
 

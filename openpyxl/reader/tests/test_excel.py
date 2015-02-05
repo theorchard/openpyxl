@@ -41,3 +41,17 @@ def test_invalid_file_extension(extension):
     tmp = NamedTemporaryFile(suffix=extension)
     with pytest.raises(InvalidFileException):
         load_workbook(filename=tmp.name)
+
+
+
+def test_style_assignment(datadir):
+    from ..excel import load_workbook
+
+    datadir.chdir()
+    wb = load_workbook("complex-styles.xlsx")
+    assert len(wb._alignments) == 8
+    assert len(wb._fills) == 6
+    assert len(wb._fonts) == 8
+    assert len(wb._borders) == 7
+    assert len(wb._number_formats) == 0
+    assert len(wb._protections) == 0

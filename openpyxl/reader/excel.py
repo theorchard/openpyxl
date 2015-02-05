@@ -216,7 +216,9 @@ def _load_workbook(wb, archive, filename, read_only, keep_vba):
         wb._borders = parsed_styles.border_list
         wb._fonts = parsed_styles.font_list
         wb._fills = parsed_styles.fill_list
-        wb._numbers = parsed_styles.custom_num_formats
+        wb._number_formats = parsed_styles.number_formats
+        wb._protections = parsed_styles.protections
+        wb._alignments = parsed_styles.alignments
 
     wb.excel_base_date = read_excel_base_date(archive)
 

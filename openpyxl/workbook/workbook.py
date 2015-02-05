@@ -81,8 +81,7 @@ class Workbook(object):
         self._fonts = IndexedList()
         self._fonts.add(DEFAULT_FONT)
 
-        self._alignments = IndexedList()
-        self._alignments.add(Alignment())
+        self._alignments = IndexedList([Alignment()])
 
         self._borders = IndexedList()
         self._borders.add(DEFAULT_BORDER)
@@ -93,8 +92,7 @@ class Workbook(object):
 
         self._number_formats = IndexedList()
 
-        self._protections = IndexedList()
-        self._protections.add(Protection())
+        self._protections = IndexedList([Protection()])
 
         self._colors = IndexedList()
         self._cell_styles = IndexedList([StyleId(0, 0, 0, 0, 0, 0)])

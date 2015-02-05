@@ -330,6 +330,7 @@ def test_alignment(datadir, StyleReader):
         reader = StyleReader(src.read())
     reader.parse_cell_styles()
     st1 = reader.shared_styles[2]
+    assert len(reader.alignments) == 2
     assert st1.alignment.textRotation == 255
 
 

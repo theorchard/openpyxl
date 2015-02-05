@@ -122,7 +122,6 @@ class WorkSheetParser(object):
 
 
         styles = {}
-        style = None
         if style_id is not None:
             style_id = int(style_id)
             style = self.ws.parent.shared_styles[style_id]
@@ -132,10 +131,6 @@ class WorkSheetParser(object):
         column, row = coordinate_from_string(coordinate)
         cell = Cell(self.ws, column, row, **styles)
         self.ws._add_cell(cell)
-
-        if style is not None:
-            cell.protection = style.protection
-            cell.alignment = style.alignment
 
         if value is not None:
             if data_type == 'n':
