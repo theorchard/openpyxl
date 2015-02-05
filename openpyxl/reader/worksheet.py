@@ -120,19 +120,20 @@ class WorkSheetParser(object):
                 if ref:
                     self.ws.formula_attributes[coordinate]['ref'] = ref
 
+
         styles = {}
         style = None
         if style_id is not None:
             style_id = int(style_id)
             style = self.ws.parent.shared_styles[style_id]
             style_id = self.ws.parent._cell_styles[style_id]
+            styles = style_id.__dict__
 
-        cell = self.ws[coordinate]
+        column, row = coordinate_from_string(coordinate)
+        cell = Cell(self.ws, column, row, **styles)
+        self.ws._add_cell(cell)
+
         if style is not None:
-            cell._font_id = style_id.font
-            cell._border_id = style_id.border
-            cell._fill_id = style_id.fill
-            cell.number_format = style.number_format
             cell.protection = style.protection
             cell.alignment = style.alignment
 

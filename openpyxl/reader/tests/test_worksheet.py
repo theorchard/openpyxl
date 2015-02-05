@@ -112,6 +112,9 @@ def Worksheet(Workbook):
             self._data_validations = []
             self.header_footer = HeaderFooter()
 
+        def _add_cell(self, cell):
+            self._cells[cell.coordinate] = cell
+
         def __getitem__(self, value):
             cell = self._cells.get(value)
 
