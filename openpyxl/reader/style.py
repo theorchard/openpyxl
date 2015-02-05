@@ -60,11 +60,8 @@ class SharedStylesParser(object):
         custom_formats = {}
         num_fmts = self.root.findall('{%s}numFmts/{%s}numFmt' % (SHEET_MAIN_NS, SHEET_MAIN_NS))
         for num_fmt_node in num_fmts:
-            fmt_id = int(num_fmt_node.get('numFmtId'))
             fmt_code = num_fmt_node.get('formatCode').lower()
             self.number_formats.append(fmt_code)
-            custom_formats[fmt_id] = fmt_code
-        self.custom_num_formats = custom_formats
 
 
     def parse_color_index(self):
@@ -157,11 +154,7 @@ class SharedStylesParser(object):
             if numFmtId < 164:
                 format_code = builtin_formats.get(numFmtId, 'General')
             else:
-                fmt_code = self.custom_num_formats.get(numFmtId)
-                if fmt_code is not None:
-                    format_code = fmt_code
-                else:
-                    raise MissingNumberFormat('%s' % numFmtId)
+                format_code = self.number_formats[numFmtId-165]
             _style['number_format'] = format_code
 
             if bool_attrib(xf, 'applyAlignment'):
