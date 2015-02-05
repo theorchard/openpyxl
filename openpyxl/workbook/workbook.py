@@ -109,6 +109,25 @@ class Workbook(object):
             if 'activeTab' in view.attrib:
                 self.active = int(view.attrib['activeTab'])
 
+    #@property
+    #def shared_styles(self):
+        #"""
+        #Legacy
+        #On the fly conversion of style references to style objects
+        #"""
+        #styles = []
+        #for sid in self._cell_styles:
+            #font = self._fonts[sid.font]
+            #fill = self._fills[sid.fill]
+            #border = self._borders[sid.fill]
+            #alignment = self._alignments[sid.alignment]
+            #protection = self._protections[sid.protection]
+            #number_format = self._number_formats[sid.number_format]
+            #styles.append(Style(font, fill, border, alignment,
+                                #number_format, protection))
+            #return styles
+
+
     @property
     def _local_data(self):
         return self.__thread_local_data

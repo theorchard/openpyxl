@@ -19,7 +19,8 @@ from openpyxl.styles import (
     GradientFill,
     Border,
     Side,
-    Alignment
+    Alignment,
+    Protection,
 )
 from openpyxl.xml.functions import Element
 
@@ -52,8 +53,9 @@ def test_unprotected_cell(StyleReader, datadir):
         reader = StyleReader(src.read())
     from openpyxl.styles import Font
     reader.font_list = [Font(), Font(), Font(), Font(), Font()]
+    reader.protections = [Protection()]
     reader.parse_cell_styles()
-    assert len(reader.shared_styles) == 3
+    assert len(reader.cell_styles) == 3
     # default is cells are locked
     style = reader.shared_styles[0]
     assert style.protection.locked is True
@@ -190,13 +192,13 @@ def test_change_existing_styles(datadir):
     ws = wb.get_active_sheet()
 
     ws.column_dimensions['A'].width = 20
-    i_style = ws.column_dimensions['I'].style
-    ws.column_dimensions['I'].style = i_style.copy(fill=PatternFill(fill_type='solid',
-                                             start_color=Color('FF442200')),
-                                   font=Font(color=Color('FF002244')))
+    ws.column_dimensions['I'].fill = PatternFill(fill_type='solid',
+                                                 start_color='FF442200')
 
-    assert ws.column_dimensions['I'].style.fill.start_color.value == 'FF442200'
-    assert ws.column_dimensions['I'].style.font.color.value == 'FF002244'
+    ws.column_dimensions['I'].font=Font(color='FF002244')
+
+    assert ws.column_dimensions['I'].fill.start_color.value == 'FF442200'
+    assert ws.column_dimensions['I'].font.color.value == 'FF002244'
 
     ws['A2'].font = Font(name='Times New Roman',
                          size=12,

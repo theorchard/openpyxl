@@ -124,7 +124,6 @@ class WorkSheetParser(object):
         styles = {}
         if style_id is not None:
             style_id = int(style_id)
-            style = self.ws.parent.shared_styles[style_id]
             style_id = self.ws.parent._cell_styles[style_id]
             styles = style_id.__dict__
 
