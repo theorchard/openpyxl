@@ -1,7 +1,7 @@
 from __future__ import absolute_import
 # Copyright (c) 2010-2015 openpyxl
 
-from openpyxl.descriptors import Bool, Integer, String, Set, Float, Typed, NoneSet
+from openpyxl.descriptors import Bool, Integer, String, Set, Float, Typed, NoneSet, Sequence
 from openpyxl.descriptors.serialisable import Serialisable
 
 
@@ -67,7 +67,8 @@ class SheetView(Serialisable):
     zoomScaleSheetLayoutView = Integer(allow_none=True)
     zoomScalePageLayoutView = Integer(allow_none=True)
     workbookViewId = Integer()
-    selection = Typed(expected_type=Selection)
+    selection = Sequence(expected_type=Selection)
+    pane = Typed(expected_type=Pane, allow_none=True)
 
     def __init__(
         self,
@@ -90,7 +91,8 @@ class SheetView(Serialisable):
         zoomScaleSheetLayoutView=None,
         zoomScalePageLayoutView=None,
         workbookViewId=0,
-        selection=Selection()
+        selection=[Selection()],
+        pane=None,
         ):
         self.windowProtection = windowProtection
         self.showFormulas = showFormulas
@@ -112,6 +114,7 @@ class SheetView(Serialisable):
         self.zoomScalePageLayoutView = zoomScalePageLayoutView
         self.workbookViewId = workbookViewId
         self.selection = selection
+        self.pane = pane
 
 
 class PivotSelection(Serialisable):
