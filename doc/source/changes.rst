@@ -14,6 +14,7 @@ Major changes
 
 Bug fixes
 ---------
+* `#261 <https://bitbucket.org/openpyxl/openpyxl/issue/261>`_ Set the zoom of a sheet
 * `#392 <https://bitbucket.org/openpyxl/openpyxl/issue/392>`_ Worksheet header not read
 * `#387 <https://bitbucket.org/openpyxl/openpyxl/issue/387>`_ Cannot read files without styles.xml
 * `#410 <https://bitbucket.org/openpyxl/openpyxl/issue/410>`_ Exception when preserving whitespace in strings
