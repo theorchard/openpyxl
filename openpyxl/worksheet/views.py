@@ -1,8 +1,46 @@
 from __future__ import absolute_import
 # Copyright (c) 2010-2015 openpyxl
 
-from openpyxl.descriptors import Bool, Integer, String, Set, Float
+from openpyxl.descriptors import Bool, Integer, String, Set, Float, Typed
 from openpyxl.descriptors.serialisable import Serialisable
+
+
+class Pane(Serialisable):
+    xSplit = Float(allow_none=True)
+    ySplit = Float(allow_none=True)
+    topLeftCell = String(allow_none=True)
+    activePane = Set(values=("bottomRight", "topRight", "bottomLeft", "topLeft"))
+    state = Set(values=("split", "frozen", "frozenSplit"))
+
+    def __init__(self,
+                 xSplit=None,
+                 ySplit=None,
+                 topLeftCell=None,
+                 activePane="topLeft",
+                 state="split"):
+        self.xSplit = xSplit
+        self.ySplit = ySplit
+        self.topLeftCell = topLeftCell
+        self.activePane = activePane
+        self.state = state
+
+
+class Selection(Serialisable):
+    pane = Set(values=("bottomRight", "topRight", "bottomLeft", "topLeft"))
+    activeCell = String(allow_none=True)
+    activeCellId = Integer(allow_none=True)
+    sqref = String(allow_none=True)
+
+    def __init__(self,
+                 pane="topLeft",
+                 activeCell="A1",
+                 activeCellId=None,
+                 sqref="A1"):
+        self.pane = pane
+        self.activeCell = activeCell
+        self.activeCellId = activeCellId
+        self.sqref = sqref
+
 
 class SheetView(Serialisable):
 
@@ -29,28 +67,31 @@ class SheetView(Serialisable):
     zoomScaleSheetLayoutView = Integer(allow_none=True)
     zoomScalePageLayoutView = Integer(allow_none=True)
     workbookViewId = Integer()
+    selection = Typed(expected_type=Selection)
 
     def __init__(
-            self,
-            windowProtection=None,
-            showFormulas=None,
-            showGridLines=None,
-            showRowColHeaders=None,
-            showZeros=None,
-            rightToLeft=None,
-            tabSelected=None,
-            showRuler=None,
-            showOutlineSymbols=None,
-            defaultGridColor=None,
-            showWhiteSpace=None,
-            view="normal",
-            topLeftCell=None,
-            colorId=None,
-            zoomScale=None,
-            zoomScaleNormal=None,
-            zoomScaleSheetLayoutView=None,
-            zoomScalePageLayoutView=None,
-            workbookViewId=None):
+        self,
+        windowProtection=None,
+        showFormulas=None,
+        showGridLines=None,
+        showRowColHeaders=None,
+        showZeros=None,
+        rightToLeft=None,
+        tabSelected=None,
+        showRuler=None,
+        showOutlineSymbols=None,
+        defaultGridColor=None,
+        showWhiteSpace=None,
+        view="normal",
+        topLeftCell=None,
+        colorId=None,
+        zoomScale=None,
+        zoomScaleNormal=None,
+        zoomScaleSheetLayoutView=None,
+        zoomScalePageLayoutView=None,
+        workbookViewId=0,
+        selection=Selection()
+        ):
         self.windowProtection = windowProtection
         self.showFormulas = showFormulas
         self.showGridLines = showGridLines
@@ -70,43 +111,7 @@ class SheetView(Serialisable):
         self.zoomScaleSheetLayoutView = zoomScaleSheetLayoutView
         self.zoomScalePageLayoutView = zoomScalePageLayoutView
         self.workbookViewId = workbookViewId
-
-
-class Pane(Serialisable):
-    xSplit = Float(allow_none=True)
-    ySplit = Float(allow_none=True)
-    topLeftCell = String(allow_none=True)
-    activePane = Set(values=("bottomRight", "topRight", "bottomLeft", "topLeft"))
-    state = Set(values=("split", "frozen", "frozenSplit"))
-
-    def __init__(self,
-                 xSplit=None,
-                 ySplit=None,
-                 topLeftCell=None,
-                 activePane="topLeft",
-                 state="split"):
-        xSplit = xSplit
-        ySplit = ySplit
-        topLeftCell = topLeftCell
-        activePane = activePane
-        state = state
-
-
-class Selection(Serialisable):
-    pane = Set(values=("bottomRight", "topRight", "bottomLeft", "topLeft"))
-    activeCell = String(allow_none=True)
-    activeCellId = Integer(allow_none=True)
-    sqref = String(allow_none=True)
-
-    def __init__(self,
-                 pane="topLeft",
-                 activeCell=None,
-                 activeCellId=None,
-                 sqref=None):
-        pane = pane
-        activeCell = activeCell
-        activeCellId = activeCellId
-        sqref = sqref
+        self.selection = selection
 
 
 class PivotSelection(Serialisable):
