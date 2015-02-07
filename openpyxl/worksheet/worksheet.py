@@ -259,7 +259,8 @@ class Worksheet(object):
 
     @property
     def freeze_panes(self):
-        return self._freeze_panes
+        if self.sheet_view.pane is not None:
+            return self.sheet_view.pane.topLeftCell
 
     @freeze_panes.setter
     def freeze_panes(self, topLeftCell):
@@ -271,6 +272,10 @@ class Worksheet(object):
             topLeftCell = topLeftCell.coordinate
         if topLeftCell == 'A1':
             topLeftCell = None
+
+        if not topLeftCell:
+            self.sheet_view.pane = None
+            return
 
         if topLeftCell is not None:
             colName, row = coordinate_from_string(topLeftCell)
