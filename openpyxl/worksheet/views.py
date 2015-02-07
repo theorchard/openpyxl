@@ -93,7 +93,7 @@ class SheetView(Serialisable):
         zoomScaleSheetLayoutView=None,
         zoomScalePageLayoutView=None,
         workbookViewId=0,
-        selection=[Selection()],
+        selection=None,
         pane=None,
         ):
         self.windowProtection = windowProtection
@@ -115,9 +115,9 @@ class SheetView(Serialisable):
         self.zoomScaleSheetLayoutView = zoomScaleSheetLayoutView
         self.zoomScalePageLayoutView = zoomScalePageLayoutView
         self.workbookViewId = workbookViewId
-        self.selection = selection
         self.pane = pane
-
+        if selection is None:
+            self.selection = (Selection(), )
 
     def __iter__(self):
 
