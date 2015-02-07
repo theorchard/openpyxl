@@ -1,7 +1,7 @@
 from __future__ import absolute_import
 # Copyright (c) 2010-2015 openpyxl
 
-from openpyxl.descriptors import Bool, Integer, String, Set, Float, Typed
+from openpyxl.descriptors import Bool, Integer, String, Set, Float, Typed, NoneSet
 from openpyxl.descriptors.serialisable import Serialisable
 
 
@@ -26,13 +26,13 @@ class Pane(Serialisable):
 
 
 class Selection(Serialisable):
-    pane = Set(values=("bottomRight", "topRight", "bottomLeft", "topLeft"))
+    pane = NoneSet(values=("bottomRight", "topRight", "bottomLeft", "topLeft"))
     activeCell = String(allow_none=True)
     activeCellId = Integer(allow_none=True)
     sqref = String(allow_none=True)
 
     def __init__(self,
-                 pane="topLeft",
+                 pane=None,
                  activeCell="A1",
                  activeCellId=None,
                  sqref="A1"):
@@ -59,7 +59,7 @@ class SheetView(Serialisable):
     showOutlineSymbols = Bool(allow_none=True)
     defaultGridColor = Bool(allow_none=True)
     showWhiteSpace = Bool(allow_none=True)
-    view = Set(values=("normal", "pageBreakPreview", "pageLayout"))
+    view = NoneSet(values=("normal", "pageBreakPreview", "pageLayout"))
     topLeftCell = String(allow_none=True)
     colorId = Integer(allow_none=True)
     zoomScale = Integer(allow_none=True)
@@ -82,7 +82,7 @@ class SheetView(Serialisable):
         showOutlineSymbols=None,
         defaultGridColor=None,
         showWhiteSpace=None,
-        view="normal",
+        view=None,
         topLeftCell=None,
         colorId=None,
         zoomScale=None,
