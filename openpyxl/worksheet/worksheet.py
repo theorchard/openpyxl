@@ -144,7 +144,6 @@ class Worksheet(object):
     def active_cell(self):
         return self.sheet_view.selection.activeCell
 
-    @deprecated("Use the worksheet's sheet_view object")
     @property
     def show_gridlines(self):
         return self.sheet_view.showGridLines
