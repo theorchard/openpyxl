@@ -31,46 +31,45 @@ class SheetView(Serialisable):
     workbookViewId = Integer()
 
     def __init__(
-        self,
-        windowProtection=None,
-        showFormulas=None,
-        showGridLines=None,
-        showRowColHeaders=None,
-        showZeros=None,
-        rightToLeft=None,
-        tabSelected=None,
-        showRuler=None,
-        showOutlineSymbols=None,
-        defaultGridColor=None,
-        showWhiteSpace=None,
-        view="normal",
-        topLeftCell=None,
-        colorId=None,
-        zoomScale=None,
-        zoomScaleNormal=None,
-        zoomScaleSheetLayoutView=None,
-        zoomScalePageLayoutView=None,
-        workbookViewId=None
-        ):
-        windowProtection = windowProtection
-        showFormulas = showFormulas
-        showGridLines = showGridLines
-        showRowColHeaders = showRowColHeaders
-        showZeros = showZeros
-        rightToLeft = rightToLeft
-        tabSelected = tabSelected
-        showRuler = showRuler
-        showOutlineSymbols = showOutlineSymbols
-        defaultGridColor = defaultGridColor
-        showWhiteSpace = showWhiteSpace
-        view = view
-        topLeftCell = topLeftCell
-        colorId = colorId
-        zoomScale = zoomScale
-        zoomScaleNormal = zoomScaleNormal
-        zoomScaleSheetLayoutView = zoomScaleSheetLayoutView
-        zoomScalePageLayoutView = zoomScalePageLayoutView
-        workbookViewId = workbookViewId
+            self,
+            windowProtection=None,
+            showFormulas=None,
+            showGridLines=None,
+            showRowColHeaders=None,
+            showZeros=None,
+            rightToLeft=None,
+            tabSelected=None,
+            showRuler=None,
+            showOutlineSymbols=None,
+            defaultGridColor=None,
+            showWhiteSpace=None,
+            view="normal",
+            topLeftCell=None,
+            colorId=None,
+            zoomScale=None,
+            zoomScaleNormal=None,
+            zoomScaleSheetLayoutView=None,
+            zoomScalePageLayoutView=None,
+            workbookViewId=None):
+        self.windowProtection = windowProtection
+        self.showFormulas = showFormulas
+        self.showGridLines = showGridLines
+        self.showRowColHeaders = showRowColHeaders
+        self.showZeros = showZeros
+        self.rightToLeft = rightToLeft
+        self.tabSelected = tabSelected
+        self.showRuler = showRuler
+        self.showOutlineSymbols = showOutlineSymbols
+        self.defaultGridColor = defaultGridColor
+        self.showWhiteSpace = showWhiteSpace
+        self.view = view
+        self.topLeftCell = topLeftCell
+        self.colorId = colorId
+        self.zoomScale = zoomScale
+        self.zoomScaleNormal = zoomScaleNormal
+        self.zoomScaleSheetLayoutView = zoomScaleSheetLayoutView
+        self.zoomScalePageLayoutView = zoomScalePageLayoutView
+        self.workbookViewId = workbookViewId
 
 
 class Pane(Serialisable):
