@@ -73,7 +73,7 @@ class SheetView(Serialisable):
         workbookViewId = workbookViewId
 
 
-class Pane(Strict):
+class Pane(Serialisable):
     xSplit = Float(allow_none=True)
     ySplit = Float(allow_none=True)
     topLeftCell = String(allow_none=True)
@@ -93,7 +93,7 @@ class Pane(Strict):
         state = state
 
 
-class Selection(Strict):
+class Selection(Serialisable):
     pane = Set(values=("bottomRight", "topRight", "bottomLeft", "topLeft"))
     activeCell = String(allow_none=True)
     activeCellId = Integer(allow_none=True)
@@ -110,7 +110,7 @@ class Selection(Strict):
         sqref = sqref
 
 
-class PivotSelection(Strict):
+class PivotSelection(Serialisable):
     pane = Set(values=("bottomRight", "topRight", "bottomLeft", "topLeft"))
     showHeader = Bool()
     label = Bool()
@@ -163,7 +163,7 @@ class PivotSelection(Strict):
         click = click
 
 
-class PivotArea(Strict):
+class PivotArea(Serialisable):
 
     field = Integer(allow_none=True)
     type = Set(values=())
@@ -205,7 +205,7 @@ class PivotArea(Strict):
         fieldPosition = fieldPosition
 
 
-class PivotAreaReferences(Strict):
+class PivotAreaReferences(Serialisable):
 
     count = Integer()
 
@@ -213,7 +213,7 @@ class PivotAreaReferences(Strict):
         count = count
 
 
-class PivotAreaReference(Strict):
+class PivotAreaReference(Serialisable):
 
     field = Integer(allow_none=True)
     count = Integer()
@@ -270,7 +270,7 @@ class PivotAreaReference(Strict):
         varPSubtotal = varPSubtotal
 
 
-class Index(Strict):
+class Index(Serialisable):
     v = Integer()
 
     def __init__(self, v=None):
