@@ -1,12 +1,14 @@
 from __future__ import absolute_import
 # Copyright (c) 2010-2015 openpyxl
 
-from openpyxl.descriptors import Strict, Bool, Integer, String, Set, Float
+from openpyxl.descriptors import Bool, Integer, String, Set, Float
+from openpyxl.descriptors.serialisable import Serialisable
 
-
-class SheetView(Strict):
+class SheetView(Serialisable):
 
     """Information about the visible portions of this sheet."""
+
+    tagname = "sheetView"
 
     windowProtection = Bool(allow_none=True)
     showFormulas = Bool(allow_none=True)
