@@ -4,6 +4,8 @@ from __future__ import absolute_import
 from openpyxl.descriptors import Bool, Integer, String, Set, Float, Typed, NoneSet, Sequence
 from openpyxl.descriptors.serialisable import Serialisable
 
+from openpyxl.compat import safe_string
+
 
 class Pane(Serialisable):
     xSplit = Float(allow_none=True)
@@ -74,7 +76,7 @@ class SheetView(Serialisable):
         self,
         windowProtection=None,
         showFormulas=None,
-        showGridLines=None,
+        showGridLines=True,
         showRowColHeaders=None,
         showZeros=None,
         rightToLeft=None,
@@ -115,6 +117,16 @@ class SheetView(Serialisable):
         self.workbookViewId = workbookViewId
         self.selection = selection
         self.pane = pane
+
+
+    def __iter__(self):
+
+        for attr in self.__attrs__:
+            value = getattr(self, attr)
+            if attr == 'showGridLines' and value:
+                continue
+            if value is not None:
+                yield attr, safe_string(value)
 
 
 class PivotSelection(Serialisable):

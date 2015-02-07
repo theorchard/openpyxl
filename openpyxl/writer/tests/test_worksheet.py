@@ -445,7 +445,7 @@ def test_frozen_panes_worksheet(worksheet, write_worksheet):
 
 def test_show_gridlines_false(worksheet, write_sheetviews):
     ws = worksheet
-    ws.show_gridlines = False
+    ws.sheet_view.showGridLines = False
 
     views = write_sheetviews(ws)
     xml = tostring(views)
@@ -462,7 +462,7 @@ def test_show_gridlines_false(worksheet, write_sheetviews):
 
 def test_show_gridlines_true(worksheet, write_sheetviews):
     ws = worksheet
-    ws.show_gridlines = True
+    ws.sheet_view.showGridLines = True
 
     views = write_sheetviews(ws)
     xml = tostring(views)
