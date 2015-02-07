@@ -51,7 +51,7 @@ from .page import PageSetup, PageMargins, PrintOptions
 from .dimensions import ColumnDimension, RowDimension, DimensionHolder
 from .protection import SheetProtection
 from .filters import AutoFilter
-from .views import SheetView
+from .views import SheetView, Pane, Selection
 from .properties import WorksheetProperties, Outline, PageSetupPr
 
 
@@ -144,6 +144,7 @@ class Worksheet(object):
     def active_cell(self):
         return self.sheet_view.selection.activeCell
 
+    @deprecated("Use the worksheet's sheet_view object")
     @property
     def show_gridlines(self):
         return self.sheet_view.showGridLines
@@ -270,7 +271,32 @@ class Worksheet(object):
             topLeftCell = topLeftCell.coordinate
         if topLeftCell == 'A1':
             topLeftCell = None
-        self._freeze_panes = topLeftCell
+
+        if topLeftCell is not None:
+            colName, row = coordinate_from_string(topLeftCell)
+            column = column_index_from_string(colName)
+
+        view = self.sheet_view
+        view.pane = Pane(topLeftCell=topLeftCell,
+                        activePane="topRight",
+                        state="frozen")
+        view.selection[0].pane = "topRight"
+
+        if column > 1:
+            view.pane.xSplit = column - 1
+        if row > 1:
+            view.pane.ySplit = row - 1
+            view.pane.activePane = 'bottomLeft'
+            view.selection[0].pane = "bottomLeft"
+            if column > 1:
+                view.selection[0].pane = "bottomRight"
+                view.pane.activePane = 'bottomRight'
+
+        if row > 1 and column > 1:
+            sel = list(view.selection)
+            sel.insert(0, Selection(pane="topRight", activeCell=None, sqref=None))
+            sel.insert(1, Selection(pane="bottomLeft", activeCell=None, sqref=None))
+            view.selection = sel
 
     def add_print_title(self, n, rows_or_cols='rows'):
         """ Print Titles are rows or columns that are repeated on each printed sheet.

@@ -42,35 +42,6 @@ def write_properties(worksheet):
 def write_sheetviews(worksheet):
     views = Element('sheetViews')
     views.append(worksheet.sheet_view.serialise())
-    #sheetviewAttrs = {'workbookViewId': '0'}
-    #if not worksheet.show_gridlines:
-        #sheetviewAttrs['showGridLines'] = '0'
-    #view = SubElement(views, 'sheetView', sheetviewAttrs)
-    #selectionAttrs = {
-        #'activeCell': worksheet.active_cell,
-        #'sqref': worksheet.selected_cell
-    #}
-    #topLeftCell = worksheet.freeze_panes
-    #if topLeftCell:
-        #colName, row = coordinate_from_string(topLeftCell)
-        #column = column_index_from_string(colName)
-        #pane = 'topRight'
-        #paneAttrs = {'topLeftCell':topLeftCell, 'state':'frozen'}
-        #if column > 1:
-            #paneAttrs['xSplit'] = str(column - 1)
-        #if row > 1:
-            #paneAttrs['ySplit'] = str(row - 1)
-            #pane = 'bottomLeft'
-            #if column > 1:
-                #pane = 'bottomRight'
-        #selectionAttrs['pane'] = pane
-        #paneAttrs['activePane'] = pane
-        #view.append(Element('pane', paneAttrs))
-        #if row > 1 and column > 1:
-            #SubElement(view, 'selection', pane='topRight')
-            #SubElement(view, 'selection', pane='bottomLeft')
-
-    #SubElement(view, 'selection', selectionAttrs)
     return views
 
 
