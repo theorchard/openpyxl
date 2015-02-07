@@ -116,8 +116,6 @@ class Worksheet(object):
         self._merged_cells = []
         self.relationships = []
         self._data_validations = []
-        self.selected_cell = 'A1'
-        self.active_cell = 'A1'
         self.sheet_state = self.SHEETSTATE_VISIBLE
         self.page_setup = PageSetup()
         self.print_options = PrintOptions()
@@ -138,6 +136,15 @@ class Worksheet(object):
         self.vba_controls = None
         self.sheet_properties = WorksheetProperties()
         self.sheet_properties.outlinePr = Outline(summaryBelow=True, summaryRight=True)
+
+
+    @property
+    def selected_cell(self):
+        return self.sheet_view.selection.sqref
+
+    @property
+    def active_cell(self):
+        return self.sheet_view.selection.activeCell
 
     def __repr__(self):
         return self.repr_format % self.title
