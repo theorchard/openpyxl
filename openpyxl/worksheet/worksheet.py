@@ -123,8 +123,6 @@ class Worksheet(object):
         self.header_footer = HeaderFooter()
         self.sheet_view = SheetView()
         self.protection = SheetProtection()
-        self.show_gridlines = True
-        self.print_gridlines = False
         self.default_row_dimension = RowDimension(worksheet=self)
         self.default_column_dimension = ColumnDimension(worksheet=self)
         self._auto_filter = AutoFilter()
@@ -145,6 +143,10 @@ class Worksheet(object):
     @property
     def active_cell(self):
         return self.sheet_view.selection.activeCell
+
+    @property
+    def show_gridlines(self):
+        return self.sheet_view.showGridLines
 
     def __repr__(self):
         return self.repr_format % self.title
