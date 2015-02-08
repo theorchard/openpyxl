@@ -68,13 +68,6 @@ class StyleWriter(object):
 
         return tostring(self._root)
 
-    def _write_color(self, node, color, key='color'):
-        """
-        Convert colors encoded as RGB, theme, indexed, auto with tint
-        """
-        attrs = dict(color)
-        SubElement(node, key, attrs)
-
 
     def _write_number_formats(self):
         node = SubElement(self._root, 'numFmts', count= "%d" % len(self.number_formats))
