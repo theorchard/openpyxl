@@ -10,13 +10,14 @@ from openpyxl.xml.functions import fromstring
 from openpyxl.worksheet.iter_worksheet import read_dimension
 from openpyxl.reader.excel import load_workbook
 from openpyxl.compat import range, zip
+from openpyxl.styles.styleable import StyleId
 
 
 @pytest.fixture
 def DummyWorkbook():
     class Workbook:
         excel_base_date = None
-        _cell_styles = [None]
+        _cell_styles = [StyleId(0, 0, 0, 0, 0, 0)]
 
         def get_sheet_names(self):
             return []
@@ -57,18 +58,11 @@ def test_force_dimension(datadir, DummyWorkbook):
                           "sheet2_no_dimension.xml"
                          ]
                          )
-def test_get_max_cell(datadir, filename):
+def test_get_max_cell(datadir, DummyWorkbook, filename):
     datadir.join("reader").chdir()
 
-    class Workbook:
-        excel_base_date = None
-        _cell_styles = [None]
-
-        def get_sheet_names(self):
-            return []
-
     from openpyxl.worksheet.iter_worksheet import IterableWorksheet
-    ws = IterableWorksheet(Workbook(), "Sheet", "", filename, [], [])
+    ws = IterableWorksheet(DummyWorkbook, "Sheet", "", filename, [], [])
     rows = tuple(ws.rows)
     assert rows[-1][-1].coordinate == "AA30"
 
@@ -259,20 +253,13 @@ def test_read_hyperlinks_read_only(datadir, Workbook):
     assert ws['F2'].value is None
 
 
-def test_read_with_missing_cells(datadir):
+def test_read_with_missing_cells(datadir, DummyWorkbook):
     datadir.join("reader").chdir()
-
-    class Workbook:
-        excel_base_date = None
-        _cell_styles = [None]
-
-        def get_sheet_names(self):
-            return []
 
     filename = "bug393-worksheet.xml"
 
     from openpyxl.worksheet.iter_worksheet import IterableWorksheet
-    ws = IterableWorksheet(Workbook(), "Sheet", "", filename, [], [])
+    ws = IterableWorksheet(DummyWorkbook, "Sheet", "", filename, [], [])
     rows = tuple(ws.rows)
 
     row = rows[1] # second row
@@ -284,15 +271,8 @@ def test_read_with_missing_cells(datadir):
     assert values == [1, 2, None, None, 3]
 
 
-def test_read_row(datadir):
+def test_read_row(datadir, DummyWorkbook):
     datadir.join("reader").chdir()
-
-    class Workbook:
-        excel_base_date = None
-        _cell_styles = [None]
-
-        def get_sheet_names(self):
-            return []
 
     src = b"""
     <sheetData  xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main" >
@@ -311,7 +291,7 @@ def test_read_row(datadir):
     """
 
     from openpyxl.worksheet.iter_worksheet import IterableWorksheet
-    ws = IterableWorksheet(Workbook(), "Sheet", "", "bug393-worksheet.xml", [], [])
+    ws = IterableWorksheet(DummyWorkbook, "Sheet", "", "bug393-worksheet.xml", [], [])
 
     xml = fromstring(src)
     row = tuple(ws._get_row(xml, 11, 11))

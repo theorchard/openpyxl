@@ -13,15 +13,9 @@ from openpyxl.styles.styleable import StyleableObject
 
 class ReadOnlyCell(StyleableObject):
 
-    __slots__ = StyleableObject.__slots__ + ('sheet', 'row', 'column', '_value', 'data_type', '_style_id')
+    __slots__ = StyleableObject.__slots__ + ('sheet', 'row', 'column', '_value', 'data_type')
 
     def __init__(self, sheet, row, column, value, data_type='n', style_id=None):
-        self._font_id = 0
-        self._fill_id = 0
-        self._border_id = 0
-        self._alignment_id = 0
-        self._protection_id = 0
-        self._number_format_id = 0
         self.parent = sheet
         self._value = None
         self.row = row
@@ -29,7 +23,20 @@ class ReadOnlyCell(StyleableObject):
         self.data_type = data_type
         self.sheet = sheet
         self.value = value
-        self._style_id = style_id
+        self._font_id = 0
+        self._fill_id = 0
+        self._border_id = 0
+        self._alignment_id = 0
+        self._protection_id = 0
+        self._number_format_id = 0
+        if style_id is not None:
+            style = sheet.parent._cell_styles[style_id]
+            self._font_id = style.font
+            self._fill_id = style.fill
+            self._border_id = style.border
+            self._alignment_id = style.alignment
+            self._protection_id = style.protection
+            self._number_format_id = style.number_format
 
     def __eq__(self, other):
         for a in self.__slots__:
@@ -57,45 +64,6 @@ class ReadOnlyCell(StyleableObject):
     @property
     def is_date(self):
         return self.data_type == 'n' and is_date_format(self.number_format)
-
-    @property
-    def number_format(self):
-        if not self.style_id:
-            return
-        self._number_format_id = self.style_id.number_format
-        return super(ReadOnlyCell, self).number_format
-
-    @property
-    def style_id(self):
-        if not self._style_id:
-            return
-        return self.parent.parent._cell_styles[self._style_id]
-
-    @property
-    def font(self):
-        self._font_id = self.style_id.font
-        return super(ReadOnlyCell, self).font
-
-    @property
-    def fill(self):
-        self._fill_id = self.style_id.fill
-        return super(ReadOnlyCell, self).fill
-
-    @property
-    def border(self):
-        self._border_id = self.style_id.border
-        return super(ReadOnlyCell, self).border
-
-    @property
-    def alignment(self):
-        self._alignment_id = self.style_id.alignment
-        return super(ReadOnlyCell, self).alignment
-
-    @property
-    def protection(self):
-        self._protection_id = self.style_id.protection
-        return super(ReadOnlyCell, self).protection
-
 
     @property
     def internal_value(self):
