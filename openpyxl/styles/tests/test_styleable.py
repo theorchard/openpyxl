@@ -10,7 +10,7 @@ def test_descriptor():
     from ..styleable import StyleDescriptor
     from ..fonts import Font
 
-    class Styled:
+    class Styled(object):
 
         font = StyleDescriptor('_fonts', '_font_id')
 

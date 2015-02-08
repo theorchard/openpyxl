@@ -12,7 +12,7 @@ from . import Style
 StyleId = namedtuple("StyleId", "alignment border fill font number_format protection")
 
 
-class StyleDescriptor:
+class StyleDescriptor(object):
 
     def __init__(self, collection, key):
         self.collection = collection
@@ -29,7 +29,7 @@ class StyleDescriptor:
         return StyleProxy(coll[idx])
 
 
-class NumberFormatDescriptor:
+class NumberFormatDescriptor(object):
 
     key = '_number_format_id'
     collection = '_number_formats'
