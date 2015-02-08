@@ -153,7 +153,8 @@ class WorkSheetParser(object):
         if self.guess_types or value is None:
             cell.value = value
         else:
-            cell.set_explicit_value(value=value, data_type=data_type)
+            cell._value=value
+            cell.data_type=data_type
 
 
     def parse_merge(self, element):
@@ -178,12 +179,9 @@ class WorkSheetParser(object):
     def parse_row_dimensions(self, row):
         attrs = dict(row.attrib)
         attrs['worksheet'] = self.ws
-        for key in set(attrs):
-            if key.startswith('{'):  # ignore custom namespaces
-                del attrs[key]
         dim = RowDimension(**attrs)
-        if dim.index not in self.ws.row_dimensions:
-            self.ws.row_dimensions[dim.index] = dim
+        self.ws.row_dimensions[dim.index] = dim
+
         for cell in safe_iterator(row, self.CELL_TAG):
             self.parse_cell(cell)
 

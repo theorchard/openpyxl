@@ -78,6 +78,7 @@ class RowDimension(Dimension):
                  spans=None,
                  thickBot=None,
                  thickTop=None,
+                 **kw
                  ):
         if r is not None:
             index = r
