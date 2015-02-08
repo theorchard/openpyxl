@@ -4,7 +4,7 @@ from __future__ import absolute_import
 import pytest
 
 from openpyxl.utils.indexed_list import IndexedList
-from openpyxl.styles.proxy import StyleId
+from openpyxl.styles.styleable import StyleId
 
 def test_invalid_dimension_ctor():
     from .. dimensions import Dimension
@@ -37,9 +37,8 @@ def test_dimension():
 
 def test_dimension_interface():
     from .. dimensions import Dimension
-    from openpyxl.styles.proxy import _DummyWorksheet
-    d = Dimension(1, True, 1, False, None)
-    assert isinstance(d.parent, _DummyWorksheet)
+    d = Dimension(1, True, 1, False, DummyWorksheet())
+    assert isinstance(d.parent, DummyWorksheet)
     assert dict(d) == {'hidden': '1', 'outlineLevel': '1'}
 
 

@@ -12,7 +12,7 @@ from openpyxl.utils.indexed_list import IndexedList
 from openpyxl.utils.datetime  import CALENDAR_WINDOWS_1900
 
 from openpyxl.styles import Style
-from openpyxl.styles.proxy import StyleId
+from openpyxl.styles.styleable import StyleId
 
 from openpyxl.tests.helper import compare_xml
 

@@ -29,10 +29,8 @@ class Dimension(Strict, StyleableObject):
         self.hidden = hidden
         self.outlineLevel = outlineLevel
         self.collapsed = collapsed
-        #self.worksheet = worksheet
         if style is not None:
             style_id = int(style)
-            self.style_id = style_id
             style = self.parent.parent._cell_styles[style_id]
             self._font_id = style.font
             self._fill_id = style.fill
@@ -103,13 +101,13 @@ class RowDimension(Dimension):
         """Always true if there is a height for the row"""
         return self.ht is not None
 
-    @property
-    def s(self):
-        return self.styleid
+    #@property
+    #def s(self):
+        #return self.styleid
 
-    @s.setter
-    def s(self, style):
-        self._style = style
+    #@s.setter
+    #def s(self, style):
+        #self._style = style
 
     def __iter__(self):
         for key in self.__fields__[1:]:

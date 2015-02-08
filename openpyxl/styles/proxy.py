@@ -47,6 +47,3 @@ class StyleProxy(object):
 
     def __ne__(self, other):
         return not self == other
-
-
-StyleId = namedtuple("StyleId", "alignment border fill font number_format protection")

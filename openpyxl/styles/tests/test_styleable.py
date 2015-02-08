@@ -6,6 +6,23 @@ import pytest
 from openpyxl.utils.indexed_list import IndexedList
 
 
+def test_descriptor():
+    from ..styleable import StyleDescriptor
+    from ..fonts import Font
+
+    class Styled:
+
+        font = StyleDescriptor('_fonts', '_font_id')
+
+        def __init__(self):
+            self.parent = DummyWorksheet()
+
+    styled = Styled()
+    styled.font = Font()
+    assert styled._font_id == 0
+    assert styled.font == Font()
+
+
 class DummyWorkbook:
 
     _fonts = IndexedList()
