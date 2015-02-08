@@ -13,12 +13,16 @@ from openpyxl.styles.styleable import StyleableObject
 
 class ReadOnlyCell(StyleableObject):
 
-    __slots__ = ('sheet', 'row', 'column', '_value', 'data_type', '_style_id',
-                 '_font_id', '_border_id', '_fill_id', '_alignment_id', '_protection_id',
-                 '_number_format_id')
+    __slots__ = StyleableObject.__slots__ + ('sheet', 'row', 'column', '_value', 'data_type', '_style_id')
 
-    def __init__(self, sheet, row, column, value, data_type=Cell.TYPE_NULL, style_id=None):
-        super(ReadOnlyCell, self).__init__(sheet=sheet)
+    def __init__(self, sheet, row, column, value, data_type='n', style_id=None):
+        self._font_id = 0
+        self._fill_id = 0
+        self._border_id = 0
+        self._alignment_id = 0
+        self._protection_id = 0
+        self._number_format_id = 0
+        self.parent = sheet
         self._value = None
         self.row = row
         self.column = column
@@ -52,7 +56,7 @@ class ReadOnlyCell(StyleableObject):
 
     @property
     def is_date(self):
-        return self.data_type == Cell.TYPE_NUMERIC and is_date_format(self.number_format)
+        return self.data_type == 'n' and is_date_format(self.number_format)
 
     @property
     def number_format(self):
@@ -101,13 +105,13 @@ class ReadOnlyCell(StyleableObject):
     def value(self):
         if self._value is None:
             return
-        if self.data_type == Cell.TYPE_BOOL:
+        if self.data_type == 'b':
             return self._value == '1'
         elif self.is_date:
             return from_excel(self._value, self.base_date)
         elif self.data_type in(Cell.TYPE_INLINE, Cell.TYPE_FORMULA_CACHE_STRING):
             return unicode(self._value)
-        elif self.data_type == Cell.TYPE_STRING:
+        elif self.data_type == 's':
             return unicode(self.shared_strings[int(self._value)])
         return self._value
 
@@ -116,8 +120,8 @@ class ReadOnlyCell(StyleableObject):
         if self._value is not None:
             raise AttributeError("Cell is read only")
         if value is None:
-            self.data_type = Cell.TYPE_NULL
-        elif self.data_type == Cell.TYPE_NUMERIC:
+            self.data_type = 'n'
+        elif self.data_type == 'n':
             try:
                 value = int(value)
             except ValueError:
