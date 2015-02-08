@@ -78,22 +78,16 @@ class Cell(StyleableObject):
     Properties of interest include style, type, value, and address.
 
     """
-    __slots__ = ('column',
-                 'row',
-                 'coordinate',
-                 '_value',
-                 'data_type',
-                 'parent',
-                 'xf_index',
-                 '_hyperlink_rel',
-                 '_comment',
-                 '_style_id',
-                 '_font_id',
-                 '_fill_id',
-                 '_alignment_id',
-                 '_border_id',
-                 '_number_format_id',
-                 '_protection_id',
+    __slots__ =  StyleableObject.__slots__ + (
+        'column',
+        'row',
+        'coordinate',
+        '_value',
+        'data_type',
+        'parent',
+        'xf_index',
+        '_hyperlink_rel',
+        '_comment',
                  )
 
     ERROR_CODES = ('#NULL!',
@@ -117,9 +111,15 @@ class Cell(StyleableObject):
                    TYPE_NULL, TYPE_INLINE, TYPE_ERROR, TYPE_FORMULA_CACHE_STRING)
 
 
-
-    def __init__(self, worksheet, column, row, value=None, **kw):
-        super(Cell, self).__init__(sheet=worksheet, **kw)
+    def __init__(self, worksheet, column, row, value=None, font=0, fill=0,
+                 border=0, alignment=0, protection=0, number_format=0):
+        self._font_id = font
+        self._fill_id = fill
+        self._border_id = border
+        self._alignment_id = alignment
+        self._protection_id = protection
+        self._number_format_id = number_format
+        self.parent = worksheet
         self.column = column
         self.row = row
         self.coordinate = '%s%d' % (self.column, self.row)
