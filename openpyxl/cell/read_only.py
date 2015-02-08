@@ -8,10 +8,10 @@ from openpyxl.cell import Cell
 from openpyxl.utils.datetime  import from_excel
 from openpyxl.styles import is_date_format, Style
 from openpyxl.styles.numbers import BUILTIN_FORMATS
-from openpyxl.styles.proxy import StyledObject
+from openpyxl.styles.styleable import StyleableObject
 
 
-class ReadOnlyCell(StyledObject):
+class ReadOnlyCell(StyleableObject):
 
     __slots__ = ('sheet', 'row', 'column', '_value', 'data_type', '_style_id',
                  '_font_id', '_border_id', '_fill_id', '_alignment_id', '_protection_id',
