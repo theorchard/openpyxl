@@ -39,12 +39,6 @@ def write_properties(worksheet):
     return pr
 
 
-def write_sheetviews(worksheet):
-    views = Element('sheetViews')
-    views.append(worksheet.sheet_view.serialise())
-    return views
-
-
 def write_format(worksheet):
     attrs = {'defaultRowHeight': '15', 'baseColWidth': '10'}
     dimensions_outline = [dim.outline_level
@@ -228,7 +222,9 @@ def write_worksheet(worksheet, shared_strings):
             dim = Element('dimension', {'ref': '%s' % worksheet.calculate_dimension()})
             xf.write(dim)
 
-            xf.write(write_sheetviews(worksheet))
+            views = Element('sheetViews')
+            views.append(worksheet.sheet_view.serialise())
+            xf.write(views)
             xf.write(write_format(worksheet))
             cols = write_cols(worksheet)
             if cols is not None:
