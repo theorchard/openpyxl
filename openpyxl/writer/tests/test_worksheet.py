@@ -443,40 +443,6 @@ def test_frozen_panes_worksheet(worksheet, write_worksheet):
     assert diff is None, diff
 
 
-def test_show_gridlines_false(worksheet, write_sheetviews):
-    ws = worksheet
-    ws.sheet_view.showGridLines = False
-
-    views = write_sheetviews(ws)
-    xml = tostring(views)
-    expected = """
-    <sheetViews>
-      <sheetView showGridLines="0" workbookViewId="0">
-        <selection activeCell="A1" sqref="A1"></selection>
-      </sheetView>
-    </sheetViews>
-    """
-    diff = compare_xml(xml,expected)
-    assert diff is None, diff
-
-
-def test_show_gridlines_true(worksheet, write_sheetviews):
-    ws = worksheet
-    ws.sheet_view.showGridLines = True
-
-    views = write_sheetviews(ws)
-    xml = tostring(views)
-    expected = """
-    <sheetViews>
-      <sheetView workbookViewId="0">
-        <selection activeCell="A1" sqref="A1"></selection>
-      </sheetView>
-    </sheetViews>
-    """
-    diff = compare_xml(xml,expected)
-    assert diff is None, diff
-
-
 def test_merge(worksheet):
     from .. worksheet import write_mergecells
 
