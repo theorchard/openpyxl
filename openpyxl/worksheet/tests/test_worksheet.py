@@ -8,7 +8,7 @@ from openpyxl.compat import zip
 
 # package imports
 from openpyxl.workbook import Workbook
-from openpyxl.worksheet import Worksheet, Relationship, flatten
+from openpyxl.worksheet import Relationship, flatten
 from openpyxl.cell import Cell, coordinate_from_string
 from openpyxl.comments import Comment
 from openpyxl.utils.exceptions import (
@@ -20,6 +20,12 @@ from openpyxl.utils.exceptions import (
 
 from openpyxl.styles.colors import Color
 from ..properties import WorksheetProperties
+
+
+@pytest.fixture
+def Worksheet():
+    from ..worksheet import Worksheet
+    return Worksheet
 
 
 @pytest.mark.parametrize('range_string, coords',
@@ -44,61 +50,59 @@ def test_cells_from_range():
                            ]
 
 
-class TestWorksheet(object):
+class TestWorksheet:
 
-    @classmethod
-    def setup_class(cls):
-        cls.wb = Workbook()
+    def test_new_worksheet(self, Worksheet):
+        wb = Workbook()
+        ws = Worksheet(wb)
+        assert ws._parent == wb
 
-    def test_new_worksheet(self):
-        ws = Worksheet(self.wb)
-        assert self.wb == ws._parent
+    def test_new_sheet_name(self, Worksheet):
+        ws = Worksheet(Workbook(), title='')
+        assert repr(ws) == '<Worksheet "Sheet2">'
 
-    def test_new_sheet_name(self):
-        self.wb.worksheets = []
-        ws = Worksheet(self.wb, title='')
-        assert repr(ws) == '<Worksheet "Sheet1">'
-
-    def test_get_cell(self):
-        ws = Worksheet(self.wb)
+    def test_get_cell(self, Worksheet):
+        ws = Worksheet(Workbook())
         cell = ws.cell(row=1, column=1)
         assert cell.coordinate == 'A1'
 
-    def test_set_bad_title(self):
+    def test_set_bad_title(self, Worksheet):
         with pytest.raises(SheetTitleException):
-            Worksheet(self.wb, 'X' * 50)
+            Worksheet(Workbook(), 'X' * 50)
 
-    def test_escapes_regex_chars_in_title(self):
-        ws1 = self.wb.create_sheet(title='Regex Test (')
-        ws2 = self.wb.create_sheet(title='Regex Test (')
+    def test_escapes_regex_chars_in_title(self, Worksheet):
+        wb = Workbook()
+        ws1 = wb.create_sheet(title='Regex Test (')
+        ws2 = wb.create_sheet(title='Regex Test (')
         assert ws1.title != ws2.title
 
-    def test_increment_title(self):
-        ws1 = self.wb.create_sheet(title="Test")
+    def test_increment_title(self, Worksheet):
+        wb = Workbook()
+        ws1 = wb.create_sheet(title="Test")
         assert ws1.title == "Test"
-        ws2 = self.wb.create_sheet(title="Test")
+        ws2 = wb.create_sheet(title="Test")
         assert ws2.title == "Test1"
 
     @pytest.mark.parametrize("value", ["[", "]", "*", ":", "?", "/", "\\"])
-    def test_set_bad_title_character(self, value):
+    def test_set_bad_title_character(self, Worksheet, value):
         with pytest.raises(SheetTitleException):
-            Worksheet(self.wb, value)
+            Worksheet(Workbook(), value)
 
 
-    def test_unique_sheet_title(self):
-        ws = self.wb.create_sheet(title="AGE")
+    def test_unique_sheet_title(self, Worksheet):
+        ws = Workbook().create_sheet(title="AGE")
         assert ws._unique_sheet_name("GE") == "GE"
 
 
-    def test_worksheet_dimension(self):
-        ws = Worksheet(self.wb)
+    def test_worksheet_dimension(self, Worksheet):
+        ws = Worksheet(Workbook())
         assert 'A1:A1' == ws.calculate_dimension()
         ws.cell('B12').value = 'AAA'
         assert 'A12:B12' == ws.calculate_dimension()
 
 
-    def test_squared_range(self):
-        ws = Worksheet(self.wb)
+    def test_squared_range(self, Worksheet):
+        ws = Worksheet(Workbook())
         expected = [
             ('A1', 'B1', 'C1'),
             ('A2', 'B2', 'C2'),
@@ -110,8 +114,8 @@ class TestWorksheet(object):
             assert tuple(c.coordinate for c in row) == coord
 
 
-    def test_iter_rows(self,):
-        ws = Worksheet(self.wb)
+    def test_iter_rows(self, Worksheet):
+        ws = Worksheet(Workbook())
         expected = [
             ('A1', 'B1', 'C1'),
             ('A2', 'B2', 'C2'),
@@ -124,8 +128,8 @@ class TestWorksheet(object):
             assert tuple(c.coordinate for c in row) == coord
 
 
-    def test_iter_rows_offset(self):
-        ws = Worksheet(self.wb)
+    def test_iter_rows_offset(self, Worksheet):
+        ws = Worksheet(Workbook())
         rows = ws.iter_rows('A1:C4', 1, 3)
         expected = [
             ('D2', 'E2', 'F2'),
@@ -138,49 +142,52 @@ class TestWorksheet(object):
             assert tuple(c.coordinate for c in row) == coord
 
 
-    def test_worksheet(self, recwarn):
-        ws = Worksheet(self.wb)
+    def test_worksheet(self, Worksheet, recwarn):
+        ws = Worksheet(Workbook())
         rows = ws.range("A1:D4")
         w = recwarn.pop()
         assert issubclass(w.category, UserWarning)
 
 
-    def test_get_named_range(self):
-        ws = Worksheet(self.wb)
-        self.wb.create_named_range('test_range', ws, 'C5')
+    def test_get_named_range(self, Worksheet):
+        wb = Workbook()
+        ws = Worksheet(wb)
+        wb.create_named_range('test_range', ws, 'C5')
         xlrange = tuple(ws.get_named_range('test_range'))
         cell = xlrange[0]
         assert isinstance(cell, Cell)
         assert cell.row == 5
 
 
-    def test_get_bad_named_range(self):
-        ws = Worksheet(self.wb)
+    def test_get_bad_named_range(self, Worksheet):
+        ws = Worksheet(Workbook())
         with pytest.raises(NamedRangeException):
             ws.get_named_range('bad_range')
 
 
-    def test_get_named_range_wrong_sheet(self):
-        ws1 = Worksheet(self.wb)
-        ws2 = Worksheet(self.wb)
-        self.wb.create_named_range('wrong_sheet_range', ws1, 'C5')
+    def test_get_named_range_wrong_sheet(self, Worksheet):
+        wb = Workbook()
+        ws1 = Worksheet(wb)
+        ws2 = Worksheet(wb)
+        wb.create_named_range('wrong_sheet_range', ws1, 'C5')
         with pytest.raises(NamedRangeException):
             ws2.get_named_range('wrong_sheet_range')
 
 
-    def test_cell_alternate_coordinates(self):
-        ws = Worksheet(self.wb)
+    def test_cell_alternate_coordinates(self, Worksheet):
+        ws = Worksheet(Workbook())
         cell = ws.cell(row=8, column=4)
         assert 'D8' == cell.coordinate
 
-    def test_cell_insufficient_coordinates(self):
-        ws = Worksheet(self.wb)
+    def test_cell_insufficient_coordinates(self, Worksheet):
+        ws = Worksheet(Workbook())
         with pytest.raises(InsufficientCoordinatesException):
             ws.cell(row=8)
 
-    def test_cell_range_name(self):
-        ws = Worksheet(self.wb)
-        self.wb.create_named_range('test_range_single', ws, 'B12')
+    def test_cell_range_name(self, Worksheet):
+        wb = Workbook()
+        ws = Worksheet(wb)
+        wb.create_named_range('test_range_single', ws, 'B12')
         c_range_name = ws.get_named_range('test_range_single')
         c_range_coord = tuple(tuple(ws.iter_rows('B12'))[0])
         c_cell = ws.cell('B12')
@@ -188,8 +195,8 @@ class TestWorksheet(object):
         assert c_range_name == (c_cell,)
 
 
-    def test_garbage_collect(self):
-        ws = Worksheet(self.wb)
+    def test_garbage_collect(self, Worksheet):
+        ws = Worksheet(Workbook())
         ws.cell('A1').value = ''
         ws.cell('B2').value = '0'
         ws.cell('C4').value = 0
@@ -198,16 +205,16 @@ class TestWorksheet(object):
         assert set(ws.get_cell_collection()), set([ws.cell('B2'), ws.cell('C4') == ws.cell('D1')])
 
 
-    def test_hyperlink_value(self):
-        ws = Worksheet(self.wb)
+    def test_hyperlink_value(self, Worksheet):
+        ws = Worksheet(Workbook())
         ws.cell('A1').hyperlink = "http://test.com"
         assert "http://test.com" == ws.cell('A1').value
         ws.cell('A1').value = "test"
         assert "test" == ws.cell('A1').value
 
 
-    def test_hyperlink_relationships(self):
-        ws = Worksheet(self.wb)
+    def test_hyperlink_relationships(self, Worksheet):
+        ws = Worksheet(Workbook())
         assert len(ws.relationships) == 0
 
         ws.cell('A1').hyperlink = "http://test.com"
@@ -224,71 +231,71 @@ class TestWorksheet(object):
         assert "http://test2.com" == ws.relationships[1].target
         assert "External" == ws.relationships[1].target_mode
 
-    def test_bad_relationship_type(self):
+    def test_bad_relationship_type(self, Worksheet):
         with pytest.raises(ValueError):
             Relationship('bad_type')
 
 
-    def test_append(self):
-        ws = Worksheet(self.wb)
+    def test_append(self, Worksheet):
+        ws = Worksheet(Workbook())
         ws.append(['value'])
         assert ws['A1'].value == "value"
         assert ws.row_dimensions[1].parent is ws
         assert ws.column_dimensions['A'].parent is ws
 
 
-    def test_append_list(self):
-        ws = Worksheet(self.wb)
+    def test_append_list(self, Worksheet):
+        ws = Worksheet(Workbook())
 
         ws.append(['This is A1', 'This is B1'])
 
         assert 'This is A1' == ws.cell('A1').value
         assert 'This is B1' == ws.cell('B1').value
 
-    def test_append_dict_letter(self):
-        ws = Worksheet(self.wb)
+    def test_append_dict_letter(self, Worksheet):
+        ws = Worksheet(Workbook())
 
         ws.append({'A' : 'This is A1', 'C' : 'This is C1'})
 
         assert 'This is A1' == ws.cell('A1').value
         assert 'This is C1' == ws.cell('C1').value
 
-    def test_append_dict_index(self):
-        ws = Worksheet(self.wb)
+    def test_append_dict_index(self, Worksheet):
+        ws = Worksheet(Workbook())
 
         ws.append({1 : 'This is A1', 3 : 'This is C1'})
 
         assert 'This is A1' == ws.cell('A1').value
         assert 'This is C1' == ws.cell('C1').value
 
-    def test_bad_append(self):
-        ws = Worksheet(self.wb)
+    def test_bad_append(self, Worksheet):
+        ws = Worksheet(Workbook())
         assert ws.max_row == 0
         with pytest.raises(TypeError):
             ws.append("test")
         assert ws.max_row == 0
 
 
-    def test_append_range(self):
-        ws = Worksheet(self.wb)
+    def test_append_range(self, Worksheet):
+        ws = Worksheet(Workbook())
         ws.append(range(30))
         assert ws['AD1'].value == 29
 
 
-    def test_append_iterator(self):
+    def test_append_iterator(self, Worksheet):
         def itty():
             for i in range(30):
                 yield i
 
-        ws = Worksheet(self.wb)
+        ws = Worksheet(Workbook())
         gen = itty()
         ws.append(gen)
         assert ws['AD1'].value == 29
 
 
-    def test_append_2d_list(self):
+    def test_append_2d_list(self, Worksheet):
 
-        ws = Worksheet(self.wb)
+        ws = Worksheet(Workbook())
 
         ws.append(['This is A1', 'This is B1'])
         ws.append(['This is A2', 'This is B2'])
@@ -302,12 +309,12 @@ class TestWorksheet(object):
             assert e == tuple(v)
 
 
-    def test_append_cell(self):
+    def test_append_cell(self, Worksheet):
         from openpyxl.cell import Cell
 
         cell = Cell(None, 'A', 1, 25)
 
-        ws = Worksheet(self.wb)
+        ws = Worksheet(Workbook())
         ws.append([])
 
         ws.append([cell])
@@ -320,9 +327,9 @@ class TestWorksheet(object):
                                  (1, 0, 'A1'),
                                  (9, 2, 'C9'),
                              ])
-    def test_iter_rows(self, row, column, coordinate):
+    def test_iter_rows(self, Worksheet, row, column, coordinate):
         from itertools import islice
-        ws = Worksheet(self.wb)
+        ws = Worksheet(Workbook())
         ws.cell('A1').value = 'first'
         ws.cell('C9').value = 'last'
         assert ws.calculate_dimension() == 'A1:C9'
@@ -331,9 +338,9 @@ class TestWorksheet(object):
         assert first_row[column].coordinate == coordinate
 
 
-    def test_rows(self):
+    def test_rows(self, Worksheet):
 
-        ws = Worksheet(self.wb)
+        ws = Worksheet(Workbook())
 
         ws.cell('A1').value = 'first'
         ws.cell('C9').value = 'last'
@@ -348,13 +355,13 @@ class TestWorksheet(object):
         assert last_row[-1].value == 'last'
 
 
-    def test_no_cols(self):
-        ws = Worksheet(self.wb)
+    def test_no_cols(self, Worksheet):
+        ws = Worksheet(Workbook())
         assert ws.columns == ((),)
 
 
-    def test_cols(self):
-        ws = Worksheet(self.wb)
+    def test_cols(self, Worksheet):
+        ws = Worksheet(Workbook())
 
         ws.cell('A1').value = 'first'
         ws.cell('C9').value = 'last'
@@ -374,8 +381,8 @@ class TestWorksheet(object):
         assert cols[0][0].value == 'first'
         assert cols[-1][-1].value == 'last'
 
-    def test_auto_filter(self):
-        ws = Worksheet(self.wb)
+    def test_auto_filter(self, Worksheet):
+        ws = Worksheet(Workbook())
         ws.auto_filter.ref = ws.iter_rows('a1:f1')
         assert ws.auto_filter.ref == 'A1:F1'
 
@@ -385,20 +392,20 @@ class TestWorksheet(object):
         ws.auto_filter.ref = 'c1:g9'
         assert ws.auto_filter.ref == 'C1:G9'
 
-    def test_getitem(self):
-        ws = Worksheet(self.wb)
+    def test_getitem(self, Worksheet):
+        ws = Worksheet(Workbook())
         c = ws['A1']
         assert isinstance(c, Cell)
         assert c.coordinate == "A1"
         assert ws['A1'].value is None
 
-    def test_setitem(self):
-        ws = Worksheet(self.wb)
+    def test_setitem(self, Worksheet):
+        ws = Worksheet(Workbook())
         ws['A12'] = 5
         assert ws['A12'].value == 5
 
-    def test_getslice(self):
-        ws = Worksheet(self.wb)
+    def test_getslice(self, Worksheet):
+        ws = Worksheet(Workbook())
         cell_range = ws['A1':'B2']
         assert tuple(cell_range) == (
             (ws['A1'], ws['B1']),
@@ -406,8 +413,8 @@ class TestWorksheet(object):
         )
 
 
-    def test_freeze(self):
-        ws = Worksheet(self.wb)
+    def test_freeze(self, Worksheet):
+        ws = Worksheet(Workbook())
         ws.freeze_panes = ws.cell('b2')
         assert ws.freeze_panes == 'B2'
 
@@ -421,8 +428,8 @@ class TestWorksheet(object):
         assert ws.freeze_panes is None
 
 
-    def test_merged_cells_lookup(self):
-        ws = Worksheet(self.wb)
+    def test_merged_cells_lookup(self, Worksheet):
+        ws = Worksheet(Workbook())
         ws._merged_cells.append("A1:N50")
         merged = ws.merged_cells
         assert 'A1' in merged
@@ -431,13 +438,13 @@ class TestWorksheet(object):
         assert 'O1' not in merged
 
 
-    def test_merged_cell_ranges(self):
-        ws = Worksheet(self.wb)
+    def test_merged_cell_ranges(self, Worksheet):
+        ws = Worksheet(Workbook())
         assert ws.merged_cell_ranges == []
 
 
-    def test_merge_range_string(self):
-        ws = Worksheet(self.wb)
+    def test_merge_range_string(self, Worksheet):
+        ws = Worksheet(Workbook())
         ws['A1'] = 1
         ws['D4'] = 16
         ws.merge_cells(range_string="A1:D4")
@@ -445,20 +452,20 @@ class TestWorksheet(object):
         assert 'D4' not in ws._cells
 
 
-    def test_merge_coordinate(self):
-        ws = Worksheet(self.wb)
+    def test_merge_coordinate(self, Worksheet):
+        ws = Worksheet(Workbook())
         ws.merge_cells(start_row=1, start_column=1, end_row=4, end_column=4)
         assert ws._merged_cells == ["A1:D4"]
 
 
-    def test_unmerge_range_string(self):
-        ws = Worksheet(self.wb)
+    def test_unmerge_range_string(self, Worksheet):
+        ws = Worksheet(Workbook())
         ws._merged_cells = ["A1:D4"]
         ws.unmerge_cells("A1:D4")
 
 
-    def test_unmerge_coordinate(self):
-        ws = Worksheet(self.wb)
+    def test_unmerge_coordinate(self, Worksheet):
+        ws = Worksheet(Workbook())
         ws._merged_cells = ["A1:D4"]
         ws.unmerge_cells(start_row=1, start_column=1, end_row=4, end_column=4)
 
@@ -474,3 +481,38 @@ class TestPositioning(object):
         wb = Workbook()
         ws = wb.get_active_sheet()
         assert ws.point_pos(*ws.cell(value).anchor) == coordinate_from_string(value)
+
+
+def test_freeze_panes_horiz(Worksheet):
+    ws = Worksheet(Workbook())
+    ws.freeze_panes = 'A4'
+
+    view = ws.sheet_view
+    assert len(view.selection) == 1
+    assert dict(view.selection[0]) == {'activeCell': 'A1', 'pane': 'bottomLeft', 'sqref': 'A1'}
+    assert dict(view.pane) == {'activePane': 'bottomLeft', 'state': 'frozen',
+                               'topLeftCell': 'A4', 'ySplit': '3'}
+
+
+def test_freeze_panes_vert(Worksheet):
+    ws = Worksheet(Workbook())
+    ws.freeze_panes = 'D1'
+
+    view = ws.sheet_view
+    assert len(view.selection) == 1
+    assert dict(view.selection[0]) ==  {'activeCell': 'A1', 'pane': 'topRight', 'sqref': 'A1'}
+    assert dict(view.pane) == {'activePane': 'topRight', 'state': 'frozen',
+                               'topLeftCell': 'D1', 'xSplit': '3'}
+
+
+def test_freeze_panes_both(Worksheet):
+    ws = Worksheet(Workbook())
+    ws.freeze_panes = 'D4'
+
+    view = ws.sheet_view
+    assert len(view.selection) == 3
+    assert dict(view.selection[0]) == {'pane': 'topRight'}
+    assert dict(view.selection[1]) == {'pane': 'bottomLeft',}
+    assert dict(view.selection[2]) == {'activeCell': 'A1', 'pane': 'bottomRight', 'sqref': 'A1'}
+    assert dict(view.pane) == {'activePane': 'bottomRight', 'state': 'frozen',
+                               'topLeftCell': 'D4', 'xSplit': '3', "ySplit":"3"}
