@@ -225,6 +225,7 @@ def write_worksheet(worksheet, shared_strings):
             views = Element('sheetViews')
             views.append(worksheet.sheet_view.serialise())
             xf.write(views)
+
             xf.write(write_format(worksheet))
             cols = write_cols(worksheet)
             if cols is not None:
