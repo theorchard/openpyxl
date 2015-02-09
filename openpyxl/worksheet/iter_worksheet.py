@@ -136,9 +136,10 @@ class IterableWorksheet(Worksheet):
                 break
 
             if min_col <= column:
-                for col_counter in range(max(col_counter, min_col), column):
-                    # pad row with missing cells
-                    yield EMPTY_CELL
+                if col_counter < column:
+                    for col_counter in range(max(col_counter, min_col), column):
+                        # pad row with missing cells
+                        yield EMPTY_CELL
 
                 data_type = cell.get('t', 'n')
                 style_id = int(cell.get('s', 0))
