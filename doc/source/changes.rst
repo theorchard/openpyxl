@@ -18,6 +18,7 @@ Bug fixes
 * `#392 <https://bitbucket.org/openpyxl/openpyxl/issue/392>`_ Worksheet header not read
 * `#387 <https://bitbucket.org/openpyxl/openpyxl/issue/387>`_ Cannot read files without styles.xml
 * `#410 <https://bitbucket.org/openpyxl/openpyxl/issue/410>`_ Exception when preserving whitespace in strings
+* `#422 <https://bitbucket.org/openpyxl/openpyxl/issue/422>`_ Preserve color index in a workbook if it differs from the standard
 
 
 Minor changes
