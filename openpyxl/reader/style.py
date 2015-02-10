@@ -41,8 +41,8 @@ class SharedStylesParser(object):
         self.font_list = IndexedList()
         self.fill_list = IndexedList()
         self.border_list = IndexedList()
-        self.alignments = IndexedList()
-        self.protections = IndexedList()
+        self.alignments = IndexedList([Alignment()])
+        self.protections = IndexedList([Protection()])
         self.number_formats = IndexedList()
 
     def parse(self):
@@ -179,7 +179,7 @@ class SharedStylesParser(object):
                 prot = xf.find('{%s}protection' % SHEET_MAIN_NS)
                 if prot is not None:
                     protection = Protection(**prot.attrib)
-                    protectionId = self.alignments.add(protection)
+                    protectionId = self.protections.add(protection)
                     _style['protection'] = protection
 
             _styles.append(Style(**_style))
