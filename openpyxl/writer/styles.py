@@ -15,6 +15,7 @@ from openpyxl.xml.functions import (
     )
 from openpyxl.xml.constants import SHEET_MAIN_NS
 
+from openpyxl.styles.colors import COLOR_INDEX
 from openpyxl.styles import DEFAULTS
 from openpyxl.styles import numbers
 from openpyxl.styles.fills import GradientFill, PatternFill
@@ -65,6 +66,7 @@ class StyleWriter(object):
         self._write_style_names()
         self._write_conditional_styles()
         self._write_table_styles()
+        self._write_colors()
 
         return tostring(self._root)
 
@@ -75,7 +77,6 @@ class StyleWriter(object):
             SubElement(node, 'numFmt', {'numFmtId':'%d' % idx,
                                         'formatCode':'%s' % nf}
                        )
-
 
     def _write_fonts(self):
         fonts_node = SubElement(self._root, 'fonts', count="%d" % len(self.fonts))
@@ -162,3 +163,17 @@ class StyleWriter(object):
         SubElement(self._root, 'tableStyles',
             {'count':'0', 'defaultTableStyle':'TableStyleMedium9',
             'defaultPivotStyle':'PivotStyleLight16'})
+
+    def _write_colors(self):
+        """
+        Workbook contains a different colour index.
+        """
+
+        colors = self.wb._colors
+        if colors == COLOR_INDEX:
+            return
+
+        cols = SubElement(self._root, "colors")
+        rgb = SubElement(cols, "indexedColors")
+        for color in colors:
+            SubElement(rgb, "rgbColor", rgb=color)

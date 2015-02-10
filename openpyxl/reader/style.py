@@ -69,6 +69,8 @@ class SharedStylesParser(object):
         colors =\
             self.root.findall('{%s}colors/{%s}indexedColors/{%s}rgbColor' %
                               (SHEET_MAIN_NS, SHEET_MAIN_NS, SHEET_MAIN_NS))
+        if not colors:
+            return
         self.color_index = IndexedList([node.get('rgb') for node in colors])
 
 
