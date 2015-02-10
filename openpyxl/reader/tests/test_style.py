@@ -9,6 +9,7 @@ from zipfile import ZipFile
 # package imports
 from openpyxl.compat import safe_string, OrderedDict
 from openpyxl.reader.excel import load_workbook
+from openpyxl.utils.indexed_list import IndexedList
 
 from openpyxl.styles import (
     borders,
@@ -52,8 +53,8 @@ def test_unprotected_cell(StyleReader, datadir):
     with open ("worksheet_unprotected_style.xml") as src:
         reader = StyleReader(src.read())
     from openpyxl.styles import Font
-    reader.font_list = [Font(), Font(), Font(), Font(), Font()]
-    reader.protections = [Protection()]
+    reader.font_list = IndexedList([Font(), Font(), Font(), Font(), Font()])
+    reader.protections = IndexedList([Protection()])
     reader.parse_cell_styles()
     assert len(reader.cell_styles) == 3
     # default is cells are locked
@@ -332,7 +333,7 @@ def test_alignment(datadir, StyleReader):
         reader = StyleReader(src.read())
     reader.parse_cell_styles()
     st1 = reader.shared_styles[2]
-    assert len(reader.alignments) == 2
+    assert len(reader.alignments) == 3
     assert st1.alignment.textRotation == 255
 
 
