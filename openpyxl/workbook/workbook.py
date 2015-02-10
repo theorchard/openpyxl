@@ -77,6 +77,7 @@ class Workbook(object):
         from openpyxl.styles.fills import DEFAULT_EMPTY_FILL, DEFAULT_GRAY_FILL
         from openpyxl.styles.fonts import DEFAULT_FONT
         from openpyxl.styles.protection import Protection
+        from openpyxl.styles.colors import COLOR_INDEX
 
         self._fonts = IndexedList()
         self._fonts.add(DEFAULT_FONT)
@@ -94,7 +95,7 @@ class Workbook(object):
 
         self._protections = IndexedList([Protection()])
 
-        self._colors = IndexedList()
+        self._colors = COLOR_INDEX
         self._cell_styles = IndexedList([StyleId(0, 0, 0, 0, 0, 0)])
 
 
