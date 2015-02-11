@@ -27,17 +27,6 @@ class HashableObject(Serialisable):
         current.update(kwargs)
         return self.__class__(**current)
 
-    def __setattr__(self, *args, **kwargs):
-        name, value = args
-        if hasattr(self, name) and (
-            getattr(self, name) is not None
-            and not isinstance(getattr(self, name), Descriptor)):
-            raise TypeError('cannot set %s attribute' % name)
-        return object.__setattr__(self, *args, **kwargs)
-
-    def __delattr__(self, *args, **kwargs):
-        raise TypeError('cannot delete %s attribute' % args[0])
-
     def __print__(self, defaults=False):
         if defaults:
             print_func = str

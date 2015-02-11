@@ -22,18 +22,6 @@ class TestHashable:
         d.value = 1
         assert d.value == 1
 
-    def test_cannot_change_attrs(self, Immutable):
-        d = Immutable()
-        d.value = 1
-        with pytest.raises(TypeError):
-            d.value = 2
-
-    def test_cannot_delete_attrs(self, Immutable):
-        d = Immutable()
-        d.value = 1
-        with pytest.raises(TypeError):
-            delattr(d, 'value')
-
     def test_copy(self, Immutable):
         d = Immutable()
         d.value = 1
