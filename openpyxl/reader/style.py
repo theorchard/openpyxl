@@ -106,7 +106,8 @@ class SharedStylesParser(object):
         """
         ns = []
         styles_node = self.root.find("{%s}cellStyleXfs" % SHEET_MAIN_NS)
-        _styles, _ids = self._parse_xfs(styles_node)
+        self._parse_xfs(styles_node)
+        _ids = self.cell_styles
 
         for _name, idx in self._parse_style_names():
             _id = _ids[idx]
@@ -134,7 +135,7 @@ class SharedStylesParser(object):
         """
         node = self.root.find('{%s}cellXfs' % SHEET_MAIN_NS)
         if node is not None:
-            self.shared_styles, self.cell_styles = self._parse_xfs(node)
+            self._parse_xfs(node)
 
 
     def _parse_xfs(self, node):
@@ -184,8 +185,10 @@ class SharedStylesParser(object):
 
             _styles.append(Style(**_style))
             _style_ids.append(StyleId(alignmentId, borderId, fillId, fontId, numFmtId, protectionId))
+            self.shared_styles = _styles
+            self.cell_styles = IndexedList(_style_ids)
 
-        return _styles, IndexedList(_style_ids)
+        #return _styles, IndexedList(_style_ids)
 
 
 def read_style_table(archive):
