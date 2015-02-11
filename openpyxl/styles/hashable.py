@@ -98,14 +98,3 @@ class HashableObject(Serialisable):
             if not getattr(other, attr) and getattr(self, attr):
                 vals[attr] = getattr(self, attr)
         return self.__class__(**vals)
-
-
-    #def __iter__(self):
-        #"""
-        #Dictionary interface for easier serialising.
-        #All values converted to strings
-        #"""
-        #for key in self.__fields__:
-            #value = getattr(self, key)
-            #if bool(value):
-                #yield key, safe_string(value)
