@@ -110,9 +110,9 @@ class StyleableObject(object):
     #legacy
     @style.setter
     def style(self, value):
-        self.font = value.font
-        self.fill = value.fill
-        self.border = value.border
-        self.protection = value.protection
-        self.alignment = value.alignment
+        self.font = value.font._StyleProxy__target
+        self.fill = value.fill._StyleProxy__target
+        self.border = value.border._StyleProxy__target
+        self.protection = value.protection._StyleProxy__target
+        self.alignment = value.alignment._StyleProxy__target
         self.number_format = value.number_format

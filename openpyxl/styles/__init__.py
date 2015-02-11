@@ -69,7 +69,7 @@ class Style(HashableObject):
 
     @property
     def protection(self):
-        return self._protection
+        return StyleProxy(self._protection)
 
 
 DEFAULTS = Style()
