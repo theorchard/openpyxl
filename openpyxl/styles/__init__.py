@@ -11,6 +11,7 @@ from .fonts import Font
 from .hashable import HashableObject
 from .numbers import NumberFormatDescriptor, is_date_format, is_builtin
 from .protection import Protection
+from .proxy import StyleProxy
 
 
 class Style(HashableObject):
@@ -23,12 +24,12 @@ class Style(HashableObject):
                   'protection')
     __base__ = True
 
-    font = Typed(expected_type=Font)
-    fill = Typed(expected_type=Fill)
-    border = Typed(expected_type=Border)
-    alignment = Typed(expected_type=Alignment)
-    number_format = NumberFormatDescriptor()
-    protection = Typed(expected_type=Protection)
+    _font = Typed(expected_type=Font)
+    _fill = Typed(expected_type=Fill)
+    _border = Typed(expected_type=Border)
+    _alignment = Typed(expected_type=Alignment)
+    _number_format = NumberFormatDescriptor()
+    _protection = Typed(expected_type=Protection)
 
     def __init__(self,
                  font=Font(),
@@ -38,11 +39,37 @@ class Style(HashableObject):
                  number_format=None,
                  protection=Protection()
                  ):
-        self.font = font
-        self.fill = fill
-        self.border = border
-        self.alignment = alignment
-        self.number_format = number_format
-        self.protection = protection
+        self._font = font
+        self._fill = fill
+        self._border = border
+        self._alignment = alignment
+        self._number_format = number_format
+        self._protection = protection
+
+
+    @property
+    def font(self):
+        return StyleProxy(self._font)
+
+    @property
+    def fill(self):
+        return StyleProxy(self._fill)
+
+    @property
+    def border(self):
+        return StyleProxy(self._border)
+
+    @property
+    def alignment(self):
+        return StyleProxy(self._alignment)
+
+    @property
+    def number_format(self):
+        return self._number_format
+
+    @property
+    def protection(self):
+        return self._protection
+
 
 DEFAULTS = Style()

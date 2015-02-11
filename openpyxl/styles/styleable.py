@@ -98,14 +98,14 @@ class StyleableObject(object):
     #legacy
     @property
     def style(self):
-        return StyleProxy(Style(
+        return Style(
             font=self.font,
             fill=self.fill,
             border=self.border,
             alignment=self.alignment,
             number_format=self.number_format,
             protection=self.protection
-        ))
+        )
 
     #legacy
     @style.setter
