@@ -14,7 +14,6 @@ BASE_TYPES = (str, unicode, float, int)
 class HashableObject(Serialisable):
     """Define how to hash property classes."""
     __fields__ = ()
-    __slots__ = ('_key',) + __fields__
     __base__ = False
 
     @property
