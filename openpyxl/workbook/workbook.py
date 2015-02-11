@@ -17,6 +17,7 @@ from openpyxl.writer.dump_worksheet import DumpWorksheet, save_dump
 from . names.named_range import NamedRange
 from openpyxl.styles import Style
 from openpyxl.styles.styleable import StyleId
+from openpyxl.styles.numbers import BUILTIN_FORMATS
 from openpyxl.writer.excel import save_workbook
 from openpyxl.utils.exceptions import ReadOnlyWorkbookException
 from openpyxl.xml import LXML
@@ -50,8 +51,7 @@ class Workbook(object):
         self.__read_only = read_only
         self.__thread_local_data = threading.local()
         self.shared_strings = IndexedList()
-        self.shared_styles = IndexedList()
-        self.shared_styles.add(Style())
+
         self._setup_styles()
         self.loaded_theme = None
         self._worksheet_class = worksheet_class
@@ -110,23 +110,27 @@ class Workbook(object):
             if 'activeTab' in view.attrib:
                 self.active = int(view.attrib['activeTab'])
 
-    #@property
-    #def shared_styles(self):
-        #"""
-        #Legacy
-        #On the fly conversion of style references to style objects
-        #"""
-        #styles = []
-        #for sid in self._cell_styles:
-            #font = self._fonts[sid.font]
-            #fill = self._fills[sid.fill]
-            #border = self._borders[sid.fill]
-            #alignment = self._alignments[sid.alignment]
-            #protection = self._protections[sid.protection]
-            #number_format = self._number_formats[sid.number_format]
-            #styles.append(Style(font, fill, border, alignment,
-                                #number_format, protection))
-            #return styles
+    @property
+    def shared_styles(self):
+        """
+        Legacy
+        On the fly conversion of style references to style objects
+        """
+        styles = []
+        for sid in self._cell_styles:
+            font = self._fonts[sid.font]
+            fill = self._fills[sid.fill]
+            border = self._borders[sid.fill]
+            alignment = self._alignments[sid.alignment]
+            protection = self._protections[sid.protection]
+            nf_id = sid.number_format
+            if nf_id < 164:
+                number_format = BUILTIN_FORMATS.get(nf_id, "General")
+            else:
+                number_format = self._number_formats[sid.number_format - 164]
+            styles.append(Style(font, fill, border, alignment,
+                                number_format, protection))
+            return styles
 
 
     @property

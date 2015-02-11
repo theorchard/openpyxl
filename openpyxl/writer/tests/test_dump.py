@@ -28,8 +28,7 @@ class DummyWorkbook:
 
     def __init__(self):
         self.shared_strings = IndexedList()
-        self.shared_styles = IndexedList()
-        self.shared_styles.add(Style())
+        self.shared_styles = [Style()]
         self._cell_styles = IndexedList([StyleId(0, 0, 0, 0, 0, 0)])
         self._number_formats = IndexedList()
         self._local_data = DummyLocalData()

@@ -33,7 +33,7 @@ class SharedStylesParser(object):
 
     def __init__(self, xml_source):
         self.root = fromstring(xml_source)
-        self.shared_styles = IndexedList()
+        self.shared_styles = []
         self.cell_styles = IndexedList()
         self.cond_styles = []
         self.style_prop = {}
@@ -185,7 +185,7 @@ class SharedStylesParser(object):
             _styles.append(Style(**_style))
             _style_ids.append(StyleId(alignmentId, borderId, fillId, fontId, numFmtId, protectionId))
 
-        return IndexedList(_styles), IndexedList(_style_ids)
+        return _styles, IndexedList(_style_ids)
 
 
 def read_style_table(archive):

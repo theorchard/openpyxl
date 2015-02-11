@@ -69,9 +69,8 @@ def Worksheet(Workbook):
         def __init__(self):
             self.shared_strings = IndexedList()
             self.shared_strings.add("hello world")
-            self.shared_styles = IndexedList()
-            self.shared_styles.extend((28*[DummyStyle()]))
-            self.shared_styles.add(Style())
+            self.shared_styles = 28*[DummyStyle()]
+            self.shared_styles.append(Style())
             self._fonts = IndexedList()
             self._fills = IndexedList()
             self._number_formats = IndexedList()

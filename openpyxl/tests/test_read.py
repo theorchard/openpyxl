@@ -32,8 +32,7 @@ def test_read_standalone_worksheet(datadir):
         data_only = False
 
         def __init__(self):
-            self.shared_styles = IndexedList()
-            self.shared_styles.add(Style())
+            self.shared_styles = [Style()]
 
         def get_sheet_by_name(self, value):
             return None
