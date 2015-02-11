@@ -89,18 +89,16 @@ one, by **completely** replacing sub-elements by others
 
 .. :: doctest
 
->>> from openpyxl.styles import Font, Style
+>>> from openpyxl.styles import Font
 >>>
->>> arial = Font(name='Arial', size=14)
->>> tahoma = Font(name='Tahoma')
->>> s1 = Style(font=arial, number_format='0%')
->>> s2 = s1.copy(font=tahoma)
->>> s2.font.name
+>>> ft1 = Font(name='Arial', size=14)
+>>> ft2 = ft1.copy(name="Tahoma")
+>>> ft1.name
+'Arial'
+>>> ft2.name
 'Tahoma'
->>> s2.number_format
-'0%'
->>> s2.font.size # 11 (tahoma does not re-specify size, so we use the default)
-11.0
+>>> ft2.size # copied from the
+14.0
 
 
 This might be surprising that we do not use the previous `Font` size,
@@ -136,18 +134,21 @@ Styles are applied directly to cells
 .. :: doctest
 
 >>> from openpyxl.workbook import Workbook
->>> from openpyxl.styles import Style
+>>> from openpyxl.styles import Font, Fill
 >>> wb = Workbook()
 >>> ws = wb.active
 >>> c = ws['A1']
->>> c.style = Style()
+>>> c.font = Font(size=12)
 
-Styles are also applied to columns and rows::
+Styles can also applied to columns and rows but note that this applies only
+to cells created (in Excel) after the file is closed. If you want to apply
+styles to entire rows and columns then you must apply the style to each cell
+yourself. This is a restriction of the file format::
 
 >>> col = ws.column_dimensions['A']
->>> col.style = Style()
+>>> col.font = Font(bold=True)
 >>> row = ws.row_dimensions[1]
->>> row.style = Style()
+>>> row.style = Font(underline="single")
 
 
 Edit Page Setup
