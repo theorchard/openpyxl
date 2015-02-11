@@ -127,15 +127,9 @@ class ReadOnlyCell(object):
 
     @property
     def style(self):
-        wb = self.parent.parent
-        font = wb._fonts[self.style_id.font]
-        fill = wb._fills[self.style_id.fill]
-        alignment = wb._alignments[self.style_id.alignment]
-        border = wb._borders[self.style_id.border]
-        protection = wb._protections[self.style_id.protection]
-
-        return Style(font=font, alignment=alignment, fill=fill,
-                     number_format=self.number_format, border=border, protection=protection)
+        return Style(font=self.font, alignment=self.alignment,
+                     fill=self.fill, number_format=self.number_format, border=self.border,
+                     protection=self.protection)
 
 
 EMPTY_CELL = ReadOnlyCell(None, None, None, None)
