@@ -28,7 +28,7 @@ class Style(HashableObject):
     _fill = Typed(expected_type=Fill)
     _border = Typed(expected_type=Border)
     _alignment = Typed(expected_type=Alignment)
-    _number_format = NumberFormatDescriptor()
+    number_format = NumberFormatDescriptor()
     _protection = Typed(expected_type=Protection)
 
     def __init__(self,
@@ -43,7 +43,7 @@ class Style(HashableObject):
         self._fill = fill
         self._border = border
         self._alignment = alignment
-        self._number_format = number_format
+        self.number_format = number_format
         self._protection = protection
 
 
@@ -62,10 +62,6 @@ class Style(HashableObject):
     @property
     def alignment(self):
         return StyleProxy(self._alignment)
-
-    @property
-    def number_format(self):
-        return self._number_format
 
     @property
     def protection(self):
