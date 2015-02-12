@@ -27,8 +27,8 @@ Write a workbook
 >>> for row in range(10, 20):
 ...     for col in range(27, 54):
 ...         _ = ws3.cell(column=col, row=row, value="%s" % get_column_letter(col))
->>> ws3['AA10'].value
-'AA'
+>>> print(ws3['AA10'].value)
+AA
 >>> wb.save(filename = dest_filename)
 
 
