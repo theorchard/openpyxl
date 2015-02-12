@@ -313,7 +313,7 @@ class Worksheet(object):
 
         self.parent.create_named_range('_xlnm.Print_Titles', self, r, self)
 
-    def cell(self, coordinate=None, row=None, column=None):
+    def cell(self, coordinate=None, row=None, column=None, value=None):
         """Returns a cell object based on the given coordinates.
 
         Usage: cell(coodinate='A15') **or** cell(row=15, column=1)
@@ -344,11 +344,17 @@ class Worksheet(object):
                     "'coordinate' or for 'row' *and* 'column'"
                 raise InsufficientCoordinatesException(msg)
             else:
-                coordinate = '%s%s' % (get_column_letter(column), row)
+                column = get_column_letter(column)
+                coordinate = '%s%s' % (column, row)
         else:
-            coordinate = coordinate.replace('$', '')
+            coordinate = coordinate.upper().replace('$', '')
 
-        return self._get_cell(coordinate)
+        if coordinate not in self._cells:
+            if row is None or column is None:
+                column, row = coordinate_from_string(coordinate)
+            self._new_cell(column, row, value)
+
+        return self._cells[coordinate]
 
 
     def _get_cell(self, coordinate):
@@ -359,9 +365,13 @@ class Worksheet(object):
         coordinate = coordinate.upper()
         if not coordinate in self._cells:
             column, row = coordinate_from_string(coordinate)
-            new_cell = Cell(self, column, row)
-            self._add_cell(new_cell)
+            self._new_cell(column, row)
         return self._cells[coordinate]
+
+
+    def _new_cell(self, column, row, value=None):
+        cell = Cell(self, column, row, value)
+        self._add_cell(cell)
 
 
     def _add_cell(self, cell):
@@ -375,6 +385,7 @@ class Worksheet(object):
             self.column_dimensions[column] = ColumnDimension(index=column, worksheet=self)
         if row not in self.row_dimensions:
             self.row_dimensions[row] = RowDimension(index=row, worksheet=self)
+        self._cells[cell.coordinate] = cell
 
 
     def __getitem__(self, key):
@@ -728,8 +739,6 @@ class Worksheet(object):
             or isgenerator(iterable)):
             for col_idx, content in enumerate(iterable, 1):
                 col = get_column_letter(col_idx)
-                if col not in self.column_dimensions:
-                    self.column_dimensions[col] = ColumnDimension(worksheet=self, index=col)
                 if isinstance(content, Cell):
                     # compatible with write-only mode
                     cell = content
@@ -737,15 +746,15 @@ class Worksheet(object):
                     cell.column = col
                     cell.row = row_idx
                     cell.coordinate = "%s%s" % (col, row_idx)
+                    self._add_cell(cell)
                 else:
-                    cell = Cell(self, col, row_idx, content)
-                self._cells['%s%d' % (col, row_idx)] = cell
+                    cell = self._new_cell(col, row_idx, content)
 
         elif isinstance(iterable, dict):
             for col_idx, content in iteritems(iterable):
                 if isinstance(col_idx, basestring):
                     col_idx = column_index_from_string(col_idx)
-                self.cell(row=row_idx, column=col_idx).value = content
+                self.cell(row=row_idx, column=col_idx, value=content)
 
         else:
             self._invalid_row(iterable)
