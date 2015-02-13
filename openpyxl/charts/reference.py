@@ -3,13 +3,13 @@ from __future__ import absolute_import
 
 
 from openpyxl.cell import get_column_letter
-from openpyxl.descriptors import Tuple, Set, Strict
+from openpyxl.descriptors import Tuple, NoneSet, Strict
 
 
 class Reference(Strict):
     """ a simple wrapper around a serie of reference data """
 
-    data_type = Set(values=['n', 's', None])
+    data_type = NoneSet(values=['n', 's', 'f'])
     pos1 = Tuple()
     pos2 = Tuple(allow_none=True)
 

@@ -1,4 +1,5 @@
 from __future__ import absolute_import
+from __future__ import division
 # Copyright (c) 2010-2015 openpyxl
 
 
@@ -82,7 +83,7 @@ class Chart(object):
 
         mb = Shape.FONT_HEIGHT + Shape.MARGIN_BOTTOM
         plot_height = self.drawing.height * self.height
-        return float(self.drawing.height - plot_height - mb) / self.drawing.height
+        return (self.drawing.height - plot_height - mb) / self.drawing.height
 
     @property
     def margin_left(self):
@@ -94,6 +95,10 @@ class Chart(object):
         self._margin_left = value
 
     def _get_min_margin_left(self):
+        try:
+            ychars = self.get_y_chars()
+        except TypeError:
+            ychars = 0
 
-        ml = (self.get_y_chars() * Shape.FONT_WIDTH) + Shape.MARGIN_LEFT
-        return float(ml) / self.drawing.width
+        ml = (ychars * Shape.FONT_WIDTH) + Shape.MARGIN_LEFT
+        return ml / self.drawing.width
