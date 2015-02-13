@@ -13,6 +13,7 @@ from openpyxl.worksheet import Worksheet, ColumnDimension, RowDimension
 from openpyxl.worksheet.iter_worksheet import IterableWorksheet
 from openpyxl.worksheet.page import PageMargins, PrintOptions, PageSetup
 from openpyxl.worksheet.protection import SheetProtection
+from openpyxl.worksheet.views import SheetView
 from openpyxl.xml.constants import SHEET_MAIN_NS, REL_NS
 from openpyxl.xml.functions import safe_iterator
 from openpyxl.styles import Color
@@ -79,6 +80,7 @@ class WorkSheetParser(object):
             '{%s}dataValidations' % SHEET_MAIN_NS: self.parse_data_validation,
             '{%s}sheetPr' % SHEET_MAIN_NS: self.parse_properties,
             '{%s}legacyDrawing' % SHEET_MAIN_NS: self.parse_legacy_drawing,
+            '{%s}sheetViews' % SHEET_MAIN_NS: self.parse_sheet_views,
                       }
         tags = dispatcher.keys()
         stream = _get_xml_iter(self.source)
@@ -295,6 +297,13 @@ class WorkSheetParser(object):
 
     def parse_legacy_drawing(self, element):
         self.ws.vba_controls = element.get("r:id")
+
+
+    def parse_sheet_views(self, element):
+        for el in element.findall("{%s}sheetView" % SHEET_MAIN_NS):
+            # according to the specification the last view wins
+            pass
+        self.ws.sheet_view = SheetView.from_etree(el)
 
 
 def fast_parse(ws, xml_source, shared_strings, style_table, color_index=None):

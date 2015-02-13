@@ -117,7 +117,8 @@ class SheetView(Serialisable):
         self.workbookViewId = workbookViewId
         self.pane = pane
         if selection is None:
-            self.selection = (Selection(), )
+            selection = (Selection(), )
+        self.selection = selection
 
     def __iter__(self):
 

@@ -436,3 +436,19 @@ def test_cell(WorkSheetParser, datadir):
     assert element.get('r') == 'A2'
     parser.parse_cell(element)
     #assert ws['A2']._font_id == 3
+
+
+def test_sheet_views(WorkSheetParser, datadir):
+    datadir.chdir()
+    parser = WorkSheetParser
+
+    with open("frozen_view_worksheet.xml") as src:
+        sheet = fromstring(src.read())
+
+    element = sheet.find("{%s}sheetViews" % SHEET_MAIN_NS)
+    parser.parse_sheet_views(element)
+    ws = parser.ws
+    view = ws.sheet_view
+
+    assert view.zoomScale == 200
+    assert len(view.selection) == 3
