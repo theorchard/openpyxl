@@ -61,7 +61,7 @@ class Serialisable(_Serialiasable):
         return el.get("val", True)
 
 
-    def serialise(self, tagname=None):
+    def to_etree(self, tagname=None):
         if tagname is None:
             tagname = self.tagname
         attrs = dict(self)
@@ -80,12 +80,12 @@ class Serialisable(_Serialiasable):
             obj = getattr(self, child)
             if isinstance(obj, tuple):
                 for v in obj:
-                    if hasattr(v, 'serialise'):
-                        el.append(v.serialise(tagname=child))
+                    if hasattr(v, 'to_etree'):
+                        el.append(v.to_etree(tagname=child))
                     else:
                         SubElement(el, child).text = v
             elif obj is not None:
-                el.append(obj.serialise(tagname=child))
+                el.append(obj.to_etree(tagname=child))
         return el
 
 
@@ -94,7 +94,7 @@ class Serialisable(_Serialiasable):
         Allow special handling of sequences which themselves are not directly serialisable
         """
         for obj in sequence:
-            yield obj.serialise()
+            yield obj.to_etree()
 
 
     def __iter__(self):

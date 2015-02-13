@@ -35,7 +35,7 @@ def test_serialise(ConditionalStyle):
     cond = ConditionalStyle()
     cond.font = Font()
     cond.fill = PatternFill()
-    xml = tostring(cond.serialise())
+    xml = tostring(cond.to_etree())
     expected = """
     <dxf>
     <font>

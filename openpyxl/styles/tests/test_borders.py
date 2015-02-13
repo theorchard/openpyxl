@@ -55,7 +55,7 @@ class TestBorder:
                              right=medium_blue,
                              top=medium_blue,
                              bottom=medium_blue)
-        xml = tostring(bd.serialise())
+        xml = tostring(bd.to_etree())
         expected = """
         <border>
           <left style="medium">

@@ -81,19 +81,19 @@ class StyleWriter(object):
     def _write_fonts(self):
         fonts_node = SubElement(self._root, 'fonts', count="%d" % len(self.fonts))
         for font in self.fonts:
-            fonts_node.append(font.serialise())
+            fonts_node.append(font.to_etree())
 
 
     def _write_fills(self):
         fills_node = SubElement(self._root, 'fills', count="%d" % len(self.fills))
         for fill in self.fills:
-            fills_node.append(fill.serialise())
+            fills_node.append(fill.to_etree())
 
     def _write_borders(self):
         """Write the child elements for an individual border section"""
         borders_node = SubElement(self._root, 'borders', count="%d" % len(self.borders))
         for border in self.borders:
-            borders_node.append(border.serialise())
+            borders_node.append(border.to_etree())
 
     def _write_named_styles(self):
         cell_style_xfs = SubElement(self._root, 'cellStyleXfs', {'count':'1'})
@@ -135,13 +135,13 @@ class StyleWriter(object):
             if st.alignment != 0:
                 node.set("applyProtection", '1')
                 al = self.alignments[st.alignment]
-                el = al.serialise()
+                el = al.to_etree()
                 node.append(el)
 
             if st.protection != 0:
                 node.set('applyProtection', '1')
                 prot = self.protections[st.protection]
-                el = prot.serialise()
+                el = prot.to_etree()
                 node.append(el)
 
 
@@ -154,7 +154,7 @@ class StyleWriter(object):
     def _write_conditional_styles(self):
         dxfs = SubElement(self._root, "dxfs", count=str(len(self.wb.conditional_formats)))
         for fmt in self.wb.conditional_formats:
-            dxfs.append(fmt.serialise())
+            dxfs.append(fmt.to_etree())
         return dxfs
 
 

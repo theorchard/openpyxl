@@ -223,7 +223,7 @@ def write_worksheet(worksheet, shared_strings):
             xf.write(dim)
 
             views = Element('sheetViews')
-            views.append(worksheet.sheet_view.serialise())
+            views.append(worksheet.sheet_view.to_etree())
             xf.write(views)
 
             xf.write(write_format(worksheet))

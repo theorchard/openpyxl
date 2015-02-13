@@ -110,7 +110,7 @@ class DumpWorksheet(Worksheet):
 
                 xf.write(pr)
                 views = Element('sheetViews')
-                views.append(self.sheet_view.serialise())
+                views.append(self.sheet_view.to_etree())
                 xf.write(views)
                 xf.write(write_format(self))
 

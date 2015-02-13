@@ -28,7 +28,7 @@ class TestFormatObject:
 
     def test_serialise(self, FormatObject):
         cfvo = FormatObject(type="percent", val=4)
-        xml = tostring(cfvo.serialise())
+        xml = tostring(cfvo.to_etree())
         expected = """<cfvo type="percent" val="4"/>"""
         diff = compare_xml(xml, expected)
         assert diff is None, diff
@@ -67,7 +67,7 @@ class TestColorScale:
         col3 = Color(rgb="FF00B050")
 
         cs = ColorScale(cfvo=[fo1, fo2, fo3], color=[col1, col2, col3])
-        xml = tostring(cs.serialise())
+        xml = tostring(cs.to_etree())
         expected = """
         <colorScale>
         <cfvo type="min" val="0"/>
@@ -108,7 +108,7 @@ class TestDataBar:
         fo1 = FormatObject(type="min", val="0")
         fo2 = FormatObject(type="percent", val="50")
         db = DataBar(minLength=4, maxLength=10, cfvo=[fo1, fo2], color="FF2266", showValue=True)
-        xml = tostring(db.serialise())
+        xml = tostring(db.to_etree())
         expected = """
         <dataBar maxLength="10" minLength="4" showValue="1">
           <cfvo type="min" val="0"></cfvo>
@@ -150,7 +150,7 @@ class TestIconSet:
         fo3 = FormatObject(type="num", val="6")
         fo4 = FormatObject(type="percent", val="0")
         icon = IconSet(cfvo=[fo1, fo2, fo3, fo4], iconSet="4ArrowsGray", reverse=True, showValue=False)
-        xml = tostring(icon.serialise())
+        xml = tostring(icon.to_etree())
         expected = """
         <iconSet iconSet="4ArrowsGray" showValue="0" reverse="1">
           <cfvo type="num" val="2"/>
@@ -191,7 +191,7 @@ class TestRule:
         rule = Rule(type="cellIs", dxfId="26", priority="13", operator="between")
         rule.formula = ["2", "7"]
 
-        xml = tostring(rule.serialise())
+        xml = tostring(rule.to_etree())
         expected = """
         <cfRule type="cellIs" dxfId="26" priority="13" operator="between">
         <formula>2</formula>
