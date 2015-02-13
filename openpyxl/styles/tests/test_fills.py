@@ -56,7 +56,7 @@ class TestGradientFill:
 
     def test_serialise(self, GradientFill):
         gf = GradientFill(degree=90, left=1, right=2, top=3, bottom=4, stop=[Color(BLACK), Color(WHITE)])
-        xml = tostring(gf.to_etree())
+        xml = tostring(gf.to_tree())
         expected = """
         <fill>
         <gradientFill bottom="4" degree="90" left="1" right="2" top="3" type="linear">
@@ -87,7 +87,7 @@ class TestGradientFill:
         </fill>
         """
         xml = fromstring(src)
-        fill = GradientFill.from_etree(xml)
+        fill = GradientFill.from_tree(xml)
         assert fill.stop == (Color(theme=0), Color(theme=4))
 
 
@@ -113,7 +113,7 @@ class TestPatternFill:
 
     def test_serialise(self, PatternFill):
         pf = PatternFill('solid', 'FF0000', 'FFFF00')
-        xml = tostring(pf.to_etree())
+        xml = tostring(pf.to_tree())
         expected = """
         <fill>
         <patternFill patternType="solid">
@@ -170,4 +170,4 @@ class TestPatternFill:
                              )
     def test_create(self, PatternFill, src, args):
         xml = fromstring(src)
-        assert PatternFill.from_etree(xml) == PatternFill(**args)
+        assert PatternFill.from_tree(xml) == PatternFill(**args)

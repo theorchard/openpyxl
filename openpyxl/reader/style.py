@@ -77,27 +77,27 @@ class SharedStylesParser(object):
     def parse_dxfs(self):
         """Read in the dxfs effects - used by conditional formatting."""
         for node in self.root.findall("{%s}dxfs/{%s}dxf" % (SHEET_MAIN_NS, SHEET_MAIN_NS) ):
-            self.cond_styles.append(ConditionaStyle.from_etree(node))
+            self.cond_styles.append(ConditionaStyle.from_tree(node))
 
 
     def parse_fonts(self):
         """Read in the fonts"""
         fonts = self.root.findall('{%s}fonts/{%s}font' % (SHEET_MAIN_NS, SHEET_MAIN_NS))
         for node in fonts:
-            yield Font.from_etree(node)
+            yield Font.from_tree(node)
 
 
     def parse_fills(self):
         """Read in the list of fills"""
         fills = self.root.findall('{%s}fills/{%s}fill' % (SHEET_MAIN_NS, SHEET_MAIN_NS))
         for fill in fills:
-            yield Fill.from_etree(fill)
+            yield Fill.from_tree(fill)
 
     def parse_borders(self):
         """Read in the boarders"""
         borders = self.root.findall('{%s}borders/{%s}border' % (SHEET_MAIN_NS, SHEET_MAIN_NS))
         for border_node in borders:
-            yield Border.from_etree(border_node)
+            yield Border.from_tree(border_node)
 
 
     def parse_named_styles(self):

@@ -34,7 +34,7 @@ class TestFont:
 
     def test_serialise(self, Font):
         ft = Font(name='Calibri', charset=204, vertAlign='superscript', underline='single')
-        xml = tostring(ft.to_etree())
+        xml = tostring(ft.to_tree())
         expected = """
         <font>
           <name val="Calibri"></name>
@@ -62,7 +62,7 @@ class TestFont:
           <color rgb="FF3300FF"></color>
          </font>"""
         xml = fromstring(src)
-        ft = Font.from_etree(xml)
+        ft = Font.from_tree(xml)
         assert ft == Font(name='Calibri', charset=204, vertAlign='superscript', underline='single', color="FF3300FF")
 
 

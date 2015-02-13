@@ -35,7 +35,7 @@ def test_parse(SheetView):
     </sheetView>
     """
     xml = fromstring(src)
-    view = SheetView.from_etree(xml)
+    view = SheetView.from_tree(xml)
     assert dict(view) == {'tabSelected': '1', 'zoomScale': '200', 'workbookViewId':"0",
                           'zoomScaleNormal': '200', 'zoomScalePageLayoutView': '200'}
     assert len(view.selection) == 3
@@ -44,7 +44,7 @@ def test_parse(SheetView):
 def test_serialise(SheetView):
     view = SheetView()
 
-    xml = tostring(view.to_etree())
+    xml = tostring(view.to_tree())
     expected = """
     <sheetView workbookViewId="0">
        <selection activeCell="A1" sqref="A1"></selection>

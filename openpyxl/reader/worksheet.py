@@ -303,7 +303,7 @@ class WorkSheetParser(object):
         for el in element.findall("{%s}sheetView" % SHEET_MAIN_NS):
             # according to the specification the last view wins
             pass
-        self.ws.sheet_view = SheetView.from_etree(el)
+        self.ws.sheet_view = SheetView.from_tree(el)
 
 
 def fast_parse(ws, xml_source, shared_strings, style_table, color_index=None):
