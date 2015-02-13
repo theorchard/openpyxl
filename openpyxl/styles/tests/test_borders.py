@@ -43,7 +43,7 @@ class TestBorder:
         </border>
         """
         xml = fromstring(src)
-        bd = Border.create(xml)
+        bd = Border.from_etree(xml)
         assert bd.left.style == "thin"
         assert bd.right.color.value == "FF006600"
         assert bd.diagonal.style == None

@@ -47,12 +47,12 @@ class Fill(HashableObject):
     tagname = "fill"
 
     @classmethod
-    def create(cls, el):
+    def from_etree(cls, el):
         child = [c for c in el][0]
         if "patternFill" in child.tag:
-            return PatternFill._create(child)
+            return PatternFill._from_etree(child)
         else:
-            return GradientFill._create(child)
+            return GradientFill._from_etree(child)
 
 
 class PatternFill(Fill):
@@ -88,11 +88,11 @@ class PatternFill(Fill):
         self.bgColor = bgColor
 
     @classmethod
-    def _create(cls, el):
+    def _from_etree(cls, el):
         attrib = dict(el.attrib)
         for child in el:
             desc = localname(child)
-            attrib[desc] = Color.create(child)
+            attrib[desc] = Color.from_etree(child)
         return cls(**attrib)
 
 
@@ -147,10 +147,10 @@ class GradientFill(Fill):
 
 
     @classmethod
-    def _create(cls, node):
+    def _from_etree(cls, node):
         colors = []
         for color in safe_iterator(node, "{%s}color" % SHEET_MAIN_NS):
-            colors.append(Color.create(color))
+            colors.append(Color.from_etree(color))
         return cls(stop=colors, **node.attrib)
 
 

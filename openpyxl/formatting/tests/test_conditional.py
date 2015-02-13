@@ -24,7 +24,7 @@ def test_parse(ConditionalStyle, datadir):
     xml = fromstring(src)
     formats = []
     for node in xml.findall("{%s}dxfs/{%s}dxf" % (SHEET_MAIN_NS, SHEET_MAIN_NS) ):
-        formats.append(ConditionalStyle.create(node))
+        formats.append(ConditionalStyle.from_etree(node))
     assert len(formats) == 164
     cond = formats[1]
     assert cond.font == Font(underline="double", color=Color(auto=1), strikethrough=True, italic=True)

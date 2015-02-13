@@ -26,7 +26,7 @@ class Serialisable(_Serialiasable):
 
 
     @classmethod
-    def create(cls, node):
+    def from_etree(cls, node):
         """
         Create object from XML
         """
@@ -39,8 +39,8 @@ class Serialisable(_Serialiasable):
             if tag in cls.__nested__:
                 attrib[tag] = cls._create_nested(el, tag)
             else:
-                if hasattr(desc.expected_type, "create"):
-                    obj = desc.expected_type.create(el)
+                if hasattr(desc.expected_type, "from_etree"):
+                    obj = desc.expected_type.from_etree(el)
                 else:
                     obj = el.text
                 if isinstance(desc, Sequence):

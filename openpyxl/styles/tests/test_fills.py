@@ -87,7 +87,7 @@ class TestGradientFill:
         </fill>
         """
         xml = fromstring(src)
-        fill = GradientFill.create(xml)
+        fill = GradientFill.from_etree(xml)
         assert fill.stop == (Color(theme=0), Color(theme=4))
 
 
@@ -170,4 +170,4 @@ class TestPatternFill:
                              )
     def test_create(self, PatternFill, src, args):
         xml = fromstring(src)
-        assert PatternFill.create(xml) == PatternFill(**args)
+        assert PatternFill.from_etree(xml) == PatternFill(**args)

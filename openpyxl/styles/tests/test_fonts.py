@@ -62,7 +62,7 @@ class TestFont:
           <color rgb="FF3300FF"></color>
          </font>"""
         xml = fromstring(src)
-        ft = Font.create(xml)
+        ft = Font.from_etree(xml)
         assert ft == Font(name='Calibri', charset=204, vertAlign='superscript', underline='single', color="FF3300FF")
 
 

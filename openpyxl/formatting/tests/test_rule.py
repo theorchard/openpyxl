@@ -20,7 +20,7 @@ class TestFormatObject:
 
     def test_create(self, FormatObject):
         xml = fromstring("""<cfvo type="num" val="3"/>""")
-        cfvo = FormatObject.create(xml)
+        cfvo = FormatObject.from_etree(xml)
         assert cfvo.type == "num"
         assert cfvo.val == 3
         assert cfvo.gte is None
@@ -52,7 +52,7 @@ class TestColorScale:
         </colorScale>
         """
         xml = fromstring(src)
-        cs = ColorScale.create(xml)
+        cs = ColorScale.from_etree(xml)
         assert len(cs.cfvo) == 2
         assert len(cs.color) == 2
 
@@ -99,7 +99,7 @@ class TestDataBar:
         </dataBar>
         """
         xml = fromstring(src)
-        db = DataBar.create(xml)
+        db = DataBar.from_etree(xml)
         assert len(db.cfvo) == 2
         assert db.color.value == "FF638EC6"
 
@@ -139,7 +139,7 @@ class TestIconSet:
         </iconSet>
         """
         xml = fromstring(src)
-        icon = IconSet.create(xml)
+        icon = IconSet.from_etree(xml)
         assert icon.iconSet == "5Rating"
         assert len(icon.cfvo) == 5
 
@@ -179,7 +179,7 @@ class TestRule:
 
         rules = []
         for el in xml.findall("{%s}conditionalFormatting/{%s}cfRule" % (SHEET_MAIN_NS, SHEET_MAIN_NS)):
-            rules.append(Rule.create(el))
+            rules.append(Rule.from_etree(el))
 
         assert len(rules) == 30
         assert rules[17].formula == ('2', '7')
