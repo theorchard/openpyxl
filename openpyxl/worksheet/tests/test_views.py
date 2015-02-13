@@ -1,9 +1,12 @@
 from __future__ import absolute_import
 # Copyright (c) 2010-2015 openpyxl
 
-from openpyxl.xml.functions import fromstring
+from openpyxl.xml.functions import fromstring, tostring
 
 import pytest
+
+from openpyxl.tests.helper import compare_xml
+
 
 @pytest.fixture
 def SheetView():
@@ -36,3 +39,16 @@ def test_parse(SheetView):
     assert dict(view) == {'tabSelected': '1', 'zoomScale': '200', 'workbookViewId':"0",
                           'zoomScaleNormal': '200', 'zoomScalePageLayoutView': '200'}
     assert len(view.selection) == 3
+
+
+def test_serialise(SheetView):
+    view = SheetView()
+
+    xml = tostring(view.to_etree())
+    expected = """
+    <sheetView workbookViewId="0">
+       <selection activeCell="A1" sqref="A1"></selection>
+    </sheetView>
+    """
+    diff = compare_xml(xml, expected)
+    assert diff is None, diff
