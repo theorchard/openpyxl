@@ -281,7 +281,7 @@ class TempXmlFileTestCase(_XmlFileTestCaseBase):
 
 class TempPathXmlFileTestCase(_XmlFileTestCaseBase):
     def setUp(self):
-        self._tmpfile = tempfile.NamedTemporaryFile()
+        self._tmpfile = tempfile.NamedTemporaryFile(delete=False)
         self._file = self._tmpfile.name
 
     def tearDown(self):
