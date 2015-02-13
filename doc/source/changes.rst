@@ -10,14 +10,19 @@ Major changes
 * Moved ancillary functions and classes into utils package - single place of reference
 * `PR 34 <https://bitbucket.org/openpyxl/openpyxl/pull-request/34/>`_ Fully support page setup
 * Removed SAX-based XML Generator. Special thanks to Elias Rabel for implementing xmlfile for xml.etree
+* Preserve sheet view definitions in existing files (frozen panes, zoom, etc.)
 
 
 Bug fixes
 ---------
+* `#103 <https://bitbucket.org/openpyxl/openpyxl/issue/103>`_ Set the zoom of a sheet
+* `#199 <https://bitbucket.org/openpyxl/openpyxl/issue/199>`_ Hide gridlines
+* `#215 <https://bitbucket.org/openpyxl/openpyxl/issue/215>`_ Preserve sheet view setings
 * `#262 <https://bitbucket.org/openpyxl/openpyxl/issue/262>`_ Set the zoom of a sheet
 * `#392 <https://bitbucket.org/openpyxl/openpyxl/issue/392>`_ Worksheet header not read
 * `#387 <https://bitbucket.org/openpyxl/openpyxl/issue/387>`_ Cannot read files without styles.xml
 * `#410 <https://bitbucket.org/openpyxl/openpyxl/issue/410>`_ Exception when preserving whitespace in strings
+* `#420 <https://bitbucket.org/openpyxl/openpyxl/issue/420>`_ Rename confusing constants
 * `#422 <https://bitbucket.org/openpyxl/openpyxl/issue/422>`_ Preserve color index in a workbook if it differs from the standard
 
 
