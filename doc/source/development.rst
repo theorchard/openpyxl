@@ -88,6 +88,8 @@ Office OpenXML. http://www.microsoft.com/en-us/download/details.aspx?id=30425
 It allows you to quickly inspect a whole Excel file. Unfortunately,
 validation errors contain many false positives.
 
+Please see :ref:`windows-development` for additional information on setting up and testing on Windows.
+
 
 Contributing
 ------------
