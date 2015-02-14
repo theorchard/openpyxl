@@ -43,6 +43,7 @@ Python 3.3
 In a DOS-box switch to the Python 3.3 folder and run::
 
 cd c:\python33
+python -mensurepip --upgrade
 python Tools\Scripts\pyvenv.py c:\Users\YOURUSER\openpyxl
 
 
@@ -50,6 +51,7 @@ Python 3.4
 ++++++++++
 
 cd c:\python34
+python -mensurepip --upgrade
 python Tools\Scripts\pyvenv.py c:\Users\YOURUSER\openpyxl
 
 
