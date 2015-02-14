@@ -6,6 +6,7 @@ import pytest
 
 from openpyxl.cell.read_only import ReadOnlyCell
 from openpyxl.utils.indexed_list import IndexedList
+from openpyxl.styles.styleable import StyleId
 
 
 @pytest.fixture(scope='module')
@@ -88,12 +89,10 @@ def test_numeric(dummy_sheet, value, expected):
 @pytest.fixture(scope="class")
 def DummyCell(dummy_sheet):
 
-    class DummyStyle(object):
-        number_format = 164
-
     dummy_sheet.parent._number_formats.add('d-mmm-yy')
-    dummy_sheet.parent._cell_styles.add(DummyStyle())
-    cell = ReadOnlyCell(dummy_sheet, None, None, "23596", 'n', DummyStyle)
+    style = StyleId(0, 0, 0, 0, 164, 0)
+    dummy_sheet.parent._cell_styles.add(style)
+    cell = ReadOnlyCell(dummy_sheet, None, None, "23596", 'n', 1)
     return cell
 
 

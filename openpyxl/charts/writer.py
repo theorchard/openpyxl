@@ -199,7 +199,9 @@ class BaseChartWriter(object):
         number_format = getattr(reference, 'number_format')
 
         mapping = {'n':{'ref':'numRef', 'cache':'numCache'},
-                   's':{'ref':'strRef', 'cache':'strCache'}}
+                   's':{'ref':'strRef', 'cache':'strCache'},
+                   'f':{'ref':'numRef', 'cache':'numCache'},
+                   }
         data = None
 
         if is_ref:

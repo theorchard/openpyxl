@@ -208,7 +208,6 @@ def _load_workbook(wb, archive, filename, read_only, keep_vba):
 
     parsed_styles = read_style_table(archive)
     if parsed_styles is not None:
-        wb.shared_styles = parsed_styles.shared_styles
         wb.conditional_formats = parsed_styles.cond_styles
         wb.cond_styles = parsed_styles.cond_styles
         wb._cell_styles = parsed_styles.cell_styles
@@ -216,7 +215,10 @@ def _load_workbook(wb, archive, filename, read_only, keep_vba):
         wb._borders = parsed_styles.border_list
         wb._fonts = parsed_styles.font_list
         wb._fills = parsed_styles.fill_list
-        wb._numbers = parsed_styles.custom_num_formats
+        wb._number_formats = parsed_styles.number_formats
+        wb._protections = parsed_styles.protections
+        wb._alignments = parsed_styles.alignments
+        wb._colors = parsed_styles.color_index
 
     wb.excel_base_date = read_excel_base_date(archive)
 

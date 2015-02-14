@@ -60,7 +60,7 @@ class Font(HashableObject):
             return el.get("val", "single")
         return super(Font, cls)._create_nested(el, tag)
 
-    def serialise(self, tagname=None):
+    def to_tree(self, tagname=None):
         el = Element(self.tagname)
         attrs = list(self.__nested__)
         attrs.insert(10, 'color')
@@ -68,7 +68,7 @@ class Font(HashableObject):
             value = getattr(self, attr)
             if value:
                 if attr == 'color':
-                    color = value.serialise()
+                    color = value.to_tree()
                     el.append(color)
                 else:
                     SubElement(el, attr, val=safe_string(value))

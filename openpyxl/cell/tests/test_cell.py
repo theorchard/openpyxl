@@ -20,11 +20,15 @@ def build_dummy_worksheet():
     from openpyxl.utils.indexed_list import IndexedList
     from openpyxl.utils.datetime  import CALENDAR_WINDOWS_1900
     from openpyxl.cell import Cell
-    from openpyxl.styles import Style
 
     class Wb(object):
         excel_base_date = CALENDAR_WINDOWS_1900
-        shared_styles = IndexedList([Style()])
+        _number_formats = IndexedList()
+        _fonts = IndexedList()
+        _fills = IndexedList()
+        _borders = IndexedList()
+        _protections = IndexedList()
+        _alignments = IndexedList()
         _number_formats = IndexedList()
 
 
@@ -314,4 +318,4 @@ def test_style(dummy_cell):
     cell = dummy_cell
     new_style = Style(font=Font(bold=True))
     cell.style = new_style
-    assert new_style in cell.parent.parent.shared_styles
+    assert cell.parent.parent._fonts == [Font(bold=True)]

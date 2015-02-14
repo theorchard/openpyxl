@@ -54,6 +54,8 @@ def to_excel(dt, offset=CALENDAR_WINDOWS_1900):
 def from_excel(value, offset=CALENDAR_WINDOWS_1900):
     if value is None:
         return
+    if 1 < value < 60 and offset == CALENDAR_WINDOWS_1900:
+        value += 1
     parts = list(jd2gcal(MJD_0, value + offset - MJD_0))
     _, fraction = divmod(value, 1)
     diff = datetime.timedelta(days=fraction)

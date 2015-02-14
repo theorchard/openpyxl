@@ -8,16 +8,22 @@ from io import BytesIO
 from openpyxl.xml.functions import iterparse
 
 # package imports
-from openpyxl.cell import get_column_letter
+from openpyxl.cell import Cell
 from openpyxl.worksheet import Worksheet, ColumnDimension, RowDimension
 from openpyxl.worksheet.iter_worksheet import IterableWorksheet
 from openpyxl.worksheet.page import PageMargins, PrintOptions, PageSetup
 from openpyxl.worksheet.protection import SheetProtection
+from openpyxl.worksheet.views import SheetView
 from openpyxl.xml.constants import SHEET_MAIN_NS, REL_NS
 from openpyxl.xml.functions import safe_iterator
 from openpyxl.styles import Color
 from openpyxl.formatting import ConditionalFormatting
 from openpyxl.worksheet.properties import parse_sheetPr
+from openpyxl.utils import (
+    coordinate_from_string,
+    get_column_letter,
+    column_index_from_string
+    )
 
 
 def _get_xml_iter(xml_source):
@@ -74,6 +80,7 @@ class WorkSheetParser(object):
             '{%s}dataValidations' % SHEET_MAIN_NS: self.parse_data_validation,
             '{%s}sheetPr' % SHEET_MAIN_NS: self.parse_properties,
             '{%s}legacyDrawing' % SHEET_MAIN_NS: self.parse_legacy_drawing,
+            '{%s}sheetViews' % SHEET_MAIN_NS: self.parse_sheet_views,
                       }
         tags = dispatcher.keys()
         stream = _get_xml_iter(self.source)
@@ -115,16 +122,16 @@ class WorkSheetParser(object):
                 if ref:
                     self.ws.formula_attributes[coordinate]['ref'] = ref
 
-        cell = self.ws[coordinate]
+
+        styles = {}
         if style_id is not None:
-            cell._style_id = int(style_id)
-            style = self.style_table[cell._style_id]
-            cell.font = style.font
-            cell.fill = style.fill
-            cell.border = style.border
-            cell.alignment = style.alignment
-            cell.number_format = style.number_format
-            cell.protection = style.protection
+            style_id = int(style_id)
+            style_id = self.ws.parent._cell_styles[style_id]
+            styles = style_id._asdict()
+
+        column, row = coordinate_from_string(coordinate)
+        cell = Cell(self.ws, column, row, **styles)
+        self.ws._add_cell(cell)
 
         if value is not None:
             if data_type == 'n':
@@ -148,7 +155,8 @@ class WorkSheetParser(object):
         if self.guess_types or value is None:
             cell.value = value
         else:
-            cell.set_explicit_value(value=value, data_type=data_type)
+            cell._value=value
+            cell.data_type=data_type
 
 
     def parse_merge(self, element):
@@ -173,12 +181,9 @@ class WorkSheetParser(object):
     def parse_row_dimensions(self, row):
         attrs = dict(row.attrib)
         attrs['worksheet'] = self.ws
-        for key in set(attrs):
-            if key.startswith('{'):  # ignore custom namespaces
-                del attrs[key]
         dim = RowDimension(**attrs)
-        if dim.index not in self.ws.row_dimensions:
-            self.ws.row_dimensions[dim.index] = dim
+        self.ws.row_dimensions[dim.index] = dim
+
         for cell in safe_iterator(row, self.CELL_TAG):
             self.parse_cell(cell)
 
@@ -292,6 +297,13 @@ class WorkSheetParser(object):
 
     def parse_legacy_drawing(self, element):
         self.ws.vba_controls = element.get("r:id")
+
+
+    def parse_sheet_views(self, element):
+        for el in element.findall("{%s}sheetView" % SHEET_MAIN_NS):
+            # according to the specification the last view wins
+            pass
+        self.ws.sheet_view = SheetView.from_tree(el)
 
 
 def fast_parse(ws, xml_source, shared_strings, style_table, color_index=None):

@@ -47,12 +47,12 @@ class Fill(HashableObject):
     tagname = "fill"
 
     @classmethod
-    def create(cls, el):
+    def from_tree(cls, el):
         child = [c for c in el][0]
         if "patternFill" in child.tag:
-            return PatternFill._create(child)
+            return PatternFill._from_tree(child)
         else:
-            return GradientFill._create(child)
+            return GradientFill._from_tree(child)
 
 
 class PatternFill(Fill):
@@ -88,21 +88,21 @@ class PatternFill(Fill):
         self.bgColor = bgColor
 
     @classmethod
-    def _create(cls, el):
+    def _from_tree(cls, el):
         attrib = dict(el.attrib)
         for child in el:
             desc = localname(child)
-            attrib[desc] = Color.create(child)
+            attrib[desc] = Color.from_tree(child)
         return cls(**attrib)
 
 
-    def serialise(self, tagname=None):
+    def to_tree(self, tagname=None):
         parent = Element("fill")
         el = Element(self.tagname, patternType=safe_string(self.patternType))
         for c in self.__elements__:
             value = getattr(self, c)
             if value != Color():
-                el.append(value.serialise(c))
+                el.append(value.to_tree(c))
         parent.append(el)
         return parent
 
@@ -147,10 +147,10 @@ class GradientFill(Fill):
 
 
     @classmethod
-    def _create(cls, node):
+    def _from_tree(cls, node):
         colors = []
         for color in safe_iterator(node, "{%s}color" % SHEET_MAIN_NS):
-            colors.append(Color.create(color))
+            colors.append(Color.from_tree(color))
         return cls(stop=colors, **node.attrib)
 
 
@@ -160,12 +160,12 @@ class GradientFill(Fill):
         """
         for idx, color in enumerate(sequence):
             stop = Element("stop", position=str(idx))
-            stop.append(color.serialise())
+            stop.append(color.to_tree())
             yield stop
 
 
-    def serialise(self, tagname=None):
+    def to_tree(self, tagname=None):
         parent = Element("fill")
-        el = super(GradientFill, self).serialise()
+        el = super(GradientFill, self).to_tree()
         parent.append(el)
         return parent

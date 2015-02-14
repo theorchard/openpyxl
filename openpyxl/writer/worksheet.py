@@ -39,40 +39,6 @@ def write_properties(worksheet):
     return pr
 
 
-def write_sheetviews(worksheet):
-    views = Element('sheetViews')
-    sheetviewAttrs = {'workbookViewId': '0'}
-    if not worksheet.show_gridlines:
-        sheetviewAttrs['showGridLines'] = '0'
-    view = SubElement(views, 'sheetView', sheetviewAttrs)
-    selectionAttrs = {
-        'activeCell': worksheet.active_cell,
-        'sqref': worksheet.selected_cell
-    }
-    topLeftCell = worksheet.freeze_panes
-    if topLeftCell:
-        colName, row = coordinate_from_string(topLeftCell)
-        column = column_index_from_string(colName)
-        pane = 'topRight'
-        paneAttrs = {'topLeftCell':topLeftCell, 'state':'frozen'}
-        if column > 1:
-            paneAttrs['xSplit'] = str(column - 1)
-        if row > 1:
-            paneAttrs['ySplit'] = str(row - 1)
-            pane = 'bottomLeft'
-            if column > 1:
-                pane = 'bottomRight'
-        selectionAttrs['pane'] = pane
-        paneAttrs['activePane'] = pane
-        view.append(Element('pane', paneAttrs))
-        if row > 1 and column > 1:
-            SubElement(view, 'selection', pane='topRight')
-            SubElement(view, 'selection', pane='bottomLeft')
-
-    SubElement(view, 'selection', selectionAttrs)
-    return views
-
-
 def write_format(worksheet):
     attrs = {'defaultRowHeight': '15', 'baseColWidth': '10'}
     dimensions_outline = [dim.outline_level
@@ -92,7 +58,6 @@ def write_cols(worksheet):
     """
     cols = []
     for label, dimension in iteritems(worksheet.column_dimensions):
-        dimension.style = worksheet._styles.get(label)
         col_def = dict(dimension)
         if col_def == {}:
             continue
@@ -257,7 +222,10 @@ def write_worksheet(worksheet, shared_strings):
             dim = Element('dimension', {'ref': '%s' % worksheet.calculate_dimension()})
             xf.write(dim)
 
-            xf.write(write_sheetviews(worksheet))
+            views = Element('sheetViews')
+            views.append(worksheet.sheet_view.to_tree())
+            xf.write(views)
+
             xf.write(write_format(worksheet))
             cols = write_cols(worksheet)
             if cols is not None:

@@ -26,7 +26,7 @@ class Serialisable(_Serialiasable):
 
 
     @classmethod
-    def create(cls, node):
+    def from_tree(cls, node):
         """
         Create object from XML
         """
@@ -39,8 +39,8 @@ class Serialisable(_Serialiasable):
             if tag in cls.__nested__:
                 attrib[tag] = cls._create_nested(el, tag)
             else:
-                if hasattr(desc.expected_type, "create"):
-                    obj = desc.expected_type.create(el)
+                if hasattr(desc.expected_type, "from_tree"):
+                    obj = desc.expected_type.from_tree(el)
                 else:
                     obj = el.text
                 if isinstance(desc, Sequence):
@@ -61,7 +61,7 @@ class Serialisable(_Serialiasable):
         return el.get("val", True)
 
 
-    def serialise(self, tagname=None):
+    def to_tree(self, tagname=None):
         if tagname is None:
             tagname = self.tagname
         attrs = dict(self)
@@ -80,12 +80,12 @@ class Serialisable(_Serialiasable):
             obj = getattr(self, child)
             if isinstance(obj, tuple):
                 for v in obj:
-                    if hasattr(v, 'serialise'):
-                        el.append(v.serialise(tagname=child))
+                    if hasattr(v, 'to_tree'):
+                        el.append(v.to_tree(tagname=child))
                     else:
                         SubElement(el, child).text = v
             elif obj is not None:
-                el.append(obj.serialise(tagname=child))
+                el.append(obj.to_tree(tagname=child))
         return el
 
 
@@ -94,7 +94,7 @@ class Serialisable(_Serialiasable):
         Allow special handling of sequences which themselves are not directly serialisable
         """
         for obj in sequence:
-            yield obj.serialise()
+            yield obj.to_tree()
 
 
     def __iter__(self):

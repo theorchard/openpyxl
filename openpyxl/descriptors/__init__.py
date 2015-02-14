@@ -26,7 +26,7 @@ class MetaSerialisable(type):
                 elif isinstance(v, Sequence):
                     elements.append(k)
                 elif isinstance(v, Typed):
-                    if hasattr(v.expected_type, 'serialise'):
+                    if hasattr(v.expected_type, 'to_tree'):
                         elements.append(k)
                     else:
                         attrs.append(k)

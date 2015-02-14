@@ -58,6 +58,7 @@ def test_get_xml_iter():
 @pytest.fixture
 def Worksheet(Workbook):
     from openpyxl.styles import numbers
+    from openpyxl.styles.styleable import StyleId
     from openpyxl.worksheet.header_footer import HeaderFooter
 
     class DummyWorkbook:
@@ -66,15 +67,21 @@ def Worksheet(Workbook):
         data_only = False
 
         def __init__(self):
-            self.shared_styles = IndexedList()
-            self.shared_styles.extend((28*[DummyStyle()]))
-            self.shared_styles.add(Style())
+            self.shared_strings = IndexedList()
+            self.shared_strings.add("hello world")
+            self.shared_styles = 28*[DummyStyle()]
+            self.shared_styles.append(Style())
             self._fonts = IndexedList()
             self._fills = IndexedList()
             self._number_formats = IndexedList()
             self._borders = IndexedList()
             self._alignments = IndexedList()
             self._protections = IndexedList()
+            self._cell_styles = IndexedList()
+            for i in range(29):
+                self._cell_styles.add((StyleId(i, i, i, i, i, i)))
+            self._cell_styles.add(StyleId(number_format=0, font=0, fill=4, border=6, alignment=1, protection=0))
+
 
 
     class DummyStyle:
@@ -100,13 +107,20 @@ def Worksheet(Workbook):
             self.row_dimensions = {}
             self._styles = {}
             self.cell = None
+            self._cells = {}
             self._data_validations = []
             self.header_footer = HeaderFooter()
 
+        def _add_cell(self, cell):
+            self._cells[cell.coordinate] = cell
+
         def __getitem__(self, value):
-            if self.cell is None:
-                self.cell = Cell(self, 'A', 1)
-            return self.cell
+            cell = self._cells.get(value)
+
+            if cell is None:
+                cell = Cell(self, 'A', 1)
+                self._cells[value] = cell
+            return cell
 
         def get_style(self, coordinate):
             return DummyStyle()
@@ -131,6 +145,7 @@ def test_col_width(datadir, Worksheet, WorkSheetParser):
         for _, col in cols:
             parser.parse_column_dimensions(col)
     assert set(ws.column_dimensions.keys()) == set(['A', 'C', 'E', 'I', 'G'])
+    assert ws.column_dimensions['A'].style_id == 0
     assert dict(ws.column_dimensions['A']) == {'max': '1', 'min': '1',
                                                'customWidth': '1',
                                                'width': '31.1640625'}
@@ -146,7 +161,8 @@ def test_hidden_col(datadir, Worksheet, WorkSheetParser):
         for _, col in cols:
             parser.parse_column_dimensions(col)
     assert 'D' in ws.column_dimensions
-    assert dict(ws.column_dimensions['D']) == {'customWidth': '1', 'hidden': '1', 'max': '4', 'min': '4'}
+    assert dict(ws.column_dimensions['D']) == {'customWidth': '1', 'hidden':
+                                               '1', 'max': '4', 'min': '4'}
 
 
 def test_styled_col(datadir, Worksheet, WorkSheetParser):
@@ -159,8 +175,7 @@ def test_styled_col(datadir, Worksheet, WorkSheetParser):
             parser.parse_column_dimensions(col)
     assert 'I' in ws.column_dimensions
     cd = ws.column_dimensions['I']
-    assert cd._style == 28
-    assert cd.style == Style()
+    assert cd.style_id == 28
     assert dict(cd) ==  {'customWidth': '1', 'max': '9', 'min': '9', 'width': '25', 'style':'28'}
 
 
@@ -190,8 +205,8 @@ def test_styled_row(datadir, Worksheet, WorkSheetParser):
             parser.parse_row_dimensions(row)
     assert 23 in ws.row_dimensions
     rd = ws.row_dimensions[23]
-    assert rd._style == 28
-    assert rd.style == Style()
+    assert rd.style_id == 28
+    #assert rd.style == Style()
     assert dict(rd) == {'s':'28', 'customFormat':'1'}
 
 
@@ -358,9 +373,9 @@ def test_inline_richtext(Worksheet, WorkSheetParser, datadir):
     element = sheet.find("{%s}sheetData/{%s}row[2]/{%s}c[18]" % (SHEET_MAIN_NS, SHEET_MAIN_NS, SHEET_MAIN_NS))
     assert element.get("r") == 'R2'
     parser.parse_cell(element)
-    cell = ws['B2'].style = ws.get_style(coordinate='')
-    assert ws['B2'].data_type == 's'
-    assert ws['B2'].value == "11 de September de 2014"
+    cell = ws['R2']
+    assert cell.data_type == 's'
+    assert cell.value == "11 de September de 2014"
 
 
 def test_data_validation(Worksheet, WorkSheetParser, datadir):
@@ -406,3 +421,34 @@ def test_header_footer(WorkSheetParser, datadir):
     assert ws.header_footer.left_footer.text == "Left footer"
     assert ws.header_footer.center_footer.text == "Middle Footer"
     assert ws.header_footer.right_footer.text == "Right Footer"
+
+
+def test_cell(WorkSheetParser, datadir):
+    datadir.chdir()
+    parser = WorkSheetParser
+    ws = parser.ws
+    parser.shared_strings[1] = "Arial Font, 10"
+
+    with open("complex-styles-worksheet.xml") as src:
+        sheet = fromstring(src.read())
+
+    element = sheet.find("{%s}sheetData/{%s}row[2]/{%s}c[1]" % (SHEET_MAIN_NS, SHEET_MAIN_NS, SHEET_MAIN_NS))
+    assert element.get('r') == 'A2'
+    parser.parse_cell(element)
+    #assert ws['A2']._font_id == 3
+
+
+def test_sheet_views(WorkSheetParser, datadir):
+    datadir.chdir()
+    parser = WorkSheetParser
+
+    with open("frozen_view_worksheet.xml") as src:
+        sheet = fromstring(src.read())
+
+    element = sheet.find("{%s}sheetViews" % SHEET_MAIN_NS)
+    parser.parse_sheet_views(element)
+    ws = parser.ws
+    view = ws.sheet_view
+
+    assert view.zoomScale == 200
+    assert len(view.selection) == 3

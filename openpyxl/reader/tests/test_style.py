@@ -9,6 +9,7 @@ from zipfile import ZipFile
 # package imports
 from openpyxl.compat import safe_string, OrderedDict
 from openpyxl.reader.excel import load_workbook
+from openpyxl.utils.indexed_list import IndexedList
 
 from openpyxl.styles import (
     borders,
@@ -19,7 +20,8 @@ from openpyxl.styles import (
     GradientFill,
     Border,
     Side,
-    Alignment
+    Alignment,
+    Protection,
 )
 from openpyxl.xml.functions import Element
 
@@ -51,9 +53,10 @@ def test_unprotected_cell(StyleReader, datadir):
     with open ("worksheet_unprotected_style.xml") as src:
         reader = StyleReader(src.read())
     from openpyxl.styles import Font
-    reader.font_list = [Font(), Font(), Font(), Font(), Font()]
+    reader.font_list = IndexedList([Font(), Font(), Font(), Font(), Font()])
+    reader.protections = IndexedList([Protection()])
     reader.parse_cell_styles()
-    assert len(reader.shared_styles) == 3
+    assert len(reader.cell_styles) == 3
     # default is cells are locked
     style = reader.shared_styles[0]
     assert style.protection.locked is True
@@ -140,8 +143,8 @@ def test_read_complex_style(datadir):
     ws = wb.get_active_sheet()
     assert ws.column_dimensions['A'].width == 31.1640625
 
-    assert ws.column_dimensions['I'].style.font == Font(sz=12.0, color='FF3300FF', scheme='minor')
-    assert ws.column_dimensions['I'].style.fill == PatternFill(patternType='solid', fgColor='FF006600', bgColor=Color(indexed=64))
+    assert ws.column_dimensions['I'].font == Font(sz=12.0, color='FF3300FF', scheme='minor')
+    assert ws.column_dimensions['I'].fill == PatternFill(patternType='solid', fgColor='FF006600', bgColor=Color(indexed=64))
 
     assert ws['A2'].font == Font(sz=10, name='Arial', color=Color(theme=1))
     assert ws['A3'].font == Font(sz=12, name='Arial', bold=True, color=Color(theme=1))
@@ -190,13 +193,13 @@ def test_change_existing_styles(datadir):
     ws = wb.get_active_sheet()
 
     ws.column_dimensions['A'].width = 20
-    i_style = ws.column_dimensions['I'].style
-    ws.column_dimensions['I'].style = i_style.copy(fill=PatternFill(fill_type='solid',
-                                             start_color=Color('FF442200')),
-                                   font=Font(color=Color('FF002244')))
+    ws.column_dimensions['I'].fill = PatternFill(fill_type='solid',
+                                                 start_color='FF442200')
 
-    assert ws.column_dimensions['I'].style.fill.start_color.value == 'FF442200'
-    assert ws.column_dimensions['I'].style.font.color.value == 'FF002244'
+    ws.column_dimensions['I'].font=Font(color='FF002244')
+
+    assert ws.column_dimensions['I'].fill.start_color.value == 'FF442200'
+    assert ws.column_dimensions['I'].font.color.value == 'FF002244'
 
     ws['A2'].font = Font(name='Times New Roman',
                          size=12,
@@ -330,6 +333,7 @@ def test_alignment(datadir, StyleReader):
         reader = StyleReader(src.read())
     reader.parse_cell_styles()
     st1 = reader.shared_styles[2]
+    assert len(reader.alignments) == 3
     assert st1.alignment.textRotation == 255
 
 

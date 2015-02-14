@@ -195,20 +195,6 @@ class TestStyleWriter(object):
         assert diff is None, diff
 
 
-    @pytest.mark.parametrize("value, expected",
-                             [
-                                 (Color('FFFFFF'), {'rgb': '00FFFFFF'}),
-                                 (Color(indexed=7), {'indexed': '7'}),
-                                 (Color(theme=7, tint=0.8), {'theme':'7', 'tint':'0.8'}),
-                                 (Color(auto=True), {'auto':'1'}),
-                             ])
-    def test_write_color(self, value, expected):
-        w = StyleWriter(self.workbook)
-        root = Element("root")
-        w._write_color(root, value)
-        assert root.find('color') is not None
-        assert root.find('color').attrib == expected
-
     def test_protection(self):
         cell = self.worksheet.cell('A1')
         cell.protection = Protection(locked=True, hidden=True)

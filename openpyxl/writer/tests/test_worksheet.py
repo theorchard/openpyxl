@@ -16,14 +16,6 @@ from openpyxl.tests.helper import compare_xml
 from openpyxl.worksheet.properties import PageSetupPr
 
 
-class DummyWorksheet:
-
-    def __init__(self):
-        self._styles = {}
-        self.column_dimensions = {}
-        self.parent = Workbook()
-
-
 @pytest.fixture
 def worksheet():
     from openpyxl import Workbook
@@ -73,10 +65,11 @@ def test_col_widths(write_cols, ColumnDimension, DummyWorksheet):
 
 
 def test_col_style(write_cols, ColumnDimension, DummyWorksheet):
+    from openpyxl.styles import Font
     ws = DummyWorksheet
     cd = ColumnDimension(worksheet=ws)
     ws.column_dimensions['A'] = cd
-    cd._style = 1
+    cd.font = Font(color="FF0000")
     cols = write_cols(ws)
     xml = tostring(cols)
     expected = """<cols><col max="1" min="1" style="1"></col></cols>"""
@@ -85,12 +78,14 @@ def test_col_style(write_cols, ColumnDimension, DummyWorksheet):
 
 
 def test_lots_cols(write_cols, ColumnDimension, DummyWorksheet):
+    from openpyxl.styles import Font
     ws = DummyWorksheet
     from openpyxl.cell import get_column_letter
     for i in range(1, 15):
         label = get_column_letter(i)
         cd = ColumnDimension(worksheet=ws)
-        cd._style = i
+        cd.font = Font(name=label)
+        dict(cd) # create style_id in order for test
         ws.column_dimensions[label] = cd
     cols = write_cols(ws)
     xml = tostring(cols)
@@ -357,128 +352,6 @@ def test_auto_filter_worksheet(worksheet, write_worksheet):
     </worksheet>
     """
     diff = compare_xml(xml, expected)
-    assert diff is None, diff
-
-
-@pytest.fixture
-def write_sheetviews():
-    from .. worksheet import write_sheetviews
-    return write_sheetviews
-
-
-def test_freeze_panes_horiz(worksheet, write_sheetviews):
-    ws = worksheet
-    ws.freeze_panes = 'A4'
-
-    views = write_sheetviews(ws)
-    xml = tostring(views)
-    expected = """
-    <sheetViews>
-    <sheetView workbookViewId="0">
-      <pane topLeftCell="A4" ySplit="3" state="frozen" activePane="bottomLeft"/>
-      <selection activeCell="A1" pane="bottomLeft" sqref="A1"/>
-    </sheetView>
-    </sheetViews>
-    """
-    diff = compare_xml(xml, expected)
-    assert diff is None, diff
-
-
-def test_freeze_panes_vert(worksheet, write_sheetviews):
-    ws = worksheet
-    ws.freeze_panes = 'D1'
-
-    views = write_sheetviews(ws)
-    xml = tostring(views)
-    expected = """
-    <sheetViews>
-      <sheetView workbookViewId="0">
-        <pane xSplit="3" topLeftCell="D1" activePane="topRight" state="frozen"/>
-        <selection pane="topRight" activeCell="A1" sqref="A1"/>
-      </sheetView>
-    </sheetViews>
-    """
-    diff = compare_xml(xml, expected)
-    assert diff is None, diff
-
-
-def test_freeze_panes_both(worksheet, write_sheetviews):
-    ws = worksheet
-    ws.freeze_panes = 'D4'
-
-    views = write_sheetviews(ws)
-    xml = tostring(views)
-    expected = """
-    <sheetViews>
-      <sheetView workbookViewId="0">
-        <pane xSplit="3" ySplit="3" topLeftCell="D4" activePane="bottomRight" state="frozen"/>
-        <selection pane="topRight"/>
-        <selection pane="bottomLeft"/>
-        <selection pane="bottomRight" activeCell="A1" sqref="A1"/>
-      </sheetView>
-    </sheetViews>
-    """
-    diff = compare_xml(xml, expected)
-    assert diff is None, diff
-
-
-def test_frozen_panes_worksheet(worksheet, write_worksheet):
-    worksheet.freeze_panes = 'D4'
-    xml = write_worksheet(worksheet, None)
-    expected = """
-    <worksheet xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main">
-      <sheetPr>
-        <outlinePr summaryBelow="1" summaryRight="1"/>
-      </sheetPr>
-      <dimension ref="A1:A1"/>
-      <sheetViews>
-        <sheetView workbookViewId="0">
-          <pane xSplit="3" ySplit="3" topLeftCell="D4" activePane="bottomRight" state="frozen"/>
-          <selection pane="topRight"/>
-          <selection pane="bottomLeft"/>
-          <selection pane="bottomRight" activeCell="A1" sqref="A1"/>
-        </sheetView>
-      </sheetViews>
-      <sheetFormatPr baseColWidth="10" defaultRowHeight="15"/>
-      <sheetData/>
-      <pageMargins bottom="1" footer="0.5" header="0.5" left="0.75" right="0.75" top="1"/>
-    </worksheet>
-    """
-    diff = compare_xml(xml, expected)
-    assert diff is None, diff
-
-
-def test_show_gridlines_false(worksheet, write_sheetviews):
-    ws = worksheet
-    ws.show_gridlines = False
-
-    views = write_sheetviews(ws)
-    xml = tostring(views)
-    expected = """
-    <sheetViews>
-      <sheetView showGridLines="0" workbookViewId="0">
-        <selection activeCell="A1" sqref="A1"></selection>
-      </sheetView>
-    </sheetViews>
-    """
-    diff = compare_xml(xml,expected)
-    assert diff is None, diff
-
-
-def test_show_gridlines_true(worksheet, write_sheetviews):
-    ws = worksheet
-    ws.show_gridlines = True
-
-    views = write_sheetviews(ws)
-    xml = tostring(views)
-    expected = """
-    <sheetViews>
-      <sheetView workbookViewId="0">
-        <selection activeCell="A1" sqref="A1"></selection>
-      </sheetView>
-    </sheetViews>
-    """
-    diff = compare_xml(xml,expected)
     assert diff is None, diff
 
 

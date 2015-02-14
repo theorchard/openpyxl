@@ -24,7 +24,6 @@ from .worksheet import (
     write_cell,
     write_cols,
     write_format,
-    write_sheetviews,
 )
 from openpyxl.xml.constants import (
     PACKAGE_WORKSHEETS,
@@ -110,7 +109,9 @@ class DumpWorksheet(Worksheet):
                     pr = write_sheetPr(self.sheet_properties)
 
                 xf.write(pr)
-                xf.write(write_sheetviews(self))
+                views = Element('sheetViews')
+                views.append(self.sheet_view.to_tree())
+                xf.write(views)
                 xf.write(write_format(self))
 
                 cols = write_cols(self)

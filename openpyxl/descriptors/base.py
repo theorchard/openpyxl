@@ -7,7 +7,7 @@ Based on Python Cookbook 3rd Edition, 8.13
 http://chimera.labs.oreilly.com/books/1230000000393/ch08.html#_discussion_130
 """
 
-from openpyxl.compat import basestring, bytes
+from openpyxl.compat import basestring, bytes, long
 import re
 
 class Descriptor(object):
@@ -128,7 +128,7 @@ class NoneSet(Set):
 
 class Integer(Convertible):
 
-    expected_type = int
+    expected_type = long
 
 
 class Float(Convertible):

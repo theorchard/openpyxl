@@ -47,7 +47,7 @@ from openpyxl.utils import (
     coordinate_from_string,
 )
 from openpyxl.styles import numbers, is_date_format, Style
-from openpyxl.styles.proxy import StyledObject
+from openpyxl.styles.styleable import StyleableObject
 
 # constants
 
@@ -72,28 +72,22 @@ NUMBER_REGEX = re.compile(r'^-?([\d]|[\d]+\.[\d]*|\.[\d]+|[1-9][\d]+\.?[\d]*)((E
 ILLEGAL_CHARACTERS_RE = re.compile(r'[\000-\010]|[\013-\014]|[\016-\037]')
 
 
-class Cell(StyledObject):
+class Cell(StyleableObject):
     """Describes cell associated properties.
 
     Properties of interest include style, type, value, and address.
 
     """
-    __slots__ = ('column',
-                 'row',
-                 'coordinate',
-                 '_value',
-                 'data_type',
-                 'parent',
-                 'xf_index',
-                 '_hyperlink_rel',
-                 '_comment',
-                 '_style_id',
-                 '_font_id',
-                 '_fill_id',
-                 '_alignment_id',
-                 '_border_id',
-                 '_number_format_id',
-                 '_protection_id',
+    __slots__ =  StyleableObject.__slots__ + (
+        'column',
+        'row',
+        'coordinate',
+        '_value',
+        'data_type',
+        'parent',
+        'xf_index',
+        '_hyperlink_rel',
+        '_comment',
                  )
 
     ERROR_CODES = ('#NULL!',
@@ -117,17 +111,22 @@ class Cell(StyledObject):
                    TYPE_NULL, TYPE_INLINE, TYPE_ERROR, TYPE_FORMULA_CACHE_STRING)
 
 
-
-    def __init__(self, worksheet, column, row, value=None):
-        super(Cell, self).__init__()
-        self.column = column.upper()
+    def __init__(self, worksheet, column, row, value=None, font=0, fill=0,
+                 border=0, alignment=0, protection=0, number_format=0):
+        self._font_id = font
+        self._fill_id = fill
+        self._border_id = border
+        self._alignment_id = alignment
+        self._protection_id = protection
+        self._number_format_id = number_format
+        self.parent = worksheet
+        self.column = column
         self.row = row
         self.coordinate = '%s%d' % (self.column, self.row)
         # _value is the stored value, while value is the displayed value
         self._value = None
         self._hyperlink_rel = None
         self.data_type = 'n'
-        self.parent = worksheet
         if value is not None:
             self.value = value
         self.xf_index = 0
@@ -350,39 +349,6 @@ class Cell(StyledObject):
         :rtype: bool
         """
         return self.data_type == self.TYPE_NUMERIC and is_date_format(self.number_format)
-
-    @property
-    def _alignments(self):
-        return self.parent.parent._alignments
-
-    @property
-    def _borders(self):
-        return self.parent.parent._borders
-
-    @property
-    def _fills(self):
-        return self.parent.parent._fills
-
-    @property
-    def _fonts(self):
-        return self.parent.parent._fonts
-
-    @property
-    def _number_formats(self):
-        return self.parent.parent._number_formats
-
-    @property
-    def _protections(self):
-        return self.parent.parent._protections
-
-    # legacy
-    @property
-    def _styles(self):
-        return self.parent.parent.shared_styles
-
-    @property
-    def _cell_styles(self):
-        return self.parent.parent._cell_styles
 
     def offset(self, row=0, column=0):
         """Returns a cell location relative to this cell.

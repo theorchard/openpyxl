@@ -43,7 +43,7 @@ class TestBorder:
         </border>
         """
         xml = fromstring(src)
-        bd = Border.create(xml)
+        bd = Border.from_tree(xml)
         assert bd.left.style == "thin"
         assert bd.right.color.value == "FF006600"
         assert bd.diagonal.style == None
@@ -55,7 +55,7 @@ class TestBorder:
                              right=medium_blue,
                              top=medium_blue,
                              bottom=medium_blue)
-        xml = tostring(bd.serialise())
+        xml = tostring(bd.to_tree())
         expected = """
         <border>
           <left style="medium">

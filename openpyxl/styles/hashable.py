@@ -14,8 +14,8 @@ BASE_TYPES = (str, unicode, float, int)
 class HashableObject(Serialisable):
     """Define how to hash property classes."""
     __fields__ = ()
-    __slots__ = ('_key',) + __fields__
     __base__ = False
+    _key = None
 
     @property
     def __defaults__(self):
@@ -26,17 +26,6 @@ class HashableObject(Serialisable):
         current = dict([(x, getattr(self, x)) for x in self.__fields__])
         current.update(kwargs)
         return self.__class__(**current)
-
-    def __setattr__(self, *args, **kwargs):
-        name, value = args
-        if hasattr(self, name) and (
-            getattr(self, name) is not None
-            and not isinstance(getattr(self, name), Descriptor)):
-            raise TypeError('cannot set %s attribute' % name)
-        return object.__setattr__(self, *args, **kwargs)
-
-    def __delattr__(self, *args, **kwargs):
-        raise TypeError('cannot delete %s attribute' % args[0])
 
     def __print__(self, defaults=False):
         if defaults:
@@ -63,23 +52,20 @@ class HashableObject(Serialisable):
     def __str__(self):
         return self.__print__(defaults=True)
 
-    def _make_key(self):
+    @property
+    def key(self):
         """Use a tuple of fields as the basis for a key"""
-        self._key = hash(tuple(getattr(self, x) for x in self.__fields__))
-
-    def __hash__(self):
-        if not hasattr(self, '_key'):
-            self._make_key()
+        if self._key is None:
+            self._key = hash(tuple(getattr(self, x) for x in self.__fields__))
         return self._key
 
+    def __hash__(self):
+        return self.key
+
     def __eq__(self, other):
-        if isinstance(other, self.__class__):
-            if not hasattr(self, '_key'):
-                self._make_key()
-            if not hasattr(other, '_key'):
-                other._make_key()
-            return self._key == other._key
-        return self._key == other
+        if other.__class__ == self.__class__:
+            return self.key == other.key
+        return self.key == other
 
     def __ne__(self, other):
         return not self == other
@@ -98,14 +84,3 @@ class HashableObject(Serialisable):
             if not getattr(other, attr) and getattr(self, attr):
                 vals[attr] = getattr(self, attr)
         return self.__class__(**vals)
-
-
-    #def __iter__(self):
-        #"""
-        #Dictionary interface for easier serialising.
-        #All values converted to strings
-        #"""
-        #for key in self.__fields__:
-            #value = getattr(self, key)
-            #if bool(value):
-                #yield key, safe_string(value)

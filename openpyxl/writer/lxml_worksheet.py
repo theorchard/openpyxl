@@ -23,7 +23,6 @@ from openpyxl.worksheet.datavalidation import writer
 from .worksheet import (
     write_datavalidation,
     write_properties,
-    write_sheetviews,
     write_format,
     write_cols,
     write_autofilter,
@@ -49,7 +48,6 @@ def write_rows(xf, worksheet):
         for row_idx in sorted(cells_by_row):
             # row meta data
             row_dimension = worksheet.row_dimensions[row_idx]
-            row_dimension.style = worksheet._styles.get(row_idx)
             attrs = {'r': '%d' % row_idx,
                      'spans': '1:%d' % worksheet.max_column}
             attrs.update(dict(row_dimension))

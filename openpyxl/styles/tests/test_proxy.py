@@ -66,17 +66,3 @@ def test_invalid_proxy():
 
     with pytest.raises(TypeError):
         sp = StyleProxy(dummy)
-
-
-@pytest.fixture
-def StyledObject():
-    from .. proxy import StyledObject
-    return StyledObject()
-
-
-def test_has_style(StyledObject):
-    so = StyledObject
-    assert so._number_format_id == 0
-    assert not so.has_style
-    so._number_format_id = 1
-    assert so.has_style

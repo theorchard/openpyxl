@@ -1,77 +1,13 @@
 from __future__ import absolute_import
 # Copyright (c) 2010-2015 openpyxl
 
-from openpyxl.descriptors import Strict, Bool, Integer, String, Set, Float
+from openpyxl.descriptors import Bool, Integer, String, Set, Float, Typed, NoneSet, Sequence
+from openpyxl.descriptors.serialisable import Serialisable
+
+from openpyxl.compat import safe_string
 
 
-class SheetView(Strict):
-
-    """Information about the visible portions of this sheet."""
-
-    windowProtection = Bool(allow_none=True)
-    showFormulas = Bool(allow_none=True)
-    showGridLines = Bool(allow_none=True)
-    showRowColHeaders = Bool(allow_none=True)
-    showZeros = Bool(allow_none=True)
-    rightToLeft = Bool(allow_none=True)
-    tabSelected = Bool(allow_none=True)
-    showRuler = Bool(allow_none=True)
-    showOutlineSymbols = Bool(allow_none=True)
-    defaultGridColor = Bool(allow_none=True)
-    showWhiteSpace = Bool(allow_none=True)
-    view = Set(values=("normal", "pageBreakPreview", "pageLayout"))
-    topLeftCell = String(allow_none=True)
-    colorId = Integer(allow_none=True)
-    zoomScale = Integer(allow_none=True)
-    zoomScaleNormal = Integer(allow_none=True)
-    zoomScaleSheetLayoutView = Integer(allow_none=True)
-    zoomScalePageLayoutView = Integer(allow_none=True)
-    workbookViewId = Integer()
-
-    def __init__(
-        self,
-        windowProtection=None,
-        showFormulas=None,
-        showGridLines=None,
-        showRowColHeaders=None,
-        showZeros=None,
-        rightToLeft=None,
-        tabSelected=None,
-        showRuler=None,
-        showOutlineSymbols=None,
-        defaultGridColor=None,
-        showWhiteSpace=None,
-        view="normal",
-        topLeftCell=None,
-        colorId=None,
-        zoomScale=None,
-        zoomScaleNormal=None,
-        zoomScaleSheetLayoutView=None,
-        zoomScalePageLayoutView=None,
-        workbookViewId=None
-        ):
-        windowProtection = windowProtection
-        showFormulas = showFormulas
-        showGridLines = showGridLines
-        showRowColHeaders = showRowColHeaders
-        showZeros = showZeros
-        rightToLeft = rightToLeft
-        tabSelected = tabSelected
-        showRuler = showRuler
-        showOutlineSymbols = showOutlineSymbols
-        defaultGridColor = defaultGridColor
-        showWhiteSpace = showWhiteSpace
-        view = view
-        topLeftCell = topLeftCell
-        colorId = colorId
-        zoomScale = zoomScale
-        zoomScaleNormal = zoomScaleNormal
-        zoomScaleSheetLayoutView = zoomScaleSheetLayoutView
-        zoomScalePageLayoutView = zoomScalePageLayoutView
-        workbookViewId = workbookViewId
-
-
-class Pane(Strict):
+class Pane(Serialisable):
     xSplit = Float(allow_none=True)
     ySplit = Float(allow_none=True)
     topLeftCell = String(allow_none=True)
@@ -84,192 +20,111 @@ class Pane(Strict):
                  topLeftCell=None,
                  activePane="topLeft",
                  state="split"):
-        xSplit = xSplit
-        ySplit = ySplit
-        topLeftCell = topLeftCell
-        activePane = activePane
-        state = state
+        self.xSplit = xSplit
+        self.ySplit = ySplit
+        self.topLeftCell = topLeftCell
+        self.activePane = activePane
+        self.state = state
 
 
-class Selection(Strict):
-    pane = Set(values=("bottomRight", "topRight", "bottomLeft", "topLeft"))
+class Selection(Serialisable):
+    pane = NoneSet(values=("bottomRight", "topRight", "bottomLeft", "topLeft"))
     activeCell = String(allow_none=True)
     activeCellId = Integer(allow_none=True)
     sqref = String(allow_none=True)
 
     def __init__(self,
-                 pane="topLeft",
-                 activeCell=None,
-                 activeCellId=None,
-                 sqref=None):
-        pane = pane
-        activeCell = activeCell
-        activeCellId = activeCellId
-        sqref = sqref
-
-
-class PivotSelection(Strict):
-    pane = Set(values=("bottomRight", "topRight", "bottomLeft", "topLeft"))
-    showHeader = Bool()
-    label = Bool()
-    data = Bool()
-    extendable = Bool()
-    count = Integer()
-    axis = String(allow_none=True)
-    dimension = Integer()
-    start = Integer()
-    min = Integer()
-    max = Integer()
-    activeRow = Integer()
-    activeCol = Integer()
-    previousRow = Integer()
-    previousCol = Integer()
-    click = Integer()
-
-    def __init__(self,
                  pane=None,
-                 showHeader=None,
-                 label=None,
-                 data=None,
-                 extendable=None,
-                 count=None,
-                 axis=None,
-                 dimension=None,
-                 start=None,
-                 min=None,
-                 max=None,
-                 activeRow=None,
-                 activeCol=None,
-                 previousRow=None,
-                 previousCol=None,
-                 click=None):
-        pane = pane
-        showHeader = showHeader
-        label = label
-        data = data
-        extendable = extendable
-        count = count
-        axis = axis
-        dimension = dimension
-        start = start
-        min = min
-        max = max
-        activeRow = activeRow
-        activeCol = activeCol
-        previousRow = previousRow
-        previousCol = previousCol
-        click = click
+                 activeCell="A1",
+                 activeCellId=None,
+                 sqref="A1"):
+        self.pane = pane
+        self.activeCell = activeCell
+        self.activeCellId = activeCellId
+        self.sqref = sqref
 
 
-class PivotArea(Strict):
+class SheetView(Serialisable):
 
-    field = Integer(allow_none=True)
-    type = Set(values=())
-    dataOnly = Bool()
-    labelOnly = Bool()
-    grandRow = Bool()
-    grandCol = Bool()
-    cacheIndex = Bool()
-    outline = Bool()
-    offset = String()
-    collapsedLevelsAreSubtotals = Bool()
-    axis = String(allow_none=True)
-    fieldPosition = Integer(allow_none=True)
+    """Information about the visible portions of this sheet."""
 
-    def __init__(self,
-                 field=None,
-                 type=None,
-                 dataOnly=None,
-                 labelOnly=None,
-                 grandRow=None,
-                 grandCol=None,
-                 cacheIndex=None,
-                 outline=None,
-                 offset=None,
-                 collapsedLevelsAreSubtotals=None,
-                 axis=None,
-                 fieldPosition=None):
-        field = field
-        type = type
-        dataOnly = dataOnly
-        labelOnly = labelOnly
-        grandRow = grandRow
-        grandCol = grandCol
-        cacheIndex = cacheIndex
-        outline = outline
-        offset = offset
-        collapsedLevelsAreSubtotals = collapsedLevelsAreSubtotals
-        axis = axis
-        fieldPosition = fieldPosition
+    tagname = "sheetView"
 
+    windowProtection = Bool(allow_none=True)
+    showFormulas = Bool(allow_none=True)
+    showGridLines = Bool(allow_none=True)
+    showRowColHeaders = Bool(allow_none=True)
+    showZeros = Bool(allow_none=True)
+    rightToLeft = Bool(allow_none=True)
+    tabSelected = Bool(allow_none=True)
+    showRuler = Bool(allow_none=True)
+    showOutlineSymbols = Bool(allow_none=True)
+    defaultGridColor = Bool(allow_none=True)
+    showWhiteSpace = Bool(allow_none=True)
+    view = NoneSet(values=("normal", "pageBreakPreview", "pageLayout"))
+    topLeftCell = String(allow_none=True)
+    colorId = Integer(allow_none=True)
+    zoomScale = Integer(allow_none=True)
+    zoomScaleNormal = Integer(allow_none=True)
+    zoomScaleSheetLayoutView = Integer(allow_none=True)
+    zoomScalePageLayoutView = Integer(allow_none=True)
+    workbookViewId = Integer()
+    selection = Sequence(expected_type=Selection)
+    pane = Typed(expected_type=Pane, allow_none=True)
 
-class PivotAreaReferences(Strict):
+    def __init__(
+        self,
+        windowProtection=None,
+        showFormulas=None,
+        showGridLines=True,
+        showRowColHeaders=None,
+        showZeros=None,
+        rightToLeft=None,
+        tabSelected=None,
+        showRuler=None,
+        showOutlineSymbols=None,
+        defaultGridColor=None,
+        showWhiteSpace=None,
+        view=None,
+        topLeftCell=None,
+        colorId=None,
+        zoomScale=None,
+        zoomScaleNormal=None,
+        zoomScaleSheetLayoutView=None,
+        zoomScalePageLayoutView=None,
+        workbookViewId=0,
+        selection=None,
+        pane=None,
+        ):
+        self.windowProtection = windowProtection
+        self.showFormulas = showFormulas
+        self.showGridLines = showGridLines
+        self.showRowColHeaders = showRowColHeaders
+        self.showZeros = showZeros
+        self.rightToLeft = rightToLeft
+        self.tabSelected = tabSelected
+        self.showRuler = showRuler
+        self.showOutlineSymbols = showOutlineSymbols
+        self.defaultGridColor = defaultGridColor
+        self.showWhiteSpace = showWhiteSpace
+        self.view = view
+        self.topLeftCell = topLeftCell
+        self.colorId = colorId
+        self.zoomScale = zoomScale
+        self.zoomScaleNormal = zoomScaleNormal
+        self.zoomScaleSheetLayoutView = zoomScaleSheetLayoutView
+        self.zoomScalePageLayoutView = zoomScalePageLayoutView
+        self.workbookViewId = workbookViewId
+        self.pane = pane
+        if selection is None:
+            selection = (Selection(), )
+        self.selection = selection
 
-    count = Integer()
+    def __iter__(self):
 
-    def __init__(self, count=None):
-        count = count
-
-
-class PivotAreaReference(Strict):
-
-    field = Integer(allow_none=True)
-    count = Integer()
-    selected = Bool()
-    byPosition = Bool()
-    relative = Bool()
-    defaultSubtotal = Bool()
-    sumSubtotal = Bool()
-    countASubtotal = Bool()
-    avgSubtotal = Bool()
-    maxSubtotal = Bool()
-    minSubtotal = Bool()
-    productSubtotal = Bool()
-    countSubtotal = Bool()
-    stdDevSubtotal = Bool()
-    stdDevPSubtotal = Bool()
-    varSubtotal = Bool()
-    varPSubtotal = Bool()
-
-    def __init__(self,
-                 field=None,
-                 count=None,
-                 selected=None,
-                 byPosition=None,
-                 relative=None,
-                 defaultSubtotal=None,
-                 sumSubtotal=None,
-                 countASubtotal=None,
-                 avgSubtotal=None,
-                 maxSubtotal=None,
-                 minSubtotal=None,
-                 productSubtotal=None,
-                 countSubtotal=None,
-                 stdDevSubtotal=None,
-                 stdDevPSubtotal=None,
-                 varSubtotal=None,
-                 varPSubtotal=None):
-        field = field
-        count = count
-        selected = selected
-        byPosition = byPosition
-        relative = relative
-        defaultSubtotal = defaultSubtotal
-        sumSubtotal = sumSubtotal
-        countASubtotal = countASubtotal
-        avgSubtotal = avgSubtotal
-        maxSubtotal = maxSubtotal
-        minSubtotal = minSubtotal
-        productSubtotal = productSubtotal
-        countSubtotal = countSubtotal
-        stdDevSubtotal = stdDevSubtotal
-        stdDevPSubtotal = stdDevPSubtotal
-        varSubtotal = varSubtotal
-        varPSubtotal = varPSubtotal
-
-
-class Index(Strict):
-    v = Integer()
-
-    def __init__(self, v=None):
-        v = v
+        for attr in self.__attrs__:
+            value = getattr(self, attr)
+            if attr == 'showGridLines' and value:
+                continue
+            if value is not None:
+                yield attr, safe_string(value)

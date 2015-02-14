@@ -92,6 +92,10 @@ class Color(HashableObject):
     def value(self):
         return getattr(self, self.type)
 
+    @value.setter
+    def value(self, value):
+        setattr(self, self.type, value)
+
     def __iter__(self):
         attrs = [(self.type, self.value)]
         if self.tint != 0:

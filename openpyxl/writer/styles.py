@@ -15,6 +15,7 @@ from openpyxl.xml.functions import (
     )
 from openpyxl.xml.constants import SHEET_MAIN_NS
 
+from openpyxl.styles.colors import COLOR_INDEX
 from openpyxl.styles import DEFAULTS
 from openpyxl.styles import numbers
 from openpyxl.styles.fills import GradientFill, PatternFill
@@ -65,15 +66,9 @@ class StyleWriter(object):
         self._write_style_names()
         self._write_conditional_styles()
         self._write_table_styles()
+        self._write_colors()
 
         return tostring(self._root)
-
-    def _write_color(self, node, color, key='color'):
-        """
-        Convert colors encoded as RGB, theme, indexed, auto with tint
-        """
-        attrs = dict(color)
-        SubElement(node, key, attrs)
 
 
     def _write_number_formats(self):
@@ -83,23 +78,22 @@ class StyleWriter(object):
                                         'formatCode':'%s' % nf}
                        )
 
-
     def _write_fonts(self):
         fonts_node = SubElement(self._root, 'fonts', count="%d" % len(self.fonts))
         for font in self.fonts:
-            fonts_node.append(font.serialise())
+            fonts_node.append(font.to_tree())
 
 
     def _write_fills(self):
         fills_node = SubElement(self._root, 'fills', count="%d" % len(self.fills))
         for fill in self.fills:
-            fills_node.append(fill.serialise())
+            fills_node.append(fill.to_tree())
 
     def _write_borders(self):
         """Write the child elements for an individual border section"""
         borders_node = SubElement(self._root, 'borders', count="%d" % len(self.borders))
         for border in self.borders:
-            borders_node.append(border.serialise())
+            borders_node.append(border.to_tree())
 
     def _write_named_styles(self):
         cell_style_xfs = SubElement(self._root, 'cellStyleXfs', {'count':'1'})
@@ -141,13 +135,13 @@ class StyleWriter(object):
             if st.alignment != 0:
                 node.set("applyProtection", '1')
                 al = self.alignments[st.alignment]
-                el = al.serialise()
+                el = al.to_tree()
                 node.append(el)
 
             if st.protection != 0:
                 node.set('applyProtection', '1')
                 prot = self.protections[st.protection]
-                el = prot.serialise()
+                el = prot.to_tree()
                 node.append(el)
 
 
@@ -160,7 +154,7 @@ class StyleWriter(object):
     def _write_conditional_styles(self):
         dxfs = SubElement(self._root, "dxfs", count=str(len(self.wb.conditional_formats)))
         for fmt in self.wb.conditional_formats:
-            dxfs.append(fmt.serialise())
+            dxfs.append(fmt.to_tree())
         return dxfs
 
 
@@ -169,3 +163,17 @@ class StyleWriter(object):
         SubElement(self._root, 'tableStyles',
             {'count':'0', 'defaultTableStyle':'TableStyleMedium9',
             'defaultPivotStyle':'PivotStyleLight16'})
+
+    def _write_colors(self):
+        """
+        Workbook contains a different colour index.
+        """
+
+        colors = self.wb._colors
+        if colors == COLOR_INDEX:
+            return
+
+        cols = SubElement(self._root, "colors")
+        rgb = SubElement(cols, "indexedColors")
+        for color in colors:
+            SubElement(rgb, "rgbColor", rgb=color)

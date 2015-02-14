@@ -8,18 +8,19 @@ from openpyxl.cell import Cell
 from openpyxl.utils.datetime  import from_excel
 from openpyxl.styles import is_date_format, Style
 from openpyxl.styles.numbers import BUILTIN_FORMATS
+from openpyxl.styles.styleable import StyleableObject
 
 
 class ReadOnlyCell(object):
 
-    __slots__ = ('sheet', 'row', 'column', '_value', 'data_type', '_style_id')
+    __slots__ =  ('parent', 'row', 'column', '_value', 'data_type', '_style_id')
 
-    def __init__(self, sheet, row, column, value, data_type=Cell.TYPE_NULL, style_id=None):
+    def __init__(self, sheet, row, column, value, data_type='n', style_id=None):
+        self.parent = sheet
         self._value = None
         self.row = row
         self.column = column
         self.data_type = data_type
-        self.sheet = sheet
         self.value = value
         self._style_id = style_id
 
@@ -34,11 +35,11 @@ class ReadOnlyCell(object):
 
     @property
     def shared_strings(self):
-        return self.sheet.shared_strings
+        return self.parent.shared_strings
 
     @property
     def base_date(self):
-        return self.sheet.base_date
+        return self.parent.base_date
 
     @property
     def coordinate(self):
@@ -47,22 +48,49 @@ class ReadOnlyCell(object):
         return "{1}{0}".format(self.row, self.column)
 
     @property
-    def is_date(self):
-        return self.data_type == Cell.TYPE_NUMERIC and is_date_format(self.number_format)
+    def style_id(self):
+        if not self._style_id:
+            return
+        return self.parent.parent._cell_styles[self._style_id]
 
     @property
     def number_format(self):
-        if self.style_id is None:
+        if not self.style_id:
             return
-        nf = self.style_id.number_format
-        if nf < 164:
-            return BUILTIN_FORMATS.get(nf, "General")
+        _id = self.style_id.number_format
+        if _id < 164:
+            return BUILTIN_FORMATS.get(_id, "General")
         else:
-            return self.sheet.parent._number_formats[nf - 164]
+            return self.parent.parent._number_formats[_id - 164]
 
     @property
-    def style_id(self):
-        return self._style_id
+    def font(self):
+        _id = self.style_id.font
+        return self.parent.parent._fonts[_id]
+
+    @property
+    def fill(self):
+        _id = self.style_id.fill
+        return self.parent.parent._fills[_id]
+
+    @property
+    def border(self):
+        _id = self.style_id.border
+        return self.parent.parent._borders[_id]
+
+    @property
+    def alignment(self):
+        _id = self.style_id.alignment
+        return self.parent.parent._alignments[_id]
+
+    @property
+    def protection(self):
+        _id = self.style_id.protection
+        return self.parent.parent._protections[_id]
+
+    @property
+    def is_date(self):
+        return self.data_type == 'n' and is_date_format(self.number_format)
 
     @property
     def internal_value(self):
@@ -72,13 +100,15 @@ class ReadOnlyCell(object):
     def value(self):
         if self._value is None:
             return
-        if self.data_type == Cell.TYPE_BOOL:
+        if self.data_type == 'n':
+            if is_date_format(self.number_format):
+                return from_excel(self._value, self.base_date)
+            return self._value
+        if self.data_type == 'b':
             return self._value == '1'
-        elif self.is_date:
-            return from_excel(self._value, self.base_date)
         elif self.data_type in(Cell.TYPE_INLINE, Cell.TYPE_FORMULA_CACHE_STRING):
             return unicode(self._value)
-        elif self.data_type == Cell.TYPE_STRING:
+        elif self.data_type == 's':
             return unicode(self.shared_strings[int(self._value)])
         return self._value
 
@@ -87,8 +117,8 @@ class ReadOnlyCell(object):
         if self._value is not None:
             raise AttributeError("Cell is read only")
         if value is None:
-            self.data_type = Cell.TYPE_NULL
-        elif self.data_type == Cell.TYPE_NUMERIC:
+            self.data_type = 'n'
+        elif self.data_type == 'n':
             try:
                 value = int(value)
             except ValueError:
@@ -97,15 +127,9 @@ class ReadOnlyCell(object):
 
     @property
     def style(self):
-        wb = self.sheet.parent
-        font = wb._fonts[self.style_id.font]
-        fill = wb._fills[self.style_id.fill]
-        alignment = wb._alignments[self.style_id.alignment]
-        border = wb._borders[self.style_id.border]
-        protection = wb._protections[self.style_id.protection]
-
-        return Style(font=font, alignment=alignment, fill=fill,
-                     number_format=self.number_format, border=border, protection=protection)
+        return Style(font=self.font, alignment=self.alignment,
+                     fill=self.fill, number_format=self.number_format, border=self.border,
+                     protection=self.protection)
 
 
 EMPTY_CELL = ReadOnlyCell(None, None, None, None)

@@ -13,21 +13,22 @@ Write a workbook
 >>>
 >>> dest_filename = 'empty_book.xlsx'
 >>>
->>> ws = wb.active
+>>> ws1 = wb.active
+>>> ws1.title = "range names"
 >>>
->>> ws.title = "range names"
+>>> for row in range(1, 40):
+...     ws1.append(range(600))
 >>>
->>> for col_idx in range(1, 40):
-...     col = get_column_letter(col_idx)
-...     for row in range(1, 600):
-...         ws.cell('%s%s'%(col, row)).value = '%s%s' % (col, row)
+>>> ws2 = wb.create_sheet(title="Pi")
 >>>
->>> ws = wb.create_sheet()
+>>> ws2['F5'] = 3.14
 >>>
->>> ws.title = 'Pi'
->>>
->>> ws['F5'] = 3.14
->>>
+>>> ws3 = wb.create_sheet(title="Data")
+>>> for row in range(10, 20):
+...     for col in range(27, 54):
+...         _ = ws3.cell(column=col, row=row, value="%s" % get_column_letter(col))
+>>> print(ws3['AA10'].value)
+AA
 >>> wb.save(filename = dest_filename)
 
 
@@ -73,7 +74,7 @@ Read an existing workbook
 >>> wb = load_workbook(filename = 'empty_book.xlsx')
 >>> sheet_ranges = wb['range names']
 >>> print(sheet_ranges['D18'].value)
-D18
+3
 
 
 .. note ::

@@ -136,9 +136,10 @@ class IterableWorksheet(Worksheet):
                 break
 
             if min_col <= column:
-                for col_counter in range(max(col_counter, min_col), column):
-                    # pad row with missing cells
-                    yield EMPTY_CELL
+                if col_counter < column:
+                    for col_counter in range(max(col_counter, min_col), column):
+                        # pad row with missing cells
+                        yield EMPTY_CELL
 
                 data_type = cell.get('t', 'n')
                 style_id = int(cell.get('s', 0))
@@ -152,7 +153,7 @@ class IterableWorksheet(Worksheet):
                         value = "=%s" % formula
 
                 yield ReadOnlyCell(self, row, column_str,
-                                   value, data_type, self.parent._cell_styles[style_id])
+                                   value, data_type, style_id)
             col_counter = column + 1
         if max_col is not None:
             for _ in range(col_counter, max_col+1):
