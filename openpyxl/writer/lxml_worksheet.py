@@ -50,7 +50,7 @@ def write_rows(xf, worksheet):
 
     with xf.element("sheetData"):
         for row_idx, row in sorted(all_rows):
-            # row meta data
+
             attrs = {'r': '%d' % row_idx, 'spans': '1:%d' % max_column}
             if row_idx in dims:
                 row_dimension = dims[row_idx]
