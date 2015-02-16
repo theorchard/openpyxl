@@ -6,6 +6,7 @@ from __future__ import absolute_import
 
 # Python stdlib imports
 from itertools import islice, chain
+from operator import itemgetter
 import re
 from inspect import isgenerator
 
@@ -61,10 +62,6 @@ def flatten(results):
 
     for row in results:
         yield(c.value for c in row)
-
-
-def sort_by_column(coordinate):
-    return coordinate[1]
 
 
 class Worksheet(object):
@@ -438,7 +435,7 @@ class Worksheet(object):
     @property
     def min_column(self):
         if self._cells:
-            cols = sorted(self._cells, key=lambda x: x[1])
+            cols = sorted(self._cells, key=itemgetter(1))
             return cols[-1][1]
         return 1
 
@@ -449,7 +446,7 @@ class Worksheet(object):
         :rtype: int
         """
         if self._cells:
-            cols = sorted(self._cells, key=lambda x: x[1])
+            cols = sorted(self._cells, key=itemgetter(1))
             return cols[-1][1]
         return 1
 
