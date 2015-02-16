@@ -141,3 +141,11 @@ def cells_from_range(range_string):
     for row in range(min_row, max_row+1):
         yield tuple('%s%d' % (get_column_letter(col), row)
                     for col in range(min_col, max_col+1))
+
+
+def coordinate_to_tuple(coordinate):
+    """
+    Convert an Excel style coordinate to (row, colum) tuple
+    """
+    col, row = coordinate_from_string(coordinate)
+    return row, column_index_from_string(col)
