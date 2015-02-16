@@ -63,7 +63,7 @@ def flatten(results):
         yield(c.value for c in row)
 
 
-def sort_by_row(coordinate):
+def sort_by_column(coordinate):
     return coordinate[1]
 
 
@@ -439,7 +439,7 @@ class Worksheet(object):
     def min_column(self):
         if self._cells:
             cols = sorted(self._cells, key=lambda x: x[1])
-            return min(cols)[1]
+            return cols[-1][1]
         return 1
 
     @property
@@ -450,7 +450,7 @@ class Worksheet(object):
         """
         if self._cells:
             cols = sorted(self._cells, key=lambda x: x[1])
-            return max(cols)[1]
+            return cols[-1][1]
         return 1
 
 

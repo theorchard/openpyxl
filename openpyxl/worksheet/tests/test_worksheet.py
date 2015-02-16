@@ -538,7 +538,11 @@ def test_min_column(Worksheet):
 
 def test_max_column(Worksheet):
     ws = Worksheet(DummyWorkbook())
-    assert ws.max_column == 1
+    ws['F1'] = 10
+    ws['F2'] = 32
+    ws['F3'] = '=F1+F2'
+    ws['A4'] = '=A1+A2+A3'
+    assert ws.max_column == 6
 
 
 def test_min_row(Worksheet):
@@ -548,4 +552,8 @@ def test_min_row(Worksheet):
 
 def test_max_row(Worksheet):
     ws = Worksheet(DummyWorkbook())
-    assert ws.max_row == 1
+    ws.append([])
+    ws.append([5])
+    ws.append([])
+    ws.append([4])
+    assert ws.max_row == 5
