@@ -348,7 +348,9 @@ class Cell(StyleableObject):
 
         :rtype: bool
         """
-        return self.data_type == self.TYPE_NUMERIC and is_date_format(self.number_format)
+        if self.data_type == "n" and self.number_format != "General":
+            return is_date_format(self.number_format)
+        return False
 
     def offset(self, row=0, column=0):
         """Returns a cell location relative to this cell.
