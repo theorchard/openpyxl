@@ -28,6 +28,7 @@ from openpyxl.utils import (
     get_column_letter,
     range_boundaries,
     cells_from_range,
+    coordinate_to_tuple,
 )
 from openpyxl.cell import Cell
 from openpyxl.utils.exceptions import (
@@ -306,9 +307,9 @@ class Worksheet(object):
         """ Print Titles are rows or columns that are repeated on each printed sheet.
         This adds n rows or columns at the top or left of the sheet
         """
-        
+
         scope = self.parent.get_index(self)
-        
+
         if rows_or_cols == 'cols':
             r = '$A:$%s' % get_column_letter(n)
         else:
@@ -346,16 +347,15 @@ class Worksheet(object):
                 msg = "You have to provide a value either for " \
                     "'coordinate' or for 'row' *and* 'column'"
                 raise InsufficientCoordinatesException(msg)
-            else:
-                column = get_column_letter(column)
-                coordinate = '%s%s' % (column, row)
+            coordinate = (row, column)
+
         else:
             coordinate = coordinate.upper().replace('$', '')
+            coordinate = coordinate_to_tuple(coordinate)
+            row, column = coordinate
 
         if coordinate not in self._cells:
-            if row is None or column is None:
-                column, row = coordinate_from_string(coordinate)
-            self._new_cell(column, row, value)
+            self._new_cell(row, column, value)
 
         return self._cells[coordinate]
 
@@ -365,15 +365,14 @@ class Worksheet(object):
         Internal method for getting a cell from a worksheet.
         Will create a new cell if one doesn't already exist.
         """
-        coordinate = coordinate.upper()
+        coordinate = coordinate_to_tuple(coordinate)
         if not coordinate in self._cells:
-            column, row = coordinate_from_string(coordinate)
-            self._new_cell(column, row)
+            self._new_cell(row=coordinate[1], col_idx=coordinate[0])
         return self._cells[coordinate]
 
 
-    def _new_cell(self, column, row, value=None):
-        cell = Cell(self, column, row, value)
+    def _new_cell(self, row, col_idx, value=None):
+        cell = Cell(self, row=row, col_idx=col_idx, value=value)
         self._add_cell(cell)
 
 
@@ -381,14 +380,9 @@ class Worksheet(object):
         """
         Internal method for adding cell objects.
         """
-        column = cell.column
+        column = cell.col_idx
         row = cell.row
-        self._cells[cell.coordinate] = cell
-        if column not in self.column_dimensions:
-            self.column_dimensions[column] = ColumnDimension(index=column, worksheet=self)
-        if row not in self.row_dimensions:
-            self.row_dimensions[row] = RowDimension(index=row, worksheet=self)
-        self._cells[cell.coordinate] = cell
+        self._cells[(row, column)] = cell
 
 
     def __getitem__(self, key):
@@ -741,27 +735,24 @@ class Worksheet(object):
         if (isinstance(iterable, (list, tuple, range))
             or isgenerator(iterable)):
             for col_idx, content in enumerate(iterable, 1):
-                col = get_column_letter(col_idx)
                 if isinstance(content, Cell):
                     # compatible with write-only mode
                     cell = content
                     cell.parent = self
-                    cell.column = col
+                    cell.col_idx = col
                     cell.row = row_idx
-                    cell.coordinate = "%s%s" % (col, row_idx)
                     self._add_cell(cell)
                 else:
-                    cell = self._new_cell(col, row_idx, content)
+                    cell = self._new_cell(row=row_idx, col_idx=col_idx, value=content)
 
         elif isinstance(iterable, dict):
             for col_idx, content in iteritems(iterable):
                 if isinstance(col_idx, basestring):
                     col_idx = column_index_from_string(col_idx)
-                self.cell(row=row_idx, column=col_idx, value=content)
+                self.cell(row=row_idx, col_idx=col_idx, value=content)
 
         else:
             self._invalid_row(iterable)
-        self.row_dimensions[row_idx] = RowDimension(worksheet=self, index=row_idx)
 
     def _invalid_row(self, iterable):
         raise TypeError('Value must be a list, tuple, range or generator, or a dict. Supplied value is {0}'.format(
