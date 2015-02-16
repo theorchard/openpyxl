@@ -63,6 +63,10 @@ def flatten(results):
         yield(c.value for c in row)
 
 
+def sort_by_row(coordinate):
+    return coordinate[1]
+
+
 class Worksheet(object):
     """Represents a worksheet.
 
@@ -117,6 +121,7 @@ class Worksheet(object):
         self._merged_cells = []
         self.relationships = []
         self._data_validations = []
+        self._max_row = 1
         self.sheet_state = self.SHEETSTATE_VISIBLE
         self.page_setup = PageSetup()
         self.print_options = PrintOptions()
@@ -367,7 +372,7 @@ class Worksheet(object):
         """
         coordinate = coordinate_to_tuple(coordinate)
         if not coordinate in self._cells:
-            self._new_cell(row=coordinate[1], col_idx=coordinate[0])
+            self._new_cell(*coordinate)
         return self._cells[coordinate]
 
 
@@ -396,57 +401,66 @@ class Worksheet(object):
     def __setitem__(self, key, value):
         self[key].value = value
 
-    def get_highest_row(self):
-        """Returns the maximum row index containing data
 
-        :rtype: int
-        """
-        if self.row_dimensions:
-            return max(self.row_dimensions)
-        else:
-            return 0
+    @deprecated("Use the max_row property")
+    def get_highest_row(self):
+        return self.max_row
+
 
     @property
     def min_row(self):
-        if self.row_dimensions:
-            return min(self.row_dimensions)
+        if self._cells:
+            return min(self._cells)[0]
         else:
             return 1
 
     @property
     def max_row(self):
-        return self.get_highest_row()
+        """Returns the maximum row index containing data
 
+        :rtype: int
+        """
+        max_cell = 1
+        if self._cells:
+            max_cell = max(self._cells)[0]
+        return max(self._max_row, max_cell)
+
+    @max_row.setter
+    def max_row(self, value):
+        self._max_row = value
+
+
+    @deprecated("Use the max_column propery.")
     def get_highest_column(self):
+        return self.max_column
+
+
+    @property
+    def min_column(self):
+        if self._cells:
+            cols = sorted(self._cells, key=lambda x: x[1])
+            return min(cols)[1]
+        return 1
+
+    @property
+    def max_column(self):
         """Get the largest value for column currently stored.
 
         :rtype: int
         """
-        if self.column_dimensions:
-            return max([column_index_from_string(column_index)
-                        for column_index in self.column_dimensions])
-        else:
-            return 1
+        if self._cells:
+            cols = sorted(self._cells, key=lambda x: x[1])
+            return max(cols)[1]
+        return 1
 
-    @property
-    def min_col(self):
-        if self.column_dimensions:
-            return max([column_index_from_string(column_index)
-                        for column_index in self.column_dimensions])
-        else:
-            return 1
-
-    @property
-    def max_column(self):
-        return self.get_highest_column()
 
     def calculate_dimension(self):
         """Return the minimum bounding range for all cells containing data."""
-        return '%s%d:%s%d' % (
-            get_column_letter(1),
+        return 'A%d:%s%d' % (
             self.min_row,
-            get_column_letter(self.max_column or 1),
-            self.max_row or 1)
+            get_column_letter(self.max_column),
+            max(self.max_row, 1)
+        )
 
 
     @property
@@ -503,10 +517,9 @@ class Worksheet(object):
         :rtype: generator
         """
         # Column name cache is very important in large files.
-        cache = dict((col, get_column_letter(col)) for col in range(min_col, max_col + 1))
         for row in range(min_row, max_row + 1):
-            yield tuple(self._get_cell('%s%d' % (cache[col], row))
-                        for col in range(min_col, max_col + 1))
+            yield tuple(self.cell(row=row, column=column)
+                        for column in range(min_col, max_col + 1))
 
 
     def get_named_range(self, range_string):
@@ -730,7 +743,7 @@ class Worksheet(object):
         :raise: TypeError when iterable is neither a list/tuple nor a dict
 
         """
-        row_idx = self.max_row + 1
+        row_idx = self.max_row
 
         if (isinstance(iterable, (list, tuple, range))
             or isgenerator(iterable)):
@@ -739,20 +752,22 @@ class Worksheet(object):
                     # compatible with write-only mode
                     cell = content
                     cell.parent = self
-                    cell.col_idx = col
+                    cell.col_idx = col_idx
                     cell.row = row_idx
                     self._add_cell(cell)
                 else:
-                    cell = self._new_cell(row=row_idx, col_idx=col_idx, value=content)
+                    cell = self._new_cell(row_idx, col_idx, content)
 
         elif isinstance(iterable, dict):
             for col_idx, content in iteritems(iterable):
                 if isinstance(col_idx, basestring):
                     col_idx = column_index_from_string(col_idx)
-                self.cell(row=row_idx, col_idx=col_idx, value=content)
+                self.cell(row=row_idx, column=col_idx, value=content)
 
         else:
             self._invalid_row(iterable)
+
+        self.max_row += 1 # increment including empty rows
 
     def _invalid_row(self, iterable):
         raise TypeError('Value must be a list, tuple, range or generator, or a dict. Supplied value is {0}'.format(
@@ -769,6 +784,8 @@ class Worksheet(object):
         """Iterate over all columns in the worksheet"""
         max_row = self.max_row
         min_row = 1
+        if not self._cells:
+            return ((),)
         cols = []
         for col_idx in range(self.max_column):
             cells = self.get_squared_range(col_idx + 1, min_row, col_idx + 1, max_row)

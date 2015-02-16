@@ -22,6 +22,12 @@ from openpyxl.styles.colors import Color
 from ..properties import WorksheetProperties
 
 
+class DummyWorkbook:
+
+    def get_sheet_names(self):
+        return []
+
+
 @pytest.fixture
 def Worksheet():
     from ..worksheet import Worksheet
@@ -240,8 +246,6 @@ class TestWorksheet:
         ws = Worksheet(Workbook())
         ws.append(['value'])
         assert ws['A1'].value == "value"
-        assert ws.row_dimensions[1].parent is ws
-        assert ws.column_dimensions['A'].parent is ws
 
 
     def test_append_list(self, Worksheet):
@@ -270,10 +274,8 @@ class TestWorksheet:
 
     def test_bad_append(self, Worksheet):
         ws = Worksheet(Workbook())
-        assert ws.max_row == 0
         with pytest.raises(TypeError):
             ws.append("test")
-        assert ws.max_row == 0
 
 
     def test_append_range(self, Worksheet):
@@ -468,8 +470,8 @@ class TestWorksheet:
         ws = Worksheet(Workbook())
         ws._merged_cells = ["A1:D4"]
         ws.unmerge_cells(start_row=1, start_column=1, end_row=4, end_column=4)
-        
-    
+
+
     def test_print_titles(self):
         wb = Workbook()
         ws = wb.active
@@ -527,3 +529,23 @@ def test_freeze_panes_both(Worksheet):
     assert dict(view.selection[2]) == {'activeCell': 'A1', 'pane': 'bottomRight', 'sqref': 'A1'}
     assert dict(view.pane) == {'activePane': 'bottomRight', 'state': 'frozen',
                                'topLeftCell': 'D4', 'xSplit': '3', "ySplit":"3"}
+
+
+def test_min_column(Worksheet):
+    ws = Worksheet(DummyWorkbook())
+    assert ws.min_column == 1
+
+
+def test_max_column(Worksheet):
+    ws = Worksheet(DummyWorkbook())
+    assert ws.max_column == 1
+
+
+def test_min_row(Worksheet):
+    ws = Worksheet(DummyWorkbook())
+    assert ws.min_row == 1
+
+
+def test_max_row(Worksheet):
+    ws = Worksheet(DummyWorkbook())
+    assert ws.max_row == 1
