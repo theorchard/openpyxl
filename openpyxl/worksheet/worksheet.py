@@ -593,29 +593,6 @@ class Worksheet(object):
             return self.get_named_range(range_string)
 
 
-    @deprecated("Access styles directly from cells, columns or rows")
-    def get_style(self, coordinate):
-        """Return a copy of the style object for the specified cell."""
-        try:
-            obj = self[coordinate]
-        except ValueError:
-            if isinstance(coordinate, int):
-                obj = self.row_dimensions[obj]
-            else:
-                obj = self.column_dimensions[obj]
-        return obj.style
-
-    @deprecated("Set styles directly on cells, columns or rows")
-    def set_style(self, coordinate, style):
-        try:
-            obj = self[coordinate]
-        except ValueError:
-            if isinstance(coordinate, int):
-                obj = self.row_dimensions[obj]
-            else:
-                obj = self.column_dimensions[obj]
-        obj.style = style
-
     def set_printer_settings(self, paper_size, orientation):
         """Set printer settings """
 
@@ -624,9 +601,6 @@ class Worksheet(object):
             raise ValueError("Values should be %s or %s" % (self.ORIENTATION_PORTRAIT, self.ORIENTATION_LANDSCAPE))
         self.page_setup.orientation = orientation
 
-    @deprecated('this method is private and should not be called directly')
-    def create_relationship(self, rel_type):
-        return self._create_relationship(rel_type)
 
     def _create_relationship(self, rel_type):
         """Add a relationship for this sheet."""
