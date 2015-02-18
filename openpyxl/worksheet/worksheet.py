@@ -118,7 +118,6 @@ class Worksheet(object):
         self._merged_cells = []
         self.relationships = []
         self._data_validations = []
-        self._max_row = 1
         self.sheet_state = self.SHEETSTATE_VISIBLE
         self.page_setup = PageSetup()
         self.print_options = PrintOptions()
