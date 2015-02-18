@@ -41,7 +41,12 @@ def read_dimension(source):
                 max_row = min_row
             else:
                 max_row = int(max_row)
-            return min_col, min_row, max_col, max_row
+            return (
+                column_index_from_string(min_col),
+                min_row,
+                column_index_from_string(max_col),
+                max_row
+                )
 
         elif element.tag == DATA_TAG:
             # Dimensions missing
@@ -59,9 +64,9 @@ DIMENSION_TAG = '{%s}dimension' % SHEET_MAIN_NS
 class IterableWorksheet(Worksheet):
 
     _xml = None
-    min_col = 'A'
-    min_row = 1
-    max_col = max_row = None
+    _min_column = 1
+    _min_row = 1
+    _max_column = _max_row = None
 
     def __init__(self, parent_workbook, title, worksheet_path,
                  xml_source, shared_strings, style_table):
@@ -72,8 +77,7 @@ class IterableWorksheet(Worksheet):
         self.xml_source = xml_source
         dimensions = read_dimension(self.xml_source)
         if dimensions is not None:
-            self.min_col, self.min_row, self.max_col, self.max_row = dimensions
-
+            self.min_column, self.min_row, self.max_column, self.max_row = dimensions
 
     @property
     def xml_source(self):
@@ -173,13 +177,18 @@ class IterableWorksheet(Worksheet):
     def rows(self):
         return self.iter_rows()
 
+
     def calculate_dimension(self, force=False):
-        if not all([self.max_col, self.max_row]):
+        if not all([self.max_column, self.max_row]):
             if force:
                 self._calculate_dimension()
             else:
                 raise ValueError("Worksheet is unsized, use calculate_dimension(force=True)")
-        return '%s%s:%s%s' % (self.min_col, self.min_row, self.max_col, self.max_row)
+        return '%s%d:%s%d' % (
+           get_column_letter(self.min_column), self.min_row,
+           get_column_letter(self.max_column), self.max_row
+       )
+
 
     def _calculate_dimension(self):
         """
@@ -190,5 +199,43 @@ class IterableWorksheet(Worksheet):
         for r in self.rows:
             cell = r[-1]
             max_col = max(max_col, column_index_from_string(cell.column))
+
         self.max_row = cell.row
-        self.max_col = max_col
+        self.max_column = max_col
+
+
+    @property
+    def min_row(self):
+        return self._min_row
+
+    @min_row.setter
+    def min_row(self, value):
+        self._min_row = value
+
+
+    @property
+    def max_row(self):
+        return self._max_row
+
+    @max_row.setter
+    def max_row(self, value):
+        self._max_row = value
+
+
+    @property
+    def min_column(self):
+        return self._min_column
+
+    @min_column.setter
+    def min_column(self, value):
+        self._min_column = value
+
+
+    @property
+    def max_column(self):
+        return self._max_column
+
+
+    @max_column.setter
+    def max_column(self, value):
+        self._max_column = value
