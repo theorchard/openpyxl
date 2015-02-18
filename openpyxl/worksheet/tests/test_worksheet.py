@@ -24,6 +24,8 @@ from ..properties import WorksheetProperties
 
 class DummyWorkbook:
 
+    encoding = "UTF-8"
+
     def get_sheet_names(self):
         return []
 
