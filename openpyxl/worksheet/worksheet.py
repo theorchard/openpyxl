@@ -128,6 +128,7 @@ class Worksheet(object):
         self.protection = SheetProtection()
         self.default_row_dimension = RowDimension(worksheet=self)
         self.default_column_dimension = ColumnDimension(worksheet=self)
+        self._current_row = 0
         self._auto_filter = AutoFilter()
         self._freeze_panes = None
         self.paper_size = None
@@ -357,7 +358,8 @@ class Worksheet(object):
             row, column = coordinate
 
         if coordinate not in self._cells:
-            self._new_cell(row, column, value)
+            cell = Cell(self, row=row, col_idx=column, value=value)
+            self._add_cell(cell)
 
         return self._cells[coordinate]
 
@@ -369,13 +371,9 @@ class Worksheet(object):
         """
         coordinate = coordinate_to_tuple(coordinate)
         if not coordinate in self._cells:
-            self._new_cell(*coordinate)
+            cell = Cell(self, row=coordinate[0], col_idx=coordinate[1])
+            self._add_cell(cell)
         return self._cells[coordinate]
-
-
-    def _new_cell(self, row, col_idx, value=None):
-        cell = Cell(self, row=row, col_idx=col_idx, value=value)
-        self._add_cell(cell)
 
 
     def _add_cell(self, cell):
@@ -384,6 +382,7 @@ class Worksheet(object):
         """
         column = cell.col_idx
         row = cell.row
+        self._current_row = max(row, self._current_row)
         self._cells[(row, column)] = cell
 
 
@@ -406,10 +405,12 @@ class Worksheet(object):
 
     @property
     def min_row(self):
+        min_row = 1
         if self._cells:
-            return min(self._cells)[0]
-        else:
-            return 1
+            rows = set(c[0] for c in self._cells)
+            min_row = min(rows)
+        return min_row
+
 
     @property
     def max_row(self):
@@ -417,14 +418,11 @@ class Worksheet(object):
 
         :rtype: int
         """
-        max_cell = 1
+        max_row = 1
         if self._cells:
-            max_cell = max(self._cells)[0]
-        return max(self._max_row, max_cell)
-
-    @max_row.setter
-    def max_row(self, value):
-        self._max_row = value
+            rows = set(c[0] for c in self._cells)
+            max_row = max(rows)
+        return max_row
 
 
     @deprecated("Use the max_column propery.")
@@ -434,10 +432,12 @@ class Worksheet(object):
 
     @property
     def min_column(self):
+        min_col = 1
         if self._cells:
-            cols = sorted(self._cells, key=itemgetter(1))
-            return cols[-1][1]
-        return 1
+            cols = set(c[1] for c in self._cells)
+            min_col = min(cols)
+        return min_col
+
 
     @property
     def max_column(self):
@@ -445,18 +445,31 @@ class Worksheet(object):
 
         :rtype: int
         """
+        max_col = 1
         if self._cells:
-            cols = sorted(self._cells, key=itemgetter(1))
-            return cols[-1][1]
-        return 1
+            cols = set(c[1] for c in self._cells)
+            max_col = max(cols)
+        return max_col
 
 
     def calculate_dimension(self):
         """Return the minimum bounding range for all cells containing data."""
-        return 'A%d:%s%d' % (
-            self.min_row,
-            get_column_letter(self.max_column),
-            max(self.max_row, 1)
+        if self._cells:
+            rows = set()
+            cols = set()
+            for row, col in self._cells:
+                rows.add(row)
+                cols.add(col)
+            max_row = max(rows)
+            max_col = max(cols)
+            min_col = min(cols)
+            min_row = min(rows)
+        else:
+            return "A1:A1"
+
+        return '%s%d:%s%d' % (
+            get_column_letter(min_col), min_row,
+            get_column_letter(max_col), max_row
         )
 
 
@@ -740,7 +753,7 @@ class Worksheet(object):
         :raise: TypeError when iterable is neither a list/tuple nor a dict
 
         """
-        row_idx = self.max_row
+        row_idx = self._current_row + 1
 
         if (isinstance(iterable, (list, tuple, range))
             or isgenerator(iterable)):
@@ -751,20 +764,22 @@ class Worksheet(object):
                     cell.parent = self
                     cell.col_idx = col_idx
                     cell.row = row_idx
-                    self._add_cell(cell)
                 else:
-                    cell = self._new_cell(row_idx, col_idx, content)
+                    cell = Cell(self, row=row_idx, col_idx=col_idx, value=content)
+                self._cells[(row_idx, col_idx)] = cell
 
         elif isinstance(iterable, dict):
             for col_idx, content in iteritems(iterable):
                 if isinstance(col_idx, basestring):
                     col_idx = column_index_from_string(col_idx)
-                self.cell(row=row_idx, column=col_idx, value=content)
+                cell = Cell(self, row=row_idx, col_idx=col_idx, value=content)
+                self._cells[(row_idx, col_idx)] = cell
 
         else:
             self._invalid_row(iterable)
 
-        self.max_row += 1 # increment including empty rows
+        self._current_row = row_idx
+
 
     def _invalid_row(self, iterable):
         raise TypeError('Value must be a list, tuple, range or generator, or a dict. Supplied value is {0}'.format(

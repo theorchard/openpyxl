@@ -104,7 +104,7 @@ class TestWorksheet:
         ws = Worksheet(Workbook())
         assert 'A1:A1' == ws.calculate_dimension()
         ws.cell('B12').value = 'AAA'
-        assert 'A12:B12' == ws.calculate_dimension()
+        assert 'B12:B12' == ws.calculate_dimension()
 
 
     def test_squared_range(self, Worksheet):
@@ -556,4 +556,4 @@ def test_max_row(Worksheet):
     ws.append([5])
     ws.append([])
     ws.append([4])
-    assert ws.max_row == 5
+    assert ws.max_row == 4
