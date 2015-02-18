@@ -43,12 +43,18 @@ def test_read_dimension(datadir, filename, expected):
     assert dimension == expected
 
 
-def test_ctor(datadir, DummyWorkbook):
+@pytest.mark.parametrize("filename, expected",
+                         [
+                             ("sheet2.xml", (1, 4, 30, 27)),
+                             ("sheet2_no_dimension.xml", (1, 1, None, None)),
+                         ]
+                         )
+def test_ctor(datadir, DummyWorkbook, filename, expected):
     datadir.join("reader").chdir()
     from openpyxl.worksheet.iter_worksheet import IterableWorksheet
-    with open("sheet2.xml") as src:
+    with open(filename) as src:
         ws = IterableWorksheet(DummyWorkbook, "Sheet", "", src, [], [])
-    assert (ws.min_row, ws.min_column, ws.max_row, ws.max_column) == (1, 4, 30, 27)
+    assert (ws.min_row, ws.min_column, ws.max_row, ws.max_column) == expected
 
 
 def test_force_dimension(datadir, DummyWorkbook):
@@ -57,7 +63,6 @@ def test_force_dimension(datadir, DummyWorkbook):
 
     ws = IterableWorksheet(DummyWorkbook, "Sheet", "", "sheet2_no_dimension.xml", [], [])
 
-    assert (ws.min_row, ws.min_column, ws.max_row, ws.max_column)  == (1, 1, None, None)
     dims = ws.calculate_dimension(True)
     assert dims == "A1:AA30"
 
