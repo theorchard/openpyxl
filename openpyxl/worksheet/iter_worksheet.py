@@ -192,13 +192,3 @@ class IterableWorksheet(Worksheet):
             max_col = max(max_col, column_index_from_string(cell.column))
         self.max_row = cell.row
         self.max_col = max_col
-
-    def get_highest_column(self):
-        if self.max_col is not None:
-            return column_index_from_string(self.max_col)
-
-    def get_highest_row(self):
-        return self.max_row
-
-    def get_style(self, coordinate):
-        raise NotImplementedError("use `cell.style` instead")
