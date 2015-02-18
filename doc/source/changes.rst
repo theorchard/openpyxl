@@ -35,7 +35,7 @@ Minor changes
 * Use ws.calculate_dimension(force=True) in read-only mode for unsized worksheets
 
 
-2.1.5 (unreleased)
+2.1.5 (2015-02-18)
 ==================
 
 
