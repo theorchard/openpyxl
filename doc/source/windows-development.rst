@@ -58,7 +58,7 @@ python Tools\Scripts\pyvenv.py c:\Users\YOURUSER\openpyxl
 lxml
 ----
 
-openpyxl needs `lxml` in order to run the tests. Unfortunately, automatic installation of lxml on Windows is tricky as pip defaults to try and compile it.
+openpyxl needs `lxml` in order to run the tests. Unfortunately, automatic installation of lxml on Windows is tricky as pip defaults to try and compile it. You will need to manually downloaded the relevant lxml binaries and convert them.
 
 #. In a DOS-box switch to your repository follder::
 cd c:\Users\YOURUSER\openpyxl
@@ -69,7 +69,7 @@ scripts\activate
 #. Install a development version of openpyxl::
 python setup.py develop
 
-#. Download all the relevant `lxml Windows installers from PyPI <https://pypi.python.org/pypi/lxml>`_
+#. Download all the relevant `lxml Windows installers <http://www.lfd.uci.edu/~gohlke/pythonlibs/#lxml>`_
 
 #. Move all these files to a folder called "downloads" in your openpyxl checkout
 
