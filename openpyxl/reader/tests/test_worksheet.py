@@ -65,6 +65,7 @@ def Worksheet(Workbook):
 
         _guess_types = False
         data_only = False
+        _colors = []
 
         def __init__(self):
             self.shared_strings = IndexedList()
@@ -132,7 +133,7 @@ def Worksheet(Workbook):
 def WorkSheetParser(Worksheet):
     """Setup a parser instance with an empty source"""
     from .. worksheet import WorkSheetParser
-    return WorkSheetParser(Worksheet, None, {0:'a'}, {})
+    return WorkSheetParser(Worksheet, None, {0:'a'})
 
 
 def test_col_width(datadir, Worksheet, WorkSheetParser):

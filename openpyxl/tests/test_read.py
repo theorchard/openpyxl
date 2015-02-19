@@ -30,6 +30,7 @@ def test_read_standalone_worksheet(datadir):
         excel_base_date = CALENDAR_WINDOWS_1900
         _guess_types = True
         data_only = False
+        _colors = []
 
         def __init__(self):
             self.shared_styles = [Style()]
@@ -95,7 +96,7 @@ def test_read_cell_formulae(datadir):
     datadir.join("reader").chdir()
     wb = Workbook()
     ws = wb.active
-    fast_parse(ws, open( "worksheet_formula.xml"), ['', ''], {})
+    fast_parse(ws, open( "worksheet_formula.xml"), ['', ''])
     b1 = ws['B1']
     assert b1.data_type == 'f'
     assert b1.value == '=CONCATENATE(A1,A2)'
