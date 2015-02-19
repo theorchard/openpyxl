@@ -6,7 +6,6 @@ from __future__ import absolute_import
 # package imports
 from openpyxl.compat import OrderedDict, zip
 from openpyxl.utils.indexed_list import IndexedList
-from openpyxl.utils.exceptions import MissingNumberFormat
 from openpyxl.styles import (
     Style,
     numbers,
