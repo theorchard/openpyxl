@@ -1,6 +1,5 @@
 pip>=6.0
-jdcal
 lxml>=3.3.4
 pytest
-pillow>=2.4.0
+pillow
 tox
