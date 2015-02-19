@@ -31,9 +31,6 @@ def test_repair_central_directory():
     assert f.read() == data_b
 
 
-    from tempfile import NamedTemporaryFile
-
-
 @pytest.mark.parametrize("extension",
                          ['.xlsb', '.xls', 'no-format']
                          )
@@ -41,7 +38,6 @@ def test_invalid_file_extension(extension):
     tmp = NamedTemporaryFile(suffix=extension)
     with pytest.raises(InvalidFileException):
         load_workbook(filename=tmp.name)
-
 
 
 def test_style_assignment(datadir):
