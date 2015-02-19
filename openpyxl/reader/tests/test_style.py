@@ -140,7 +140,7 @@ def test_read_simple_style_mappings(datadir, StyleReader):
 def test_read_complex_style(datadir):
     datadir.chdir()
     wb = load_workbook("complex-styles.xlsx")
-    ws = wb.get_active_sheet()
+    ws = wb.active
     assert ws.column_dimensions['A'].width == 31.1640625
 
     assert ws.column_dimensions['I'].font == Font(sz=12.0, color='FF3300FF', scheme='minor')
@@ -190,7 +190,7 @@ def test_read_complex_style(datadir):
 
 def test_change_existing_styles(datadir):
     wb = load_workbook("complex-styles.xlsx")
-    ws = wb.get_active_sheet()
+    ws = wb.active
 
     ws.column_dimensions['A'].width = 20
     ws.column_dimensions['I'].fill = PatternFill(fill_type='solid',

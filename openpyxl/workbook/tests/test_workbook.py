@@ -18,8 +18,7 @@ from openpyxl.tests.schema import validate_archive
 
 def test_get_active_sheet():
     wb = Workbook()
-    active_sheet = wb.get_active_sheet()
-    assert active_sheet == wb.worksheets[0]
+    assert wb.active == wb.worksheets[0]
 
 
 def test_create_sheet():
@@ -164,14 +163,14 @@ def test_write_regular_date(tmpdir):
     tmpdir.chdir()
     today = datetime.datetime(2010, 1, 18, 14, 15, 20, 1600)
     book = Workbook()
-    sheet = book.get_active_sheet()
+    sheet = book.active
     sheet.cell("A1").value = today
     dest_filename = 'date_read_write_issue.xlsx'
     book.save(dest_filename)
 
     validate_archive(dest_filename)
     test_book = load_workbook(dest_filename)
-    test_sheet = test_book.get_active_sheet()
+    test_sheet = test_book.active
 
     assert test_sheet.cell("A1").value == today
 
@@ -186,7 +185,7 @@ def test_write_regular_float(tmpdir):
 
     validate_archive(dest_filename)
     test_book = load_workbook(dest_filename)
-    test_sheet = test_book.get_active_sheet()
+    test_sheet = test_book.active
 
     assert test_sheet.cell("A1").value == float_value
 

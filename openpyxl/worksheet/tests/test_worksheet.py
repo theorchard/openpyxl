@@ -488,13 +488,13 @@ class TestWorksheet:
 class TestPositioning(object):
     def test_point(self):
         wb = Workbook()
-        ws = wb.get_active_sheet()
+        ws = wb.active
         assert ws.point_pos(top=40, left=150), ('C' == 3)
 
     @pytest.mark.parametrize("value", ('A1', 'D52', 'X11'))
     def test_roundtrip(self, value):
         wb = Workbook()
-        ws = wb.get_active_sheet()
+        ws = wb.active
         assert ws.point_pos(*ws.cell(value).anchor) == coordinate_from_string(value)
 
 

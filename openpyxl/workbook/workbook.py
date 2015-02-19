@@ -145,6 +145,7 @@ class Workbook(object):
     def write_only(self):
         return self.__write_only
 
+    @deprecated("Use the .active property")
     def get_active_sheet(self):
         """Returns the current active sheet."""
         return self.active

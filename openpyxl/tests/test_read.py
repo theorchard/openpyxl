@@ -108,7 +108,7 @@ def test_read_cell_formulae(datadir):
 def test_read_complex_formulae(datadir):
     datadir.join("reader").chdir()
     wb = load_workbook('formulae.xlsx')
-    ws = wb.get_active_sheet()
+    ws = wb.active
 
     # Test normal forumlae
     assert ws.cell('A1').data_type != 'f'

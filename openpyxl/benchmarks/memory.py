@@ -13,7 +13,7 @@ def test_memory_use():
     folder = os.path.split(__file__)[0]
     src = os.path.join(folder, "files", "very_large.xlsx")
     wb = openpyxl.load_workbook(src, use_iterators=True)
-    ws = wb.get_active_sheet()
+    ws = wb.active
 
     initial_use = None
 
