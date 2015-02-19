@@ -69,7 +69,7 @@ class IterableWorksheet(Worksheet):
     _max_column = _max_row = None
 
     def __init__(self, parent_workbook, title, worksheet_path,
-                 xml_source, shared_strings, style_table):
+                 xml_source, shared_strings):
         Worksheet.__init__(self, parent_workbook, title)
         self.worksheet_path = worksheet_path
         self.shared_strings = shared_strings
