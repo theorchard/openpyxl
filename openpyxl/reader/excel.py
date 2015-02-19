@@ -21,7 +21,7 @@ except ImportError:
 
 
 # package imports
-from openpyxl.utils.exceptions import OpenModeError, InvalidFileException
+from openpyxl.utils.exceptions import InvalidFileException
 from openpyxl.xml.constants import (
     ARC_SHARED_STRINGS,
     ARC_CORE,
@@ -61,7 +61,7 @@ def repair_central_directory(zipFile, is_file_instance):
     code taken from http://stackoverflow.com/a/7457686/570216, courtesy of Uri Cohen
     '''
 
-    f = zipFile if is_file_instance else open(zipFile, 'r+b')
+    f = zipFile if is_file_instance else open(zipFile, 'rb+')
     data = f.read()
     pos = data.find(CENTRAL_DIRECTORY_SIGNATURE)  # End of central directory signature
     if (pos > 0):
@@ -104,20 +104,11 @@ def load_workbook(filename, read_only=False, use_iterators=False, keep_vba=KEEP_
         and the returned workbook will be read-only.
 
     """
-
-    is_file_instance = isinstance(filename, file)
-
     read_only = read_only or use_iterators
 
-    if is_file_instance:
-        # fileobject must have been opened with 'rb' flag
-        # it is required by zipfile
-        if 'b' not in filename.mode:
-            raise OpenModeError("File-object must be opened in binary mode")
+    is_file_like = hasattr(filename, 'read')
 
-    try:
-        archive = ZipFile(filename, 'r', ZIP_DEFLATED)
-    except BadZipfile:
+    if not is_file_like and os.path.isfile(filename):
         file_format = os.path.splitext(filename)[-1]
         if file_format not in SUPPORTED_FORMATS:
             if file_format == '.xls':
@@ -133,18 +124,25 @@ def load_workbook(filename, read_only=False, use_iterators=False, keep_vba=KEEP_
                        'please check you can open '
                        'it with Excel first. '
                        'Supported formats are: %s') % (file_format,
-                                                     ','.join(SUPPORTED_FORMATS))
+                                                       ','.join(SUPPORTED_FORMATS))
             raise InvalidFileException(msg)
 
+
+    if is_file_like:
+        # fileobject must have been opened with 'rb' flag
+        # it is required by zipfile
+        if hasattr(filename, 'encoding'):
+            raise IOError("File-object must be opened in binary mode")
+
+    try:
+        archive = ZipFile(filename, 'r', ZIP_DEFLATED)
+    except BadZipfile:
         try:
-            f = repair_central_directory(filename, is_file_instance)
+            f = repair_central_directory(filename, is_file_like)
             archive = ZipFile(f, 'r', ZIP_DEFLATED)
-        except BadZipfile:
-            e = exc_info()[1]
-            raise InvalidFileException(unicode(e))
-    except (BadZipfile, RuntimeError, IOError, ValueError):
-        e = exc_info()[1]
-        raise InvalidFileException(unicode(e))
+        except BadZipfile as e:
+            raise(e)
+
     wb = Workbook(guess_types=guess_types, data_only=data_only, read_only=read_only)
 
     if read_only and guess_types:
