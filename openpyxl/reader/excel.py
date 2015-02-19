@@ -137,11 +137,8 @@ def load_workbook(filename, read_only=False, use_iterators=False, keep_vba=KEEP_
     try:
         archive = ZipFile(filename, 'r', ZIP_DEFLATED)
     except BadZipfile:
-        try:
-            f = repair_central_directory(filename, is_file_like)
-            archive = ZipFile(f, 'r', ZIP_DEFLATED)
-        except BadZipfile as e:
-            raise(e)
+        f = repair_central_directory(filename, is_file_like)
+        archive = ZipFile(f, 'r', ZIP_DEFLATED)
 
     wb = Workbook(guess_types=guess_types, data_only=data_only, read_only=read_only)
 
