@@ -3,6 +3,7 @@ from __future__ import absolute_import
 
 from io import BytesIO
 from tempfile import NamedTemporaryFile
+from zipfile import BadZipfile
 
 from openpyxl.utils.exceptions import InvalidFileException
 from .. excel import load_workbook
@@ -12,7 +13,7 @@ import pytest
 
 def test_read_empty_file(datadir):
     datadir.chdir()
-    with pytest.raises(InvalidFileException):
+    with pytest.raises(BadZipfile):
         load_workbook('null_file.xlsx')
 
 
@@ -51,3 +52,10 @@ def test_style_assignment(datadir):
     assert len(wb._borders) == 7
     assert len(wb._number_formats) == 0
     assert len(wb._protections) == 1
+
+
+def test_read_stringio():
+    filelike = BytesIO(b"certainly not a valid XSLX content")
+    # Test invalid file-like objects are detected and not handled as regular files
+    with pytest.raises(BadZipfile):
+        load_workbook(filelike)
