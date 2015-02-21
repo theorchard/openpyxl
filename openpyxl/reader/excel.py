@@ -48,7 +48,7 @@ from openpyxl.reader.workbook import (
 )
 from openpyxl.workbook.properties import read_properties, DocumentProperties
 from openpyxl.worksheet.iter_worksheet import IterableWorksheet
-from openpyxl.reader.worksheet import fast_parse
+from openpyxl.reader.worksheet import WorkSheetParser
 from openpyxl.reader.comments import read_comments, get_comments_file
 # Use exc_info for Python 2 compatibility with "except Exception[,/ as] e"
 
@@ -230,10 +230,10 @@ def _load_workbook(wb, archive, filename, read_only, keep_vba):
             new_ws = IterableWorksheet(wb, sheet_name, worksheet_path, None,
                                        shared_strings)
         else:
-            new_ws = fast_parse(archive.read(worksheet_path),
-                                wb,
-                                sheet_name,
-                                shared_strings)
+            parser = WorkSheetParser(wb, sheet_name, archive.read(worksheet_path),
+                            shared_strings)
+            parser.parse()
+            new_ws = parser.ws
         new_ws.sheet_state = sheet.get('state') or 'visible'
         wb._add_sheet(new_ws)
 
