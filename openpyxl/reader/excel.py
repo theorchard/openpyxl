@@ -229,13 +229,13 @@ def _load_workbook(wb, archive, filename, read_only, keep_vba):
         if read_only:
             new_ws = IterableWorksheet(wb, sheet_name, worksheet_path, None,
                                        shared_strings)
+            wb._add_sheet(new_ws)
         else:
             parser = WorkSheetParser(wb, sheet_name, archive.read(worksheet_path),
                             shared_strings)
             parser.parse()
-            new_ws = parser.ws
+            new_ws = wb[sheet_name]
         new_ws.sheet_state = sheet.get('state') or 'visible'
-        wb._add_sheet(new_ws)
 
         if not read_only:
         # load comments into the worksheet cells

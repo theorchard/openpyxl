@@ -56,7 +56,7 @@ class WorkSheetParser(object):
     INLINE_RICHTEXT = "{%s}is/{%s}r/{%s}t" % (SHEET_MAIN_NS, SHEET_MAIN_NS, SHEET_MAIN_NS)
 
     def __init__(self, wb, title, xml_source, shared_strings):
-        self.ws = Worksheet(wb, title=title)
+        self.ws = wb.create_sheet(title=title)
         self.source = xml_source
         self.shared_strings = shared_strings
         self.color_index = wb._colors
