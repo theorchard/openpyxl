@@ -55,13 +55,13 @@ class WorkSheetParser(object):
     INLINE_STRING = "{%s}is/{%s}t" % (SHEET_MAIN_NS, SHEET_MAIN_NS)
     INLINE_RICHTEXT = "{%s}is/{%s}r/{%s}t" % (SHEET_MAIN_NS, SHEET_MAIN_NS, SHEET_MAIN_NS)
 
-    def __init__(self, ws, xml_source, shared_strings):
-        self.ws = ws
+    def __init__(self, wb, title, xml_source, shared_strings):
+        self.ws = Worksheet(wb, title=title)
         self.source = xml_source
         self.shared_strings = shared_strings
-        self.color_index = ws.parent._colors
-        self.guess_types = ws.parent._guess_types
-        self.data_only = ws.parent.data_only
+        self.color_index = wb._colors
+        self.guess_types = wb._guess_types
+        self.data_only = wb.data_only
 
     def parse(self):
         dispatcher = {
@@ -305,7 +305,6 @@ class WorkSheetParser(object):
 
 
 def fast_parse(xml_source, parent, sheet_title, shared_strings):
-    ws = Worksheet(parent, sheet_title)
-    parser = WorkSheetParser(ws, xml_source, shared_strings)
+    parser = WorkSheetParser(parent, sheet_title, xml_source, shared_strings)
     parser.parse()
     return parser.ws
