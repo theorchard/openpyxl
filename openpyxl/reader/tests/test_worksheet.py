@@ -58,6 +58,19 @@ def test_get_xml_iter():
 @pytest.fixture
 def Workbook():
     from openpyxl.styles.styleable import StyleId
+    from openpyxl.styles import numbers
+
+    class DummyStyle:
+        number_format = numbers.FORMAT_GENERAL
+        font = ""
+        fill = ""
+        border = ""
+        alignment = ""
+        protection = ""
+
+        def copy(self, **kw):
+            return self
+
 
     class DummyWorkbook:
 
@@ -82,7 +95,7 @@ def Workbook():
             self._cell_styles.add(StyleId(number_format=0, font=0, fill=4, border=6, alignment=1, protection=0))
 
 
-        def get_sheet_names():
+        def get_sheet_names(self):
             return []
 
     return DummyWorkbook()
