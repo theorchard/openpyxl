@@ -138,8 +138,8 @@ def WorkSheetParser(Worksheet):
 
 def test_col_width(datadir, Worksheet, WorkSheetParser):
     datadir.chdir()
-    ws = Worksheet
     parser = WorkSheetParser
+    ws = parser.ws
 
     with open("complex-styles-worksheet.xml", "rb") as src:
         cols = iterparse(src, tag='{%s}col' % SHEET_MAIN_NS)
@@ -154,8 +154,8 @@ def test_col_width(datadir, Worksheet, WorkSheetParser):
 
 def test_hidden_col(datadir, Worksheet, WorkSheetParser):
     datadir.chdir()
-    ws = Worksheet
     parser = WorkSheetParser
+    ws = parser.ws
 
     with open("hidden_rows_cols.xml", "rb") as src:
         cols = iterparse(src, tag='{%s}col' % SHEET_MAIN_NS)
@@ -168,8 +168,9 @@ def test_hidden_col(datadir, Worksheet, WorkSheetParser):
 
 def test_styled_col(datadir, Worksheet, WorkSheetParser):
     datadir.chdir()
-    ws = Worksheet
     parser = WorkSheetParser
+    ws = parser.ws
+
     with open("complex-styles-worksheet.xml", "rb") as src:
         cols = iterparse(src, tag='{%s}col' % SHEET_MAIN_NS)
         for _, col in cols:
@@ -182,8 +183,8 @@ def test_styled_col(datadir, Worksheet, WorkSheetParser):
 
 def test_hidden_row(datadir, Worksheet, WorkSheetParser):
     datadir.chdir()
-    ws = Worksheet
     parser = WorkSheetParser
+    ws = parser.ws
 
     with open("hidden_rows_cols.xml", "rb") as src:
         rows = iterparse(src, tag='{%s}row' % SHEET_MAIN_NS)
@@ -427,7 +428,6 @@ def test_header_footer(WorkSheetParser, datadir):
 def test_cell(WorkSheetParser, datadir):
     datadir.chdir()
     parser = WorkSheetParser
-    ws = parser.ws
     parser.shared_strings[1] = "Arial Font, 10"
 
     with open("complex-styles-worksheet.xml") as src:
@@ -436,7 +436,6 @@ def test_cell(WorkSheetParser, datadir):
     element = sheet.find("{%s}sheetData/{%s}row[2]/{%s}c[1]" % (SHEET_MAIN_NS, SHEET_MAIN_NS, SHEET_MAIN_NS))
     assert element.get('r') == 'A2'
     parser.parse_cell(element)
-    #assert ws['A2']._font_id == 3
 
 
 def test_sheet_views(WorkSheetParser, datadir):
