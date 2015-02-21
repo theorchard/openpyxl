@@ -47,7 +47,8 @@ from openpyxl.reader.workbook import (
     read_workbook_code_name,
 )
 from openpyxl.workbook.properties import read_properties, DocumentProperties
-from openpyxl.reader.worksheet import read_worksheet
+from openpyxl.worksheet.iter_worksheet import IterableWorksheet
+from openpyxl.reader.worksheet import fast_parse
 from openpyxl.reader.comments import read_comments, get_comments_file
 # Use exc_info for Python 2 compatibility with "except Exception[,/ as] e"
 
@@ -226,12 +227,13 @@ def _load_workbook(wb, archive, filename, read_only, keep_vba):
             continue
 
         if read_only:
-            new_ws = read_worksheet(None, wb, sheet_name, shared_strings,
-                                    worksheet_path=worksheet_path)
+            new_ws = IterableWorksheet(wb, sheet_name, worksheet_path, None,
+                                       shared_strings)
         else:
-            new_ws = read_worksheet(archive.read(worksheet_path), wb,
-                                    sheet_name, shared_strings,
-                                    keep_vba=keep_vba)
+            new_ws = fast_parse(archive.read(worksheet_path),
+                                wb,
+                                sheet_name,
+                                shared_strings)
         new_ws.sheet_state = sheet.get('state') or 'visible'
         wb._add_sheet(new_ws)
 

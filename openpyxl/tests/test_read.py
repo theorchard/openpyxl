@@ -16,7 +16,7 @@ from openpyxl.utils.indexed_list import IndexedList
 from openpyxl.worksheet import Worksheet
 from openpyxl.workbook import Workbook
 from openpyxl.styles import numbers, Style
-from openpyxl.reader.worksheet import read_worksheet
+from openpyxl.reader.worksheet import fast_parse
 from openpyxl.reader.excel import load_workbook
 from openpyxl.utils.datetime  import CALENDAR_WINDOWS_1900, CALENDAR_MAC_1904
 
@@ -46,7 +46,7 @@ def test_read_standalone_worksheet(datadir):
     shared_strings = IndexedList(['hello'])
 
     with open('sheet2.xml') as src:
-        ws = read_worksheet(src.read(), DummyWb(), 'Sheet 2', shared_strings)
+        ws = fast_parse(src.read(), DummyWb(), 'Sheet 2', shared_strings)
         assert isinstance(ws, Worksheet)
         assert ws.cell('G5').value == 'hello'
         assert ws.cell('D30').value == 30
@@ -95,8 +95,7 @@ def test_read_cell_formulae(datadir):
     from openpyxl.reader.worksheet import fast_parse
     datadir.join("reader").chdir()
     wb = Workbook()
-    ws = wb.active
-    fast_parse(ws, open( "worksheet_formula.xml"), ['', ''])
+    ws = fast_parse(open( "worksheet_formula.xml"), wb, "Title", ['', ''])
     b1 = ws['B1']
     assert b1.data_type == 'f'
     assert b1.value == '=CONCATENATE(A1,A2)'
