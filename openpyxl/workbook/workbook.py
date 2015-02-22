@@ -30,8 +30,6 @@ from . properties import DocumentProperties, DocumentSecurity
 class Workbook(object):
     """Workbook is the container for all other parts of the document."""
 
-    _worksheet_class = Worksheet
-
     def __init__(self,
                  optimized_write=False,
                  encoding='utf-8',
@@ -65,8 +63,6 @@ class Workbook(object):
 
         if not self.write_only:
             self.worksheets.append(Worksheet(parent_workbook=self))
-        else:
-            self._worksheet_class = DumpWorksheet
 
 
     def _setup_styles(self):
@@ -158,10 +154,9 @@ class Workbook(object):
             new_ws = DumpWorksheet(parent_workbook=self, title=title)
         else:
             if title is not None:
-                new_ws = self._worksheet_class(
-                    parent_workbook=self, title=title)
+                new_ws = Worksheet(parent_workbook=self, title=title)
             else:
-                new_ws = self._worksheet_class(parent_workbook=self)
+                new_ws = Worksheet(parent_workbook=self)
 
         self._add_sheet(worksheet=new_ws, index=index)
         return new_ws
@@ -172,8 +167,11 @@ class Workbook(object):
 
     def _add_sheet(self, worksheet, index=None):
         """Add an existing worksheet (at an optional index)."""
-        if not isinstance(worksheet, self._worksheet_class):
-            raise TypeError("The parameter you have given is not of the type '%s'" % self._worksheet_class.__name__)
+        cls = Worksheet
+        if self.write_only:
+            cls = DumpWorksheet
+        if not isinstance(worksheet, cls):
+            raise TypeError("The parameter you have given is not of the type '%s'" % cls.__name__)
         if worksheet.parent != self:
             raise ValueError("You cannot add worksheets from another workbook.")
 
@@ -237,8 +235,6 @@ class Workbook(object):
 
     def create_named_range(self, name, worksheet, range, scope=None):
         """Create a new named_range on a worksheet"""
-        if not isinstance(worksheet, self._worksheet_class):
-            raise TypeError("Worksheet is not of the right type")
         named_range = NamedRange(name, [(worksheet, range)], scope)
         self.add_named_range(named_range)
 
