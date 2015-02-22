@@ -59,7 +59,6 @@ class WorkSheetParser(object):
         self.ws = wb.create_sheet(title=title)
         self.source = xml_source
         self.shared_strings = shared_strings
-        self.color_index = wb._colors
         self.guess_types = wb._guess_types
         self.data_only = wb.data_only
 
