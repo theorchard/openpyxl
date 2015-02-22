@@ -104,14 +104,6 @@ class RowDimension(Dimension):
         """Always true if there is a height for the row"""
         return self.ht is not None
 
-    #@property
-    #def s(self):
-        #return self.styleid
-
-    #@s.setter
-    #def s(self, style):
-        #self._style = style
-
     def __iter__(self):
         for key in self.__fields__[1:]:
             if key == 's':
