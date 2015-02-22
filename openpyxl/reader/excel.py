@@ -105,8 +105,23 @@ def load_workbook(filename, read_only=False, use_iterators=False, keep_vba=KEEP_
         and the returned workbook will be read-only.
 
     """
+    archive = _validate_archive(filename)
     read_only = read_only or use_iterators
 
+    wb = Workbook(guess_types=guess_types, data_only=data_only, read_only=read_only)
+
+    if read_only and guess_types:
+        warnings.warn('Data types are not guessed when using iterator reader')
+
+    _load_workbook(wb, archive, filename, read_only, keep_vba)
+
+    archive.close()
+    return wb
+
+def _validate_archive(filename):
+    """
+    Check the file is a valid zipfile
+    """
     is_file_like = hasattr(filename, 'read')
 
     if not is_file_like and os.path.isfile(filename):
@@ -140,16 +155,7 @@ def load_workbook(filename, read_only=False, use_iterators=False, keep_vba=KEEP_
     except BadZipfile:
         f = repair_central_directory(filename, is_file_like)
         archive = ZipFile(f, 'r', ZIP_DEFLATED)
-
-    wb = Workbook(guess_types=guess_types, data_only=data_only, read_only=read_only)
-
-    if read_only and guess_types:
-        warnings.warn('Data types are not guessed when using iterator reader')
-
-    _load_workbook(wb, archive, filename, read_only, keep_vba)
-
-    archive.close()
-    return wb
+    return archive
 
 
 def _load_workbook(wb, archive, filename, read_only, keep_vba):
