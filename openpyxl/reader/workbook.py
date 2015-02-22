@@ -119,3 +119,11 @@ def read_workbook_code_name(xml_source):
         pr = {}
 
     return pr.get('codeName', 'ThisWorkbook')
+
+
+def read_workbook_settings(xml_source):
+    root = fromstring(xml_source)
+    view = root.find('*/' '{%s}workbookView' % SHEET_MAIN_NS)
+    if view is not None:
+        if 'activeTab' in view.attrib:
+            return int(view.attrib['activeTab'])

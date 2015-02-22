@@ -45,7 +45,6 @@ class Workbook(object):
         self._named_ranges = []
         self._external_links = []
         self.properties = DocumentProperties()
-        self.style = Style()
         self.security = DocumentSecurity()
         self.__write_only = write_only or optimized_write
         self.__read_only = read_only
@@ -97,13 +96,6 @@ class Workbook(object):
         self._colors = COLOR_INDEX
         self._cell_styles = IndexedList([StyleId(0, 0, 0, 0, 0, 0)])
 
-
-    def _read_workbook_settings(self, xml_source):
-        root = fromstring(xml_source)
-        view = root.find('*/' '{%s}workbookView' % SHEET_MAIN_NS)
-        if view is not None:
-            if 'activeTab' in view.attrib:
-                self.active = int(view.attrib['activeTab'])
 
     @property
     def shared_styles(self):

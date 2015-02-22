@@ -37,19 +37,20 @@ from openpyxl.xml.constants import (
 from openpyxl.workbook import Workbook
 from openpyxl.workbook.names.external import detect_external_links
 from openpyxl.workbook.names.named_range import read_named_ranges
-from openpyxl.reader.strings import read_string_table
-from openpyxl.reader.style import read_style_table
-from openpyxl.reader.workbook import (
+from .strings import read_string_table
+from .style import read_style_table
+from .workbook import (
     read_content_types,
     read_excel_base_date,
     detect_worksheets,
     read_rels,
     read_workbook_code_name,
+    read_workbook_settings,
 )
 from openpyxl.workbook.properties import read_properties, DocumentProperties
 from openpyxl.worksheet.iter_worksheet import IterableWorksheet
-from openpyxl.reader.worksheet import WorkSheetParser
-from openpyxl.reader.comments import read_comments, get_comments_file
+from .worksheet import WorkSheetParser
+from .comments import read_comments, get_comments_file
 # Use exc_info for Python 2 compatibility with "except Exception[,/ as] e"
 
 
@@ -178,7 +179,7 @@ def load_workbook(filename, read_only=False, use_iterators=False, keep_vba=KEEP_
         wb.properties = read_properties(archive.read(ARC_CORE))
     except KeyError:
         wb.properties = DocumentProperties()
-    wb._read_workbook_settings(archive.read(ARC_WORKBOOK))
+    wb.active = read_workbook_settings(archive.read(ARC_WORKBOOK)) or 0
 
     # what content types do we have?
     cts = dict(read_content_types(archive))
