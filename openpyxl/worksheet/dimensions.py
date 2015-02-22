@@ -178,9 +178,8 @@ class ColumnDimension(Dimension):
 
 class DimensionHolder(OrderedDict, BoundDictionary):
     "hold (row|column)dimensions and allow operations over them"
-    def __init__(self, worksheet, direction, reference="index", default_factory=None, *args, **kwargs):
+    def __init__(self, worksheet, reference="index", default_factory=None, *args, **kwargs):
         self.worksheet = worksheet
-        self.direction = direction
         self.reference = reference
         self.default_factory = default_factory
         super(DimensionHolder, self).__init__(*args, **kwargs)

@@ -107,7 +107,6 @@ class Worksheet(object):
         self.title = title or "Sheet"
         self.row_dimensions = BoundDictionary("index", self._add_row)
         self.column_dimensions = DimensionHolder(worksheet=self,
-                                                 direction=[],
                                                  default_factory=self._add_column)
         self.page_breaks = []
         self._cells = {}
