@@ -153,10 +153,7 @@ class Workbook(object):
         if self.write_only :
             new_ws = DumpWorksheet(parent_workbook=self, title=title)
         else:
-            if title is not None:
-                new_ws = Worksheet(parent_workbook=self, title=title)
-            else:
-                new_ws = Worksheet(parent_workbook=self)
+            new_ws = Worksheet(parent_workbook=self, title=title)
 
         self._add_sheet(worksheet=new_ws, index=index)
         return new_ws

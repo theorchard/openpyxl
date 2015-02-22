@@ -99,13 +99,10 @@ class Worksheet(object):
     ORIENTATION_PORTRAIT = 'portrait'
     ORIENTATION_LANDSCAPE = 'landscape'
 
-    def __init__(self, parent_workbook, title='Sheet'):
+    def __init__(self, parent_workbook, title=None):
         self._parent = parent_workbook
         self._title = ''
-        if not title:
-            self.title = 'Sheet%d' % (1 + len(self._parent.worksheets))
-        else:
-            self.title = title
+        self.title = title or "Sheet"
         self.row_dimensions = {}
         self.column_dimensions = DimensionHolder(worksheet=self,
                                                  direction=[])

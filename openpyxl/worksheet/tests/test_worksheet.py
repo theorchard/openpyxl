@@ -67,7 +67,7 @@ class TestWorksheet:
 
     def test_new_sheet_name(self, Worksheet):
         ws = Worksheet(Workbook(), title='')
-        assert repr(ws) == '<Worksheet "Sheet2">'
+        assert repr(ws) == '<Worksheet "Sheet1">'
 
     def test_get_cell(self, Worksheet):
         ws = Worksheet(Workbook())
