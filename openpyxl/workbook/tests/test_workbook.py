@@ -197,12 +197,6 @@ class AlternativeWorksheet(object):
             title = 'AlternativeSheet'
         self.title = title
 
-
-def test_worksheet_class():
-    wb = Workbook(worksheet_class=AlternativeWorksheet)
-    assert isinstance(wb.worksheets[0], AlternativeWorksheet)
-
-
 def test_add_invalid_worksheet_class_instance():
     wb = Workbook()
     ws = AlternativeWorksheet(parent_workbook=wb)

@@ -30,12 +30,11 @@ from . properties import DocumentProperties, DocumentSecurity
 class Workbook(object):
     """Workbook is the container for all other parts of the document."""
 
-    _optimized_worksheet_class = DumpWorksheet
+    _worksheet_class = Worksheet
 
     def __init__(self,
                  optimized_write=False,
                  encoding='utf-8',
-                 worksheet_class=Worksheet,
                  guess_types=False,
                  data_only=False,
                  read_only=False,
@@ -51,8 +50,8 @@ class Workbook(object):
         self.shared_strings = IndexedList()
 
         self._setup_styles()
+
         self.loaded_theme = None
-        self._worksheet_class = worksheet_class
         self.vba_archive = None
         self.is_template = False
         self.conditional_formats = []
@@ -65,7 +64,9 @@ class Workbook(object):
         self.encoding = encoding
 
         if not self.write_only:
-            self.worksheets.append(self._worksheet_class(parent_workbook=self))
+            self.worksheets.append(Worksheet(parent_workbook=self))
+        else:
+            self._worksheet_class = DumpWorksheet
 
 
     def _setup_styles(self):
@@ -154,9 +155,7 @@ class Workbook(object):
             raise ReadOnlyWorkbookException('Cannot create new sheet in a read-only workbook')
 
         if self.write_only :
-            new_ws = self._optimized_worksheet_class(parent_workbook=self,
-                                                      title=title)
-            self._worksheet_class = self._optimized_worksheet_class
+            new_ws = DumpWorksheet(parent_workbook=self, title=title)
         else:
             if title is not None:
                 new_ws = self._worksheet_class(
