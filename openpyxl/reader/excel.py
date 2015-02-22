@@ -76,47 +76,6 @@ def repair_central_directory(zipFile, is_file_instance):
     return f
 
 
-def load_workbook(filename, read_only=False, use_iterators=False, keep_vba=KEEP_VBA, guess_types=False, data_only=False):
-    """Open the given filename and return the workbook
-
-    :param filename: the path to open or a file-like object
-    :type filename: string or a file-like object open in binary mode c.f., :class:`zipfile.ZipFile`
-
-    :param read_only: optimised for reading, content cannot be edited
-    :type read_only: bool
-
-    :param use_iterators: use lazy load for cells
-    :type use_iterators: bool
-
-    :param keep_vba: preseve vba content (this does NOT mean you can use it)
-    :type keep_vba: bool
-
-    :param guess_types: guess cell content type and do not read it from the file
-    :type guess_types: bool
-
-    :param data_only: controls whether cells with formulae have either the formula (default) or the value stored the last time Excel read the sheet
-    :type data_only: bool
-
-    :rtype: :class:`openpyxl.workbook.Workbook`
-
-    .. note::
-
-        When using lazy load, all worksheets will be :class:`openpyxl.worksheet.iter_worksheet.IterableWorksheet`
-        and the returned workbook will be read-only.
-
-    """
-    archive = _validate_archive(filename)
-    read_only = read_only or use_iterators
-
-    wb = Workbook(guess_types=guess_types, data_only=data_only, read_only=read_only)
-
-    if read_only and guess_types:
-        warnings.warn('Data types are not guessed when using iterator reader')
-
-    _load_workbook(wb, archive, filename, read_only, keep_vba)
-
-    archive.close()
-    return wb
 
 def _validate_archive(filename):
     """
@@ -158,7 +117,42 @@ def _validate_archive(filename):
     return archive
 
 
-def _load_workbook(wb, archive, filename, read_only, keep_vba):
+def load_workbook(filename, read_only=False, use_iterators=False, keep_vba=KEEP_VBA, guess_types=False, data_only=False):
+    """Open the given filename and return the workbook
+
+    :param filename: the path to open or a file-like object
+    :type filename: string or a file-like object open in binary mode c.f., :class:`zipfile.ZipFile`
+
+    :param read_only: optimised for reading, content cannot be edited
+    :type read_only: bool
+
+    :param use_iterators: use lazy load for cells
+    :type use_iterators: bool
+
+    :param keep_vba: preseve vba content (this does NOT mean you can use it)
+    :type keep_vba: bool
+
+    :param guess_types: guess cell content type and do not read it from the file
+    :type guess_types: bool
+
+    :param data_only: controls whether cells with formulae have either the formula (default) or the value stored the last time Excel read the sheet
+    :type data_only: bool
+
+    :rtype: :class:`openpyxl.workbook.Workbook`
+
+    .. note::
+
+        When using lazy load, all worksheets will be :class:`openpyxl.worksheet.iter_worksheet.IterableWorksheet`
+        and the returned workbook will be read-only.
+
+    """
+    archive = _validate_archive(filename)
+    read_only = read_only or use_iterators
+
+    wb = Workbook(guess_types=guess_types, data_only=data_only, read_only=read_only)
+
+    if read_only and guess_types:
+        warnings.warn('Data types are not guessed when using iterator reader')
 
     valid_files = archive.namelist()
 
@@ -252,3 +246,7 @@ def _load_workbook(wb, archive, filename, read_only, keep_vba):
     if EXTERNAL_LINK in cts:
         rels = read_rels(archive)
         wb._external_links = list(detect_external_links(rels, archive))
+
+
+    archive.close()
+    return wb
