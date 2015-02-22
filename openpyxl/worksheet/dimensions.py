@@ -1,6 +1,8 @@
 from __future__ import absolute_import
 # Copyright (c) 2010-2015 openpyxl
 
+from collections import defaultdict
+
 from openpyxl.compat import safe_string
 from openpyxl.cell import get_column_interval, column_index_from_string
 from openpyxl.descriptors import Integer, Float, Bool, Strict, String, Alias
@@ -182,11 +184,12 @@ class ColumnDimension(Dimension):
         # return get_column_letter(self.index)
 
 
-class DimensionHolder(OrderedDict):
+class DimensionHolder(OrderedDict, defaultdict):
     "hold (row|column)dimensions and allow operations over them"
-    def __init__(self, worksheet, direction, *args, **kwargs):
+    def __init__(self, worksheet, direction, default_factory, *args, **kwargs):
         self.worksheet = worksheet
         self.direction = direction
+        self.default_factory = default_factory
         super(DimensionHolder, self).__init__(*args, **kwargs)
 
     def group(self, start, end=None, outline_level=1, hidden=False):

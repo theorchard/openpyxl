@@ -7,6 +7,7 @@ from __future__ import absolute_import
 # Python stdlib imports
 from itertools import islice, chain
 from operator import itemgetter
+from collections import defaultdict
 import re
 from inspect import isgenerator
 
@@ -103,9 +104,10 @@ class Worksheet(object):
         self._parent = parent_workbook
         self._title = ''
         self.title = title or "Sheet"
-        self.row_dimensions = {}
+        self.row_dimensions = defaultdict(self._add_row)
         self.column_dimensions = DimensionHolder(worksheet=self,
-                                                 direction=[])
+                                                 direction=[],
+                                                 default_factory=self._add_column)
         self.page_breaks = []
         self._cells = {}
         self._styles = {}
@@ -122,8 +124,7 @@ class Worksheet(object):
         self.header_footer = HeaderFooter()
         self.sheet_view = SheetView()
         self.protection = SheetProtection()
-        self.default_row_dimension = RowDimension(worksheet=self)
-        self.default_column_dimension = ColumnDimension(worksheet=self)
+
         self._current_row = 0
         self._auto_filter = AutoFilter()
         self._freeze_panes = None
@@ -809,3 +810,14 @@ class Worksheet(object):
             top_pos += default_height
 
         return (letter, row)
+
+
+    def _add_column(self):
+        """Dimension factory for column information"""
+
+        return ColumnDimension(self)
+
+    def _add_row(self):
+        """Dimension factory for row information"""
+
+        return RowDimension(self)
