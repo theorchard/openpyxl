@@ -146,11 +146,7 @@ def load_workbook(filename, read_only=False, use_iterators=False, keep_vba=KEEP_
     if read_only and guess_types:
         warnings.warn('Data types are not guessed when using iterator reader')
 
-    try:
-        _load_workbook(wb, archive, filename, read_only, keep_vba)
-    except KeyError:
-        e = exc_info()[1]
-        raise InvalidFileException(unicode(e))
+    _load_workbook(wb, archive, filename, read_only, keep_vba)
 
     archive.close()
     return wb
