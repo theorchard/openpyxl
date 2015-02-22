@@ -161,25 +161,18 @@ class WorkSheetParser(object):
             self.ws.merge_cells(mergeCell.get('ref'))
 
     def parse_column_dimensions(self, col):
-        min = int(col.get('min')) if col.get('min') else 1
-        max = int(col.get('max')) if col.get('max') else 1
-        # Ignore ranges that go up to the max column 16384.  Columns need to be extended to handle
-        # ranges without creating an entry for every single one.
-        if max != 16384:
-            for colId in range(min, max + 1):
-                column = get_column_letter(colId)
-                attrs = dict(col.attrib)
-                attrs['index'] = column
-                attrs['worksheet'] = self.ws
-                if column not in self.ws.column_dimensions:
-                    dim = ColumnDimension(**attrs)
-                    self.ws.column_dimensions[column] = dim
+        attrs = dict(col.attrib)
+        column = get_column_letter(int(attrs['min']))
+        attrs['index'] = column
+        dim = ColumnDimension(self.ws, **attrs)
+        self.ws.column_dimensions[column] = dim
 
     def parse_row_dimensions(self, row):
         attrs = dict(row.attrib)
-        attrs['worksheet'] = self.ws
-        dim = RowDimension(**attrs)
-        self.ws.row_dimensions[dim.index] = dim
+        if set(attrs) - set(['r', 'span']):
+            attrs['worksheet'] = self.ws
+            dim = RowDimension(**attrs)
+            self.ws.row_dimensions[dim.index] = dim
 
         for cell in safe_iterator(row, self.CELL_TAG):
             self.parse_cell(cell)
