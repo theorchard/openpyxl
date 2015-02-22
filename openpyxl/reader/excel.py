@@ -231,7 +231,7 @@ def _load_workbook(wb, archive, filename, read_only, keep_vba):
                             shared_strings)
             parser.parse()
             new_ws = wb[sheet_name]
-        new_ws.sheet_state = sheet.get('state') or 'visible'
+        new_ws.sheet_state = sheet['state']
 
         if not read_only:
         # load comments into the worksheet cells

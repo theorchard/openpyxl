@@ -97,9 +97,7 @@ def detect_worksheets(archive):
         rel = rels[sheet['id']]
         rel['title'] = sheet['name']
         rel['sheet_id'] = sheet['sheetId']
-        state = sheet.get('state')
-        if state is not None:
-            rel['state'] = state
+        rel['state'] = sheet.get('state', 'visible')
         if ("/" + rel['path'] in valid_sheets
             or "worksheets" in rel['path']): # fallback in case content type is missing
             yield rel
