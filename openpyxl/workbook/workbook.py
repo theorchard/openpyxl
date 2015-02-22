@@ -99,10 +99,6 @@ class Workbook(object):
         self._cell_styles = IndexedList([StyleId(0, 0, 0, 0, 0, 0)])
 
 
-    @deprecated('this method is private and should not be called directly')
-    def read_workbook_settings(self, xml_source):
-        self._read_workbook_settings(xml_source)
-
     def _read_workbook_settings(self, xml_source):
         root = fromstring(xml_source)
         view = root.find('*/' '{%s}workbookView' % SHEET_MAIN_NS)
