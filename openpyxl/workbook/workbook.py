@@ -49,7 +49,6 @@ class Workbook(object):
         self.security = DocumentSecurity()
         self.__write_only = write_only or optimized_write
         self.__read_only = read_only
-        self.__thread_local_data = threading.local()
         self.shared_strings = IndexedList()
 
         self._setup_styles()
@@ -127,11 +126,6 @@ class Workbook(object):
             styles.append(Style(font, fill, border, alignment,
                                 number_format, protection))
             return styles
-
-
-    @property
-    def _local_data(self):
-        return self.__thread_local_data
 
     @property
     def read_only(self):
