@@ -89,6 +89,8 @@ class WorkSheetParser(object):
                 dispatcher[tag_name](element)
                 element.clear()
 
+        self.ws._current_row = self.ws.max_row
+
         # Handle parsed conditional formatting rules together.
         if len(self.ws.conditional_formatting.parse_rules):
             self.ws.conditional_formatting.update(self.ws.conditional_formatting.parse_rules)
@@ -128,7 +130,7 @@ class WorkSheetParser(object):
 
         column, row = coordinate_from_string(coordinate)
         cell = Cell(self.ws, column, row, **styles)
-        self.ws._add_cell(cell)
+        self.ws._cells[(row, cell.col_idx)] = cell
 
         if value is not None:
             if data_type == 'n':
@@ -167,6 +169,7 @@ class WorkSheetParser(object):
         dim = ColumnDimension(self.ws, **attrs)
         self.ws.column_dimensions[column] = dim
 
+
     def parse_row_dimensions(self, row):
         attrs = dict(row.attrib)
         if set(attrs) - set(['r', 'span']):
@@ -176,6 +179,7 @@ class WorkSheetParser(object):
 
         for cell in safe_iterator(row, self.CELL_TAG):
             self.parse_cell(cell)
+
 
     def parse_print_options(self, element):
         self.ws.print_options = PrintOptions(**element.attrib)
