@@ -44,6 +44,17 @@ def _get_xml_iter(xml_source):
         return xml_source
 
 
+def styles_cache(styles):
+    """
+    Cell styles are denormalised references to style ids
+
+    """
+    lookup = {}
+    for k, v in enumerate(styles):
+        lookup[k] = v._asdict()
+    return lookup
+
+
 class WorkSheetParser(object):
 
     COL_TAG = '{%s}col' % SHEET_MAIN_NS
@@ -61,6 +72,7 @@ class WorkSheetParser(object):
         self.shared_strings = shared_strings
         self.guess_types = wb._guess_types
         self.data_only = wb.data_only
+        self.styles = styles_cache(self.ws.parent._cell_styles)
 
     def parse(self):
         dispatcher = {
@@ -122,14 +134,13 @@ class WorkSheetParser(object):
                     self.ws.formula_attributes[coordinate]['ref'] = ref
 
 
-        styles = {}
+        style = {}
         if style_id is not None:
             style_id = int(style_id)
-            style_id = self.ws.parent._cell_styles[style_id]
-            styles = style_id._asdict()
+            style = self.styles[style_id]
 
         column, row = coordinate_from_string(coordinate)
-        cell = Cell(self.ws, column, row, **styles)
+        cell = Cell(self.ws, column, row, **style)
         self.ws._cells[(row, cell.col_idx)] = cell
 
         if value is not None:
