@@ -44,6 +44,15 @@ def _get_xml_iter(xml_source):
         return xml_source
 
 
+def _cast_number(value):
+    "Convert numbers as string to an int or float"
+    try:
+        return int(value)
+    except ValueError:
+        return float(value)
+
+
+
 class WorkSheetParser(object):
 
     COL_TAG = '{%s}col' % SHEET_MAIN_NS
@@ -134,7 +143,7 @@ class WorkSheetParser(object):
 
         if value is not None:
             if data_type == 'n':
-                value = cell._cast_numeric(value)
+                value = _cast_number(value)
             elif data_type == 'b':
                 value = bool(int(value))
             elif data_type == 's':
