@@ -44,17 +44,6 @@ def _get_xml_iter(xml_source):
         return xml_source
 
 
-def styles_cache(styles):
-    """
-    Cell styles are denormalised references to style ids
-
-    """
-    lookup = {}
-    for k, v in enumerate(styles):
-        lookup[k] = v._asdict()
-    return lookup
-
-
 class WorkSheetParser(object):
 
     COL_TAG = '{%s}col' % SHEET_MAIN_NS
@@ -72,7 +61,7 @@ class WorkSheetParser(object):
         self.shared_strings = shared_strings
         self.guess_types = wb._guess_types
         self.data_only = wb.data_only
-        self.styles = styles_cache(self.ws.parent._cell_styles)
+        self.styles = [v._asdict() for v in self.ws.parent._cell_styles]
 
     def parse(self):
         dispatcher = {
