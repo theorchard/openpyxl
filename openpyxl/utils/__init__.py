@@ -148,4 +148,4 @@ def coordinate_to_tuple(coordinate):
     Convert an Excel style coordinate to (row, colum) tuple
     """
     col, row = coordinate_from_string(coordinate)
-    return row, column_index_from_string(col)
+    return row, _COL_STRING_CACHE[col]
