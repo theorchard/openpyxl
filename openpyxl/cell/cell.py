@@ -198,7 +198,7 @@ class Cell(StyleableObject):
 
         self.data_type = "n"
 
-        if isinstance(value, bool):
+        if value is True or value is False:
             self.data_type = self.TYPE_BOOL
 
         elif isinstance(value, NUMERIC_TYPES):
