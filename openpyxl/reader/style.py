@@ -35,7 +35,6 @@ class SharedStylesParser(object):
         self.shared_styles = []
         self.cell_styles = IndexedList()
         self.cond_styles = []
-        self.style_prop = {}
         self.color_index = COLOR_INDEX
         self.font_list = IndexedList()
         self.fill_list = IndexedList()
@@ -47,7 +46,6 @@ class SharedStylesParser(object):
     def parse(self):
         self.parse_custom_num_formats()
         self.parse_color_index()
-        self.style_prop['color_index'] = self.color_index
         self.font_list = IndexedList(self.parse_fonts())
         self.fill_list = IndexedList(self.parse_fills())
         self.border_list = IndexedList(self.parse_borders())
