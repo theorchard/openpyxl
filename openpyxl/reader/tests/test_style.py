@@ -7,7 +7,6 @@ from io import BytesIO
 from zipfile import ZipFile
 
 # package imports
-from openpyxl.compat import safe_string, OrderedDict
 from openpyxl.reader.excel import load_workbook
 from openpyxl.utils.indexed_list import IndexedList
 
