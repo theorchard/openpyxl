@@ -7,7 +7,6 @@ from __future__ import absolute_import
 from openpyxl.compat import OrderedDict, zip
 from openpyxl.utils.indexed_list import IndexedList
 from openpyxl.styles import (
-    Style,
     numbers,
     Font,
     Fill,
@@ -32,7 +31,6 @@ class SharedStylesParser(object):
 
     def __init__(self, xml_source):
         self.root = fromstring(xml_source)
-        self.shared_styles = []
         self.cell_styles = IndexedList()
         self.cond_styles = []
         self.color_index = COLOR_INDEX
@@ -143,7 +141,6 @@ class SharedStylesParser(object):
         builtin_formats = numbers.BUILTIN_FORMATS
         xfs = safe_iterator(node, '{%s}xf' % SHEET_MAIN_NS)
         for index, xf in enumerate(xfs):
-            _style = {}
 
             alignmentId = protectionId = 0
             numFmtId = int(xf.get("numFmtId", 0))
@@ -155,37 +152,21 @@ class SharedStylesParser(object):
                 format_code = builtin_formats.get(numFmtId, 'General')
             else:
                 format_code = self.number_formats[numFmtId-165]
-            _style['number_format'] = format_code
 
             if bool_attrib(xf, 'applyAlignment'):
                 al = xf.find('{%s}alignment' % SHEET_MAIN_NS)
                 if al is not None:
                     alignment = Alignment(**al.attrib)
                     alignmentId = self.alignments.add(alignment)
-                    _style['alignment'] = alignment
-
-            if bool_attrib(xf, 'applyFont'):
-                _style['font'] = self.font_list[fontId]
-
-            if bool_attrib(xf, 'applyFill'):
-                _style['fill'] = self.fill_list[fillId]
-
-            if bool_attrib(xf, 'applyBorder'):
-                _style['border'] = self.border_list[borderId]
 
             if bool_attrib(xf, 'applyProtection'):
                 prot = xf.find('{%s}protection' % SHEET_MAIN_NS)
                 if prot is not None:
                     protection = Protection(**prot.attrib)
                     protectionId = self.protections.add(protection)
-                    _style['protection'] = protection
 
-            _styles.append(Style(**_style))
             _style_ids.append(StyleId(alignmentId, borderId, fillId, fontId, numFmtId, protectionId))
-            self.shared_styles = _styles
             self.cell_styles = IndexedList(_style_ids)
-
-        #return _styles, IndexedList(_style_ids)
 
 
 def read_style_table(archive):
