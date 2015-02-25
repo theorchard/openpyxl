@@ -139,7 +139,7 @@ class SharedStylesParser(object):
 
         builtin_formats = numbers.BUILTIN_FORMATS
         xfs = safe_iterator(node, '{%s}xf' % SHEET_MAIN_NS)
-        for index, xf in enumerate(xfs):
+        for xf in xfs:
             attrs = {'alignment':0, 'protection':0}
             d = dict(xf.attrib)
 
