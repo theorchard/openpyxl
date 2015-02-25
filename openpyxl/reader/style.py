@@ -135,37 +135,32 @@ class SharedStylesParser(object):
 
     def _parse_xfs(self, node):
         """Read styles from the shared style table"""
-        _styles  = []
         _style_ids = []
 
         builtin_formats = numbers.BUILTIN_FORMATS
         xfs = safe_iterator(node, '{%s}xf' % SHEET_MAIN_NS)
         for index, xf in enumerate(xfs):
+            attrs = {'alignment':0, 'protection':0}
+            d = dict(xf.attrib)
 
-            alignmentId = protectionId = 0
-            numFmtId = int(xf.get("numFmtId", 0))
-            fontId = int(xf.get("fontId", 0))
-            fillId = int(xf.get("fillId", 0))
-            borderId = int(xf.get("borderId", 0))
-
-            if numFmtId < 164:
-                format_code = builtin_formats.get(numFmtId, 'General')
-            else:
-                format_code = self.number_formats[numFmtId-165]
+            attrs['font'] = int(d.get('fontId', 0))
+            attrs['fill'] = int(d.get('fillId', 0))
+            attrs['border'] = int(d.get('borderId', 0))
+            attrs['number_format'] = int(d.get('numFmtId', 0))
 
             if bool_attrib(xf, 'applyAlignment'):
                 al = xf.find('{%s}alignment' % SHEET_MAIN_NS)
                 if al is not None:
                     alignment = Alignment(**al.attrib)
-                    alignmentId = self.alignments.add(alignment)
+                    attrs['alignment'] = self.alignments.add(alignment)
 
             if bool_attrib(xf, 'applyProtection'):
                 prot = xf.find('{%s}protection' % SHEET_MAIN_NS)
                 if prot is not None:
                     protection = Protection(**prot.attrib)
-                    protectionId = self.protections.add(protection)
+                    attrs['protection'] = self.protections.add(protection)
 
-            _style_ids.append(StyleId(alignmentId, borderId, fillId, fontId, numFmtId, protectionId))
+            _style_ids.append(StyleId(**attrs))
             self.cell_styles = IndexedList(_style_ids)
 
 
