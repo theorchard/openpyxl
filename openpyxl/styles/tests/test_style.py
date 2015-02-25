@@ -3,6 +3,9 @@ from __future__ import absolute_import
 
 import pytest
 
+from openpyxl.xml.functions import tostring
+from openpyxl.tests.helper import compare_xml
+
 
 @pytest.fixture
 def StyleId():
@@ -13,16 +16,24 @@ def StyleId():
 def test_ctor(StyleId):
     style = StyleId()
     assert dict(style) == {'borderId': '0', 'fillId': '0', 'fontId': '0',
-                           'numFmtId': '0', 'xfId': '0'}
+                           'numFmtId': '0', 'xfId': '0', 'alignment':'0', 'protection':'0'}
 
 
 def test_protection(StyleId):
     style = StyleId(protection=1)
-    assert dict(style) == {'borderId': '0', 'fillId': '0', 'fontId': '0',
-                           'numFmtId': '0', 'xfId': '0', 'applyProtection':'1'}
+    assert style.applyProtection is True
 
 
 def test_alignment(StyleId):
     style = StyleId(alignment=1)
-    assert dict(style) == {'borderId': '0', 'fillId': '0', 'fontId': '0',
-                           'numFmtId': '0', 'xfId': '0', 'applyAlignment':'1'}
+    assert style.applyAlignment is True
+
+
+def test_serialise(StyleId):
+    style = StyleId()
+    xml = tostring(style.to_tree())
+    expected = """
+     <xf borderId="0" fillId="0" fontId="0" numFmtId="0" xfId="0" />
+    """
+    diff = compare_xml(xml, expected)
+    assert diff is None, diff

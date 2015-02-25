@@ -19,6 +19,7 @@ class StyleId(Serialisable):
 
     This is a virtual style composed of references to global format objects
     """
+    tagname = "xf"
 
     numFmtId = Integer()
     number_format = Alias("numFtdId")
@@ -72,9 +73,15 @@ class StyleId(Serialisable):
     def applyProtection(self):
         return self.protection != 0 or None
 
-    def __iter__(self):
-        for key in ('xfId', 'quotePrefix', 'fontId', 'pivotButton', 'fillId',
-                 'numFmtId', 'borderId', 'applyAlignment', 'applyProtection'):
-            value = getattr(self, key)
-            if value is not None:
-                yield key, safe_string(value)
+    def to_tree(self):
+        """
+        Alignment and protection objects are implemented as child elements.
+        This is a completely different API to other format objects. :-/
+        """
+        attrs = set(self.__attrs__)
+        attrs.discard('alignment')
+        attrs.discard('protection')
+        attrs.add('applyProtection')
+        attrs.add('applyAlignment')
+        self.__attrs__ = attrs
+        return super(StyleId, self).to_tree()
