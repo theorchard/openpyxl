@@ -147,17 +147,15 @@ class SharedStylesParser(object):
             attrs['border'] = int(d.get('borderId', 0))
             attrs['number_format'] = int(d.get('numFmtId', 0))
 
-            if bool_attrib(xf, 'applyAlignment'):
-                al = xf.find('{%s}alignment' % SHEET_MAIN_NS)
-                if al is not None:
-                    alignment = Alignment(**al.attrib)
-                    attrs['alignment'] = self.alignments.add(alignment)
+            al = xf.find('{%s}alignment' % SHEET_MAIN_NS)
+            if al is not None:
+                alignment = Alignment(**al.attrib)
+                attrs['alignment'] = self.alignments.add(alignment)
 
-            if bool_attrib(xf, 'applyProtection'):
-                prot = xf.find('{%s}protection' % SHEET_MAIN_NS)
-                if prot is not None:
-                    protection = Protection(**prot.attrib)
-                    attrs['protection'] = self.protections.add(protection)
+            prot = xf.find('{%s}protection' % SHEET_MAIN_NS)
+            if prot is not None:
+                protection = Protection(**prot.attrib)
+                attrs['protection'] = self.protections.add(protection)
 
             _style_ids.append(StyleId(**attrs))
             self.cell_styles = IndexedList(_style_ids)
