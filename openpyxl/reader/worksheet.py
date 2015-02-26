@@ -10,7 +10,6 @@ from openpyxl.xml.functions import iterparse
 # package imports
 from openpyxl.cell import Cell
 from openpyxl.worksheet import Worksheet, ColumnDimension, RowDimension
-from openpyxl.worksheet.iter_worksheet import IterableWorksheet
 from openpyxl.worksheet.page import PageMargins, PrintOptions, PageSetup
 from openpyxl.worksheet.protection import SheetProtection
 from openpyxl.worksheet.views import SheetView
@@ -22,7 +21,8 @@ from openpyxl.worksheet.properties import parse_sheetPr
 from openpyxl.utils import (
     coordinate_from_string,
     get_column_letter,
-    column_index_from_string
+    column_index_from_string,
+    coordinate_to_tuple,
     )
 
 
@@ -45,15 +45,12 @@ def _get_xml_iter(xml_source):
         return xml_source
 
 
-def styles_cache(styles):
-    """
-    Cell styles are denormalised references to style ids
-
-    """
-    lookup = {}
-    for k, v in enumerate(styles):
-        lookup[k] = v._asdict()
-    return lookup
+def _cast_number(value):
+    "Convert numbers as string to an int or float"
+    try:
+        return int(value)
+    except ValueError:
+        return float(value)
 
 
 
@@ -68,15 +65,13 @@ class WorkSheetParser(object):
     INLINE_STRING = "{%s}is/{%s}t" % (SHEET_MAIN_NS, SHEET_MAIN_NS)
     INLINE_RICHTEXT = "{%s}is/{%s}r/{%s}t" % (SHEET_MAIN_NS, SHEET_MAIN_NS, SHEET_MAIN_NS)
 
-    def __init__(self, ws, xml_source, shared_strings, style_table, color_index=None):
-        self.ws = ws
+    def __init__(self, wb, title, xml_source, shared_strings):
+        self.ws = wb.create_sheet(title=title)
         self.source = xml_source
         self.shared_strings = shared_strings
-        self.style_table = style_table
-        self.color_index = color_index
-        self.guess_types = ws.parent._guess_types
-        self.data_only = ws.parent.data_only
-        self.styles = styles_cache(self.ws.parent._cell_styles)
+        self.guess_types = wb._guess_types
+        self.data_only = wb.data_only
+        self.styles = [v._asdict() for v in self.ws.parent._cell_styles]
 
     def parse(self):
         dispatcher = {
@@ -104,6 +99,8 @@ class WorkSheetParser(object):
             if tag_name in dispatcher:
                 dispatcher[tag_name](element)
                 element.clear()
+
+        self.ws._current_row = self.ws.max_row
 
         # Handle parsed conditional formatting rules together.
         if len(self.ws.conditional_formatting.parse_rules):
@@ -141,14 +138,13 @@ class WorkSheetParser(object):
             style_id = int(style_id)
             style = self.styles[style_id]
 
-
-        column, row = coordinate_from_string(coordinate)
-        cell = Cell(self.ws, column, row, **style)
-        self.ws._add_cell(cell)
+        row, column = coordinate_to_tuple(coordinate)
+        cell = Cell(self.ws, row=row, col_idx=column, **style)
+        self.ws._cells[(row, column)] = cell
 
         if value is not None:
             if data_type == 'n':
-                value = cell._cast_numeric(value)
+                value = _cast_number(value)
             elif data_type == 'b':
                 value = bool(int(value))
             elif data_type == 's':
@@ -177,28 +173,23 @@ class WorkSheetParser(object):
             self.ws.merge_cells(mergeCell.get('ref'))
 
     def parse_column_dimensions(self, col):
-        min = int(col.get('min')) if col.get('min') else 1
-        max = int(col.get('max')) if col.get('max') else 1
-        # Ignore ranges that go up to the max column 16384.  Columns need to be extended to handle
-        # ranges without creating an entry for every single one.
-        if max != 16384:
-            for colId in range(min, max + 1):
-                column = get_column_letter(colId)
-                attrs = dict(col.attrib)
-                attrs['index'] = column
-                attrs['worksheet'] = self.ws
-                if column not in self.ws.column_dimensions:
-                    dim = ColumnDimension(**attrs)
-                    self.ws.column_dimensions[column] = dim
+        attrs = dict(col.attrib)
+        column = get_column_letter(int(attrs['min']))
+        attrs['index'] = column
+        dim = ColumnDimension(self.ws, **attrs)
+        self.ws.column_dimensions[column] = dim
+
 
     def parse_row_dimensions(self, row):
         attrs = dict(row.attrib)
-        attrs['worksheet'] = self.ws
-        dim = RowDimension(**attrs)
-        self.ws.row_dimensions[dim.index] = dim
+        if set(attrs) - set(['r', 'span']):
+            attrs['worksheet'] = self.ws
+            dim = RowDimension(**attrs)
+            self.ws.row_dimensions[dim.index] = dim
 
         for cell in safe_iterator(row, self.CELL_TAG):
             self.parse_cell(cell)
+
 
     def parse_print_options(self, element):
         self.ws.print_options = PrintOptions(**element.attrib)
@@ -319,19 +310,7 @@ class WorkSheetParser(object):
         self.ws.sheet_view = SheetView.from_tree(el)
 
 
-def fast_parse(ws, xml_source, shared_strings, style_table, color_index=None):
-    parser = WorkSheetParser(ws, xml_source, shared_strings, style_table, color_index)
+def fast_parse(xml_source, parent, sheet_title, shared_strings):
+    parser = WorkSheetParser(parent, sheet_title, xml_source, shared_strings)
     parser.parse()
-    del parser
-
-
-def read_worksheet(xml_source, parent, preset_title, shared_strings,
-                   style_table, color_index=None, worksheet_path=None, keep_vba=False):
-    """Read an xml worksheet"""
-    if worksheet_path:
-        ws = IterableWorksheet(parent, preset_title,
-                worksheet_path, xml_source, shared_strings, style_table)
-    else:
-        ws = Worksheet(parent, preset_title)
-        fast_parse(ws, xml_source, shared_strings, style_table, color_index)
-    return ws
+    return parser.ws

@@ -4,8 +4,9 @@ from __future__ import absolute_import
 from openpyxl.compat import safe_string
 from openpyxl.cell import get_column_interval, column_index_from_string
 from openpyxl.descriptors import Integer, Float, Bool, Strict, String, Alias
-from openpyxl.compat import OrderedDict
 from openpyxl.styles.styleable import StyleableObject
+
+from openpyxl.utils.bound_dictionary import BoundDictionary
 
 
 class Dimension(Strict, StyleableObject):
@@ -102,14 +103,6 @@ class RowDimension(Dimension):
         """Always true if there is a height for the row"""
         return self.ht is not None
 
-    #@property
-    #def s(self):
-        #return self.styleid
-
-    #@s.setter
-    #def s(self, style):
-        #self._style = style
-
     def __iter__(self):
         for key in self.__fields__[1:]:
             if key == 's':
@@ -182,11 +175,12 @@ class ColumnDimension(Dimension):
         # return get_column_letter(self.index)
 
 
-class DimensionHolder(OrderedDict):
+class DimensionHolder(BoundDictionary):
     "hold (row|column)dimensions and allow operations over them"
-    def __init__(self, worksheet, direction, *args, **kwargs):
+    def __init__(self, worksheet, reference="index", default_factory=None, *args, **kwargs):
         self.worksheet = worksheet
-        self.direction = direction
+        self.reference = reference
+        self.default_factory = default_factory
         super(DimensionHolder, self).__init__(*args, **kwargs)
 
     def group(self, start, end=None, outline_level=1, hidden=False):
