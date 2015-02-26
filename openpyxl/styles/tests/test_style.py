@@ -16,16 +16,16 @@ def StyleId():
 def test_ctor(StyleId):
     style = StyleId()
     assert dict(style) == {'borderId': '0', 'fillId': '0', 'fontId': '0',
-                           'numFmtId': '0', 'xfId': '0', 'alignment':'0', 'protection':'0'}
+                           'numFmtId': '0', 'xfId': '0', 'alignmentId':'0', 'protectionId':'0'}
 
 
 def test_protection(StyleId):
-    style = StyleId(protection=1)
+    style = StyleId(protectionId=1)
     assert style.applyProtection is True
 
 
 def test_alignment(StyleId):
-    style = StyleId(alignment=1)
+    style = StyleId(alignmentId=1)
     assert style.applyAlignment is True
 
 
