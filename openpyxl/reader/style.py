@@ -158,7 +158,7 @@ class SharedStylesParser(object):
                 attrs['protection'] = self.protections.add(protection)
 
             _style_ids.append(StyleId(**attrs))
-            self.cell_styles = IndexedList(_style_ids)
+        self.cell_styles = IndexedList(_style_ids)
 
 
 def read_style_table(archive):
