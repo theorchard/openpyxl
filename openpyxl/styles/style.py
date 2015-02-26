@@ -30,12 +30,16 @@ class StyleId(Serialisable):
     borderId = Integer()
     border = Alias("border")
     xfId = Integer()
+    named_style = Alias("xfId")
     alignmentId = Integer()
+    alignment = Alias("alignmentId")
     protectionId = Integer()
+    protection = Alias("protectionId")
     quotePrefix = Bool(allow_none=True)
     pivotButton = Bool(allow_none=True)
     applyAlignment = Bool(allow_none=True)
     applyProtection = Bool(allow_none=True)
+
 
     def __init__(self,
                  numFmtId=0,
@@ -85,3 +89,15 @@ class StyleId(Serialisable):
         attrs.add('applyAlignment')
         self.__attrs__ = attrs
         return super(StyleId, self).to_tree()
+
+    def __eq__(self, other):
+        return dict(self) == dict(other)
+
+    def __ne__(self, other):
+        return not self == other
+
+    def __hash__(self):
+        return hash(tuple(self))
+
+    def __repr__(self):
+        return repr(dict(self))

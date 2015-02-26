@@ -20,7 +20,7 @@ from openpyxl.styles import (
 )
 from openpyxl.formatting.conditional import ConditionaStyle
 from openpyxl.styles.colors import COLOR_INDEX, Color
-from openpyxl.styles.styleable import StyleId
+from openpyxl.styles.style import StyleId
 from openpyxl.styles.named_styles import NamedStyle
 from openpyxl.xml.functions import fromstring, safe_iterator, localname
 from openpyxl.xml.constants import SHEET_MAIN_NS, ARC_STYLE
@@ -139,23 +139,17 @@ class SharedStylesParser(object):
 
         xfs = safe_iterator(node, '{%s}xf' % SHEET_MAIN_NS)
         for xf in xfs:
-            attrs = {'alignment':0, 'protection':0}
-            d = dict(xf.attrib)
-
-            attrs['font'] = int(d.get('fontId', 0))
-            attrs['fill'] = int(d.get('fillId', 0))
-            attrs['border'] = int(d.get('borderId', 0))
-            attrs['number_format'] = int(d.get('numFmtId', 0))
+            attrs = dict(xf.attrib)
 
             al = xf.find('{%s}alignment' % SHEET_MAIN_NS)
             if al is not None:
                 alignment = Alignment(**al.attrib)
-                attrs['alignment'] = self.alignments.add(alignment)
+                attrs['alignmentId'] = self.alignments.add(alignment)
 
             prot = xf.find('{%s}protection' % SHEET_MAIN_NS)
             if prot is not None:
                 protection = Protection(**prot.attrib)
-                attrs['protection'] = self.protections.add(protection)
+                attrs['protectionId'] = self.protections.add(protection)
 
             _style_ids.append(StyleId(**attrs))
         self.cell_styles = IndexedList(_style_ids)
