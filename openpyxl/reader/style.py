@@ -137,7 +137,6 @@ class SharedStylesParser(object):
         """Read styles from the shared style table"""
         _style_ids = []
 
-        builtin_formats = numbers.BUILTIN_FORMATS
         xfs = safe_iterator(node, '{%s}xf' % SHEET_MAIN_NS)
         for xf in xfs:
             attrs = {'alignment':0, 'protection':0}
