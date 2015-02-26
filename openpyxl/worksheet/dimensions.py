@@ -33,12 +33,12 @@ class Dimension(Strict, StyleableObject):
         if style is not None:
             style_id = int(style)
             style = self.parent.parent._cell_styles[style_id]
-            self._font_id = style.font
-            self._fill_id = style.fill
-            self._border_id = style.border
-            self._alignment_id = style.alignment
-            self._protection_id = style.protection
-            self._number_format_id = style.number_format
+            self._font_id = style.fontId
+            self._fill_id = style.fillId
+            self._border_id = style.borderId
+            self._alignment_id = style.alignmentId
+            self._protection_id = style.protectionId
+            self._number_format_id = style.numFmtId
 
 
     def __iter__(self):

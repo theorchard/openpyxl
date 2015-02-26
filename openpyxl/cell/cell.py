@@ -110,14 +110,14 @@ class Cell(StyleableObject):
                    TYPE_NULL, TYPE_INLINE, TYPE_ERROR, TYPE_FORMULA_CACHE_STRING)
 
 
-    def __init__(self, worksheet, column=None, row=None, value=None, col_idx=None, font=0, fill=0,
-                 border=0, alignment=0, protection=0, number_format=0):
-        self._font_id = font
-        self._fill_id = fill
-        self._border_id = border
-        self._alignment_id = alignment
-        self._protection_id = protection
-        self._number_format_id = number_format
+    def __init__(self, worksheet, column=None, row=None, value=None, col_idx=None, fontId=0, fillId=0,
+                 borderId=0, alignmentId=0, protectionId=0, numFmtId=0, xfId=None):
+        self._font_id = fontId
+        self._fill_id = fillId
+        self._border_id = borderId
+        self._alignment_id = alignmentId
+        self._protection_id = protectionId
+        self._number_format_id = numFmtId
         self.parent = worksheet
         self.row = row
         # _value is the stored value, while value is the displayed value

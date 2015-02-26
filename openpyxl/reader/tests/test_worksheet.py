@@ -58,7 +58,7 @@ def test_get_xml_iter():
 
 @pytest.fixture
 def Workbook():
-    from openpyxl.styles.styleable import StyleId
+    from openpyxl.styles.style import StyleId
     from openpyxl.styles import numbers
 
     class DummyStyle:
@@ -82,8 +82,6 @@ def Workbook():
         def __init__(self):
             self.shared_strings = IndexedList()
             self.shared_strings.add("hello world")
-            self.shared_styles = 28*[DummyStyle()]
-            self.shared_styles.append(Style())
             self._fonts = IndexedList()
             self._fills = IndexedList()
             self._number_formats = IndexedList()
@@ -93,7 +91,7 @@ def Workbook():
             self._cell_styles = IndexedList()
             for i in range(29):
                 self._cell_styles.add((StyleId(i, i, i, i, i, i)))
-            self._cell_styles.add(StyleId(number_format=0, font=0, fill=4, border=6, alignment=1, protection=0))
+            self._cell_styles.add(StyleId(fillId=4, borderId=6, alignmentId=1))
 
 
         def create_sheet(self, title):
@@ -175,7 +173,6 @@ def test_styled_row(datadir, WorkSheetParser):
     parser = WorkSheetParser
     ws = parser.ws
     parser.shared_strings = dict((i, i) for i in range(30))
-    parser.style_table = ws.parent.shared_styles
 
     with open("complex-styles-worksheet.xml", "rb") as src:
         rows = iterparse(src, tag='{%s}row' % SHEET_MAIN_NS)
@@ -328,7 +325,6 @@ def test_boolean(WorkSheetParser):
 def test_inline_string(WorkSheetParser, datadir):
     parser = WorkSheetParser
     ws = parser.ws
-    parser.style_table = ws.parent.shared_styles
     datadir.chdir()
 
     with open("Table1-XmlFromAccess.xml") as src:
@@ -343,7 +339,6 @@ def test_inline_string(WorkSheetParser, datadir):
 def test_inline_richtext(WorkSheetParser, datadir):
     parser = WorkSheetParser
     ws = parser.ws
-    parser.style_table = ws.parent.shared_styles
     datadir.chdir()
     with open("jasper_sheet.xml", "rb") as src:
         sheet = fromstring(src.read())

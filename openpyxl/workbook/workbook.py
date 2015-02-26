@@ -16,7 +16,7 @@ from openpyxl.worksheet import Worksheet
 from openpyxl.writer.dump_worksheet import DumpWorksheet, save_dump
 from . names.named_range import NamedRange
 from openpyxl.styles import Style
-from openpyxl.styles.styleable import StyleId
+from openpyxl.styles.style import StyleId
 from openpyxl.styles.numbers import BUILTIN_FORMATS
 from openpyxl.writer.excel import save_workbook
 from openpyxl.utils.exceptions import ReadOnlyWorkbookException
@@ -91,7 +91,7 @@ class Workbook(object):
         self._protections = IndexedList([Protection()])
 
         self._colors = COLOR_INDEX
-        self._cell_styles = IndexedList([StyleId(0, 0, 0, 0, 0, 0)])
+        self._cell_styles = IndexedList([StyleId()])
 
 
     @property
@@ -102,11 +102,11 @@ class Workbook(object):
         """
         styles = []
         for sid in self._cell_styles:
-            font = self._fonts[sid.font]
-            fill = self._fills[sid.fill]
-            border = self._borders[sid.fill]
-            alignment = self._alignments[sid.alignment]
-            protection = self._protections[sid.protection]
+            font = self._fonts[sid.fontId]
+            fill = self._fills[sid.fillId]
+            border = self._borders[sid.fillId]
+            alignment = self._alignments[sid.alignmentId]
+            protection = self._protections[sid.protectionId]
             nf_id = sid.number_format
             if nf_id < 164:
                 number_format = BUILTIN_FORMATS.get(nf_id, "General")

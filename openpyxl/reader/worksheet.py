@@ -71,7 +71,7 @@ class WorkSheetParser(object):
         self.shared_strings = shared_strings
         self.guess_types = wb._guess_types
         self.data_only = wb.data_only
-        self.styles = [v._asdict() for v in self.ws.parent._cell_styles]
+        self.styles = [dict(v) for v in self.ws.parent._cell_styles]
 
     def parse(self):
         dispatcher = {
