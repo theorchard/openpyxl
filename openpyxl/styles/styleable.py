@@ -74,12 +74,13 @@ class StyleableObject(object):
 
     @property
     def style_id(self):
-        style = StyleId(self._alignment_id,
-                        self._border_id,
-                        self._fill_id,
-                        self._font_id,
-                        self._number_format_id,
-                        self._protection_id)
+        style = StyleId(
+            alignmentId=self._alignment_id,
+            borderId=self._border_id,
+            fillId=self._fill_id,
+            fontId=self._font_id,
+            numFmtId=self._number_format_id,
+            protectionId=self._protection_id)
         return self.parent.parent._cell_styles.add(style)
 
     @property
