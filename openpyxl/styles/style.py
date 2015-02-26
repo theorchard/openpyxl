@@ -88,7 +88,7 @@ class StyleId(Serialisable):
         if self.applyProtection:
             attrs['applyProtection'] = '1'
         if self.applyAlignment:
-            attrs[applyAlignment] = '1'
+            attrs['applyAlignment'] = '1'
         for k in ('alignmentId', 'protectionId'):
             if k in attrs:
                 del attrs[k]
