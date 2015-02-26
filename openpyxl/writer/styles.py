@@ -64,7 +64,7 @@ class StyleWriter(object):
         self._write_named_styles()
         self._write_cell_styles()
         self._write_style_names()
-        self._write_conditional_styles()
+        self._write_differential_styles()
         self._write_table_styles()
         self._write_colors()
 
@@ -151,9 +151,9 @@ class StyleWriter(object):
             {'name':"Normal", 'xfId':"0", 'builtinId':"0"})
 
 
-    def _write_conditional_styles(self):
-        dxfs = SubElement(self._root, "dxfs", count=str(len(self.wb.conditional_formats)))
-        for fmt in self.wb.conditional_formats:
+    def _write_differential_styles(self):
+        dxfs = SubElement(self._root, "dxfs", count=str(len(self.wb.differerential_styles)))
+        for fmt in self.wb.differerential_styles:
             dxfs.append(fmt.to_tree())
         return dxfs
 

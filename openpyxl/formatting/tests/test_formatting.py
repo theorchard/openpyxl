@@ -231,10 +231,10 @@ class TestRule:
         assert r.items() == [('stopIfTrue', False)]
 
 
-class WB():
+class DummyWorkbook():
 
     def __init__(self):
-        self.conditional_formats = []
+        self.differential_styles = []
         self.shared_styles = IndexedList()
         self.worksheets = []
 
@@ -243,12 +243,13 @@ class TestConditionalFormatting(object):
 
 
     def setup(self):
-        self.workbook = WB()
+        self.workbook = DummyWorkbook()
 
     def test_conditional_formatting_customRule(self):
-        class WS():
+        class DummyWorksheet():
             conditional_formatting = ConditionalFormatting()
-        worksheet = WS()
+
+        worksheet = DummyWorksheet()
         worksheet.conditional_formatting.add('C1:C10', {'type': 'expression', 'formula': ['ISBLANK(C1)'],
                                                         'stopIfTrue': '1', 'dxf': {}})
         worksheet.conditional_formatting._save_styles(self.workbook)
@@ -280,8 +281,8 @@ class TestConditionalFormatting(object):
         cf.add('C1:C10', FormulaRule(formula=['ISBLANK(C1)'], font=font, border=border, fill=fill))
         cf.add('D1:D10', FormulaRule(formula=['ISBLANK(D1)'], fill=fill))
         cf._save_styles(self.workbook)
-        assert len(self.workbook.conditional_formats) == 2
-        ft1, ft2 = self.workbook.conditional_formats
+        assert len(self.workbook.differential_styles) == 2
+        ft1, ft2 = self.workbook.differential_styles
         assert ft1.font == font
         assert ft1.border == border
         assert ft1.fill == fill
