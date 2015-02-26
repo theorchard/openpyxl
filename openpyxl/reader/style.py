@@ -166,11 +166,9 @@ class SharedStylesParser(object):
 def read_style_table(archive):
     if ARC_STYLE in archive.namelist():
         xml_source = archive.read(ARC_STYLE)
-    else:
-        return
-    p = SharedStylesParser(xml_source)
-    p.parse()
-    return p
+        p = SharedStylesParser(xml_source)
+        p.parse()
+        return p
 
 
 def bool_attrib(element, attr):
