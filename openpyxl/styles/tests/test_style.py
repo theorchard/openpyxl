@@ -15,8 +15,8 @@ def StyleId():
 
 def test_ctor(StyleId):
     style = StyleId()
-    assert dict(style) == {'borderId': '0', 'fillId': '0', 'fontId': '0',
-                           'numFmtId': '0', 'xfId': '0', 'alignmentId':'0', 'protectionId':'0'}
+    assert dict(style) == {'borderId': 0, 'fillId': 0, 'fontId': 0,
+                           'numFmtId': 0, 'xfId': 0, 'alignmentId':0, 'protectionId':0}
 
 
 def test_protection(StyleId):

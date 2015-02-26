@@ -12,6 +12,8 @@ from openpyxl.descriptors import (
     Set,
 )
 
+from openpyxl.xml.functions import Element
+
 
 class StyleId(Serialisable):
     """
@@ -22,7 +24,7 @@ class StyleId(Serialisable):
     tagname = "xf"
 
     numFmtId = Integer()
-    number_format = Alias("numFtdId")
+    number_format = Alias("numFmtId")
     fontId = Integer()
     font = Alias("fontId")
     fillId = Integer()
@@ -82,13 +84,26 @@ class StyleId(Serialisable):
         Alignment and protection objects are implemented as child elements.
         This is a completely different API to other format objects. :-/
         """
+        attrs = dict(self)
+        if self.applyProtection:
+            attrs['applyProtection'] = '1'
+        if self.applyAlignment:
+            attrs[applyAlignment] = '1'
+        for k in ('alignmentId', 'protectionId'):
+            if k in attrs:
+                del attrs[k]
+        attrs = dict((k, safe_string(v)) for k,v in attrs.items())
+        return Element(self.tagname, attrs)
+
+    def __iter__(self):
+        """
+        Don't convert values to strings to allow use as **kw
+        """
         attrs = set(self.__attrs__)
-        attrs.discard('alignmentId')
-        attrs.discard('protectionId')
-        attrs.add('applyProtection')
-        attrs.add('applyAlignment')
-        self.__attrs__ = attrs
-        return super(StyleId, self).to_tree()
+        for key in attrs:
+            value = getattr(self, key)
+            if value is not None:
+                yield key, value
 
     def __eq__(self, other):
         return dict(self) == dict(other)
