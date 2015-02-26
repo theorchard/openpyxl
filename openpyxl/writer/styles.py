@@ -152,8 +152,8 @@ class StyleWriter(object):
 
 
     def _write_differential_styles(self):
-        dxfs = SubElement(self._root, "dxfs", count=str(len(self.wb.differerential_styles)))
-        for fmt in self.wb.differerential_styles:
+        dxfs = SubElement(self._root, "dxfs", count=str(len(self.wb.differential_styles)))
+        for fmt in self.wb.differential_styles:
             dxfs.append(fmt.to_tree())
         return dxfs
 
