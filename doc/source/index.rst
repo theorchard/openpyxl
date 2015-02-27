@@ -211,6 +211,7 @@ Information for Developers
 .. toctree::
 
     development
+    windows-development
 
 
 Indices and tables

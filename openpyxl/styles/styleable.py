@@ -1,15 +1,11 @@
 from __future__ import absolute_import
 # Copyright (c) 2010-2015 openpyxl
 
-from collections import namedtuple
-
 from openpyxl.utils.indexed_list import IndexedList
 from .numbers import BUILTIN_FORMATS, BUILTIN_FORMATS_REVERSE
 from .proxy import StyleProxy
+from .style import StyleId
 from . import Style
-
-
-StyleId = namedtuple("StyleId", "alignment border fill font number_format protection")
 
 
 class StyleDescriptor(object):
@@ -66,24 +62,25 @@ class StyleableObject(object):
     __slots__ = ('parent', '_font_id', '_border_id', '_fill_id',
                  '_alignment_id', '_protection_id', '_number_format_id')
 
-    def __init__(self, sheet, font=0, fill=0, border=0, alignment=0, protection=0, number_format=0):
-        self._font_id = font
-        self._fill_id = fill
-        self._border_id = border
-        self._alignment_id = alignment
-        self._protection_id = protection
-        self._number_format_id = number_format
+    def __init__(self, sheet, fontId=0, fillId=0, borderId=0, alignmentId=0, protectionId=0, numFmtId=0):
+        self._font_id = fontId
+        self._fill_id = fillId
+        self._border_id = borderId
+        self._alignment_id = alignmentId
+        self._protection_id = protectionId
+        self._number_format_id = numFmtId
         self.parent = sheet
 
 
     @property
     def style_id(self):
-        style = StyleId(self._alignment_id,
-                        self._border_id,
-                        self._fill_id,
-                        self._font_id,
-                        self._number_format_id,
-                        self._protection_id)
+        style = StyleId(
+            alignmentId=self._alignment_id,
+            borderId=self._border_id,
+            fillId=self._fill_id,
+            fontId=self._font_id,
+            numFmtId=self._number_format_id,
+            protectionId=self._protection_id)
         return self.parent.parent._cell_styles.add(style)
 
     @property

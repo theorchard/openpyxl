@@ -15,6 +15,7 @@ from openpyxl.xml.constants import SHEET_MAIN_NS
 from openpyxl.cell import Cell
 from openpyxl.utils.indexed_list import IndexedList
 from openpyxl.styles import Style
+from openpyxl.worksheet import Worksheet
 
 
 def test_get_xml_iter():
@@ -56,33 +57,9 @@ def test_get_xml_iter():
 
 
 @pytest.fixture
-def Worksheet(Workbook):
+def Workbook():
+    from openpyxl.styles.style import StyleId
     from openpyxl.styles import numbers
-    from openpyxl.styles.styleable import StyleId
-    from openpyxl.worksheet.header_footer import HeaderFooter
-
-    class DummyWorkbook:
-
-        _guess_types = False
-        data_only = False
-
-        def __init__(self):
-            self.shared_strings = IndexedList()
-            self.shared_strings.add("hello world")
-            self.shared_styles = 28*[DummyStyle()]
-            self.shared_styles.append(Style())
-            self._fonts = IndexedList()
-            self._fills = IndexedList()
-            self._number_formats = IndexedList()
-            self._borders = IndexedList()
-            self._alignments = IndexedList()
-            self._protections = IndexedList()
-            self._cell_styles = IndexedList()
-            for i in range(29):
-                self._cell_styles.add((StyleId(i, i, i, i, i, i)))
-            self._cell_styles.add(StyleId(number_format=0, font=0, fill=4, border=6, alignment=1, protection=0))
-
-
 
     class DummyStyle:
         number_format = numbers.FORMAT_GENERAL
@@ -96,49 +73,47 @@ def Worksheet(Workbook):
             return self
 
 
-    class DummyWorksheet:
+    class DummyWorkbook:
 
-        encoding = "utf-8"
-        title = "Dummy"
+        _guess_types = False
+        data_only = False
+        _colors = []
 
         def __init__(self):
-            self.parent = DummyWorkbook()
-            self.column_dimensions = {}
-            self.row_dimensions = {}
-            self._styles = {}
-            self.cell = None
-            self._cells = {}
-            self._data_validations = []
-            self.header_footer = HeaderFooter()
+            self.shared_strings = IndexedList()
+            self.shared_strings.add("hello world")
+            self._fonts = IndexedList()
+            self._fills = IndexedList()
+            self._number_formats = IndexedList()
+            self._borders = IndexedList()
+            self._alignments = IndexedList()
+            self._protections = IndexedList()
+            self._cell_styles = IndexedList()
+            for i in range(29):
+                self._cell_styles.add((StyleId(i, i, i, i, i, i)))
+            self._cell_styles.add(StyleId(fillId=4, borderId=6, alignmentId=1))
 
-        def _add_cell(self, cell):
-            self._cells[cell.coordinate] = cell
 
-        def __getitem__(self, value):
-            cell = self._cells.get(value)
+        def create_sheet(self, title):
+            return Worksheet(self)
 
-            if cell is None:
-                cell = Cell(self, 'A', 1)
-                self._cells[value] = cell
-            return cell
+        def get_sheet_names(self):
+            return []
 
-        def get_style(self, coordinate):
-            return DummyStyle()
-
-    return DummyWorksheet()
+    return DummyWorkbook()
 
 
 @pytest.fixture
-def WorkSheetParser(Worksheet):
+def WorkSheetParser(Workbook):
     """Setup a parser instance with an empty source"""
     from .. worksheet import WorkSheetParser
-    return WorkSheetParser(Worksheet, None, {0:'a'}, {})
+    return WorkSheetParser(Workbook, 'sheet', None, {0:'a'})
 
 
-def test_col_width(datadir, Worksheet, WorkSheetParser):
+def test_col_width(datadir, WorkSheetParser):
     datadir.chdir()
-    ws = Worksheet
     parser = WorkSheetParser
+    ws = parser.ws
 
     with open("complex-styles-worksheet.xml", "rb") as src:
         cols = iterparse(src, tag='{%s}col' % SHEET_MAIN_NS)
@@ -151,10 +126,10 @@ def test_col_width(datadir, Worksheet, WorkSheetParser):
                                                'width': '31.1640625'}
 
 
-def test_hidden_col(datadir, Worksheet, WorkSheetParser):
+def test_hidden_col(datadir, WorkSheetParser):
     datadir.chdir()
-    ws = Worksheet
     parser = WorkSheetParser
+    ws = parser.ws
 
     with open("hidden_rows_cols.xml", "rb") as src:
         cols = iterparse(src, tag='{%s}col' % SHEET_MAIN_NS)
@@ -165,10 +140,11 @@ def test_hidden_col(datadir, Worksheet, WorkSheetParser):
                                                '1', 'max': '4', 'min': '4'}
 
 
-def test_styled_col(datadir, Worksheet, WorkSheetParser):
+def test_styled_col(datadir, WorkSheetParser):
     datadir.chdir()
-    ws = Worksheet
     parser = WorkSheetParser
+    ws = parser.ws
+
     with open("complex-styles-worksheet.xml", "rb") as src:
         cols = iterparse(src, tag='{%s}col' % SHEET_MAIN_NS)
         for _, col in cols:
@@ -179,10 +155,10 @@ def test_styled_col(datadir, Worksheet, WorkSheetParser):
     assert dict(cd) ==  {'customWidth': '1', 'max': '9', 'min': '9', 'width': '25', 'style':'28'}
 
 
-def test_hidden_row(datadir, Worksheet, WorkSheetParser):
+def test_hidden_row(datadir, WorkSheetParser):
     datadir.chdir()
-    ws = Worksheet
     parser = WorkSheetParser
+    ws = parser.ws
 
     with open("hidden_rows_cols.xml", "rb") as src:
         rows = iterparse(src, tag='{%s}row' % SHEET_MAIN_NS)
@@ -192,12 +168,11 @@ def test_hidden_row(datadir, Worksheet, WorkSheetParser):
     assert dict(ws.row_dimensions[2]) == {'hidden': '1'}
 
 
-def test_styled_row(datadir, Worksheet, WorkSheetParser):
+def test_styled_row(datadir, WorkSheetParser):
     datadir.chdir()
-    ws = Worksheet
     parser = WorkSheetParser
+    ws = parser.ws
     parser.shared_strings = dict((i, i) for i in range(30))
-    parser.style_table = ws.parent.shared_styles
 
     with open("complex-styles-worksheet.xml", "rb") as src:
         rows = iterparse(src, tag='{%s}row' % SHEET_MAIN_NS)
@@ -210,10 +185,10 @@ def test_styled_row(datadir, Worksheet, WorkSheetParser):
     assert dict(rd) == {'s':'28', 'customFormat':'1'}
 
 
-def test_sheet_protection(datadir, Worksheet, WorkSheetParser):
+def test_sheet_protection(datadir, WorkSheetParser):
     datadir.chdir()
-    ws = Worksheet
     parser = WorkSheetParser
+    ws = parser.ws
 
     with open("protected_sheet.xml", "rb") as src:
         tree = iterparse(src, tag='{%s}sheetProtection' % SHEET_MAIN_NS)
@@ -229,9 +204,9 @@ def test_sheet_protection(datadir, Worksheet, WorkSheetParser):
     }
 
 
-def test_formula_without_value(Worksheet, WorkSheetParser):
-    ws = Worksheet
+def test_formula_without_value(WorkSheetParser):
     parser = WorkSheetParser
+    ws = parser.ws
 
     src = """
       <x:c r="A1" xmlns:x="http://schemas.openxmlformats.org/spreadsheetml/2006/main">
@@ -246,9 +221,9 @@ def test_formula_without_value(Worksheet, WorkSheetParser):
     assert ws['A1'].value == '=IF(TRUE, "y", "n")'
 
 
-def test_formula(Worksheet, WorkSheetParser):
-    ws = Worksheet
+def test_formula(WorkSheetParser):
     parser = WorkSheetParser
+    ws = parser.ws
 
     src = """
     <x:c r="A1" t="str" xmlns:x="http://schemas.openxmlformats.org/spreadsheetml/2006/main">
@@ -263,9 +238,9 @@ def test_formula(Worksheet, WorkSheetParser):
     assert ws['A1'].value == '=IF(TRUE, "y", "n")'
 
 
-def test_formula_data_only(Worksheet, WorkSheetParser):
-    ws = Worksheet
+def test_formula_data_only(WorkSheetParser):
     parser = WorkSheetParser
+    ws = parser.ws
     parser.data_only = True
 
     src = """
@@ -281,9 +256,9 @@ def test_formula_data_only(Worksheet, WorkSheetParser):
     assert ws['A1'].value == 3
 
 
-def test_string_formula_data_only(Worksheet, WorkSheetParser):
-    ws = Worksheet
+def test_string_formula_data_only(WorkSheetParser):
     parser = WorkSheetParser
+    ws = parser.ws
     parser.data_only = True
 
     src = """
@@ -299,9 +274,9 @@ def test_string_formula_data_only(Worksheet, WorkSheetParser):
     assert ws['A1'].value == 'y'
 
 
-def test_number(Worksheet, WorkSheetParser):
-    ws = Worksheet
+def test_number(WorkSheetParser):
     parser = WorkSheetParser
+    ws = parser.ws
 
     src = """
     <x:c r="A1" xmlns:x="http://schemas.openxmlformats.org/spreadsheetml/2006/main">
@@ -315,9 +290,9 @@ def test_number(Worksheet, WorkSheetParser):
     assert ws['A1'].value == 1
 
 
-def test_string(Worksheet, WorkSheetParser):
-    ws = Worksheet
+def test_string(WorkSheetParser):
     parser = WorkSheetParser
+    ws = parser.ws
 
     src = """
     <x:c r="A1" t="s" xmlns:x="http://schemas.openxmlformats.org/spreadsheetml/2006/main">
@@ -331,9 +306,9 @@ def test_string(Worksheet, WorkSheetParser):
     assert ws['A1'].value == "a"
 
 
-def test_boolean(Worksheet, WorkSheetParser):
-    ws = Worksheet
+def test_boolean(WorkSheetParser):
     parser = WorkSheetParser
+    ws = parser.ws
 
     src = """
     <x:c r="A1" t="b" xmlns:x="http://schemas.openxmlformats.org/spreadsheetml/2006/main">
@@ -347,10 +322,9 @@ def test_boolean(Worksheet, WorkSheetParser):
     assert ws['A1'].value is True
 
 
-def test_inline_string(Worksheet, WorkSheetParser, datadir):
-    ws = Worksheet
+def test_inline_string(WorkSheetParser, datadir):
     parser = WorkSheetParser
-    parser.style_table = ws.parent.shared_styles
+    ws = parser.ws
     datadir.chdir()
 
     with open("Table1-XmlFromAccess.xml") as src:
@@ -362,10 +336,9 @@ def test_inline_string(Worksheet, WorkSheetParser, datadir):
     assert ws['A1'].value == "ID"
 
 
-def test_inline_richtext(Worksheet, WorkSheetParser, datadir):
-    ws = Worksheet
+def test_inline_richtext(WorkSheetParser, datadir):
     parser = WorkSheetParser
-    parser.style_table = ws.parent.shared_styles
+    ws = parser.ws
     datadir.chdir()
     with open("jasper_sheet.xml", "rb") as src:
         sheet = fromstring(src.read())
@@ -378,9 +351,9 @@ def test_inline_richtext(Worksheet, WorkSheetParser, datadir):
     assert cell.value == "11 de September de 2014"
 
 
-def test_data_validation(Worksheet, WorkSheetParser, datadir):
-    ws = Worksheet
+def test_data_validation(WorkSheetParser, datadir):
     parser = WorkSheetParser
+    ws = parser.ws
     datadir.chdir()
 
     with open("worksheet_data_validation.xml") as src:
@@ -426,7 +399,6 @@ def test_header_footer(WorkSheetParser, datadir):
 def test_cell(WorkSheetParser, datadir):
     datadir.chdir()
     parser = WorkSheetParser
-    ws = parser.ws
     parser.shared_strings[1] = "Arial Font, 10"
 
     with open("complex-styles-worksheet.xml") as src:
@@ -435,7 +407,6 @@ def test_cell(WorkSheetParser, datadir):
     element = sheet.find("{%s}sheetData/{%s}row[2]/{%s}c[1]" % (SHEET_MAIN_NS, SHEET_MAIN_NS, SHEET_MAIN_NS))
     assert element.get('r') == 'A2'
     parser.parse_cell(element)
-    #assert ws['A2']._font_id == 3
 
 
 def test_sheet_views(WorkSheetParser, datadir):

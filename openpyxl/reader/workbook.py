@@ -97,9 +97,7 @@ def detect_worksheets(archive):
         rel = rels[sheet['id']]
         rel['title'] = sheet['name']
         rel['sheet_id'] = sheet['sheetId']
-        state = sheet.get('state')
-        if state is not None:
-            rel['state'] = state
+        rel['state'] = sheet.get('state', 'visible')
         if ("/" + rel['path'] in valid_sheets
             or "worksheets" in rel['path']): # fallback in case content type is missing
             yield rel
@@ -121,3 +119,11 @@ def read_workbook_code_name(xml_source):
         pr = {}
 
     return pr.get('codeName', 'ThisWorkbook')
+
+
+def read_workbook_settings(xml_source):
+    root = fromstring(xml_source)
+    view = root.find('*/' '{%s}workbookView' % SHEET_MAIN_NS)
+    if view is not None:
+        if 'activeTab' in view.attrib:
+            return int(view.attrib['activeTab'])

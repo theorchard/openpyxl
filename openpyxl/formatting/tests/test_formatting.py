@@ -409,7 +409,7 @@ def test_conditional_formatting_read(datadir):
     datadir.chdir()
     reference_file = 'conditional-formatting.xlsx'
     wb = load_workbook(reference_file)
-    ws = wb.get_active_sheet()
+    ws = wb.active
 
     # First test the conditional formatting rules read
     assert ws.conditional_formatting.cf_rules['A1:A1048576'] == [
