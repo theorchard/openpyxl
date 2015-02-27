@@ -29,8 +29,14 @@ from openpyxl.descriptors import Alias
 def AliasProxyGet(self, instance, cls):
     return getattr(cls, self.alias)
 
+from openpyxl.styles.numbers import NumberFormatDescriptor
+
+def NumberFormatGet(self, instance, cls):
+    return getattr(cls, self.number_format)
+
 if os.environ.get("APIDOC") == "True":
     Alias.__get__ = AliasProxyGet
+    NumberFormatDescriptor.__get__ = NumberFormatDescriptor
 
 # -- General configuration -----------------------------------------------------
 
