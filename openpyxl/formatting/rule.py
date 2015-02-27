@@ -22,7 +22,7 @@ from openpyxl.xml.functions import (
 )
 
 
-from .differential import DifferentialFormat
+from openpyxl.styles.differential import DifferentialFormat
 
 
 class ExtensionList(Serialisable):

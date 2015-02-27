@@ -275,9 +275,9 @@ class TestConditionalFormatting(object):
         font = Font(name='Arial', size=12, bold=True,
                     underline=Font.UNDERLINE_SINGLE)
         border = Border(top=Side(border_style=borders.BORDER_THIN,
-                                     color=Color(colors.DARKYELLOW)),
-                          bottom=Side(border_style=borders.BORDER_THIN,
-                                        color=Color(colors.BLACK)))
+                                 color=Color(colors.DARKYELLOW)),
+                        bottom=Side(border_style=borders.BORDER_THIN,
+                                    color=Color(colors.BLACK)))
         cf.add('C1:C10', FormulaRule(formula=['ISBLANK(C1)'], font=font, border=border, fill=fill))
         cf.add('D1:D10', FormulaRule(formula=['ISBLANK(D1)'], fill=fill))
         cf._save_styles(self.workbook)

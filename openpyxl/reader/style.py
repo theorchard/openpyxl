@@ -19,7 +19,7 @@ from openpyxl.styles import (
     Alignment,
     borders,
 )
-from openpyxl.formatting.differential import DifferentialFormat
+from openpyxl.styles.differential import DifferentialFormat
 from openpyxl.styles.colors import COLOR_INDEX, Color
 from openpyxl.styles.styleable import StyleId
 from openpyxl.styles.named_styles import NamedStyle

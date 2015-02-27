@@ -4,8 +4,8 @@ from __future__ import absolute_import
 from openpyxl.compat import iteritems, OrderedDict, deprecated
 
 from openpyxl.styles import Font, PatternFill, Border
+from openpyxl.styles.differential import DifferentialFormat
 from .rules import CellIsRule, ColorScaleRule, FormatRule, FormulaRule
-from .differential import DifferentialFormat
 
 
 def unpack_rules(cfRules):
