@@ -80,7 +80,7 @@ style for lots of cells when instead of only one.
 >>> a1.font = ft
 >>> d4.font = ft
 >>>
->>> a1.font.italic = True # is not allowed
+>>> a1.font.italic = True # is not allowed # doctest: +SKIP
 >>>
 >>> # If you want to change the color of a Font, you need to reassign it::
 >>>
