@@ -92,6 +92,14 @@ openpyxl.styles.proxy module
     :undoc-members:
     :show-inheritance:
 
+openpyxl.styles.style module
+----------------------------
+
+.. automodule:: openpyxl.styles.style
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
 openpyxl.styles.styleable module
 --------------------------------
 
