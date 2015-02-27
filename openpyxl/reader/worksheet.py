@@ -47,11 +47,10 @@ def _get_xml_iter(xml_source):
 
 def _cast_number(value):
     "Convert numbers as string to an int or float"
-    try:
-        return int(value)
-    except ValueError:
-        return float(value)
 
+    if "." in value:
+        return float(value)
+    return int(value)
 
 
 class WorkSheetParser(object):
