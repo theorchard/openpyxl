@@ -106,41 +106,20 @@ class StyleWriter(object):
         cell_xfs = SubElement(self._root, 'cellXfs',
                               count='%d' % len(self.styles))
 
-        # default
-        def _get_default_vals():
-            return dict(numFmtId='0', fontId='0', fillId='0',
-                        xfId='0', borderId='0')
+        for style in self.styles:
 
-        for st in self.styles:
-            vals = _get_default_vals()
+            node = style.to_tree()
+            cell_xfs.append(node)
 
-            if st.font != 0:
-                vals['fontId'] = "%d" % (st.font)
-                vals['applyFont'] = '1'
-
-            if st.border != 0:
-                vals['borderId'] = "%d" % (st.border)
-                vals['applyBorder'] = '1'
-
-            if st.fill != 0:
-                vals['fillId'] =  "%d" % (st.fill)
-                vals['applyFill'] = '1'
-
-            if st.number_format != 0:
-                vals['numFmtId'] = '%d' % st.number_format
-                vals['applyNumberFormat'] = '1'
-
-            node = SubElement(cell_xfs, 'xf', vals)
-
-            if st.alignment != 0:
-                node.set("applyProtection", '1')
-                al = self.alignments[st.alignment]
+            if style.applyAlignment:
+                node.set('applyAlignment', '1')
+                al = self.alignments[style.alignmentId]
                 el = al.to_tree()
                 node.append(el)
 
-            if st.protection != 0:
+            if style.applyProtection:
                 node.set('applyProtection', '1')
-                prot = self.protections[st.protection]
+                prot = self.protections[style.protectionId]
                 el = prot.to_tree()
                 node.append(el)
 

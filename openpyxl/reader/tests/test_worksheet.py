@@ -58,7 +58,7 @@ def test_get_xml_iter():
 @pytest.fixture
 def Worksheet(Workbook):
     from openpyxl.styles import numbers
-    from openpyxl.styles.styleable import StyleId
+    from openpyxl.styles.style import StyleId
     from openpyxl.worksheet.header_footer import HeaderFooter
 
     class DummyWorkbook:
@@ -80,8 +80,7 @@ def Worksheet(Workbook):
             self._cell_styles = IndexedList()
             for i in range(29):
                 self._cell_styles.add((StyleId(i, i, i, i, i, i)))
-            self._cell_styles.add(StyleId(number_format=0, font=0, fill=4, border=6, alignment=1, protection=0))
-
+            self._cell_styles.add(StyleId(fillId=4, borderId=6, alignmentId=1, protectionId=0))
 
 
     class DummyStyle:
