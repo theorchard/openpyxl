@@ -34,9 +34,15 @@ from openpyxl.styles.numbers import NumberFormatDescriptor
 def NumberFormatGet(self, instance, cls):
     return self
 
+from openpyxl.styles.styleable import StyleDescriptor
+
+def StyleDescriptorGet(self, instance, cls):
+    return self.key
+
 if os.environ.get("APIDOC") == "True":
     Alias.__get__ = AliasProxyGet
     NumberFormatDescriptor.__get__ = NumberFormatGet
+
 
 # -- General configuration -----------------------------------------------------
 
