@@ -199,3 +199,27 @@ class Rule(Serialisable):
         self.iconSet = iconSet
         self.extLst = extLst
         self.style = style
+
+
+def ColorScaleRule(start_type=None,
+                 start_value=None,
+                 start_color=None,
+                 mid_type=None,
+                 mid_value=None,
+                 mid_color=None,
+                 end_type=None,
+                 end_value=None,
+                 end_color=None):
+
+    """Backwards compatibility"""
+    formats = []
+    if start_type is not None:
+        formats.append(FormatObject(type=start_type, val=start_value))
+    if mid_type is not None:
+        formats.append(FormatObject(type=mid_type, val=mid_value))
+    if end_type is not None:
+        formats.append(FormatObject(type=end_type, val=end_value))
+    colors = [Color(v) for v in (start_color, mid_color, end_color) if v is not None]
+    cs = ColorScale(cfvo=formats, color=colors)
+    rule = Rule(type="colorScale", priority=0, colorScale=cs)
+    return rule

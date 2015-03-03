@@ -40,6 +40,12 @@ def ColorScale():
     return ColorScale
 
 
+@pytest.fixture
+def ColorScaleRule():
+    from ..rule import ColorScaleRule
+    return ColorScaleRule
+
+
 class TestColorScale:
 
     def test_create(self, ColorScale):
@@ -77,6 +83,47 @@ class TestColorScale:
         <color rgb="FFFFFF00"/>
         <color rgb="FF00B050"/>
         </colorScale>
+        """
+        diff = compare_xml(xml, expected)
+        assert diff is None, diff
+
+
+    def test_two_colors(self, ColorScaleRule):
+        cfRule = ColorScaleRule(start_type='min', start_value=None,
+                                start_color='FFAA0000', end_type='max', end_value=None,
+                                end_color='FF00AA00')
+        xml = tostring(cfRule.to_tree())
+        expected = """
+        <cfRule priority="0" type="colorScale">
+          <colorScale>
+            <cfvo type="min"/>
+            <cfvo type="max"/>
+            <color rgb="FFAA0000"/>
+            <color rgb="FF00AA00"/>
+          </colorScale>
+        </cfRule>
+        """
+        diff = compare_xml(xml, expected)
+        assert diff is None, diff
+
+
+    def test_three_colors(self, ColorScaleRule):
+        cfRule = ColorScaleRule(start_type='percentile', start_value=10,
+                                start_color='FFAA0000', mid_type='percentile', mid_value=50,
+                                mid_color='FF0000AA', end_type='percentile', end_value=90,
+                                end_color='FF00AA00')
+        xml = tostring(cfRule.to_tree())
+        expected = """
+        <cfRule priority="0" type="colorScale">
+            <colorScale>
+              <cfvo type="percentile" val="10"></cfvo>
+              <cfvo type="percentile" val="50"></cfvo>
+              <cfvo type="percentile" val="90"></cfvo>
+              <color rgb="FFAA0000"></color>
+              <color rgb="FF0000AA"></color>
+              <color rgb="FF00AA00"></color>
+            </colorScale>
+        </cfRule>
         """
         diff = compare_xml(xml, expected)
         assert diff is None, diff
