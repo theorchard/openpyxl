@@ -27,6 +27,7 @@ from openpyxl.xml.constants import (
     REL_NS,
 )
 from openpyxl.formatting import ConditionalFormatting
+from openpyxl.styles.differential import DifferentialFormat
 from openpyxl.worksheet.datavalidation import writer
 from openpyxl.worksheet.properties import WorksheetProperties, write_sheetPr
 
@@ -118,6 +119,7 @@ def write_mergecells(worksheet):
 
 def write_conditional_formatting(worksheet):
     """Write conditional formatting to xml."""
+    wb = worksheet.parent
     for range_string, rules in iteritems(worksheet.conditional_formatting.cf_rules):
         if not len(rules):
             # Skip if there are no rules.  This is possible if a dataBar rule was read in and ignored.
@@ -127,10 +129,16 @@ def write_conditional_formatting(worksheet):
             if rule['type'] == 'dataBar':
                 # Ignore - uses extLst tag which is currently unsupported.
                 continue
+            if rule.get("dxf"):
+                dxf = DifferentialFormat(**rule['dxf'])
+                if dxf != DifferentialFormat():
+                    wb.differential_styles.append(dxf)
+                    rule['dxfId'] = len(wb.differential_styles) - 1
             attr = {'type': rule['type']}
             for rule_attr in ConditionalFormatting.rule_attributes:
                 if rule_attr in rule:
                     attr[rule_attr] = str(rule[rule_attr])
+
             cfr = SubElement(cf, 'cfRule', attr)
             if 'formula' in rule:
                 for f in rule['formula']:

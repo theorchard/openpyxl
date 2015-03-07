@@ -79,9 +79,6 @@ class ExcelWriter(object):
                         archive.writestr(name, vba_archive.read(name))
                         break
 
-        for sheet in self.workbook.worksheets:
-            sheet.conditional_formatting._save_styles(self.workbook)
-
         self._write_worksheets(archive)
         self._write_string_table(archive)
         self._write_external_links(archive)

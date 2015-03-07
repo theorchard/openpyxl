@@ -485,8 +485,6 @@ def write_conditional_formatting():
 
 
 def test_conditional_formatting_customRule(worksheet_with_cf, write_conditional_formatting):
-    from .. lxml_worksheet import write_conditional_formatting
-
     ws = worksheet_with_cf
 
     ws.conditional_formatting.add('C1:C10', {'type': 'expression', 'formula': ['ISBLANK(C1)'],
@@ -532,7 +530,7 @@ def test_conditional_font(worksheet_with_cf, write_conditional_formatting):
         xml += tostring(cf)
     diff = compare_xml(xml, """
     <conditionalFormatting sqref="A1:A3">
-      <cfRule operator="equal" priority="1" type="cellIs">
+      <cfRule operator="equal" priority="1" type="cellIs" dxfId="0">
         <formula>"Fail"</formula>
       </cfRule>
     </conditionalFormatting>

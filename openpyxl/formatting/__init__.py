@@ -68,32 +68,4 @@ class ConditionalFormatting(object):
 
     @deprecated("Conditionl Formats are saved automatically")
     def setDxfStyles(self, wb):
-        self._save_styles(wb)
-
-
-    def _save_styles(self, wb):
-        """Formatting for non color scale conditional formatting uses the dxf style list in styles.xml. This scans
-        the cf_rules for dxf styles which have not been added - and saves them to the workbook.
-
-        When adding a conditional formatting rule that uses a font, border or fill, this must be called at least once
-        before saving the workbook.
-
-        :param wb: the workbook
-        """
-
-        for rules in self.cf_rules.values():
-            for rule in rules:
-                if 'dxf' in rule:
-                    dxf = DifferentialFormat()
-                    if 'font' in rule['dxf'] and isinstance(rule['dxf']['font'], Font):
-                        # DXF font is limited to color, bold, italic, underline and strikethrough
-                        dxf.font = rule['dxf']['font']
-                    if 'border' in rule['dxf'] and isinstance(rule['dxf']['border'], Border):
-                        dxf.border = rule['dxf']['border']
-                    if 'fill' in rule['dxf'] and isinstance(rule['dxf']['fill'], PatternFill):
-                        dxf.fill = rule['dxf']['fill']
-
-                    wb.differential_styles.append(dxf)
-                    rule.pop('dxf')
-                    rule['dxfId'] = len(wb.differential_styles) - 1
-
+        pass

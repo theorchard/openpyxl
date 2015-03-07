@@ -238,21 +238,24 @@ class DummyWorkbook():
         self.shared_styles = IndexedList()
         self.worksheets = []
 
+class DummyWorksheet():
+
+    def __init__(self):
+        self.conditional_formatting = ConditionalFormatting()
+        self.parent = DummyWorkbook()
+
 
 class TestConditionalFormatting(object):
 
 
     def setup(self):
-        self.workbook = DummyWorkbook()
+        self.ws = DummyWorksheet()
 
     def test_conditional_formatting_customRule(self):
-        class DummyWorksheet():
-            conditional_formatting = ConditionalFormatting()
 
-        worksheet = DummyWorksheet()
+        worksheet = self.ws
         worksheet.conditional_formatting.add('C1:C10', {'type': 'expression', 'formula': ['ISBLANK(C1)'],
-                                                        'stopIfTrue': '1', 'dxf': {}})
-        worksheet.conditional_formatting._save_styles(self.workbook)
+                                                        'stopIfTrue': '1', 'dxf':{}})
         cfs = write_conditional_formatting(worksheet)
         xml = b""
         for cf in cfs:
@@ -260,7 +263,7 @@ class TestConditionalFormatting(object):
 
         diff = compare_xml(xml, """
         <conditionalFormatting sqref="C1:C10">
-          <cfRule dxfId="0" type="expression" stopIfTrue="1" priority="1">
+          <cfRule type="expression" stopIfTrue="1" priority="1">
             <formula>ISBLANK(C1)</formula>
           </cfRule>
         </conditionalFormatting>
@@ -268,7 +271,10 @@ class TestConditionalFormatting(object):
         assert diff is None, diff
 
     def test_conditional_formatting_setDxfStyle(self):
+        ws = self.ws
         cf = ConditionalFormatting()
+        ws.conditional_formatting = cf
+
         fill = PatternFill(start_color=Color('FFEE1111'),
                     end_color=Color('FFEE1111'),
                     patternType=fills.FILL_SOLID)
@@ -280,18 +286,20 @@ class TestConditionalFormatting(object):
                                     color=Color(colors.BLACK)))
         cf.add('C1:C10', FormulaRule(formula=['ISBLANK(C1)'], font=font, border=border, fill=fill))
         cf.add('D1:D10', FormulaRule(formula=['ISBLANK(D1)'], fill=fill))
-        cf._save_styles(self.workbook)
-        assert len(self.workbook.differential_styles) == 2
-        ft1, ft2 = self.workbook.differential_styles
+        from openpyxl.writer.worksheet import write_conditional_formatting
+        for _ in write_conditional_formatting(ws):
+            pass # exhaust generator
+
+        wb = ws.parent
+        assert len(wb.differential_styles) == 2
+        ft1, ft2 = wb.differential_styles
         assert ft1.font == font
         assert ft1.border == border
         assert ft1.fill == fill
         assert ft2.fill == fill
 
     def test_conditional_formatting_update(self):
-        class WS():
-            conditional_formatting = ConditionalFormatting()
-        worksheet = WS()
+        worksheet = self.ws
         rules = {'A1:A4': [{'type': 'colorScale', 'priority': 13,
                             'colorScale': {'cfvo': [{'type': 'min'}, {'type': 'max'}], 'color':
                                            [Color('FFFF7128'), Color('FFFFEF9C')]}}]}
@@ -302,7 +310,7 @@ class TestConditionalFormatting(object):
         for cf in cfs:
             xml += tostring(cf)
 
-        diff = compare_xml(xml, """
+        expected = """
         <conditionalFormatting sqref="A1:A4">
           <cfRule type="colorScale" priority="1">
             <colorScale>
@@ -313,27 +321,31 @@ class TestConditionalFormatting(object):
             </colorScale>
           </cfRule>
         </conditionalFormatting>
-        """)
+        """
+
+        diff = compare_xml(xml, expected)
         assert diff is None, diff
 
     def test_conditional_font(self):
         """Test to verify font style written correctly."""
-        class WS():
-            conditional_formatting = ConditionalFormatting()
-        worksheet = WS()
+
+        ws = self.ws
+        cf = ConditionalFormatting()
+        ws.conditional_formatting = cf
 
         # Create cf rule
         redFill = PatternFill(start_color=Color('FFEE1111'),
                        end_color=Color('FFEE1111'),
                        patternType=fills.FILL_SOLID)
         whiteFont = Font(color=Color("FFFFFFFF"))
-        worksheet.conditional_formatting.add('A1:A3',
+        ws.conditional_formatting.add('A1:A3',
                                              CellIsRule(operator='equal', formula=['"Fail"'], stopIfTrue=False,
                                                         font=whiteFont, fill=redFill))
-        worksheet.conditional_formatting._save_styles(self.workbook)
+
+        from openpyxl.writer.worksheet import write_conditional_formatting
 
         # First, verify conditional formatting xml
-        cfs = write_conditional_formatting(worksheet)
+        cfs = write_conditional_formatting(ws)
         xml = b""
         for cf in cfs:
             xml += tostring(cf)
