@@ -57,3 +57,16 @@ class DifferentialFormat(Serialisable):
         self.border = border
         self.protection = protection
         self.extLst = extLst
+
+
+    def __eq__(self, other):
+        if not self.__class__ == other.__class__:
+            return False
+        for key in self.__elements__:
+            if getattr(self, key) != getattr(other, key):
+                return False
+        return True
+
+
+    def __ne__(self, other):
+        return not self == other
