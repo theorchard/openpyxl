@@ -128,6 +128,7 @@ class ColorScale(RuleType):
 class Rule(Serialisable):
 
     tagname = "cfRule"
+    dxf = None
 
     type = Set(values=(['expression', 'cellIs', 'colorScale', 'dataBar',
                         'iconSet', 'top10', 'uniqueValues', 'duplicateValues', 'containsText',
@@ -222,4 +223,14 @@ def ColorScaleRule(start_type=None,
     colors = [Color(v) for v in (start_color, mid_color, end_color) if v is not None]
     cs = ColorScale(cfvo=formats, color=colors)
     rule = Rule(type="colorScale", priority=0, colorScale=cs)
+    return rule
+
+
+def FormulaRule(formula=None, stopIfTrue=None, font=None, border=None,
+                fill=None):
+    """
+    Conditional formatting with custom differential style
+    """
+    rule = Rule(type="expression", priority=0, formula=formula, stopIfTrue=stopIfTrue)
+    rule.dxf =  DifferentialFormat(font=font, border=border, fill=fill)
     return rule

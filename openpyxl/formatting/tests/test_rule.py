@@ -210,7 +210,6 @@ class TestIconSet:
         assert diff is None, diff
 
 
-
 @pytest.fixture
 def Rule():
     from ..rule import Rule
@@ -249,3 +248,11 @@ class TestRule:
         assert diff is None, diff
 
 
+def test_formula_rule():
+    from ..rule import FormulaRule
+    from openpyxl.styles.differential import DifferentialFormat
+
+    cf = FormulaRule(formula=['ISBLANK(C1)'], stopIfTrue=True)
+    assert dict(cf) == {'priority': '0', 'stopIfTrue': '1', 'type': 'expression'}
+    assert cf.formula == ('ISBLANK(C1)',)
+    assert cf.dxf == DifferentialFormat()
