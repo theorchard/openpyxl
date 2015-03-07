@@ -256,3 +256,16 @@ def test_formula_rule():
     assert dict(cf) == {'priority': '0', 'stopIfTrue': '1', 'type': 'expression'}
     assert cf.formula == ('ISBLANK(C1)',)
     assert cf.dxf == DifferentialFormat()
+
+
+def test_cellis_rule():
+    from ..rule import CellIsRule
+    from openpyxl.styles import PatternFill
+
+    red_fill = PatternFill(start_color='FFEE1111', end_color='FFEE1111',
+                           fill_type='solid')
+
+    rule = CellIsRule(operator='<', formula=['C$1'], stopIfTrue=True, fill=red_fill)
+    assert dict(rule) == {'operator': 'lessThan', 'priority': '0', 'type': 'cellIs', 'stopIfTrue':'1'}
+    assert rule.formula == ('C$1',)
+    assert rule.dxf.fill == red_fill
