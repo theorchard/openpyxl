@@ -3,10 +3,7 @@ from __future__ import absolute_import
 
 
 from openpyxl.compat import iteritems, OrderedDict, deprecated
-
-from openpyxl.styles import Font, PatternFill, Border
 from openpyxl.styles.differential import DifferentialFormat
-from .rules import CellIsRule, ColorScaleRule, FormatRule, FormulaRule
 
 
 def unpack_rules(cfRules):
@@ -25,7 +22,6 @@ class ConditionalFormatting(object):
     def __init__(self):
         self.cf_rules = OrderedDict()
         self.max_priority = 0
-        #self.parse_rules = {}
 
     def add(self, range_string, cfRule):
         """Add a rule such as ColorScaleRule, FormulaRule or CellIsRule
