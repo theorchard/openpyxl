@@ -29,36 +29,42 @@ from openpyxl.utils.indexed_list import IndexedList
 
 @pytest.fixture
 def rules():
+
+    class DummyRule:
+
+        def __init__(self, priority):
+            self.priority = priority
+
     return OrderedDict(
         [
-            ('H1:H10', [{'priority': 23, }]),
-            ('Q1:Q10', [{'priority': 14, }]),
-            ('G1:G10', [{'priority': 24, }]),
-            ('F1:F10', [{'priority': 25, }]),
-            ('O1:O10', [{'priority': 16, }]),
+            ('H1:H10', [DummyRule(23)]),
+            ('Q1:Q10', [DummyRule(14)]),
+            ('G1:G10', [DummyRule(24)]),
+            ('F1:F10', [DummyRule(25)]),
+            ('O1:O10', [DummyRule(16)]),
             ('K1:K10', []),
-            ('T1:T10', [{'priority': 11, }]),
-            ('X1:X10', [{'priority': 7, }]),
-            ('R1:R10', [{'priority': 13}]),
-            ('C1:C10', [{'priority': 28, }]),
-            ('J1:J10', [{'priority': 21, }]),
-            ('E1:E10', [{'priority': 26, }]),
-            ('I1:I10', [{'priority': 22, }]),
-            ('Z1:Z10', [{'priority': 5}]),
-            ('V1:V10', [{'priority': 9}]),
-            ('AC1:AC10', [{'priority': 2, }]),
+            ('T1:T10', [DummyRule(11)]),
+            ('X1:X10', [DummyRule(7)]),
+            ('R1:R10', [DummyRule(13)]),
+            ('C1:C10', [DummyRule(28)]),
+            ('J1:J10', [DummyRule(21)]),
+            ('E1:E10', [DummyRule(26)]),
+            ('I1:I10', [DummyRule(22)]),
+            ('Z1:Z10', [DummyRule(5)]),
+            ('V1:V10', [DummyRule(9)]),
+            ('AC1:AC10', [DummyRule(2)]),
             ('L1:L10', []),
-            ('N1:N10', [{'priority': 17, }]),
-            ('AA1:AA10', [{'priority': 4, }]),
+            ('N1:N10', [DummyRule(17)]),
+            ('AA1:AA10', [DummyRule(4)]),
             ('M1:M10', []),
-            ('Y1:Y10', [{'priority': 6, }]),
-            ('B1:B10', [{'priority': 29, }]),
-            ('P1:P10', [{'priority': 15, }]),
-            ('W1:W10', [{'priority': 8, }]),
-            ('AB1:AB10', [{'priority': 3, }]),
-            ('A1:A1048576', [{'priority': 29, }]),
-            ('S1:S10', [{'priority': 12, }]),
-            ('D1:D10', [{'priority': 27, }])
+            ('Y1:Y10', [DummyRule(6)]),
+            ('B1:B10', [DummyRule(29)]),
+            ('P1:P10', [DummyRule(15)]),
+            ('W1:W10', [DummyRule(8)]),
+            ('AB1:AB10', [DummyRule(3)]),
+            ('A1:A1048576', [DummyRule(29)]),
+            ('S1:S10', [DummyRule(12)]),
+            ('D1:D10', [DummyRule(27)])
         ]
     )
 
@@ -91,40 +97,6 @@ def test_unpack_rules(rules):
         ('A1:A1048576',0 ,29),
         ('S1:S10', 0, 12),
         ('D1:D10', 0, 27),
-    ]
-
-
-def test_update(rules):
-    from .. import unpack_rules, ConditionalFormatting
-    cf = ConditionalFormatting()
-    cf.update(rules)
-    assert cf.max_priority == 25
-    assert list(unpack_rules(cf.cf_rules)) == [
-        ('H1:H10', 0, 18),
-        ('Q1:Q10', 0, 12),
-        ('G1:G10', 0, 19),
-        ('F1:F10', 0, 20),
-        ('O1:O10', 0, 14),
-        ('T1:T10', 0, 9),
-        ('X1:X10', 0, 6),
-        ('R1:R10', 0, 11),
-        ('C1:C10', 0, 23),
-        ('J1:J10', 0, 16),
-        ('E1:E10', 0, 21),
-        ('I1:I10', 0, 17),
-        ('Z1:Z10', 0, 4),
-        ('V1:V10', 0, 8),
-        ('AC1:AC10', 0, 1),
-        ('N1:N10', 0, 15),
-        ('AA1:AA10', 0, 3),
-        ('Y1:Y10', 0, 5),
-        ('B1:B10', 0, 24),
-        ('P1:P10', 0, 13),
-        ('W1:W10', 0, 7),
-        ('AB1:AB10', 0, 2),
-        ('A1:A1048576', 0, 25),
-        ('S1:S10', 0, 10),
-        ('D1:D10', 0, 22),
     ]
 
 
@@ -301,33 +273,6 @@ class TestConditionalFormatting(object):
         assert ft1.fill == fill
         assert ft2.fill == fill
 
-    def test_conditional_formatting_update(self):
-        worksheet = self.ws
-        rules = {'A1:A4': [{'type': 'colorScale', 'priority': 13,
-                            'colorScale': {'cfvo': [{'type': 'min'}, {'type': 'max'}], 'color':
-                                           [Color('FFFF7128'), Color('FFFFEF9C')]}}]}
-        worksheet.conditional_formatting.update(rules)
-
-        cfs = write_conditional_formatting(worksheet)
-        xml = b""
-        for cf in cfs:
-            xml += tostring(cf)
-
-        expected = """
-        <conditionalFormatting sqref="A1:A4">
-          <cfRule type="colorScale" priority="1">
-            <colorScale>
-              <cfvo type="min" />
-              <cfvo type="max" />
-              <color rgb="FFFF7128" />
-              <color rgb="FFFFEF9C" />
-            </colorScale>
-          </cfRule>
-        </conditionalFormatting>
-        """
-
-        diff = compare_xml(xml, expected)
-        assert diff is None, diff
 
     def test_conditional_font(self):
         """Test to verify font style written correctly."""
