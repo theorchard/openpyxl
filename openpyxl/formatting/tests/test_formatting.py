@@ -128,7 +128,7 @@ def test_fix_priorities(rules):
 class DummyWorkbook():
 
     def __init__(self):
-        self.differential_styles = []
+        self._differential_styles = []
         self.worksheets = []
 
 class DummyWorksheet():
@@ -166,7 +166,7 @@ class TestConditionalFormatting(object):
         """)
         assert diff is None, diff
 
-    def test_conditional_formatting_setDxfStyle(self):
+    def test_write_conditional_formatting(self):
         ws = self.ws
         cf = ConditionalFormatting()
         ws.conditional_formatting = cf
@@ -187,8 +187,8 @@ class TestConditionalFormatting(object):
             pass # exhaust generator
 
         wb = ws.parent
-        assert len(wb.differential_styles) == 2
-        ft1, ft2 = wb.differential_styles
+        assert len(wb._differential_styles) == 2
+        ft1, ft2 = wb._differential_styles
         assert ft1.font == font
         assert ft1.border == border
         assert ft1.fill == fill

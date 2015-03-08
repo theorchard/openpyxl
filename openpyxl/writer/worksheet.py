@@ -126,8 +126,8 @@ def write_conditional_formatting(worksheet):
         for rule in rules:
             if rule.dxf is not None:
                 if rule.dxf != DifferentialFormat():
-                    rule.dxfId = len(wb.differential_styles)
-                    wb.differential_styles.append(rule.dxf)
+                    rule.dxfId = len(wb._differential_styles)
+                    wb._differential_styles.append(rule.dxf)
             cf.append(rule.to_tree())
 
         yield cf

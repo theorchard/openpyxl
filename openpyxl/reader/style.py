@@ -32,7 +32,7 @@ class SharedStylesParser(object):
     def __init__(self, xml_source):
         self.root = fromstring(xml_source)
         self.cell_styles = IndexedList()
-        self.cond_styles = []
+        self.differential_styles = []
         self.color_index = COLOR_INDEX
         self.font_list = IndexedList()
         self.fill_list = IndexedList()
@@ -72,7 +72,7 @@ class SharedStylesParser(object):
     def parse_dxfs(self):
         """Read in the dxfs effects - used by conditional formatting."""
         for node in self.root.findall("{%s}dxfs/{%s}dxf" % (SHEET_MAIN_NS, SHEET_MAIN_NS) ):
-            self.cond_styles.append(DifferentialFormat.from_tree(node))
+            self.differential_styles.append(DifferentialFormat.from_tree(node))
 
 
     def parse_fonts(self):
