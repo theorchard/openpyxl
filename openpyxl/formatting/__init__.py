@@ -37,11 +37,10 @@ class ConditionalFormatting(object):
             rule = cfRule
         else:
             rule = cfRule.rule
-        rule['priority'] = self.max_priority + 1
         self.max_priority += 1
-        if range_string not in self.cf_rules:
-            self.cf_rules[range_string] = []
-        self.cf_rules[range_string].append(rule)
+        rule['priority'] = self.max_priority
+
+        self.cf_rules.setdefault(range_string, []).append(rule)
 
 
     def _fix_priorities(self):
