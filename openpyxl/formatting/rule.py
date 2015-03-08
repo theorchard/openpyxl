@@ -220,7 +220,12 @@ def ColorScaleRule(start_type=None,
         formats.append(FormatObject(type=mid_type, val=mid_value))
     if end_type is not None:
         formats.append(FormatObject(type=end_type, val=end_value))
-    colors = [Color(v) for v in (start_color, mid_color, end_color) if v is not None]
+    colors = []
+    for v in (start_color, mid_color, end_color):
+        if v is not None:
+            if not isinstance(v, Color):
+                v = Color(v)
+            colors.append(v)
     cs = ColorScale(cfvo=formats, color=colors)
     rule = Rule(type="colorScale", colorScale=cs)
     return rule
