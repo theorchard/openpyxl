@@ -125,38 +125,14 @@ def write_conditional_formatting(worksheet):
             # Skip if there are no rules.  This is possible if a dataBar rule was read in and ignored.
             continue
         cf = Element('conditionalFormatting', {'sqref': range_string})
-        for rule in rules:
-            if rule['type'] == 'dataBar':
-                # Ignore - uses extLst tag which is currently unsupported.
-                continue
-            if rule.get("dxf"):
-                dxf = DifferentialFormat(**rule['dxf'])
-                if dxf != DifferentialFormat():
-                    wb.differential_styles.append(dxf)
-                    rule['dxfId'] = len(wb.differential_styles) - 1
-            attr = {'type': rule['type']}
-            for rule_attr in ConditionalFormatting.rule_attributes:
-                if rule_attr in rule:
-                    attr[rule_attr] = str(rule[rule_attr])
 
-            cfr = SubElement(cf, 'cfRule', attr)
-            if 'formula' in rule:
-                for f in rule['formula']:
-                    SubElement(cfr, 'formula').text = f
-            if 'colorScale' in rule:
-                cs = SubElement(cfr, 'colorScale')
-                for cfvo in rule['colorScale']['cfvo']:
-                    SubElement(cs, 'cfvo', cfvo)
-                for color in rule['colorScale']['color']:
-                    SubElement(cs, 'color', dict(color))
-            if 'iconSet' in rule:
-                iconAttr = {}
-                for icon_attr in ConditionalFormatting.icon_attributes:
-                    if icon_attr in rule['iconSet']:
-                        iconAttr[icon_attr] = rule['iconSet'][icon_attr]
-                iconSet = SubElement(cfr, 'iconSet', iconAttr)
-                for cfvo in rule['iconSet']['cfvo']:
-                    SubElement(iconSet, 'cfvo', cfvo)
+        for rule in rules:
+            cf.append(rule.to_tree())
+            if rule.dxf is not None:
+                if rule.dxf != DifferentialFormat():
+                    wb.differential_styles.append(rule.dxf)
+                    rule.dxfId = len(wb.differential_styles) - 1
+
         yield cf
 
 
