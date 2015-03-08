@@ -73,7 +73,7 @@ class TestStyleWriter(object):
 
     def test_no_style(self):
         w = StyleWriter(self.workbook)
-        assert len(w.styles) == 1  # there is always the empty (defaul) style
+        assert len(w.wb._cell_styles) == 1  # there is always the empty (defaul) style
 
     def test_nb_style(self):
         for i in range(1, 6):
@@ -81,13 +81,13 @@ class TestStyleWriter(object):
             cell.font = Font(size=i)
             _ = cell.style_id
         w = StyleWriter(self.workbook)
-        assert len(w.styles) == 6  # 5 + the default
+        assert len(w.wb._cell_styles) == 6  # 5 + the default
 
         cell = self.worksheet.cell('A10')
         cell.border=Border(top=Side(border_style=borders.BORDER_THIN))
         _ = cell.style_id
         w = StyleWriter(self.workbook)
-        assert len(w.styles) == 7
+        assert len(w.wb._cell_styles) == 7
 
 
     def test_default_xfs(self):
