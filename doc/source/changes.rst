@@ -5,6 +5,7 @@
 Major changes
 -------------
 * Shift to using (row, column) indexing for cells. Cells will at some point *lose* coordinates.
+* New implementation of conditional formatting. Databars now partially preserved.
 
 
 2.2.0 (unreleased)
