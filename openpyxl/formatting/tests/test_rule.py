@@ -269,3 +269,22 @@ def test_cellis_rule():
     assert dict(rule) == {'operator': 'lessThan', 'priority': '0', 'type': 'cellIs', 'stopIfTrue':'1'}
     assert rule.formula == ('C$1',)
     assert rule.dxf.fill == red_fill
+
+
+@pytest.mark.parametrize("value, expansion",
+                         [
+                             ('<=', 'lessThanOrEqual'),
+                             ('>', 'greaterThan'),
+                             ('!=', 'notEqual'),
+                             ('=', 'equal'),
+                             ('>=', 'greaterThanOrEqual'),
+                             ('==', 'equal'),
+                             ('<', 'lessThan'),
+                         ]
+                         )
+def test_operator_expansion(value, expansion):
+    from ..rule import CellIsRule
+    cf1 = CellIsRule(operator=value, formula=[])
+    cf2 = CellIsRule(operator=expansion, formula=[])
+    assert cf1.operator == expansion
+    assert cf2.operator == expansion

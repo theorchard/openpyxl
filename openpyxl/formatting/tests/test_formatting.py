@@ -308,63 +308,6 @@ class TestConditionalFormatting(object):
         assert diff is None, diff
 
 
-class TestColorScaleRule(object):
-
-    def test_two_colors(self):
-        cfRule = ColorScaleRule(start_type='min', start_value=None, start_color='FFAA0000',
-                                end_type='max', end_value=None, end_color='FF00AA00')
-        assert dict(cfRule) == {'colorScale':
-                                {'cfvo': [{'type': 'min'}, {'type': 'max'}],
-                                'color': ['FFAA0000', 'FF00AA00']},
-                                'type': 'colorScale'
-                                }
-
-
-    def test_three_colors(self):
-        cfRule = ColorScaleRule(start_type='percentile', start_value=10, start_color='FFAA0000',
-                                mid_type='percentile', mid_value=50, mid_color='FF0000AA',
-                                end_type='percentile', end_value=90, end_color='FF00AA00')
-        assert dict(cfRule) == {'colorScale':
-                                {'cfvo': [
-                                    {'type': 'percentile', 'val':'10'},
-                                    {'type': 'percentile', 'val':'50'},
-                                    {'type': 'percentile', 'val':'90'}],
-                                'color': ['FFAA0000', 'FF0000AA', 'FF00AA00']},
-                                'type': 'colorScale'
-                                }
-
-
-@pytest.mark.parametrize("value, expansion",
-                         [
-                             ('<=', 'lessThanOrEqual'),
-                             ('>', 'greaterThan'),
-                             ('!=', 'notEqual'),
-                             ('=', 'equal'),
-                             ('>=', 'greaterThanOrEqual'),
-                             ('==', 'equal'),
-                             ('<', 'lessThan'),
-                         ]
-                         )
-def test_operator_expansion(value, expansion):
-    cf1 = CellIsRule()
-    cf2 = CellIsRule()
-    cf1.operator = value
-    cf2.operator = expansion
-    assert cf1.operator == expansion
-    assert cf2.operator == expansion
-
-
-def test_formula_rule():
-
-    cf1 = FormulaRule(formula=['ISBLANK(C1)'], stopIfTrue=True)
-    assert cf1.rule == {'dxf':
-                        {'border': None, 'fill': None, 'font': None},
-                        'formula': ['ISBLANK(C1)'],
-                        'stopIfTrue': '1',
-                        'type': 'expression'
-                        }
-
-
 def test_conditional_formatting_read(datadir):
     datadir.chdir()
     reference_file = 'conditional-formatting.xlsx'
