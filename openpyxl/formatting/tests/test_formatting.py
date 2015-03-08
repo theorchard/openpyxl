@@ -1,30 +1,20 @@
 from __future__ import absolute_import
 # Copyright (c) 2010-2015 openpyxl
 
-# Python stdlib imports
-from io import BytesIO
-
 # compatibility imports
-from openpyxl.compat import iteritems, OrderedDict
+from openpyxl.compat import OrderedDict
 
 # package imports
-from openpyxl import Workbook
-from openpyxl.formatting.rule import ColorScaleRule, CellIsRule, FormulaRule, Rule
 from openpyxl.reader.excel import load_workbook
-from openpyxl.reader.style import SharedStylesParser
-from openpyxl.xml.constants import ARC_STYLE
 from openpyxl.xml.functions import tostring
 from openpyxl.writer.worksheet import write_conditional_formatting
-from openpyxl.writer.styles import StyleWriter
-from openpyxl.styles import Color, PatternFill, Font, Border, Side
-from openpyxl.styles import borders, fills, colors
+from openpyxl.styles import Border, Side, PatternFill, Color, Font, fills, borders, colors
 from openpyxl.formatting import ConditionalFormatting
+from openpyxl.formatting.rule import ColorScaleRule, CellIsRule, FormulaRule, Rule
 
 # test imports
 import pytest
-from zipfile import ZIP_DEFLATED, ZipFile
 from openpyxl.tests.helper import compare_xml
-from openpyxl.utils.indexed_list import IndexedList
 
 
 @pytest.fixture
@@ -139,7 +129,6 @@ class DummyWorkbook():
 
     def __init__(self):
         self.differential_styles = []
-        self.shared_styles = IndexedList()
         self.worksheets = []
 
 class DummyWorksheet():
