@@ -24,7 +24,7 @@ class ConditionalFormatting(object):
     def __init__(self):
         self.cf_rules = OrderedDict()
         self.max_priority = 0
-        self.parse_rules = {}
+        #self.parse_rules = {}
 
     def add(self, range_string, cfRule):
         """Add a rule such as ColorScaleRule, FormulaRule or CellIsRule

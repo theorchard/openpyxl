@@ -101,10 +101,6 @@ class WorkSheetParser(object):
 
         self.ws._current_row = self.ws.max_row
 
-        # Handle parsed conditional formatting rules together.
-        if len(self.ws.conditional_formatting.parse_rules):
-            self.ws.conditional_formatting.update(self.ws.conditional_formatting.parse_rules)
-
     def parse_cell(self, element):
         value = element.find(self.VALUE_TAG)
         if value is not None:
@@ -214,59 +210,13 @@ class WorkSheetParser(object):
     def parser_conditional_formatting(self, element):
         range_string = element.get('sqref')
         cfRules = element.findall('{%s}cfRule' % SHEET_MAIN_NS)
-        if range_string not in self.ws.conditional_formatting.parse_rules:
-            self.ws.conditional_formatting.parse_rules[range_string] = []
-        for cfRule in cfRules:
-            if not cfRule.get('type') or cfRule.get('type') == 'dataBar':
-                # dataBar conditional formatting isn't supported, as it relies on the complex <extLst> tag
-                continue
-            rule = {'type': cfRule.get('type')}
-            for attr in ConditionalFormatting.rule_attributes:
-                if cfRule.get(attr) is not None:
-                    if attr == 'priority':
-                        rule[attr] = int(cfRule.get(attr))
-                    else:
-                        rule[attr] = cfRule.get(attr)
+        from openpyxl.formatting.rule import Rule
+        if range_string not in self.ws.conditional_formatting.cf_rules:
+            self.ws.conditional_formatting.cf_rules[range_string] = []
+        for node in cfRules:
+            rule = Rule.from_tree(node)
+            self.ws.conditional_formatting.cf_rules[range_string].append(rule)
 
-            formula = cfRule.findall('{%s}formula' % SHEET_MAIN_NS)
-            for f in formula:
-                if 'formula' not in rule:
-                    rule['formula'] = []
-                rule['formula'].append(f.text)
-
-            colorScale = cfRule.find('{%s}colorScale' % SHEET_MAIN_NS)
-            if colorScale is not None:
-                rule['colorScale'] = {'cfvo': [], 'color': []}
-                cfvoNodes = colorScale.findall('{%s}cfvo' % SHEET_MAIN_NS)
-                for node in cfvoNodes:
-                    cfvo = {}
-                    if node.get('type') is not None:
-                        cfvo['type'] = node.get('type')
-                    if node.get('val') is not None:
-                        cfvo['val'] = node.get('val')
-                    rule['colorScale']['cfvo'].append(cfvo)
-                colorNodes = colorScale.findall('{%s}color' % SHEET_MAIN_NS)
-                for color in colorNodes:
-                    attrs = dict(color.items())
-                    color = Color(**attrs)
-                    rule['colorScale']['color'].append(color)
-
-            iconSet = cfRule.find('{%s}iconSet' % SHEET_MAIN_NS)
-            if iconSet is not None:
-                rule['iconSet'] = {'cfvo': []}
-                for iconAttr in ConditionalFormatting.icon_attributes:
-                    if iconSet.get(iconAttr) is not None:
-                        rule['iconSet'][iconAttr] = iconSet.get(iconAttr)
-                cfvoNodes = iconSet.findall('{%s}cfvo' % SHEET_MAIN_NS)
-                for node in cfvoNodes:
-                    cfvo = {}
-                    if node.get('type') is not None:
-                        cfvo['type'] = node.get('type')
-                    if node.get('val') is not None:
-                        cfvo['val'] = node.get('val')
-                    rule['iconSet']['cfvo'].append(cfvo)
-
-            self.ws.conditional_formatting.parse_rules[range_string].append(rule)
 
     def parse_auto_filter(self, element):
         self.ws.auto_filter.ref = element.get("ref")
