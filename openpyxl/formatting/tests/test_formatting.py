@@ -9,6 +9,7 @@ from openpyxl.reader.excel import load_workbook
 from openpyxl.xml.functions import tostring
 from openpyxl.writer.worksheet import write_conditional_formatting
 from openpyxl.styles import Border, Side, PatternFill, Color, Font, fills, borders, colors
+from openpyxl.styles.differential import DifferentialStyle
 from openpyxl.formatting import ConditionalFormatting
 from openpyxl.formatting.rule import ColorScaleRule, CellIsRule, FormulaRule, Rule
 
@@ -286,14 +287,18 @@ def test_conditional_formatting_read(datadir):
     rule = rules['P1:P10'][0]
     assert dict(rule) == {'priority': '15', 'type': 'iconSet'}
 
-    # need to check dxf
     rule = rules['Q1:Q10'][0]
     assert dict(rule) == {'text': '3', 'priority': '14', 'dxfId': '27',
                           'operator': 'containsText', 'type': 'containsText'}
+    assert rule.dxf == DifferentialStyle(font=Font(color='FF9C0006'),
+                                         fill=PatternFill(bgColor='FFFFC7CE')
+                                         )
 
     rule = rules['R1:R10'][0]
     assert dict(rule) == {'operator': 'between', 'dxfId': '26', 'type':
                           'cellIs', 'priority': '13'}
+    assert rule.dxf == DifferentialStyle(font=Font(color='FF9C6500'),
+                                         fill=PatternFill(bgColor='FFFFEB9C'))
 
     rule = rules['S1:S10'][0]
     assert dict(rule) == {'priority': '12', 'dxfId': '25', 'percent': '1',

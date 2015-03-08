@@ -10,6 +10,7 @@ from openpyxl.styles import (
     Border,
     Alignment,
     Protection,
+    HashableObject
     )
 
 from openpyxl.xml.functions import localname, Element
@@ -28,11 +29,12 @@ class NumFmt(Serialisable):
         self.formatCode = formatCode
 
 
-class DifferentialStyle(Serialisable):
+class DifferentialStyle(HashableObject):
 
     tagname = "dxf"
 
     __elements__ = ("font", "numFmt", "fill", "alignment", "border", "protection")
+    __fields__ = __elements__
 
     font = Typed(expected_type=Font, allow_none=True)
     numFmt = Typed(expected_type=NumFmt, allow_none=True)
@@ -57,16 +59,3 @@ class DifferentialStyle(Serialisable):
         self.border = border
         self.protection = protection
         self.extLst = extLst
-
-
-    def __eq__(self, other):
-        if not self.__class__ == other.__class__:
-            return False
-        for key in self.__elements__:
-            if getattr(self, key) != getattr(other, key):
-                return False
-        return True
-
-
-    def __ne__(self, other):
-        return not self == other

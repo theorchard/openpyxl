@@ -239,6 +239,7 @@ def load_workbook(filename, read_only=False, use_iterators=False, keep_vba=KEEP_
             if comments_file is not None:
                 read_comments(new_ws, archive.read(comments_file))
 
+    wb._differential_styles = [] # reset
     wb._named_ranges = list(read_named_ranges(archive.read(ARC_WORKBOOK), wb))
 
     wb.code_name = read_workbook_code_name(archive.read(ARC_WORKBOOK))

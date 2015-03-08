@@ -80,6 +80,7 @@ def Workbook():
         _colors = []
 
         def __init__(self):
+            self._differential_styles = []
             self.shared_strings = IndexedList()
             self.shared_strings.add("hello world")
             self._fonts = IndexedList()

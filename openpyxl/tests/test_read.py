@@ -36,6 +36,7 @@ def test_read_standalone_worksheet(datadir):
         def __init__(self):
             self.shared_styles = [Style()]
             self._cell_styles = IndexedList()
+            self._differential_styles = []
 
         def get_sheet_by_name(self, value):
             return None

@@ -71,6 +71,7 @@ class WorkSheetParser(object):
         self.guess_types = wb._guess_types
         self.data_only = wb.data_only
         self.styles = [dict(v) for v in self.ws.parent._cell_styles]
+        self.differential_styles = wb._differential_styles
 
     def parse(self):
         dispatcher = {
@@ -215,6 +216,8 @@ class WorkSheetParser(object):
             self.ws.conditional_formatting.cf_rules[range_string] = []
         for node in cfRules:
             rule = Rule.from_tree(node)
+            if rule.dxfId is not None:
+                rule.dxf = self.differential_styles[rule.dxfId]
             self.ws.conditional_formatting.cf_rules[range_string].append(rule)
 
 
