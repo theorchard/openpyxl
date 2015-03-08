@@ -300,7 +300,7 @@ class TestConditionalFormatting(object):
 
         diff = compare_xml(xml, """
         <conditionalFormatting sqref="A1:A3">
-          <cfRule dxfId="0" operator="equal" priority="1" type="cellIs">
+          <cfRule dxfId="0" operator="equal" priority="1" type="cellIs" stopIfTrue="0">
             <formula>"Fail"</formula>
           </cfRule>
         </conditionalFormatting>

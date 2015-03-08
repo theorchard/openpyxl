@@ -127,11 +127,11 @@ def write_conditional_formatting(worksheet):
         cf = Element('conditionalFormatting', {'sqref': range_string})
 
         for rule in rules:
-            cf.append(rule.to_tree())
             if rule.dxf is not None:
                 if rule.dxf != DifferentialFormat():
+                    rule.dxfId = len(wb.differential_styles)
                     wb.differential_styles.append(rule.dxf)
-                    rule.dxfId = len(wb.differential_styles) - 1
+            cf.append(rule.to_tree())
 
         yield cf
 
