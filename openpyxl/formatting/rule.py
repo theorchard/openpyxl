@@ -128,7 +128,6 @@ class ColorScale(RuleType):
 class Rule(Serialisable):
 
     tagname = "cfRule"
-    dxf = None
 
     type = Set(values=(['expression', 'cellIs', 'colorScale', 'dataBar',
                         'iconSet', 'top10', 'uniqueValues', 'duplicateValues', 'containsText',
@@ -156,7 +155,7 @@ class Rule(Serialisable):
     dataBar = Typed(expected_type=DataBar, allow_none=True)
     iconSet = Typed(expected_type=IconSet, allow_none=True)
     extLst = Typed(expected_type=ExtensionList, allow_none=True)
-    style = Typed(expected_type=DifferentialStyle, allow_none=True)
+    dxf = Typed(expected_type=DifferentialStyle, allow_none=True)
 
     __elements__ = ('colorScale', 'dataBar', 'extLst', 'iconSet', 'formula')
 
@@ -179,7 +178,7 @@ class Rule(Serialisable):
                  dataBar=None,
                  iconSet=None,
                  extLst=None,
-                 style=None,
+                 dxf=None,
                 ):
         self.type = type
         self.dxfId = dxfId
@@ -199,7 +198,7 @@ class Rule(Serialisable):
         self.dataBar = dataBar
         self.iconSet = iconSet
         self.extLst = extLst
-        self.style = style
+        self.dxf = dxf
 
 
 def ColorScaleRule(start_type=None,
