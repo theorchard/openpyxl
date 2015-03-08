@@ -9,7 +9,7 @@ from openpyxl.compat import iteritems, OrderedDict
 
 # package imports
 from openpyxl import Workbook
-from openpyxl.formatting.rules import ColorScaleRule, CellIsRule, FormulaRule
+from openpyxl.formatting.rule import ColorScaleRule, CellIsRule, FormulaRule, Rule
 from openpyxl.reader.excel import load_workbook
 from openpyxl.reader.style import SharedStylesParser
 from openpyxl.xml.constants import ARC_STYLE
@@ -254,8 +254,11 @@ class TestConditionalFormatting(object):
     def test_conditional_formatting_customRule(self):
 
         worksheet = self.ws
-        worksheet.conditional_formatting.add('C1:C10', {'type': 'expression', 'formula': ['ISBLANK(C1)'],
-                                                        'stopIfTrue': '1', 'dxf':{}})
+        worksheet.conditional_formatting.add('C1:C10',
+                                             Rule(**{'type': 'expression', 'formula': ['ISBLANK(C1)'],
+                                                     'stopIfTrue': '1',}
+                                                  )
+                                             )
         cfs = write_conditional_formatting(worksheet)
         xml = b""
         for cf in cfs:

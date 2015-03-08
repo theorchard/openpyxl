@@ -31,12 +31,9 @@ class ConditionalFormatting(object):
 
          The priority will be added automatically.
         """
-        if isinstance(cfRule, dict):
-            rule = cfRule
-        else:
-            rule = cfRule.rule
+        rule = cfRule
         self.max_priority += 1
-        rule['priority'] = self.max_priority
+        rule.priority = self.max_priority
 
         self.cf_rules.setdefault(range_string, []).append(rule)
 
