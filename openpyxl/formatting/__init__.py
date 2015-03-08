@@ -52,6 +52,7 @@ class ConditionalFormatting(object):
         self.max_priority = len(rules)
 
 
+    @deprecated("Always use Rule objects")
     def update(self, cfRules):
         """Set the conditional formatting rules from a dictionary.  Intended for use when loading a document.
         cfRules use the structure: {range_string: [rule1, rule2]}, eg:
