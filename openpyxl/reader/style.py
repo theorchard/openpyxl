@@ -18,7 +18,7 @@ from openpyxl.styles import (
     Alignment,
     borders,
 )
-from openpyxl.styles.differential import DifferentialFormat
+from openpyxl.styles.differential import DifferentialStyle
 from openpyxl.styles.colors import COLOR_INDEX, Color
 from openpyxl.styles.style import StyleId
 from openpyxl.styles.named_styles import NamedStyle
@@ -72,7 +72,7 @@ class SharedStylesParser(object):
     def parse_dxfs(self):
         """Read in the dxfs effects - used by conditional formatting."""
         for node in self.root.findall("{%s}dxfs/{%s}dxf" % (SHEET_MAIN_NS, SHEET_MAIN_NS) ):
-            self.differential_styles.append(DifferentialFormat.from_tree(node))
+            self.differential_styles.append(DifferentialStyle.from_tree(node))
 
 
     def parse_fonts(self):

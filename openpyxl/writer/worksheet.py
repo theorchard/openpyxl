@@ -27,7 +27,7 @@ from openpyxl.xml.constants import (
     REL_NS,
 )
 from openpyxl.formatting import ConditionalFormatting
-from openpyxl.styles.differential import DifferentialFormat
+from openpyxl.styles.differential import DifferentialStyle
 from openpyxl.worksheet.datavalidation import writer
 from openpyxl.worksheet.properties import WorksheetProperties, write_sheetPr
 
@@ -125,7 +125,7 @@ def write_conditional_formatting(worksheet):
 
         for rule in rules:
             if rule.dxf is not None:
-                if rule.dxf != DifferentialFormat():
+                if rule.dxf != DifferentialStyle():
                     rule.dxfId = len(wb._differential_styles)
                     wb._differential_styles.append(rule.dxf)
             cf.append(rule.to_tree())

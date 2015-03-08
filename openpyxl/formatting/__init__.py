@@ -3,7 +3,7 @@ from __future__ import absolute_import
 
 
 from openpyxl.compat import iteritems, OrderedDict, deprecated
-from openpyxl.styles.differential import DifferentialFormat
+from openpyxl.styles.differential import DifferentialStyle
 
 from .rule import Rule
 

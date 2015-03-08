@@ -22,7 +22,7 @@ from openpyxl.xml.functions import (
 )
 
 
-from openpyxl.styles.differential import DifferentialFormat
+from openpyxl.styles.differential import DifferentialStyle
 
 
 class ExtensionList(Serialisable):
@@ -156,7 +156,7 @@ class Rule(Serialisable):
     dataBar = Typed(expected_type=DataBar, allow_none=True)
     iconSet = Typed(expected_type=IconSet, allow_none=True)
     extLst = Typed(expected_type=ExtensionList, allow_none=True)
-    style = Typed(expected_type=DifferentialFormat, allow_none=True)
+    style = Typed(expected_type=DifferentialStyle, allow_none=True)
 
     __elements__ = ('colorScale', 'dataBar', 'extLst', 'iconSet', 'formula')
 
@@ -237,7 +237,7 @@ def FormulaRule(formula=None, stopIfTrue=None, font=None, border=None,
     Conditional formatting with custom differential style
     """
     rule = Rule(type="expression", formula=formula, stopIfTrue=stopIfTrue)
-    rule.dxf =  DifferentialFormat(font=font, border=border, fill=fill)
+    rule.dxf =  DifferentialStyle(font=font, border=border, fill=fill)
     return rule
 
 
@@ -250,6 +250,6 @@ def CellIsRule(operator=None, formula=None, stopIfTrue=None, font=None, border=N
     operator = expand.get(operator, operator)
 
     rule = Rule(type='cellIs', operator=operator, formula=formula, stopIfTrue=stopIfTrue)
-    rule.dxf = DifferentialFormat(font=font, border=border, fill=fill)
+    rule.dxf = DifferentialStyle(font=font, border=border, fill=fill)
 
     return rule
