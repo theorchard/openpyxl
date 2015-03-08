@@ -260,7 +260,7 @@ def test_empty_workbook():
       </fonts>
       <fills count="2">
        <fill>
-          <patternFill patternType="none" />
+          <patternFill />
        </fill>
        <fill>
           <patternFill patternType="gray125"/>

@@ -98,7 +98,9 @@ class PatternFill(Fill):
 
     def to_tree(self, tagname=None):
         parent = Element("fill")
-        el = Element(self.tagname, patternType=safe_string(self.patternType))
+        el = Element(self.tagname)
+        if self.patternType is not None:
+            el.set('patternType', self.patternType)
         for c in self.__elements__:
             value = getattr(self, c)
             if value != Color():
