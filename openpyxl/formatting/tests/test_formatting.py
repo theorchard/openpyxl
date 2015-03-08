@@ -287,8 +287,8 @@ class TestConditionalFormatting(object):
                        patternType=fills.FILL_SOLID)
         whiteFont = Font(color=Color("FFFFFFFF"))
         ws.conditional_formatting.add('A1:A3',
-                                             CellIsRule(operator='equal', formula=['"Fail"'], stopIfTrue=False,
-                                                        font=whiteFont, fill=redFill))
+                                      CellIsRule(operator='equal', formula=['"Fail"'], stopIfTrue=False,
+                                                 font=whiteFont, fill=redFill))
 
         from openpyxl.writer.worksheet import write_conditional_formatting
 
