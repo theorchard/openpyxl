@@ -27,9 +27,7 @@ class ConditionalFormatting(object):
         self.parse_rules = {}
 
     def add(self, range_string, cfRule):
-        """Add a rule.  Rule is either:
-         1. A dictionary containing a key called type, and other keys, as in `ConditionalFormatting.rule_attributes`.
-         2. A rule object, such as ColorScaleRule, FormulaRule or CellIsRule
+        """Add a rule such as ColorScaleRule, FormulaRule or CellIsRule
 
          The priority will be added automatically.
         """
