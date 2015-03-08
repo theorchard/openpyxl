@@ -5,6 +5,8 @@ from __future__ import absolute_import
 from openpyxl.compat import iteritems, OrderedDict, deprecated
 from openpyxl.styles.differential import DifferentialFormat
 
+from .rule import Rule
+
 
 def unpack_rules(cfRules):
     for key, rules in iteritems(cfRules):
@@ -28,6 +30,8 @@ class ConditionalFormatting(object):
 
          The priority will be added automatically.
         """
+        if not isinstance(cfRule, Rule):
+            raise ValueError("Only instances of openpyxl.formatting.rule.Rule may be added")
         rule = cfRule
         self.max_priority += 1
         rule.priority = self.max_priority
