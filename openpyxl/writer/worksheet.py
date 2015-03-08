@@ -121,9 +121,6 @@ def write_conditional_formatting(worksheet):
     """Write conditional formatting to xml."""
     wb = worksheet.parent
     for range_string, rules in iteritems(worksheet.conditional_formatting.cf_rules):
-        if not len(rules):
-            # Skip if there are no rules.  This is possible if a dataBar rule was read in and ignored.
-            continue
         cf = Element('conditionalFormatting', {'sqref': range_string})
 
         for rule in rules:
