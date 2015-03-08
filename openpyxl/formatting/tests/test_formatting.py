@@ -234,7 +234,7 @@ class TestRule:
 class DummyWorkbook():
 
     def __init__(self):
-        self.differential_styles = []
+        self._differential_styles = []
         self.shared_styles = IndexedList()
         self.worksheets = []
 
@@ -281,8 +281,8 @@ class TestConditionalFormatting(object):
         cf.add('C1:C10', FormulaRule(formula=['ISBLANK(C1)'], font=font, border=border, fill=fill))
         cf.add('D1:D10', FormulaRule(formula=['ISBLANK(D1)'], fill=fill))
         cf._save_styles(self.workbook)
-        assert len(self.workbook.differential_styles) == 2
-        ft1, ft2 = self.workbook.differential_styles
+        assert len(self.workbook._differential_styles) == 2
+        ft1, ft2 = self.workbook._differential_styles
         assert ft1.font == font
         assert ft1.border == border
         assert ft1.fill == fill

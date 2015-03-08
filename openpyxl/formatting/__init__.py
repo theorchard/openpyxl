@@ -4,7 +4,7 @@ from __future__ import absolute_import
 from openpyxl.compat import iteritems, OrderedDict, deprecated
 
 from openpyxl.styles import Font, PatternFill, Border
-from openpyxl.styles.differential import DifferentialFormat
+from openpyxl.styles.differential import DifferentialStyle
 from .rules import CellIsRule, ColorScaleRule, FormatRule, FormulaRule
 
 
@@ -84,7 +84,7 @@ class ConditionalFormatting(object):
         for rules in self.cf_rules.values():
             for rule in rules:
                 if 'dxf' in rule:
-                    dxf = DifferentialFormat()
+                    dxf = DifferentialStyle()
                     if 'font' in rule['dxf'] and isinstance(rule['dxf']['font'], Font):
                         # DXF font is limited to color, bold, italic, underline and strikethrough
                         dxf.font = rule['dxf']['font']
@@ -93,7 +93,7 @@ class ConditionalFormatting(object):
                     if 'fill' in rule['dxf'] and isinstance(rule['dxf']['fill'], PatternFill):
                         dxf.fill = rule['dxf']['fill']
 
-                    wb.differential_styles.append(dxf)
+                    wb._differential_styles.append(dxf)
                     rule.pop('dxf')
-                    rule['dxfId'] = len(wb.differential_styles) - 1
+                    rule['dxfId'] = len(wb._differential_styles) - 1
 
