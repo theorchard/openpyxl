@@ -110,7 +110,6 @@ class Worksheet(object):
                                                  default_factory=self._add_column)
         self.page_breaks = []
         self._cells = {}
-        self._styles = {}
         self._charts = []
         self._images = []
         self._comment_count = 0
@@ -198,7 +197,7 @@ class Worksheet(object):
         for coordinate, cell in iteritems(self._cells):
             if (cell.value in ('', None)
             and cell.comment is None
-            and (coordinate not in self._styles or cell.style == DEFAULTS_STYLE)):
+            and (cell.style_id == 0)):
                 delete_list.append(coordinate)
         for coordinate in delete_list:
             del self._cells[coordinate]
