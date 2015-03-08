@@ -128,6 +128,7 @@ class ColorScale(RuleType):
 class Rule(Serialisable):
 
     tagname = "cfRule"
+    dxf = None
 
     type = Set(values=(['expression', 'cellIs', 'colorScale', 'dataBar',
                         'iconSet', 'top10', 'uniqueValues', 'duplicateValues', 'containsText',
@@ -162,7 +163,7 @@ class Rule(Serialisable):
     def __init__(self,
                  type,
                  dxfId=None,
-                 priority=None,
+                 priority=0,
                  stopIfTrue=None,
                  aboveAverage=None,
                  percent=None,
@@ -199,3 +200,56 @@ class Rule(Serialisable):
         self.iconSet = iconSet
         self.extLst = extLst
         self.style = style
+
+
+def ColorScaleRule(start_type=None,
+                 start_value=None,
+                 start_color=None,
+                 mid_type=None,
+                 mid_value=None,
+                 mid_color=None,
+                 end_type=None,
+                 end_value=None,
+                 end_color=None):
+
+    """Backwards compatibility"""
+    formats = []
+    if start_type is not None:
+        formats.append(FormatObject(type=start_type, val=start_value))
+    if mid_type is not None:
+        formats.append(FormatObject(type=mid_type, val=mid_value))
+    if end_type is not None:
+        formats.append(FormatObject(type=end_type, val=end_value))
+    colors = []
+    for v in (start_color, mid_color, end_color):
+        if v is not None:
+            if not isinstance(v, Color):
+                v = Color(v)
+            colors.append(v)
+    cs = ColorScale(cfvo=formats, color=colors)
+    rule = Rule(type="colorScale", colorScale=cs)
+    return rule
+
+
+def FormulaRule(formula=None, stopIfTrue=None, font=None, border=None,
+                fill=None):
+    """
+    Conditional formatting with custom differential style
+    """
+    rule = Rule(type="expression", formula=formula, stopIfTrue=stopIfTrue)
+    rule.dxf =  DifferentialStyle(font=font, border=border, fill=fill)
+    return rule
+
+
+def CellIsRule(operator=None, formula=None, stopIfTrue=None, font=None, border=None, fill=None):
+    """Conditional formatting rule based on cell contents."""
+    # Excel doesn't use >, >=, etc, but allow for ease of python development
+    expand = {">": "greaterThan", ">=": "greaterThanOrEqual", "<": "lessThan", "<=": "lessThanOrEqual",
+              "=": "equal", "==": "equal", "!=": "notEqual"}
+
+    operator = expand.get(operator, operator)
+
+    rule = Rule(type='cellIs', operator=operator, formula=formula, stopIfTrue=stopIfTrue)
+    rule.dxf = DifferentialStyle(font=font, border=border, fill=fill)
+
+    return rule

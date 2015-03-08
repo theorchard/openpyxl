@@ -8,7 +8,6 @@ import datetime
 
 from openpyxl.compat import unicode
 from openpyxl.formatting import ConditionalFormatting
-from openpyxl.formatting.rules import FormulaRule
 
 from openpyxl.xml.functions import SubElement
 from openpyxl.styles import (

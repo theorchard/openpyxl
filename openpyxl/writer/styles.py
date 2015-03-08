@@ -112,13 +112,11 @@ class StyleWriter(object):
             cell_xfs.append(node)
 
             if style.applyAlignment:
-                node.set('applyAlignment', '1')
                 al = self.alignments[style.alignmentId]
                 el = al.to_tree()
                 node.append(el)
 
             if style.applyProtection:
-                node.set('applyProtection', '1')
                 prot = self.protections[style.protectionId]
                 el = prot.to_tree()
                 node.append(el)

@@ -40,6 +40,12 @@ def ColorScale():
     return ColorScale
 
 
+@pytest.fixture
+def ColorScaleRule():
+    from ..rule import ColorScaleRule
+    return ColorScaleRule
+
+
 class TestColorScale:
 
     def test_create(self, ColorScale):
@@ -77,6 +83,47 @@ class TestColorScale:
         <color rgb="FFFFFF00"/>
         <color rgb="FF00B050"/>
         </colorScale>
+        """
+        diff = compare_xml(xml, expected)
+        assert diff is None, diff
+
+
+    def test_two_colors(self, ColorScaleRule):
+        cfRule = ColorScaleRule(start_type='min', start_value=None,
+                                start_color='FFAA0000', end_type='max', end_value=None,
+                                end_color='FF00AA00')
+        xml = tostring(cfRule.to_tree())
+        expected = """
+        <cfRule priority="0" type="colorScale">
+          <colorScale>
+            <cfvo type="min"/>
+            <cfvo type="max"/>
+            <color rgb="FFAA0000"/>
+            <color rgb="FF00AA00"/>
+          </colorScale>
+        </cfRule>
+        """
+        diff = compare_xml(xml, expected)
+        assert diff is None, diff
+
+
+    def test_three_colors(self, ColorScaleRule):
+        cfRule = ColorScaleRule(start_type='percentile', start_value=10,
+                                start_color='FFAA0000', mid_type='percentile', mid_value=50,
+                                mid_color='FF0000AA', end_type='percentile', end_value=90,
+                                end_color='FF00AA00')
+        xml = tostring(cfRule.to_tree())
+        expected = """
+        <cfRule priority="0" type="colorScale">
+            <colorScale>
+              <cfvo type="percentile" val="10"></cfvo>
+              <cfvo type="percentile" val="50"></cfvo>
+              <cfvo type="percentile" val="90"></cfvo>
+              <color rgb="FFAA0000"></color>
+              <color rgb="FF0000AA"></color>
+              <color rgb="FF00AA00"></color>
+            </colorScale>
+        </cfRule>
         """
         diff = compare_xml(xml, expected)
         assert diff is None, diff
@@ -163,7 +210,6 @@ class TestIconSet:
         assert diff is None, diff
 
 
-
 @pytest.fixture
 def Rule():
     from ..rule import Rule
@@ -202,3 +248,43 @@ class TestRule:
         assert diff is None, diff
 
 
+def test_formula_rule():
+    from ..rule import FormulaRule
+    from openpyxl.styles.differential import DifferentialStyle
+
+    cf = FormulaRule(formula=['ISBLANK(C1)'], stopIfTrue=True)
+    assert dict(cf) == {'priority': '0', 'stopIfTrue': '1', 'type': 'expression'}
+    assert cf.formula == ('ISBLANK(C1)',)
+    assert cf.dxf == DifferentialStyle()
+
+
+def test_cellis_rule():
+    from ..rule import CellIsRule
+    from openpyxl.styles import PatternFill
+
+    red_fill = PatternFill(start_color='FFEE1111', end_color='FFEE1111',
+                           fill_type='solid')
+
+    rule = CellIsRule(operator='<', formula=['C$1'], stopIfTrue=True, fill=red_fill)
+    assert dict(rule) == {'operator': 'lessThan', 'priority': '0', 'type': 'cellIs', 'stopIfTrue':'1'}
+    assert rule.formula == ('C$1',)
+    assert rule.dxf.fill == red_fill
+
+
+@pytest.mark.parametrize("value, expansion",
+                         [
+                             ('<=', 'lessThanOrEqual'),
+                             ('>', 'greaterThan'),
+                             ('!=', 'notEqual'),
+                             ('=', 'equal'),
+                             ('>=', 'greaterThanOrEqual'),
+                             ('==', 'equal'),
+                             ('<', 'lessThan'),
+                         ]
+                         )
+def test_operator_expansion(value, expansion):
+    from ..rule import CellIsRule
+    cf1 = CellIsRule(operator=value, formula=[])
+    cf2 = CellIsRule(operator=expansion, formula=[])
+    assert cf1.operator == expansion
+    assert cf2.operator == expansion

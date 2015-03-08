@@ -78,7 +78,7 @@ def ErrorBar():
 def ws(Workbook):
     """Empty worksheet titled 'data'"""
     wb = Workbook()
-    ws = wb.get_active_sheet()
+    ws = wb.active
     ws.title = 'data'
     return ws
 
