@@ -331,6 +331,15 @@ def test_conditional_formatting_read(datadir):
     rule = rules['Z1:Z10'][0]
     assert dict(rule)== {'aboveAverage': '0', 'dxfId': '18', 'type':
                          'aboveAverage', 'stdDev': '1', 'priority': '5'}
+    assert rule.dxf == DifferentialStyle(font=Font(b=True, i=True, color='FF9C0006'),
+                                         fill=PatternFill(bgColor='FFFFC7CE'),
+                                         border=Border(
+                                             left=Side(style='thin', color=Color(theme=5)),
+                                             right=Side(style='thin', color=Color(theme=5)),
+                                             top=Side(style='thin', color=Color(theme=5)),
+                                             bottom=Side(style='thin', color=Color(theme=5))
+        )
+    )
 
     rule = rules['AA1:AA10'][0]
     assert dict(rule) == {'priority': '4', 'dxfId': '17', 'type':
