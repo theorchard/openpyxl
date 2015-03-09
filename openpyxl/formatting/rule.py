@@ -14,14 +14,6 @@ from openpyxl.descriptors import (
     Integer,)
 from openpyxl.descriptors.excel import HexBinary
 from openpyxl.styles.colors import Color, ColorDescriptor
-
-from openpyxl.xml.functions import (
-    localname,
-    Element,
-    SubElement,
-)
-
-
 from openpyxl.styles.differential import DifferentialStyle
 
 
