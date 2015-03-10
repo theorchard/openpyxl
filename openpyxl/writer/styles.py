@@ -118,11 +118,10 @@ class StyleWriter(object):
         Workbook contains a different colour index.
         """
 
-        colors = self.wb._colors
-        if colors == COLOR_INDEX:
+        if self.wb._colors == COLOR_INDEX:
             return
 
         cols = SubElement(self._root, "colors")
         rgb = SubElement(cols, "indexedColors")
-        for color in colors:
+        for color in self.wb._colors:
             SubElement(rgb, "rgbColor", rgb=color)
