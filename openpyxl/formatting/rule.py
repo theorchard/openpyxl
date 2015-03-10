@@ -233,7 +233,9 @@ def FormulaRule(formula=None, stopIfTrue=None, font=None, border=None,
 
 
 def CellIsRule(operator=None, formula=None, stopIfTrue=None, font=None, border=None, fill=None):
-    """Conditional formatting rule based on cell contents."""
+    """
+    Conditional formatting rule based on cell contents.
+    """
     # Excel doesn't use >, >=, etc, but allow for ease of python development
     expand = {">": "greaterThan", ">=": "greaterThanOrEqual", "<": "lessThan", "<=": "lessThanOrEqual",
               "=": "equal", "==": "equal", "!=": "notEqual"}
@@ -242,5 +244,19 @@ def CellIsRule(operator=None, formula=None, stopIfTrue=None, font=None, border=N
 
     rule = Rule(type='cellIs', operator=operator, formula=formula, stopIfTrue=stopIfTrue)
     rule.dxf = DifferentialStyle(font=font, border=border, fill=fill)
+
+    return rule
+
+
+def IconSetRule(icon_style=None, type=None, values=None, showValue=None, percent=None, reverse=None):
+    """
+    Convenience function for creating icon set rules
+    """
+    cfvo = []
+    for val in values:
+        cfvo.append(FormatObject(type, val))
+    icon_set = IconSet(iconSet=icon_style, cfvo=cfvo, showValue=showValue,
+                       percent=percent, reverse=reverse)
+    rule = Rule(type='iconSet', iconSet=icon_set)
 
     return rule

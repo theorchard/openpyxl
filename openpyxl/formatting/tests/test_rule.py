@@ -288,3 +288,21 @@ def test_operator_expansion(value, expansion):
     cf2 = CellIsRule(operator=expansion, formula=[])
     assert cf1.operator == expansion
     assert cf2.operator == expansion
+
+
+def test_iconset_rule():
+    from ..rule import IconSetRule
+    rule = IconSetRule('5Arrows', 'percent', [10, 20, 30, 40, 50])
+    from openpyxl.xml.functions import tostring
+    tostring(rule.to_tree())
+    expected = """
+    <cfRule priority="0" type="iconSet">
+    <iconSet iconSet="5Arrows">
+      <cfvo type="percent" val="10"/>
+      <cfvo type="percent" val="20"/>
+      <cfvo type="percent" val="30"/>
+      <cfvo type="percent" val="40"/>
+      <cfvo type="percent" val="50"/>
+    </iconSet>
+    </cfRule>
+    """
