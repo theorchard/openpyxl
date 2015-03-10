@@ -260,3 +260,14 @@ def IconSetRule(icon_style=None, type=None, values=None, showValue=None, percent
     rule = Rule(type='iconSet', iconSet=icon_set)
 
     return rule
+
+
+def DataBarRule(start_type=None, start_value=None, end_type=None,
+                end_value=None, color=None, showValue=None, minLength=None, maxLength=None):
+    start = FormatObject(start_type, start_value)
+    end = FormatObject(end_type, end_value)
+    data_bar = DataBar(cfvo=[start, end], color=color, showValue=showValue,
+                       minLength=minLength, maxLength=maxLength)
+    rule = Rule(type='dataBar', dataBar=data_bar)
+
+    return rule

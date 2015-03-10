@@ -293,8 +293,7 @@ def test_operator_expansion(value, expansion):
 def test_iconset_rule():
     from ..rule import IconSetRule
     rule = IconSetRule('5Arrows', 'percent', [10, 20, 30, 40, 50])
-    from openpyxl.xml.functions import tostring
-    tostring(rule.to_tree())
+    xml = tostring(rule.to_tree())
     expected = """
     <cfRule priority="0" type="iconSet">
     <iconSet iconSet="5Arrows">
@@ -306,3 +305,23 @@ def test_iconset_rule():
     </iconSet>
     </cfRule>
     """
+    diff = compare_xml(xml, expected)
+    assert diff is None, diff
+
+
+def test_databar_rule():
+    from ..rule import DataBarRule
+    rule = DataBarRule(start_type='percentile', start_value=10,
+                       end_type='percentile', end_value='90', color="FF638EC6")
+    xml = tostring(rule.to_tree())
+    expected = """
+    <cfRule type="dataBar" priority="0">
+    <dataBar>
+      <cfvo type="percentile" val="10"/>
+      <cfvo type="percentile" val="90"/>
+      <color rgb="FF638EC6"/>
+    </dataBar>
+    </cfRule>
+    """
+    diff = compare_xml(xml, expected)
+    assert diff is None, diff
