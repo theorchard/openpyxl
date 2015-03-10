@@ -30,7 +30,7 @@ The builtins conditional formats are:
   * IconSet
   * DataBar
 
-Builtin formats contain a sequence of formatting settings which combine a type with an integer for comparison. Possible types are: 'num', 'percent', 'max', 'min', 'formula', 'percentile'.
+Builtin formats contain a sequence of formatting settings which combine a type with an integer for comparison. Possible types are: `'num', 'percent', 'max', 'min', 'formula', 'percentile'`.
 
 
 ColorScale
@@ -70,7 +70,7 @@ There is a convenience function for creating ColorScale rules
 IconSet
 +++++++
 
-Choose from the following set of icons: '3Arrows', '3ArrowsGray', '3Flags', '3TrafficLights1', '3TrafficLights2', '3Signs', '3Symbols', '3Symbols2', '4Arrows', '4ArrowsGray', '4RedToBlack', '4Rating', '4TrafficLights', '5Arrows', '5ArrowsGray', '5Rating', '5Quarters'
+Choose from the following set of icons: `'3Arrows', '3ArrowsGray', '3Flags', '3TrafficLights1', '3TrafficLights2', '3Signs', '3Symbols', '3Symbols2', '4Arrows', '4ArrowsGray', '4RedToBlack', '4Rating', '4TrafficLights', '5Arrows', '5ArrowsGray', '5Rating', '5Quarters'`
 
 The full syntax for creating an IconSet rule is:
 
