@@ -29,7 +29,7 @@ The builtins conditional formats are:
   * IconSet
   * DataBar
 
-Builtin formats contain a sequence of formatting settings which combine a type with an integer for comparison. Possible types are 'num', 'percent', 'max', 'min', 'formula', 'percentile'.
+Builtin formats contain a sequence of formatting settings which combine a type with an integer for comparison. Possible types are: 'num', 'percent', 'max', 'min', 'formula', 'percentile'.
 
 
 ColorScale
@@ -52,8 +52,11 @@ The full syntax for creating a ColorScale rule is:
 >>> mid = FormatObject(type='num', val=40) 
 >>> colors.insert(1, Color('FF00AA00'))
 >>> cs3 = ColorScale(cfvo=[first, mid, last], color=colors)
+>>> # create a rule with the color scale
+>>> from openpyxl.formatting.rule import Rule
+>>> rule = Rule(type='colorScale', colorScale=cs3)
 
-There is a convenience function for creating ColorScaleRule
+There is a convenience function for creating ColorScale rules
 
 .. ::doctest
 
@@ -61,6 +64,32 @@ There is a convenience function for creating ColorScaleRule
 >>> rule = ColorScaleRule(start_type='percentile', start_value=10, start_color='FFAA0000',
 ...                       mid_type='percentile', mid_value=50, mid_color='FF0000AA',
 ...                       end_type='percentile', end_value=90, end_color='FF00AA00')
+
+
+IconSet
++++++++
+
+Choose from the following sets of icons: '3Arrows', '3ArrowsGray', '3Flags', '3TrafficLights1', '3TrafficLights2', '3Signs', '3Symbols', '3Symbols2', '4Arrows', '4ArrowsGray', '4RedToBlack', '4Rating', '4TrafficLights', '5Arrows', '5ArrowsGray', '5Rating', '5Quarters'
+
+.. ::doctest
+
+The full syntax for creating an IconSet rule is:
+>>> from openpyxl.formatting.rule import IconSet, FormatObject
+>>> first = FormatObject(type='percent', val=0)
+>>> second = FormatObject(type='percent', val=33)
+>>> third = FormatObject(type='percent', val=67)
+>>> iconset = IconSet(iconSet='3TrafficLights1', cfvo=[first, second, third], showValue=None, percent=None, reverse=None)
+>>> # assign the icon set to a rule
+>>> from openpyxl.formatting.rule import Rule
+>>> rule = Rule(type='iconSet', iconSet=iconset)
+
+There is a convenience function for creating IconSet rules
+
+.. ::doctest
+
+>>> from openpyxl.formatting.rule import IconSetRule
+>>> rule = IconSetRule('5Arrows', 'percent', [10, 20, 30, 40, 50], showValue=None, percent=None, reverse=None)
+
 
 Standard conditional formats
 ----------------------------
