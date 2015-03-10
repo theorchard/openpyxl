@@ -3,14 +3,15 @@ Conditional Formatting
 
 Excel supports three different types of conditional formatting: builtins, standard and custom. Builtins combine specific rules with predefined styles. Standard conditional formats combine specific rules with custom formatting. In additional it is possible to define custom formulae for applying custom formats using differential styles.
 
-.. :: note
+.. note::
 
-The syntax for the different rules varies so much that it is not possible for openpyxl to know whether a rule makes sense or not.
+  The syntax for the different rules varies so much that it is not
+  possible for openpyxl to know whether a rule makes sense or not.
 
 
 The basic syntax for creating a formatting rule is:
 
-.. :: doctest
+.. doctest
 
 >>> from openpyxl.formatting import Rule
 >>> from openpyxl.styles import Font, PatternFill, Border
@@ -39,17 +40,17 @@ You can have color scales with 2 or 3 colors. 2 color scales produce a gradient 
 
 The full syntax for creating a ColorScale rule is:
 
-.. :: doctest
+.. doctest
 
 >>> from openpyxl.formatting.rule import ColorScale, FormatObject
 >>> from openpyxl.styles import Color
 >>> first = FormatObject(type='min')
->>> last = FormatObject(type='max') 
+>>> last = FormatObject(type='max')
 >>> # colors match the format objects:
 >>> colors = [Color('FFAA0000'), Color('FF00AA00')]
 >>> cs2 = ColorScale(cfvo=[first, last], color=colors)
 >>> # a three color scale would extend the sequences
->>> mid = FormatObject(type='num', val=40) 
+>>> mid = FormatObject(type='num', val=40)
 >>> colors.insert(1, Color('FF00AA00'))
 >>> cs3 = ColorScale(cfvo=[first, mid, last], color=colors)
 >>> # create a rule with the color scale
@@ -58,7 +59,7 @@ The full syntax for creating a ColorScale rule is:
 
 There is a convenience function for creating ColorScale rules
 
-.. ::doctest
+.. doctest
 
 >>> from openpyxl.formatting.rule import ColorScaleRule
 >>> rule = ColorScaleRule(start_type='percentile', start_value=10, start_color='FFAA0000',
@@ -73,7 +74,7 @@ Choose from the following set of icons: '3Arrows', '3ArrowsGray', '3Flags', '3Tr
 
 The full syntax for creating an IconSet rule is:
 
-.. ::doctest
+.. doctest
 
 >>> from openpyxl.formatting.rule import IconSet, FormatObject
 >>> first = FormatObject(type='percent', val=0)
@@ -86,7 +87,7 @@ The full syntax for creating an IconSet rule is:
 
 There is a convenience function for creating IconSet rules:
 
-.. ::doctest
+.. doctest
 
 >>> from openpyxl.formatting.rule import IconSetRule
 >>> rule = IconSetRule('5Arrows', 'percent', [10, 20, 30, 40, 50], showValue=None, percent=None, reverse=None)
@@ -99,7 +100,7 @@ Currently, openpyxl supports the DataBars as defined in the original specificati
 
 The full syntax for creating a DataBar rule is:
 
-.. ::doctest
+.. doctest
 
 >>> from openpyxl.formatting.rule import DataBar, FormatObject
 >>> first = FormatObject(type='min')
@@ -111,7 +112,7 @@ The full syntax for creating a DataBar rule is:
 
 There is a convenience function for creating DataBar rules:
 
-.. ::doctest
+.. doctest
 
 >>> from openpyxl.formatting.rule import DataBarRule
 >>> rule = DataBarRule(start_type='percentile', start_value=10, end_type='percentile', end_value='90',
@@ -129,7 +130,7 @@ The standard conditional formats are:
   * Value
   * Rank
 
-.. :: doctest
+.. doctest
 
 >>> from openpyxl import Workbook
 >>> from openpyxl.styles import Color, PatternFill, Font, Border

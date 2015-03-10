@@ -64,11 +64,11 @@ Any help will be greatly appreciated, just follow those steps:
 
 For further information see :ref:`development`
 
-.. note:
+.. note::
 
-This is an open-source project, maintained by volunteers on their spare time,
-so while we try to work on this project as often as possible, sometimes life
-gets in the way. Please be patient.
+    This is an open-source project, maintained by volunteers on their spare
+    time, so while we try to work on this project as often as possible,
+    sometimes life gets in the way. Please be patient.
 
 Other ways to help
 ------------------
