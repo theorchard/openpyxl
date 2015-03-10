@@ -69,11 +69,12 @@ There is a convenience function for creating ColorScale rules
 IconSet
 +++++++
 
-Choose from the following sets of icons: '3Arrows', '3ArrowsGray', '3Flags', '3TrafficLights1', '3TrafficLights2', '3Signs', '3Symbols', '3Symbols2', '4Arrows', '4ArrowsGray', '4RedToBlack', '4Rating', '4TrafficLights', '5Arrows', '5ArrowsGray', '5Rating', '5Quarters'
+Choose from the following set of icons: '3Arrows', '3ArrowsGray', '3Flags', '3TrafficLights1', '3TrafficLights2', '3Signs', '3Symbols', '3Symbols2', '4Arrows', '4ArrowsGray', '4RedToBlack', '4Rating', '4TrafficLights', '5Arrows', '5ArrowsGray', '5Rating', '5Quarters'
+
+The full syntax for creating an IconSet rule is:
 
 .. ::doctest
 
-The full syntax for creating an IconSet rule is:
 >>> from openpyxl.formatting.rule import IconSet, FormatObject
 >>> first = FormatObject(type='percent', val=0)
 >>> second = FormatObject(type='percent', val=33)
@@ -83,12 +84,38 @@ The full syntax for creating an IconSet rule is:
 >>> from openpyxl.formatting.rule import Rule
 >>> rule = Rule(type='iconSet', iconSet=iconset)
 
-There is a convenience function for creating IconSet rules
+There is a convenience function for creating IconSet rules:
 
 .. ::doctest
 
 >>> from openpyxl.formatting.rule import IconSetRule
 >>> rule = IconSetRule('5Arrows', 'percent', [10, 20, 30, 40, 50], showValue=None, percent=None, reverse=None)
+
+
+DataBar
++++++++
+
+Currently, openpyxl supports the DataBars as defined in the original specification. Borders and directions were added in a later extension.
+
+The full syntax for creating a DataBar rule is:
+
+.. ::doctest
+
+>>> from openpyxl.formatting.rule import DataBar, FormatObject
+>>> first = FormatObject(type='min')
+>>> second = FormatObject(type='max')
+>>> data_bar = DataBar(cfvo=[first, second], color="FF638EC6", showValue=None, minLength=None, maxLength=None)
+>>> # assign the data bar to a rule
+>>> from openpyxl.formatting.rule import Rule
+>>> rule = Rule(type='dataBar', dataBar=data_bar)
+
+There is a convenience function for creating DataBar rules:
+
+.. ::doctest
+
+>>> from openpyxl.formatting.rule import DataBarRule
+>>> rule = DataBarRule(start_type='percentile', start_value=10, end_type='percentile', end_value='90',
+...                    color="FF638EC6", showValue="None", minLength=None, maxLength=None)
 
 
 Standard conditional formats
