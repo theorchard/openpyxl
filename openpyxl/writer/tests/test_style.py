@@ -119,9 +119,9 @@ class TestStyleWriter(object):
         <styleSheet xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main">
             <cellXfs count="4">
                 <xf borderId="0" fillId="0" fontId="0" numFmtId="0" xfId="0"/>
-                <xf applyNumberFormat="1" borderId="0" fillId="0" fontId="0" numFmtId="164" xfId="0"/>
-                <xf applyNumberFormat="1" borderId="0" fillId="0" fontId="0" numFmtId="10" xfId="0"/>
-                <xf applyNumberFormat="1" borderId="0" fillId="0" fontId="0" numFmtId="165" xfId="0"/>
+                <xf borderId="0" fillId="0" fontId="0" numFmtId="164" xfId="0"/>
+                <xf borderId="0" fillId="0" fontId="0" numFmtId="10" xfId="0"/>
+                <xf borderId="0" fillId="0" fontId="0" numFmtId="165" xfId="0"/>
             </cellXfs>
         </styleSheet>
         """
@@ -144,7 +144,7 @@ class TestStyleWriter(object):
         <styleSheet xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main">
           <cellXfs count="2">
             <xf borderId="0" fillId="0" fontId="0" numFmtId="0" xfId="0"/>
-            <xf applyFont="1" borderId="0" fillId="0" fontId="1" numFmtId="0" xfId="0"/>
+            <xf borderId="0" fillId="0" fontId="1" numFmtId="0" xfId="0"/>
           </cellXfs>
         </styleSheet>
         """
@@ -165,7 +165,7 @@ class TestStyleWriter(object):
         <styleSheet xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main">
           <cellXfs count="2">
             <xf borderId="0" fillId="0" fontId="0" numFmtId="0" xfId="0"/>
-            <xf applyFill="1" borderId="0" fillId="2" fontId="0" numFmtId="0" xfId="0"/>
+            <xf borderId="0" fillId="2" fontId="0" numFmtId="0" xfId="0"/>
           </cellXfs>
         </styleSheet>
         """
@@ -187,7 +187,7 @@ class TestStyleWriter(object):
         <styleSheet xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main">
         <cellXfs count="2">
           <xf borderId="0" fillId="0" fontId="0" numFmtId="0" xfId="0"/>
-          <xf applyBorder="1" borderId="1" fillId="0" fontId="0" numFmtId="0" xfId="0"/>
+          <xf borderId="1" fillId="0" fontId="0" numFmtId="0" xfId="0"/>
         </cellXfs>
         </styleSheet>
         """
@@ -260,7 +260,7 @@ def test_empty_workbook():
       </fonts>
       <fills count="2">
        <fill>
-          <patternFill patternType="none" />
+          <patternFill />
        </fill>
        <fill>
           <patternFill patternType="gray125"/>

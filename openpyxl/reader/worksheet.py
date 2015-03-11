@@ -64,6 +64,7 @@ class WorkSheetParser(object):
         self.color_index = color_index
         self.guess_types = ws.parent._guess_types
         self.data_only = ws.parent.data_only
+        self.styles = [dict(style) for style in self.ws.parent._cell_styles]
 
     def parse(self):
         dispatcher = {
@@ -123,14 +124,14 @@ class WorkSheetParser(object):
                     self.ws.formula_attributes[coordinate]['ref'] = ref
 
 
-        styles = {}
+        style = {}
         if style_id is not None:
             style_id = int(style_id)
-            style_id = self.ws.parent._cell_styles[style_id]
-            styles = style_id._asdict()
+            style = self.styles[style_id]
+
 
         column, row = coordinate_from_string(coordinate)
-        cell = Cell(self.ws, column, row, **styles)
+        cell = Cell(self.ws, column, row, **style)
         self.ws._add_cell(cell)
 
         if value is not None:

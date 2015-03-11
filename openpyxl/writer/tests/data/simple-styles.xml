@@ -14,7 +14,7 @@
   </fonts>
   <fills count="2">
     <fill>
-      <patternFill patternType="none"/>
+      <patternFill/>
     </fill>
     <fill>
       <patternFill patternType="gray125"/>
@@ -34,9 +34,9 @@
   </cellStyleXfs>
   <cellXfs count="5">
     <xf borderId="0" fillId="0" fontId="0" numFmtId="0" xfId="0"/>
-    <xf applyNumberFormat="1" borderId="0" fillId="0" fontId="0" numFmtId="9" xfId="0"/>
-    <xf applyNumberFormat="1" borderId="0" fillId="0" fontId="0" numFmtId="164" xfId="0"/>
-    <xf applyNumberFormat="1" borderId="0" fillId="0" fontId="0" numFmtId="2" xfId="0"/>
+    <xf borderId="0" fillId="0" fontId="0" numFmtId="9" xfId="0"/>
+    <xf borderId="0" fillId="0" fontId="0" numFmtId="164" xfId="0"/>
+    <xf borderId="0" fillId="0" fontId="0" numFmtId="2" xfId="0"/>
     <xf applyProtection="1" borderId="0" fillId="0" fontId="0" numFmtId="0" xfId="0">
       <protection hidden="1" locked="1"/>
     </xf>

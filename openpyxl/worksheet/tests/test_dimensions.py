@@ -16,8 +16,8 @@ class DummyWorkbook:
     def __init__(self):
         self.shared_styles = IndexedList()
         self._cell_styles = IndexedList()
-        self._cell_styles.add(StyleId(0, 0, 0, 0, 0, 0))
-        self._cell_styles.add(StyleId(font=10, number_format=0, border=0, fill=0, protection=0, alignment=0))
+        self._cell_styles.add(StyleId())
+        self._cell_styles.add(StyleId(fontId=10, numFmtId=0, borderId=0, fillId=0, protectionId=0, alignmentId=0))
 
     def get_sheet_names(self):
         return []

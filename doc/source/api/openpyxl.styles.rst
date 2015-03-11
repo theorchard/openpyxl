@@ -28,6 +28,14 @@ openpyxl.styles.colors module
     :undoc-members:
     :show-inheritance:
 
+openpyxl.styles.differential module
+-----------------------------------
+
+.. automodule:: openpyxl.styles.differential
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
 openpyxl.styles.fills module
 ----------------------------
 
@@ -80,6 +88,22 @@ openpyxl.styles.proxy module
 ----------------------------
 
 .. automodule:: openpyxl.styles.proxy
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
+openpyxl.styles.style module
+----------------------------
+
+.. automodule:: openpyxl.styles.style
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
+openpyxl.styles.styleable module
+--------------------------------
+
+.. automodule:: openpyxl.styles.styleable
     :members:
     :undoc-members:
     :show-inheritance:

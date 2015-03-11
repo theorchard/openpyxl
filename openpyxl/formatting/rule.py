@@ -22,7 +22,7 @@ from openpyxl.xml.functions import (
 )
 
 
-from .conditional import ConditionaStyle
+from openpyxl.styles.differential import DifferentialStyle
 
 
 class ExtensionList(Serialisable):
@@ -155,7 +155,7 @@ class Rule(Serialisable):
     dataBar = Typed(expected_type=DataBar, allow_none=True)
     iconSet = Typed(expected_type=IconSet, allow_none=True)
     extLst = Typed(expected_type=ExtensionList, allow_none=True)
-    style = Typed(expected_type=ConditionaStyle, allow_none=True)
+    style = Typed(expected_type=DifferentialStyle, allow_none=True)
 
     __elements__ = ('colorScale', 'dataBar', 'extLst', 'iconSet', 'formula')
 

@@ -188,135 +188,6 @@ def test_read_complex_style(datadir):
     assert ws['A26'].alignment == Alignment(shrinkToFit=True)
 
 
-def test_change_existing_styles(datadir):
-    wb = load_workbook("complex-styles.xlsx")
-    ws = wb.get_active_sheet()
-
-    ws.column_dimensions['A'].width = 20
-    ws.column_dimensions['I'].fill = PatternFill(fill_type='solid',
-                                                 start_color='FF442200')
-
-    ws.column_dimensions['I'].font=Font(color='FF002244')
-
-    assert ws.column_dimensions['I'].fill.start_color.value == 'FF442200'
-    assert ws.column_dimensions['I'].font.color.value == 'FF002244'
-
-    ws['A2'].font = Font(name='Times New Roman',
-                         size=12,
-                         bold=True,
-                         italic=True,
-                         )
-    assert ws['A2'].font == Font(name='Times New Roman', size=12, bold=True,
-                                 italic=True)
-
-    ws['A3'].font = Font(name='Times New Roman',
-                         size=14,
-                         bold=False,
-                         italic=True,
-                         )
-    assert ws['A3'].font == Font(name='Times New Roman', size=14,
-                                 bold=False, italic=True,)
-
-
-    ws['A4'].font = Font(name='Times New Roman',
-                         size=16,
-                         bold=True,
-                         italic=False,
-                         )
-    assert ws['A4'].font == Font(name='Times New Roman', size=16, bold=True,
-                                 italic=False,)
-
-    ws['A5'].font = Font(color=Color('FF66FF66'))
-    assert ws['A5'].font == Font(color='FF66FF66')
-
-
-    ws['A6'].font =Font(color=Color(theme='1'))
-    assert ws['A6'].font == Font(color=Color(theme='1'))
-
-    ws['A7'].fill = PatternFill(fill_type='solid',
-                                start_color=Color('FF330066'))
-    assert ws['A7'].fill == PatternFill(fill_type='solid',
-                                        start_color=Color('FF330066'))
-
-    ws['A8'].fill = PatternFill(fill_type='solid',
-                                start_color=Color(theme='2'))
-    assert ws['A8'].fill == PatternFill(fill_type='solid',
-                                        start_color=Color(theme='2'))
-
-    ws['A9'].alignment = Alignment(horizontal='center')
-    assert ws['A9'].alignment == Alignment(horizontal='center')
-
-    ws['A10'].alignment = Alignment(horizontal='left')
-    assert ws['A10'].alignment == Alignment(horizontal='left')
-
-    ws['A11'].alignment = Alignment(horizontal='right')
-    assert ws['A11'].alignment == Alignment(horizontal='right')
-
-    ws['A12'].alignment = Alignment(vertical='bottom')
-    assert ws['A12'].alignment == Alignment(vertical='bottom')
-
-    ws['A13'].alignment= Alignment(vertical='top')
-    assert ws['A13'].alignment == Alignment(vertical='top')
-
-    ws['A14'].alignment = Alignment(vertical='center')
-    assert ws['A14'].alignment == Alignment(vertical='center')
-
-    ws['A15'].number_format='0.00%'
-    assert ws['A15'].number_format == '0.00%'
-
-    ws['A16'].number_format ='0.00'
-    assert ws['A16'].number_format == '0.00'
-
-    ws['A17'].number_format='mm-dd-yy'
-    assert ws['A17'].number_format == 'mm-dd-yy'
-
-    ws.unmerge_cells('A18:B18')
-
-    ws['A19'].border = Border(top=Side(border_style=borders.BORDER_THIN,
-                                       color=Color('FF006600')),
-                              bottom=Side(border_style=borders.BORDER_THIN,
-                                          color=Color('FF006600')),
-                              left=Side(border_style=borders.BORDER_THIN,
-                                        color=Color('FF006600')),
-                              right=Side(border_style=borders.BORDER_THIN,
-                                         color=Color('FF006600')))
-    assert ws['A19'].border == Border(
-        top=Side(border_style=borders.BORDER_THIN, color='FF006600'),
-        bottom=Side(border_style=borders.BORDER_THIN, color='FF006600'),
-        left=Side(border_style=borders.BORDER_THIN, color='FF006600'),
-        right=Side(border_style=borders.BORDER_THIN, color='FF006600'))
-
-    ws['A21'].border = Border(top=Side(border_style=borders.BORDER_THIN,
-                                       color=Color(theme=7)),
-                              bottom=Side(border_style=borders.BORDER_THIN,
-                                          color=Color(theme=7)),
-                              left=Side(border_style=borders.BORDER_THIN,
-                                        color=Color(theme=7)),
-                              right=Side(border_style=borders.BORDER_THIN,
-                                         color=Color(theme=7)))
-    assert ws['A21'].border == Border(
-        top=Side(border_style=borders.BORDER_THIN, color=Color(theme=7)),
-        bottom=Side(border_style=borders.BORDER_THIN, color=Color(theme=7)),
-        left=Side(border_style=borders.BORDER_THIN, color=Color(theme=7)),
-        right=Side(border_style=borders.BORDER_THIN, color=Color(theme=7)))
-
-
-    ws['A23'].fill = PatternFill(fill_type='solid',
-                               start_color=Color('FFCCCCFF'))
-    assert ws['A23'].fill == PatternFill(fill_type='solid',
-                               start_color=Color('FFCCCCFF'))
-
-    ws.unmerge_cells('A23:B24')
-
-    ws['A25'].alignment = Alignment(wrap_text=False)
-    assert ws['A25'].alignment == Alignment(wrap_text=False)
-
-    ws['A26'].alignment = Alignment(shrink_to_fit=False)
-    assert ws['A26'].alignment == Alignment(shrink_to_fit=False)
-
-    assert ws.column_dimensions['A'].width == 20.0
-
-
 def test_none_values(datadir, StyleReader):
     datadir.chdir()
     with open("none_value_styles.xml") as src:
@@ -358,6 +229,7 @@ def test_style_names(datadir, StyleReader):
     ]
 
 
+@pytest.mark.xfail
 def test_named_styles(datadir, StyleReader):
     from openpyxl.styles.named_styles import NamedStyle
     from openpyxl.styles.fonts import DEFAULT_FONT

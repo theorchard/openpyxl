@@ -57,7 +57,7 @@ class Workbook(object):
         self._worksheet_class = worksheet_class
         self.vba_archive = None
         self.is_template = False
-        self.conditional_formats = []
+        self._differential_styles = []
         self._guess_types = guess_types
         self.data_only = data_only
         self.relationships = []
@@ -96,7 +96,7 @@ class Workbook(object):
         self._protections = IndexedList([Protection()])
 
         self._colors = COLOR_INDEX
-        self._cell_styles = IndexedList([StyleId(0, 0, 0, 0, 0, 0)])
+        self._cell_styles = IndexedList([StyleId()])
 
 
     @deprecated('this method is private and should not be called directly')

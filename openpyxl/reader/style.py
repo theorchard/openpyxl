@@ -6,7 +6,6 @@ from __future__ import absolute_import
 # package imports
 from openpyxl.compat import OrderedDict, zip
 from openpyxl.utils.indexed_list import IndexedList
-from openpyxl.utils.exceptions import MissingNumberFormat
 from openpyxl.styles import (
     Style,
     numbers,
@@ -20,9 +19,9 @@ from openpyxl.styles import (
     Alignment,
     borders,
 )
-from openpyxl.formatting.conditional import ConditionaStyle
+from openpyxl.styles.differential import DifferentialStyle
 from openpyxl.styles.colors import COLOR_INDEX, Color
-from openpyxl.styles.styleable import StyleId
+from openpyxl.styles.style import StyleId
 from openpyxl.styles.named_styles import NamedStyle
 from openpyxl.xml.functions import fromstring, safe_iterator, localname
 from openpyxl.xml.constants import SHEET_MAIN_NS, ARC_STYLE
@@ -77,7 +76,7 @@ class SharedStylesParser(object):
     def parse_dxfs(self):
         """Read in the dxfs effects - used by conditional formatting."""
         for node in self.root.findall("{%s}dxfs/{%s}dxf" % (SHEET_MAIN_NS, SHEET_MAIN_NS) ):
-            self.cond_styles.append(ConditionaStyle.from_tree(node))
+            self.cond_styles.append(DifferentialStyle.from_tree(node))
 
 
     def parse_fonts(self):
@@ -147,6 +146,7 @@ class SharedStylesParser(object):
         xfs = safe_iterator(node, '{%s}xf' % SHEET_MAIN_NS)
         for index, xf in enumerate(xfs):
             _style = {}
+            attrs = dict(xf.attrib)
 
             alignmentId = protectionId = 0
             numFmtId = int(xf.get("numFmtId", 0))
@@ -164,7 +164,7 @@ class SharedStylesParser(object):
                 al = xf.find('{%s}alignment' % SHEET_MAIN_NS)
                 if al is not None:
                     alignment = Alignment(**al.attrib)
-                    alignmentId = self.alignments.add(alignment)
+                    attrs['alignmentId'] = self.alignments.add(alignment)
                     _style['alignment'] = alignment
 
             if bool_attrib(xf, 'applyFont'):
@@ -180,15 +180,13 @@ class SharedStylesParser(object):
                 prot = xf.find('{%s}protection' % SHEET_MAIN_NS)
                 if prot is not None:
                     protection = Protection(**prot.attrib)
-                    protectionId = self.protections.add(protection)
+                    attrs['protectionId'] = self.protections.add(protection)
                     _style['protection'] = protection
 
             _styles.append(Style(**_style))
-            _style_ids.append(StyleId(alignmentId, borderId, fillId, fontId, numFmtId, protectionId))
-            self.shared_styles = _styles
-            self.cell_styles = IndexedList(_style_ids)
-
-        #return _styles, IndexedList(_style_ids)
+            _style_ids.append(StyleId(**attrs))
+        self.shared_styles = _styles
+        self.cell_styles = IndexedList(_style_ids)
 
 
 def read_style_table(archive):
