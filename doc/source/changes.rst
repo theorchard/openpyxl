@@ -8,6 +8,16 @@ Major changes
 * New implementation of conditional formatting. Databars now partially preserved.
 
 
+2.2.1 (unreleased)
+==================
+
+
+Bug fixes
+---------
+
+* `#429 <https://bitbucket.org/openpyxl/openpyxl/issue/429>`_ Workbook fails to load because header and footers cannot be parsed.
+
+
 2.2.0 (2015-03-11)
 ==================
 
@@ -15,7 +25,7 @@ Major changes
 Bug fixes
 ---------
 * `#415 <https://bitbucket.org/openpyxl/openpyxl/issue/415>`_ Improved exception when passing in invalid in memory files.
-* `#429 <https://bitbucket.org/openpyxl/openpyxl/issue/429>`_ Workbook fails to load because header and footers cannot be parsed.
+
 
 
 2.2.0-b1 (2015-02-18)
