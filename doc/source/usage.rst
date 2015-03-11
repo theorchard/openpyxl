@@ -179,7 +179,7 @@ Inserting an image
 >>> # the top left offset needed to put the image
 >>> # at a specific cell can be automatically calculated
 >>> img2.anchor(ws['D12'])
-(('D', 12), ('D', 21))
+(('D', 12), ('D', 20))
 >>>
 >>> # one can also position the image relative to the specified cell
 >>> # this can be advantageous if the spreadsheet is later resized

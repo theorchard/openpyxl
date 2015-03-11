@@ -6,7 +6,7 @@ import pytest
 
 from openpyxl.cell.read_only import ReadOnlyCell
 from openpyxl.utils.indexed_list import IndexedList
-from openpyxl.styles.styleable import StyleId
+from openpyxl.styles.style import StyleId
 
 
 @pytest.fixture(scope='module')

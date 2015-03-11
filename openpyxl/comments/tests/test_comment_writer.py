@@ -17,9 +17,9 @@ def _create_ws():
     comment1 = Comment("text", "author")
     comment2 = Comment("text2", "author2")
     comment3 = Comment("text3", "author3")
-    ws.cell(coordinate="B2").comment = comment1
-    ws.cell(coordinate="C7").comment = comment2
-    ws.cell(coordinate="D9").comment = comment3
+    ws["B2"].comment = comment1
+    ws["C7"].comment = comment2
+    ws["D9"].comment = comment3
     return ws, comment1, comment2, comment3
 
 def test_comment_writer_init():
@@ -112,7 +112,8 @@ def test_write_only_cell_vml(datadir):
     ws = wb.active
     cell = ws['A1'] # write-only cells are always A1
     cell.comment = Comment("Some text", "an author")
-    cell.coordinate = "B2" # coordinate calculcated on-demand
+    cell.col_idx = 2
+    cell.row = 2
 
     writer = CommentWriter(ws)
     root = Element("root")
