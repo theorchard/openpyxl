@@ -54,3 +54,21 @@ def test_split_into_parts():
     assert m.group('left') == '&"Lucida Grande,Standard"&K000000Left top'
     assert m.group('center') == '&"Lucida Grande,Standard"&K000000Middle top'
     assert m.group('right') == '&"Lucida Grande,Standard"&K000000Right top'
+
+
+def test_multiline_string():
+    from .. header_footer import ITEM_REGEX
+    s = """&L141023 V1&CRoute - Malls\nSchedules R1201 v R1301&RClient-internal use only"""
+    match = ITEM_REGEX.match(s)
+    assert match.groupdict() == {
+        'center': 'Route - Malls\nSchedules R1201 v R1301',
+        'left': '141023 V1',
+        'right': 'Client-internal use only'
+    }
+
+
+def test_font_size():
+    from .. header_footer import SIZE_REGEX
+    s = "&9"
+    match = SIZE_REGEX.search(s)
+    assert match.group('size') == "9"

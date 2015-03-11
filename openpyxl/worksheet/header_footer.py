@@ -109,7 +109,7 @@ class HeaderFooterItem(object):
 
         m = SIZE_REGEX.search(text)
         if m:
-            self.font_size = m.group(0)
+            self.font_size = int(m.group('size'))
             text = SIZE_REGEX.sub('', text)
 
         m = COLOR_REGEX.search(text)
@@ -194,7 +194,9 @@ ITEM_REGEX = re.compile("""
 (&L(?P<left>.+?))?
 (&C(?P<center>.+?))?
 (&R(?P<right>.+?))?
-$""", re.VERBOSE)
+$""", re.VERBOSE | re.DOTALL)
+
+# add support for multiline strings (how do re.flags combine?)
 
 from warnings import warn
 
@@ -211,4 +213,4 @@ def _split_string(text):
 HEADER_REGEX = re.compile(r"(&[ABDEGHINOPSTUXYZ\+\-])") # split part into commands
 FONT_REGEX = re.compile('&"(?P<font>.+)"')
 COLOR_REGEX = re.compile("&K(?P<color>[A-F0-9]{6})")
-SIZE_REGEX = re.compile(r"&\d+")
+SIZE_REGEX = re.compile(r"&(?P<size>\d+)")
