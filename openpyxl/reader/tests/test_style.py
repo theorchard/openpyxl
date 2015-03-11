@@ -7,9 +7,9 @@ from io import BytesIO
 from zipfile import ZipFile
 
 # package imports
-from openpyxl.compat import safe_string, OrderedDict
 from openpyxl.reader.excel import load_workbook
 from openpyxl.utils.indexed_list import IndexedList
+from openpyxl.styles.style import StyleId
 
 from openpyxl.styles import (
     borders,
@@ -56,13 +56,12 @@ def test_unprotected_cell(StyleReader, datadir):
     reader.font_list = IndexedList([Font(), Font(), Font(), Font(), Font()])
     reader.protections = IndexedList([Protection()])
     reader.parse_cell_styles()
-    assert len(reader.cell_styles) == 3
+    styles  = reader.cell_styles
+    assert len(styles) == 3
     # default is cells are locked
-    style = reader.shared_styles[0]
-    assert style.protection.locked is True
-
-    style = reader.shared_styles[2]
-    assert style.protection.locked is False
+    assert styles[0] == StyleId()
+    assert styles[1] == StyleId(fontId=4)
+    assert styles[2] == StyleId(fontId=3, protectionId=1)
 
 
 def test_read_cell_style(datadir, StyleReader):
@@ -70,8 +69,10 @@ def test_read_cell_style(datadir, StyleReader):
     with open("empty-workbook-styles.xml") as content:
         reader = StyleReader(content.read())
     reader.parse()
-    style_properties = reader.shared_styles
-    assert len(style_properties) == 2
+    styles  = reader.cell_styles
+    assert len(styles) == 2
+    assert reader.cell_styles[0] == StyleId()
+    assert reader.cell_styles[1] == StyleId(numFmtId=9, xfId=1)
 
 
 def test_read_xf_no_number_format(datadir, StyleReader):
@@ -83,11 +84,11 @@ def test_read_xf_no_number_format(datadir, StyleReader):
     reader.font_list = [Font(), Font()]
     reader.parse_cell_styles()
 
-    styles = reader.shared_styles
+    styles = reader.cell_styles
     assert len(styles) == 3
-    assert styles[0].number_format == 'General'
-    assert styles[1].number_format == 'General'
-    assert styles[2].number_format == 'mm-dd-yy'
+    assert styles[0] == StyleId()
+    assert styles[1] == StyleId(fontId=1, borderId=1)
+    assert styles[2] == StyleId(numFmtId=14)
 
 
 def test_read_complex_style_mappings(datadir, StyleReader):
@@ -95,9 +96,9 @@ def test_read_complex_style_mappings(datadir, StyleReader):
     with open("complex-styles.xml") as content:
         reader = StyleReader(content.read())
     reader.parse()
-    style_properties = reader.shared_styles
-    assert len(style_properties) == 29
-    assert style_properties[-1].font.bold is False
+    styles  = reader.cell_styles
+    assert len(styles) == 29
+    assert styles[-1] == StyleId(fillId=5, fontId=6)
 
 
 def test_read_complex_fonts(datadir, StyleReader):
@@ -131,16 +132,16 @@ def test_read_simple_style_mappings(datadir, StyleReader):
     with open("simple-styles.xml") as content:
         reader = StyleReader(content.read())
     reader.parse()
-    style_properties = reader.shared_styles
-    assert len(style_properties) == 4
-    assert numbers.BUILTIN_FORMATS[9] == style_properties[1].number_format
-    assert 'yyyy-mm-dd' == style_properties[2].number_format
+    styles  = reader.cell_styles
+    assert len(styles) == 4
+    assert styles[1] == StyleId(numFmtId=9)
+    assert styles[2] == StyleId(numFmtId=165)
 
 
 def test_read_complex_style(datadir):
     datadir.chdir()
     wb = load_workbook("complex-styles.xlsx")
-    ws = wb.get_active_sheet()
+    ws = wb.active
     assert ws.column_dimensions['A'].width == 31.1640625
 
     assert ws.column_dimensions['I'].font == Font(sz=12.0, color='FF3300FF', scheme='minor')
@@ -203,9 +204,16 @@ def test_alignment(datadir, StyleReader):
     with open("alignment_styles.xml") as src:
         reader = StyleReader(src.read())
     reader.parse_cell_styles()
-    st1 = reader.shared_styles[2]
-    assert len(reader.alignments) == 3
-    assert st1.alignment.textRotation == 255
+    styles = reader.cell_styles
+    assert len(styles) == 3
+    assert styles[2] == StyleId(alignmentId=2)
+
+    assert reader.alignments == [
+        Alignment(),
+        Alignment(textRotation=180),
+        Alignment(vertical='top', textRotation=255),
+        ]
+
 
 
 def test_style_names(datadir, StyleReader):

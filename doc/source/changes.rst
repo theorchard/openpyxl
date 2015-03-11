@@ -1,3 +1,13 @@
+2.3.0 (unreleased)
+==================
+
+
+Major changes
+-------------
+* Shift to using (row, column) indexing for cells. Cells will at some point *lose* coordinates.
+* New implementation of conditional formatting. Databars now partially preserved.
+
+
 2.2.0 (unreleased)
 ==================
 
@@ -6,7 +16,6 @@ Bug fixes
 ---------
 * `#415 <https://bitbucket.org/openpyxl/openpyxl/issue/415>`_ Improved exception when passing in invalid in memory files.
 * `#429 <https://bitbucket.org/openpyxl/openpyxl/issue/429>`_ Workbook fails to load because header and footers cannot be parsed.
-
 
 
 2.2.0-b1 (2015-02-18)
