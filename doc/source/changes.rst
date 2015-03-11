@@ -27,7 +27,6 @@ Bug fixes
 * `#415 <https://bitbucket.org/openpyxl/openpyxl/issue/415>`_ Improved exception when passing in invalid in memory files.
 
 
-
 2.2.0-b1 (2015-02-18)
 =====================
 
