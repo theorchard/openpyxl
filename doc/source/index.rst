@@ -197,6 +197,14 @@ Data Validation
     validation
 
 
+Information for Developers
+--------------------------
+
+.. toctree::
+
+    development
+    windows-development
+
 API Documentation
 ------------------
 
@@ -204,13 +212,6 @@ API Documentation
     :maxdepth: 2
 
     api/openpyxl
-
-Information for Developers
---------------------------
-
-.. toctree::
-
-    development
 
 
 Indices and tables
