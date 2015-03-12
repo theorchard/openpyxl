@@ -9,29 +9,27 @@ amounts of data with (near) constant memory consumption.
 Introducing :class:`openpyxl.worksheet.iter_worksheet.IterableWorksheet`::
 
     from openpyxl import load_workbook
-    wb = load_workbook(filename = 'large_file.xlsx', use_iterators = True)
-    ws = wb.get_sheet_by_name(name = 'big_data') # ws is now an IterableWorksheet
+    wb = load_workbook(filename='large_file.xlsx', read_only=True)
+    ws = wb['big_data'] # ws is now an IterableWorksheet
 
-    for row in ws.iter_rows(): # it brings a new method: iter_rows()
-
+    for row in ws.rows:
         for cell in row:
-
-            print cell.value
+            print(cell.value)
 
 .. warning::
 
     * :class:`openpyxl.worksheet.iter_worksheet.IterableWorksheet` are read-only
     * range, rows, columns methods and properties are disabled
 
-Cells returned by iter_rows() are not regular :class:`openpyxl.cell.Cell` but
-:class:`openpyxl.worksheet.iter_worksheet.RawCell`.
+Cells returned are not regular :class:`openpyxl.cell.cell.Cell` but
+:class:`openpyxl.cell.read_only.ReadOnlyCell`.
 
 Optimized writer
 ================
 
-Here again, the regular :class:`openpyxl.worksheet.Worksheet` has been replaced
+Here again, the regular :class:`openpyxl.worksheet.worksheet.Worksheet` has been replaced
 by a faster alternative, the :class:`openpyxl.writer.dump_worksheet.DumpWorksheet`.
-When you want to dump large amounts of data, you might find optimized writer helpful
+When you want to dump large amounts of data, you might find optimized writer helpful.
 
 .. :: doctest
 
@@ -46,7 +44,7 @@ When you want to dump large amounts of data, you might find optimized writer hel
 >>> # save the file
 >>> wb.save('new_big_file.xlsx') # doctest: +SKIP
 
-If you want to have cells with styles or comments then use a `WriteOnlyCell`
+If you want to have cells with styles or comments then use a :func:`openpyxl.writer.dump_worksheet.WriteOnlyCell`
 
 .. :: doctest
 
@@ -75,5 +73,5 @@ font size, a float and an empty cell that will be discarded anyway.
 
     * A workbook using the optimized writer can only be saved once. After
       that, every attempt to save the workbook or append() to an existing
-      worksheet will raise an :class:`openpyxl.shared.exc.WorkbookAlreadySaved`
+      worksheet will raise an :class:`openpyxl.utils.exceptions.WorkbookAlreadySaved`
       exception.
