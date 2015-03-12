@@ -27,6 +27,7 @@ from openpyxl.xml.constants import (
     REL_NS,
 )
 from openpyxl.formatting import ConditionalFormatting
+from openpyxl.styles.differential import DifferentialStyle
 from openpyxl.worksheet.datavalidation import writer
 from openpyxl.worksheet.properties import WorksheetProperties, write_sheetPr
 
@@ -118,37 +119,17 @@ def write_mergecells(worksheet):
 
 def write_conditional_formatting(worksheet):
     """Write conditional formatting to xml."""
+    wb = worksheet.parent
     for range_string, rules in iteritems(worksheet.conditional_formatting.cf_rules):
-        if not len(rules):
-            # Skip if there are no rules.  This is possible if a dataBar rule was read in and ignored.
-            continue
         cf = Element('conditionalFormatting', {'sqref': range_string})
+
         for rule in rules:
-            if rule['type'] == 'dataBar':
-                # Ignore - uses extLst tag which is currently unsupported.
-                continue
-            attr = {'type': rule['type']}
-            for rule_attr in ConditionalFormatting.rule_attributes:
-                if rule_attr in rule:
-                    attr[rule_attr] = str(rule[rule_attr])
-            cfr = SubElement(cf, 'cfRule', attr)
-            if 'formula' in rule:
-                for f in rule['formula']:
-                    SubElement(cfr, 'formula').text = f
-            if 'colorScale' in rule:
-                cs = SubElement(cfr, 'colorScale')
-                for cfvo in rule['colorScale']['cfvo']:
-                    SubElement(cs, 'cfvo', cfvo)
-                for color in rule['colorScale']['color']:
-                    SubElement(cs, 'color', dict(color))
-            if 'iconSet' in rule:
-                iconAttr = {}
-                for icon_attr in ConditionalFormatting.icon_attributes:
-                    if icon_attr in rule['iconSet']:
-                        iconAttr[icon_attr] = rule['iconSet'][icon_attr]
-                iconSet = SubElement(cfr, 'iconSet', iconAttr)
-                for cfvo in rule['iconSet']['cfvo']:
-                    SubElement(iconSet, 'cfvo', cfvo)
+            if rule.dxf is not None:
+                if rule.dxf != DifferentialStyle():
+                    rule.dxfId = len(wb._differential_styles)
+                    wb._differential_styles.append(rule.dxf)
+            cf.append(rule.to_tree())
+
         yield cf
 
 

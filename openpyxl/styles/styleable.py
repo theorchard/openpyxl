@@ -1,8 +1,6 @@
 from __future__ import absolute_import
 # Copyright (c) 2010-2015 openpyxl
 
-from collections import namedtuple
-
 from openpyxl.utils.indexed_list import IndexedList
 from .numbers import BUILTIN_FORMATS, BUILTIN_FORMATS_REVERSE
 from .proxy import StyleProxy
@@ -83,7 +81,6 @@ class StyleableObject(object):
             fontId=self._font_id,
             numFmtId=self._number_format_id,
             protectionId=self._protection_id)
-
         return self.parent.parent._cell_styles.add(style)
 
     @property

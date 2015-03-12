@@ -86,3 +86,8 @@ def test_column_letter_boundries(value):
                          )
 def test_column_letter(value, expected):
     assert get_column_letter(value) == expected
+
+
+def test_coordinate_tuple():
+    from .. import coordinate_to_tuple
+    assert coordinate_to_tuple("D15") == (15, 4)
