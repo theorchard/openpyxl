@@ -72,7 +72,6 @@ setup(name='openpyxl',
         'jdcal',
         ],
     classifiers=[
-                 'Development Status :: 4 - Beta',
                  'Development Status :: 5 - Production/Stable',
                  'Operating System :: MacOS :: MacOS X',
                  'Operating System :: Microsoft :: Windows',

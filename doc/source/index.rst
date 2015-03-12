@@ -64,11 +64,11 @@ Any help will be greatly appreciated, just follow those steps:
 
 For further information see :ref:`development`
 
-.. note::
+.. note:
 
-    This is an open-source project, maintained by volunteers on their spare
-    time, so while we try to work on this project as often as possible,
-    sometimes life gets in the way. Please be patient.
+This is an open-source project, maintained by volunteers on their spare time,
+so while we try to work on this project as often as possible, sometimes life
+gets in the way. Please be patient.
 
 Other ways to help
 ------------------
@@ -197,14 +197,6 @@ Data Validation
     validation
 
 
-API Documentation
-------------------
-
-.. toctree::
-    :maxdepth: 2
-
-    api/openpyxl
-
 Information for Developers
 --------------------------
 
@@ -212,6 +204,14 @@ Information for Developers
 
     development
     windows-development
+
+API Documentation
+------------------
+
+.. toctree::
+    :maxdepth: 2
+
+    api/openpyxl
 
 
 Indices and tables
