@@ -40,7 +40,7 @@ Now you can install virtualenv::
 lxml
 ----
 
-openpyxl needs `lxml` in order to run the tests. Unfortunately, automatic installation of lxml on Windows is tricky as pip defaults to try and compile it. 
+openpyxl needs `lxml` in order to run the tests. Unfortunately, automatic installation of lxml on Windows is tricky as pip defaults to try and compile it. This can be avoided by using pre-compiled versions of the library.
 
 #. In the command line switch to your repository folder::
 
