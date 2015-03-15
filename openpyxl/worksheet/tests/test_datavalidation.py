@@ -82,21 +82,18 @@ def test_writer_validation(DataValidation):
 
 
 def test_sqref(DataValidation):
-    from .. datavalidation import DataValidation
     dv = DataValidation()
     dv.sqref = "A1"
     assert dv.cells == ["A1"]
 
 
 def test_ctor(DataValidation):
-    from .. datavalidation import DataValidation
     dv = DataValidation()
     assert dict(dv) == {'allowBlank': '0', 'showErrorMessage': '1',
                         'showInputMessage': '1', 'sqref': ''}
 
 
 def test_with_formula(DataValidation):
-    from .. datavalidation import parser
     xml = """
     <dataValidation xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main" allowBlank="0" showErrorMessage="1" showInputMessage="1" sqref="A1" type="list">
       <formula1>&quot;Dog,Cat,Fish&quot;</formula1>
@@ -109,13 +106,13 @@ def test_with_formula(DataValidation):
     assert dv.formula1 == '"Dog,Cat,Fish"'
 
 
-def test_parser():
-    from .. datavalidation import parser
+def test_parser(DataValidation):
     xml = """
     <dataValidation xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main" type="list" errorStyle="warning" allowBlank="1" showInputMessage="1" showErrorMessage="1" error="Value must be between 1 and 3!" errorTitle="An Error Message" promptTitle="Multiplier" prompt="for monthly or quartely reports" sqref="H6">
     </dataValidation>
-"""
-    dv = parser(fromstring(xml))
+    """
+    xml = fromstring(xml)
+    dv = DataValidation.from_tree(xml)
     assert dict(dv) == {"error":"Value must be between 1 and 3!",
                         "errorStyle":"warning",
                         "errorTitle":"An Error Message",
