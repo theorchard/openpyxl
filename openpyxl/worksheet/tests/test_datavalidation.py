@@ -66,15 +66,14 @@ def test_prompt_message(DataValidation):
 
 
 def test_writer_validation(DataValidation):
-    from .. datavalidation import writer
     wb = Workbook()
     ws = wb.active
     dv = DataValidation(type="list", formula1='"Dog,Cat,Fish"')
     dv.add_cell(ws['A1'])
 
-    xml = tostring(writer(dv))
+    xml = tostring(dv.to_tree())
     expected = """
-    <dataValidation xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main" allowBlank="0" showErrorMessage="1" showInputMessage="1" sqref="A1" type="list">
+    <dataValidation allowBlank="0" showErrorMessage="1" showInputMessage="1" sqref="A1" type="list">
       <formula1>&quot;Dog,Cat,Fish&quot;</formula1>
     </dataValidation>
     """
@@ -96,14 +95,15 @@ def test_ctor(DataValidation):
                         'showInputMessage': '1', 'sqref': ''}
 
 
-def test_with_formula():
+def test_with_formula(DataValidation):
     from .. datavalidation import parser
     xml = """
     <dataValidation xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main" allowBlank="0" showErrorMessage="1" showInputMessage="1" sqref="A1" type="list">
       <formula1>&quot;Dog,Cat,Fish&quot;</formula1>
     </dataValidation>
     """
-    dv = parser(fromstring(xml))
+    xml = fromstring(xml)
+    dv = DataValidation.from_tree(xml)
     assert dv.cells == ['A1']
     assert dv.type == "list"
     assert dv.formula1 == '"Dog,Cat,Fish"'
@@ -126,9 +126,3 @@ def test_parser():
                         "sqref":"H6",
                         "showErrorMessage":"1",
                         "showInputMessage":"1"}
-
-    from ..datavalidation import writer
-    tag = writer(dv)
-    output = tostring(tag)
-    diff = compare_xml(output, xml)
-    assert diff is None,diff

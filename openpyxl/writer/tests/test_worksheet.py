@@ -595,28 +595,6 @@ def test_write_empty(worksheet, write_worksheet):
     assert diff is None, diff
 
 
-def test_data_validation(worksheet):
-    from .. worksheet import write_datavalidation
-    from openpyxl.worksheet.datavalidation import DataValidation, ValidationType
-
-    ws = worksheet
-    dv = DataValidation(ValidationType.LIST, formula1='"Dog,Cat,Fish"')
-    dv.add_cell(ws['A1'])
-    ws.add_data_validation(dv)
-
-    xml = write_datavalidation(worksheet)
-    xml = tostring(xml)
-    expected = """
-    <dataValidations xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main" count="1">
-    <dataValidation allowBlank="0" showErrorMessage="1" showInputMessage="1" sqref="A1" type="list">
-      <formula1>&quot;Dog,Cat,Fish&quot;</formula1>
-    </dataValidation>
-    </dataValidations>
-    """
-    diff = compare_xml(xml, expected)
-    assert diff is None, diff
-
-
 def test_vba(worksheet, write_worksheet):
     ws = worksheet
     ws.vba_code = {"codeName":"Sheet1"}

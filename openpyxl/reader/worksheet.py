@@ -13,6 +13,7 @@ from openpyxl.worksheet import Worksheet, ColumnDimension, RowDimension
 from openpyxl.worksheet.page import PageMargins, PrintOptions, PageSetup
 from openpyxl.worksheet.protection import SheetProtection
 from openpyxl.worksheet.views import SheetView
+from openpyxl.worksheet.datavalidation import DataValidation
 from openpyxl.xml.constants import SHEET_MAIN_NS, REL_NS
 from openpyxl.xml.functions import safe_iterator
 from openpyxl.styles import Color
@@ -237,9 +238,8 @@ class WorkSheetParser(object):
             self.ws.protection.set_password(password, True)
 
     def parse_data_validation(self, element):
-        from openpyxl.worksheet.datavalidation import parser
-        for tag in safe_iterator(element, "{%s}dataValidation" % SHEET_MAIN_NS):
-            dv = parser(tag)
+        for node in safe_iterator(element, "{%s}dataValidation" % SHEET_MAIN_NS):
+            dv = DataValidation.from_tree(node)
             self.ws._data_validations.append(dv)
 
 

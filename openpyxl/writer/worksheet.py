@@ -28,7 +28,6 @@ from openpyxl.xml.constants import (
 )
 from openpyxl.formatting import ConditionalFormatting
 from openpyxl.styles.differential import DifferentialStyle
-from openpyxl.worksheet.datavalidation import writer
 from openpyxl.worksheet.properties import WorksheetProperties
 
 from .etree_worksheet import write_cell
@@ -135,10 +134,9 @@ def write_datavalidation(worksheet):
     if not required_dvs:
         return
 
-    dvs = Element("{%s}dataValidations" % SHEET_MAIN_NS,
-                  count=str(len(required_dvs)))
+    dvs = Element("dataValidations", count=str(len(required_dvs)))
     for dv in required_dvs:
-        dvs.append(writer(dv))
+        dvs.append(dv.to_tree())
 
     return dvs
 
