@@ -1,7 +1,7 @@
 prune openpyxl/tests
 prune openpyxl/sample
 prune openpyxl/benchmarks
-prune openpyxl/classify
+prune openpyxl/develop
 
 recursive-exclude openpyxl test_*.py tests/*.py
 
