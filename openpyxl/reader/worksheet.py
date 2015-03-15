@@ -194,11 +194,7 @@ class WorkSheetParser(object):
         self.page_margins = PageMargins.from_tree(element)
 
     def parse_page_setup(self, element):
-        id_key = '{%s}id' % REL_NS
-        if id_key in element.attrib.keys():
-            element.attrib['id'] = element.attrib.pop(id_key)
-
-        self.ws.page_setup = PageSetup(**element.attrib)
+        self.ws.page_setup = PageSetup.from_tree(element)
 
     def parse_header_footer(self, element):
         oddHeader = element.find('{%s}oddHeader' % SHEET_MAIN_NS)

@@ -103,8 +103,16 @@ class PageSetup(Serialisable):
         pass
 
 
-    def to_tree(self):
+    @classmethod
+    def from_tree(cls, node):
+        attrs = node.attrib
+        id_key = '{%s}id' % REL_NS
+        if id_key in attrs:
+            attrs['id'] = attrs.pop(id_key)
+        return cls(**attrs)
 
+
+    def to_tree(self):
         attrs = dict(self)
         if 'id' in attrs:
             attrs['{%s}id' % REL_NS] = attrs['id']
