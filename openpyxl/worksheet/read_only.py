@@ -61,7 +61,7 @@ FORMULA_TAG = '{%s}f' % SHEET_MAIN_NS
 DIMENSION_TAG = '{%s}dimension' % SHEET_MAIN_NS
 
 
-class IterableWorksheet(Worksheet):
+class ReadOnlyWorksheet(Worksheet):
 
     _xml = None
     _min_column = 1

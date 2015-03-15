@@ -48,7 +48,7 @@ from .workbook import (
     read_workbook_settings,
 )
 from openpyxl.workbook.properties import read_properties, DocumentProperties
-from openpyxl.worksheet.iter_worksheet import IterableWorksheet
+from openpyxl.worksheet.read_only import ReadOnlyWorksheet
 from .worksheet import WorkSheetParser
 from .comments import read_comments, get_comments_file
 # Use exc_info for Python 2 compatibility with "except Exception[,/ as] e"
@@ -223,7 +223,7 @@ def load_workbook(filename, read_only=False, use_iterators=False, keep_vba=KEEP_
             continue
 
         if read_only:
-            new_ws = IterableWorksheet(wb, sheet_name, worksheet_path, None,
+            new_ws = ReadOnlyWorksheet(wb, sheet_name, worksheet_path, None,
                                        shared_strings)
             wb._add_sheet(new_ws)
         else:
