@@ -1124,8 +1124,8 @@ class UnsignedInt(Serialisable):
 
 class Marker(Serialisable):
 
-    symbol = Set(values=(['circle', 'dash', 'diamond', 'dot', 'none', 'picture', 'plus', 'square', 'star', 'triangle', 'x', 'auto']))
-    size = MinMax(min=2, max=72)
+    symbol = Set(values=(['circle', 'dash', 'diamond', 'dot', 'none', 'picture', 'plus', 'square', 'star', 'triangle', 'x', 'auto']), nested=True)
+    size = MinMax(min=2, max=72, nested=True)
     spPr = Typed(expected_type=ShapeProperties, allow_none=True)
     extLst = Typed(expected_type=ExtensionList, allow_none=True)
 
