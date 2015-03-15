@@ -241,7 +241,7 @@ def write_worksheet(worksheet, shared_strings):
 
             setup = worksheet.page_setup
             if len(dict(setup)) > 0:
-                new_element = setup.write_xml_element()
+                new_element = setup.to_tree()
                 xf.write(new_element)
 
             hf = write_header_footer(worksheet)
