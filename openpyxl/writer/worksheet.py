@@ -29,15 +29,9 @@ from openpyxl.xml.constants import (
 from openpyxl.formatting import ConditionalFormatting
 from openpyxl.styles.differential import DifferentialStyle
 from openpyxl.worksheet.datavalidation import writer
-from openpyxl.worksheet.properties import WorksheetProperties, write_sheetPr
+from openpyxl.worksheet.properties import WorksheetProperties
 
 from .etree_worksheet import write_cell
-
-
-def write_properties(worksheet):
-    wsp = worksheet.sheet_properties
-    pr = write_sheetPr(wsp)
-    return pr
 
 
 def write_format(worksheet):
@@ -197,7 +191,7 @@ def write_worksheet(worksheet, shared_strings):
     with xmlfile(out) as xf:
         with xf.element('worksheet', xmlns=SHEET_MAIN_NS):
 
-            props = write_properties(worksheet)
+            props = worksheet.sheet_properties.to_tree()
             xf.write(props)
 
             dim = Element('dimension', {'ref': '%s' % worksheet.calculate_dimension()})

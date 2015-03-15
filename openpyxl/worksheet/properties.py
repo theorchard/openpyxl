@@ -49,6 +49,7 @@ class PageSetupPr(Serialisable):
 class WorksheetProperties(Serialisable):
 
     tag = "{%s}sheetPr" % SHEET_MAIN_NS
+    tagname = "sheetPr"
 
     codeName = String(allow_none=True)
     enableFormatConditionsCalculation = Bool(allow_none=True)
@@ -95,41 +96,7 @@ class WorksheetProperties(Serialisable):
 
 
 def parse_sheetPr(node):
-    props = WorksheetProperties(**node.attrib)
+    pass
 
-    outline = node.find(Outline.tag)
-    if outline is not None:
-        props.outlinePr = Outline(**outline.attrib)
-
-    page_setup = node.find(PageSetupPr.tag)
-    if page_setup is not None:
-        props.pageSetUpPr = PageSetupPr(**page_setup.attrib)
-
-    tab_color = node.find('{%s}tabColor' % SHEET_MAIN_NS)
-    if tab_color is not None:
-        props.tabColor = Color(**dict(tab_color.attrib))
-
-    return props
-
-
-def write_sheetPr(props):
-
-    attributes = {}
-    for k, v in dict(props).items():
-        if not isinstance(v, dict):
-            attributes[k] = v
-
-    el = Element(props.tag, attributes)
-
-    outline = props.outlinePr
-    if outline:
-        el.append(Element(outline.tag, dict(outline)))
-
-    page_setup = props.pageSetUpPr
-    if page_setup:
-        el.append(Element(page_setup.tag, dict(page_setup)))
-
-    if props.tabColor:
-        el.append(Element('{%s}tabColor' % SHEET_MAIN_NS, rgb=props.tabColor.value))
-
-    return el
+def write_sheetPr():
+    pass

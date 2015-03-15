@@ -276,7 +276,7 @@ def test_get_rows_to_write(worksheet):
 
 @pytest.fixture
 def write_autofilter():
-    from .. lxml_worksheet import write_autofilter
+    from .. worksheet import write_autofilter
     return write_autofilter
 
 
@@ -405,7 +405,7 @@ def test_header_footer(worksheet):
     ws.header_footer.right_footer.font_size = 14
     ws.header_footer.right_footer.font_color = "AABBCC"
 
-    from .. lxml_worksheet import write_header_footer
+    from .. worksheet import write_header_footer
     hf = write_header_footer(ws)
     xml = tostring(hf)
     expected = """
@@ -419,14 +419,14 @@ def test_header_footer(worksheet):
 
 
 def test_no_header(worksheet):
-    from .. lxml_worksheet import write_header_footer
+    from .. worksheet import write_header_footer
 
     hf = write_header_footer(worksheet)
     assert hf is None
 
 
 def test_hyperlink(worksheet):
-    from .. lxml_worksheet import write_hyperlinks
+    from .. worksheet import write_hyperlinks
 
     ws = worksheet
     ws.cell('A1').value = "test"
@@ -444,7 +444,7 @@ def test_hyperlink(worksheet):
 
 
 def test_no_hyperlink(worksheet):
-    from .. lxml_worksheet import write_hyperlinks
+    from .. worksheet import write_hyperlinks
 
     l = write_hyperlinks(worksheet)
     assert l is None
@@ -480,7 +480,7 @@ def worksheet_with_cf(worksheet):
 
 @pytest.fixture
 def write_conditional_formatting():
-    from .. lxml_worksheet import write_conditional_formatting
+    from .. worksheet import write_conditional_formatting
     return write_conditional_formatting
 
 

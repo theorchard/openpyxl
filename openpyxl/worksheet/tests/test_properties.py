@@ -2,7 +2,9 @@ from __future__ import absolute_import
 # Copyright (c) 2010-2015 openpyxl
 
 import pytest
-from lxml.etree import fromstring
+
+from openpyxl.xml.functions import tostring, fromstring
+
 from openpyxl.styles.colors import Color
 from openpyxl.tests.schema import sheet_schema
 from openpyxl.tests.helper import compare_xml
@@ -30,22 +32,26 @@ def SimpleTestProps():
 
 
 def test_write_properties(SimpleTestProps):
-    from .. properties import write_sheetPr
 
-    content = write_sheetPr(SimpleTestProps)
-    expected = """ <s:sheetPr xmlns:s="http://schemas.openxmlformats.org/spreadsheetml/2006/main" filterMode="0"><s:pageSetUpPr fitToPage="0" /><s:tabColor rgb="FF123456"/></s:sheetPr>"""
-    diff = compare_xml(tostring(content), expected)
+    xml = tostring(SimpleTestProps.to_tree())
+    expected = """
+    <sheetPr filterMode="0">
+      <pageSetUpPr fitToPage="0" />
+      <tabColor rgb="FF123456"/>
+    </sheetPr>"""
+    diff = compare_xml(xml, expected)
     assert diff is None, diff
 
 
 def test_parse_properties(datadir, SimpleTestProps):
-    from .. properties import parse_sheetPr
+    from .. properties import WorksheetProperties
     datadir.chdir()
 
     with open("sheetPr2.xml") as src:
         content = src.read()
 
-    parseditem = parse_sheetPr(fromstring(content))
+    xml = fromstring(content)
+    parseditem = WorksheetProperties.from_tree(xml)
     assert dict(parseditem) == dict(SimpleTestProps)
     assert parseditem.tabColor == SimpleTestProps.tabColor
     assert dict(parseditem.pageSetUpPr) == dict(SimpleTestProps.pageSetUpPr)
