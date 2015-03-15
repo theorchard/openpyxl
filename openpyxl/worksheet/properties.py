@@ -15,6 +15,7 @@ from openpyxl.styles.colors import Color
 class Outline(Serialisable):
 
     tag = "{%s}outlinePr" % SHEET_MAIN_NS
+    tagname = "outlinePr"
 
     applyStyles = Bool(allow_none=True)
     summaryBelow = Bool(allow_none=True)
@@ -37,6 +38,7 @@ class Outline(Serialisable):
 class PageSetupPr(Serialisable):
 
     tag = "{%s}pageSetUpPr" % SHEET_MAIN_NS
+    tagname = "pageSetupPr"
 
     autoPageBreaks = Bool(allow_none=True)
     fitToPage = Bool(allow_none=True)
@@ -93,10 +95,3 @@ class WorksheetProperties(Serialisable):
         self.tabColor = tabColor
         self.outlinePr = outlinePr
         self.pageSetUpPr = pageSetUpPr
-
-
-def parse_sheetPr(node):
-    pass
-
-def write_sheetPr():
-    pass
