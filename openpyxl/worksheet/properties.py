@@ -4,13 +4,15 @@ from __future__ import absolute_import
 """Worksheet Properties"""
 
 from openpyxl.compat import safe_string
-from openpyxl.descriptors import Strict, String, Bool, Typed
+from openpyxl.descriptors.serialisable import Serialisable
+from openpyxl.descriptors import String, Bool, Typed
 from openpyxl.styles.colors import ColorDescriptor
 from openpyxl.xml.constants import SHEET_MAIN_NS
 from openpyxl.xml.functions import Element
 from openpyxl.styles.colors import Color
 
-class Outline(Strict):
+
+class Outline(Serialisable):
 
     tag = "{%s}outlinePr" % SHEET_MAIN_NS
 
@@ -32,14 +34,7 @@ class Outline(Strict):
         self.showOutlineSymbols = showOutlineSymbols
 
 
-    def __iter__(self):
-        for attr in ("applyStyles", "summaryBelow", "summaryRight", "showOutlineSymbols"):
-            value = getattr(self, attr)
-            if value is not None:
-                yield attr, safe_string(value)
-
-
-class PageSetupPr(Strict):
+class PageSetupPr(Serialisable):
 
     tag = "{%s}pageSetUpPr" % SHEET_MAIN_NS
 
@@ -50,14 +45,8 @@ class PageSetupPr(Strict):
         self.autoPageBreaks = autoPageBreaks
         self.fitToPage = fitToPage
 
-    def __iter__(self):
-        for attr in ("autoPageBreaks", "fitToPage"):
-            value = getattr(self, attr)
-            if value is not None:
-                yield attr, safe_string(value)
 
-
-class WorksheetProperties(Strict):
+class WorksheetProperties(Serialisable):
 
     tag = "{%s}sheetPr" % SHEET_MAIN_NS
 
@@ -103,15 +92,6 @@ class WorksheetProperties(Strict):
         self.tabColor = tabColor
         self.outlinePr = outlinePr
         self.pageSetUpPr = pageSetUpPr
-
-
-    def __iter__(self):
-        for attr in ("codeName", "enableFormatConditionsCalculation",
-                     "filterMode", "published", "syncHorizontal", "syncRef",
-                     "syncVertical", "transitionEvaluation", "transitionEntry"):
-            value = getattr(self, attr)
-            if value is not None:
-                yield attr, safe_string(value)
 
 
 def parse_sheetPr(node):
