@@ -2,8 +2,8 @@ from __future__ import absolute_import
 # Copyright (c) 2010-2015 openpyxl
 
 from openpyxl.compat import safe_string
+from openpyxl.descriptors.serialisable import Serialisable
 from openpyxl.descriptors import (
-    Strict,
     Float,
     Typed,
     Bool,
@@ -17,10 +17,11 @@ from openpyxl.xml.constants import SHEET_MAIN_NS, REL_NS
 from openpyxl.compat import deprecated
 
 
-class PageSetup(Strict):
+class PageSetup(Serialisable):
     """ Worksheet page setup """
 
-    tag = "{%s}pageSetup" % SHEET_MAIN_NS
+    tagname = "pageSetup"
+    tag = "{%s}" % SHEET_MAIN_NS + tagname
 
     orientation = NoneSet(values=("default", "portrait", "landscape"))
     paperSize = Integer(allow_none=True)
@@ -101,29 +102,21 @@ class PageSetup(Strict):
     def fitToPage(self):
         pass
 
-    def __iter__(self):
-        for attr in ("orientation", "paperSize", "scale", "fitToHeight",
-                     "fitToWidth", "firstPageNumber", "useFirstPageNumber" ,
-                     "paperHeight", "paperWidth", "pageOrder", "usePrinterDefaults",
-                     "blackAndWhite", "draft", "cellComments", "errors" , "horizontalDpi",
-                     "verticalDpi", "copies", "id"):
-            value = getattr(self, attr)
-            if value is not None:
-                yield attr, safe_string(value)
 
-    def write_xml_element(self):
+    def to_tree(self):
 
         attrs = dict(self)
         if 'id' in attrs:
             attrs['{%s}id' % REL_NS] = attrs['id']
             del attrs['id']
-        return Element(self.tag, attrs)
+        return Element(self.tagname, attrs)
 
 
-class PrintOptions(Strict):
+class PrintOptions(Serialisable):
     """ Worksheet print options """
 
-    tag = "{%s}printOptions" % SHEET_MAIN_NS
+    tagname = "printOptions"
+    tag = "{%s}" % SHEET_MAIN_NS + tagname
     horizontalCentered = Bool(allow_none=True)
     verticalCentered = Bool(allow_none=True)
     headings = Bool(allow_none=True)
@@ -142,22 +135,8 @@ class PrintOptions(Strict):
         self.gridLines = gridLines
         self.gridLinesSet = gridLinesSet
 
-    def __iter__(self):
-        for attr in ("horizontalCentered", "verticalCentered", "headings",
-                     "gridLines", "gridLinesSet"):
-            value = getattr(self, attr)
-            if value is not None:
-                yield attr, safe_string(value)
 
-
-    def write_xml_element(self):
-
-        el = Element(self.tag, dict(self))
-
-        return el
-
-
-class PageMargins(Strict):
+class PageMargins(Serialisable):
     """
     Information about page margins for view/print layouts.
     Standard values (in inches)
@@ -165,6 +144,7 @@ class PageMargins(Strict):
     top, bottom = 1
     header, footer = 0.5
     """
+    tagname = "pageMargins"
 
     left = Float()
     right = Float()
@@ -181,8 +161,3 @@ class PageMargins(Strict):
         self.bottom = bottom
         self.header = header
         self.footer = footer
-
-    def __iter__(self):
-        for key in ("left", "right", "top", "bottom", "header", "footer"):
-            value = getattr(self, key)
-            yield key, safe_string(value)

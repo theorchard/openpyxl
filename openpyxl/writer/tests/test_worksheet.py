@@ -595,69 +595,6 @@ def test_write_empty(worksheet, write_worksheet):
     assert diff is None, diff
 
 
-def test_page_margins(worksheet, write_worksheet):
-    ws = worksheet
-    ws.page_margins.left = 2.0
-    ws.page_margins.right = 2.0
-    ws.page_margins.top = 2.0
-    ws.page_margins.bottom = 2.0
-    ws.page_margins.header = 1.5
-    ws.page_margins.footer = 1.5
-    xml = write_worksheet(ws, None)
-    expected = """
-    <worksheet xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main" xmlns:r="http://schemas.openxmlformats.org/officeDocument/2006/relationships">
-      <sheetPr>
-        <outlinePr summaryRight="1" summaryBelow="1"/>
-      </sheetPr>
-      <dimension ref="A1:A1"/>
-      <sheetViews>
-        <sheetView workbookViewId="0">
-          <selection sqref="A1" activeCell="A1"/>
-        </sheetView>
-      </sheetViews>
-      <sheetFormatPr baseColWidth="10" defaultRowHeight="15"/>
-      <sheetData/>
-      <pageMargins left="2" right="2" top="2" bottom="2" header="1.5" footer="1.5"/>
-    </worksheet>
-    """
-    diff = compare_xml(xml, expected)
-    assert diff is None, diff
-
-
-def test_printer_settings(worksheet, write_worksheet):
-    ws = worksheet
-    ws.page_setup.orientation = ws.ORIENTATION_LANDSCAPE
-    ws.page_setup.paperSize = ws.PAPERSIZE_TABLOID
-    ws.page_setup.fitToHeight = 0
-    ws.page_setup.fitToWidth = 1
-    ws.print_options.horizontalCentered = True
-    ws.print_options.verticalCentered = True
-    page_setup_prop = PageSetupPr(fitToPage=True)
-    ws.sheet_properties.pageSetUpPr = page_setup_prop
-    xml = write_worksheet(ws, None)
-    expected = """
-    <worksheet xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main" xmlns:r="http://schemas.openxmlformats.org/officeDocument/2006/relationships">
-      <sheetPr>
-        <outlinePr summaryRight="1" summaryBelow="1"/>
-        <pageSetUpPr fitToPage="1"/>
-      </sheetPr>
-      <dimension ref="A1:A1"/>
-      <sheetViews>
-        <sheetView workbookViewId="0">
-          <selection sqref="A1" activeCell="A1"/>
-        </sheetView>
-      </sheetViews>
-      <sheetFormatPr baseColWidth="10" defaultRowHeight="15"/>
-      <sheetData/>
-      <printOptions horizontalCentered="1" verticalCentered="1"/>
-      <pageMargins left="0.75" right="0.75" top="1" bottom="1" header="0.5" footer="0.5"/>
-      <pageSetup orientation="landscape" paperSize="3" fitToHeight="0" fitToWidth="1"/>
-    </worksheet>
-    """
-    diff = compare_xml(xml, expected)
-    assert diff is None, diff
-
-
 def test_data_validation(worksheet):
     from .. worksheet import write_datavalidation
     from openpyxl.worksheet.datavalidation import DataValidation, ValidationType

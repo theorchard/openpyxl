@@ -231,22 +231,18 @@ def write_worksheet(worksheet, shared_strings):
             if hyper is not None:
                 xf.write(hyper)
 
-
             options = worksheet.print_options
             if len(dict(options)) > 0:
-                new_element = options.write_xml_element()
+                new_element = options.to_tree()
                 xf.write(new_element)
-                del new_element
 
-            margins = Element('pageMargins', dict(worksheet.page_margins))
+            margins = worksheet.page_margins.to_tree()
             xf.write(margins)
-            del margins
 
             setup = worksheet.page_setup
             if len(dict(setup)) > 0:
                 new_element = setup.write_xml_element()
                 xf.write(new_element)
-                del new_element
 
             hf = write_header_footer(worksheet)
             if hf is not None:
@@ -255,7 +251,6 @@ def write_worksheet(worksheet, shared_strings):
             if worksheet._charts or worksheet._images:
                 drawing = Element('drawing', {'{%s}id' % REL_NS: 'rId1'})
                 xf.write(drawing)
-                del drawing
 
             # If vba is being preserved then add a legacyDrawing element so
             # that any controls can be drawn.

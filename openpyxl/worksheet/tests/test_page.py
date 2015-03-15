@@ -3,6 +3,8 @@ from __future__ import absolute_import
 
 import pytest
 
+from openpyxl.xml.functions import tostring
+from openpyxl.tests.helper import compare_xml
 
 @pytest.fixture
 def PageMargins():
@@ -65,3 +67,45 @@ def test_print_options(PrintOptions):
     p.horizontalCentered = True
     p.verticalCentered = True
     assert dict(p) == {'verticalCentered': '1', 'horizontalCentered': '1'}
+
+
+def test_page_margins(PageMargins):
+    page_margins = PageMargins()
+    page_margins.left = 2.0
+    page_margins.right = 2.0
+    page_margins.top = 2.0
+    page_margins.bottom = 2.0
+    page_margins.header = 1.5
+    page_margins.footer = 1.5
+    xml = tostring(page_margins.to_tree())
+    expected = """
+    <pageMargins xmlns:r="http://schemas.openxmlformats.org/officeDocument/2006/relationships" left="2" right="2" top="2" bottom="2" header="1.5" footer="1.5"/>
+    """
+    diff = compare_xml(xml, expected)
+    assert diff is None, diff
+
+
+def test_printer_settings(PageSetup):
+    page_setup = PageSetup()
+    page_setup.orientation = "landscape"
+    page_setup.paperSize = 3
+    page_setup.fitToHeight = False
+    page_setup.fitToWidth = True
+    xml = tostring(page_setup.to_tree())
+    expected = """
+    <pageSetup orientation="landscape" paperSize="3" fitToHeight="0" fitToWidth="1"/>
+    """
+    diff = compare_xml(xml, expected)
+    assert diff is None, diff
+
+
+def test_print_options(PrintOptions):
+    print_options = PrintOptions()
+    print_options.horizontalCentered = True
+    print_options.verticalCentered = True
+    xml = tostring(print_options.to_tree())
+    expected = """
+    <printOptions horizontalCentered="1" verticalCentered="1"/>
+    """
+    diff = compare_xml(xml, expected)
+    assert diff is None, diff
