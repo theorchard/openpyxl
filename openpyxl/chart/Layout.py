@@ -6,7 +6,7 @@ from openpyxl.descriptors import (
     Float,
     Typed,)
 
-from .LineSer import ExtensionList
+from openpyxl.descriptors.excel import ExtensionList
 
 
 class LayoutMode(Serialisable):
