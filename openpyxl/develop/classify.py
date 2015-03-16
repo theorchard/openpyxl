@@ -102,9 +102,11 @@ def classify(tagname, src=sheet_src, schema=None):
     children = []
     elements = []
     child_elements = node.findall("{%s}sequence/{%s}element" % (XSD, XSD))
-    for el in node.iterfind("{%s}sequence/{%s}element" % (XSD, XSD)):
-        attr = {'name': el.get("name"),}
+    if not child_elements:
+        child_elements = node.findall("{%s}choice/{%s}element" % (XSD, XSD))
 
+    for el in child_elements:
+        attr = {'name': el.get("name"),}
         typename = el.get("type")
         match = ST_REGEX.match(typename)
         if typename.startswith("xsd:"):
