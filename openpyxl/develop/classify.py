@@ -192,7 +192,6 @@ class ClassMaker:
         self.classes = classes
         self.body = ""
         self.create(tagname)
-        print(self.classes)
 
     def create(self, tagname):
         body, types, children = classify(tagname, schema=self.schema)
