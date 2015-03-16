@@ -134,10 +134,11 @@ def classify(tagname, src=sheet_src, schema=None):
             s += "    {name} = {type}(nested=True, {use})\n".format(**attr)
         else:
             s += "    {name} = Typed(expected_type={type}, {use})\n".format(**attr)
+        elements.append(attr)
 
-    #if children:
-        #names = (c.name for c in children)
-        #s += "\n__elements__ = {0}\n".format(tuple(names))
+    if children:
+        names = (c['name'] for c in elements)
+        s += "\n    __elements__ = {0}\n".format(tuple(names))
 
     if attrs:
         s += "\n    def __init__(self,\n"
