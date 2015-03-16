@@ -98,15 +98,6 @@ class ErrDir(Serialisable):
         self.val = val
 
 
-
-
-
-class Color(Serialisable):
-    # EG_ColorChoice
-    pass
-
-
-
 class ErrBars(Serialisable):
 
     errDir = Typed(expected_type=ErrDir, allow_none=True)
