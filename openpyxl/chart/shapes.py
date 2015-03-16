@@ -1,9 +1,15 @@
 from openpyxl.descriptors.serialisable import Serialisable
-
+from openpyxl.descriptors import Typed, Integer, Bool
+from openpyxl.descriptors.excel import Coordinate, Percentage
 
 from openpyxl.descriptors import (
     Set,
     )
+
+from .colors import *
+
+from openpyxl.styles.colors import Color
+
 
 class Shape(Serialisable):
 
