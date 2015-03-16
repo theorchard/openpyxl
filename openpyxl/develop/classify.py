@@ -227,8 +227,14 @@ from openpyxl.descriptors import (\n    Typed,"""
         return s
 
 
-def make(element, schema=sheet_src):
-    cm = ClassMaker(element, schema)
+import importlib
+
+def make(element, schema=sheet_src, module=None):
+    classes = set()
+    if module is not None:
+        module = importlib.import_module(module)
+        classes = set(dir(module))
+    cm = ClassMaker(element, schema, classes)
     print(cm)
 
 
@@ -240,7 +246,8 @@ commands.add_argument('--schema',
                       default="sheet_src",
                       )
 
+
 if __name__ == "__main__":
     args = commands.parse_args()
     schema = globals().get(args.schema)
-    make(args.element, schema)
+    make(args.element, schema, "openpyxl.chart.LineSer")
