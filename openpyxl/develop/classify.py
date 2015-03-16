@@ -58,7 +58,10 @@ def classify(tagname, src=sheet_src, schema=None):
     """
     if schema is None:
         schema = parse(src)
-    nodes = schema.iterfind("{%s}complexType" % XSD)
+    if tagname.startswith("EG"):
+        nodes = schema.iterfind("{%s}group" % XSD)
+    else:
+        nodes = schema.iterfind("{%s}complexType" % XSD)
     tag = None
     for node in nodes:
         if node.get('name') == tagname:
