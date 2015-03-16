@@ -51,6 +51,8 @@ complex_mapping = {
 
 
 ST_REGEX = re.compile("(?P<schema>[a-z]:)?(?P<typename>ST_[A-Za-z]+)")
+CT_REGEX = re.compile("(?P<schema>[a-z]:)?CT_(?P<typename>[A-Za-z]+)")
+
 
 def classify(tagname, src=sheet_src, schema=None):
     """
@@ -178,6 +180,7 @@ def simple(tagname, schema, use=""):
 
 srcs_mapping = {'a:':drawing_main_src, 's:':shared_src}
 
+
 class ClassMaker:
     """
     Generate
@@ -189,17 +192,18 @@ class ClassMaker:
         self.classes = classes
         self.body = ""
         self.create(tagname)
+        print(self.classes)
 
     def create(self, tagname):
         body, types, children = classify(tagname, schema=self.schema)
         self.body = body + self.body
         self.types = self.types.union(types)
         for child in children:
-            if (child.startswith("a:")
-                or child.startswith("s:")
-                ):
-                src = srcs_mapping[child[:2]]
-                tagname = child[2:]
+            match = CT_REGEX.match(child)
+            tagname = match.group("typename")
+            schema = match.group("schema")
+            if schema is not None:
+                src = srcs_mapping[schema]
                 if tagname not in self.classes:
                     cm = ClassMaker(tagname, src=src, classes=self.classes)
                     self.body = cm.body + self.body # prepend dependent types
@@ -207,7 +211,7 @@ class ClassMaker:
                     self.classes.add(tagname)
                     self.classes.union(cm.classes)
                 continue
-            if child not in self.classes:
+            if tagname not in self.classes:
                 self.create(child)
                 self.classes.add(child)
 
