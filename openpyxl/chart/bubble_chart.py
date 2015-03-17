@@ -5,7 +5,13 @@ from openpyxl.descriptors import (
     Typed,
     Set,
     MinMax,
+    Bool,
+    Integer,
 )
+from openpyxl.descriptors.excel import ExtensionList
+
+from .series import BubbleSer
+from .label import DLbls
 
 
 class SizeRepresents(Serialisable):
@@ -37,10 +43,11 @@ class BubbleChart(Serialisable):
     bubbleScale = Typed(expected_type=BubbleScale, allow_none=True)
     showNegBubbles = Bool(nested=True, allow_none=True)
     sizeRepresents = Typed(expected_type=SizeRepresents, allow_none=True)
-    axId = Typed(expected_type=UnsignedInt, )
+    axId = Integer(nested=True)
     extLst = Typed(expected_type=ExtensionList, allow_none=True)
 
-    __elements__ = ('varyColors', 'ser', 'dLbls', 'bubble3D', 'bubbleScale', 'showNegBubbles', 'sizeRepresents', 'axId', 'extLst')
+    __elements__ = ('varyColors', 'ser', 'dLbls', 'bubble3D', 'bubbleScale',
+                    'showNegBubbles', 'sizeRepresents', 'axId', 'extLst')
 
     def __init__(self,
                  varyColors=None,

@@ -10,7 +10,9 @@ from openpyxl.descriptors.excel import ExtensionList
 from .shapes import ShapeProperties, Shape
 from .chartBase import AxDataSource, NumDataSource
 from .error_bar import ErrBars
-from .LineSer import DLbls, DPt, PictureOptions, Trendline
+from .label import DLbls
+from .marker import DPt, PictureOptions, Marker
+from .trendline import Trendline
 
 
 class StrVal(Serialisable):
@@ -205,7 +207,7 @@ class BubbleSer(_SeriesBase):
 
 class PieSer(_SeriesBase):
 
-    explosion = Typed(expected_type=UnsignedInt, allow_none=True)
+    explosion = Integer(allow_none=True, nested=True)
     dPt = Typed(expected_type=DPt, allow_none=True)
     dLbls = Typed(expected_type=DLbls, allow_none=True)
     cat = Typed(expected_type=AxDataSource, allow_none=True)
@@ -321,7 +323,7 @@ class LineSer(Serialisable):
     errBars = Typed(expected_type=ErrBars, allow_none=True)
     cat = Typed(expected_type=AxDataSource, allow_none=True)
     val = Typed(expected_type=NumDataSource, allow_none=True)
-    smooth = Typed(expected_type=Boolean, allow_none=True)
+    smooth = Bool(allow_none=True, nested=True)
     extLst = Typed(expected_type=ExtensionList, allow_none=True)
 
     __elements__ = ('marker', 'dPt', 'dLbls', 'trendline', 'errBars', 'cat', 'val', 'smooth', 'extLst')
