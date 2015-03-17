@@ -3,10 +3,11 @@ from openpyxl.descriptors import (
     Typed,
     String,
     Integer,
+    Bool,
 )
 from openpyxl.descriptors.excel import ExtensionList
 
-from .shapes import ShapeProperties
+from .shapes import ShapeProperties, Shape
 from .chartBase import AxDataSource, NumDataSource
 from .error_bar import ErrBars
 from .LineSer import DLbls, DPt, PictureOptions, Trendline
@@ -119,3 +120,44 @@ class AreaSer(_SeriesBase):
         self.cat = cat
         self.val = val
         self.extLst = extLst
+
+
+class BarSer(_SeriesBase):
+
+    invertIfNegative = Bool(nested=True, allow_none=True)
+    pictureOptions = Typed(expected_type=PictureOptions, allow_none=True)
+    dPt = Typed(expected_type=DPt, allow_none=True)
+    dLbls = Typed(expected_type=DLbls, allow_none=True)
+    trendline = Typed(expected_type=Trendline, allow_none=True)
+    errBars = Typed(expected_type=ErrBars, allow_none=True)
+    cat = Typed(expected_type=AxDataSource, allow_none=True)
+    val = Typed(expected_type=NumDataSource, allow_none=True)
+    shape = Typed(expected_type=Shape, allow_none=True)
+    extLst = Typed(expected_type=ExtensionList, allow_none=True)
+
+    _SeriesBase.__elements__ + ('invertIfNegative', 'pictureOptions', 'dPt',
+                                'dLbls', 'trendline', 'errBars', 'cat', 'val', 'shape', 'extLst')
+
+    def __init__(self,
+                 invertIfNegative=None,
+                 pictureOptions=None,
+                 dPt=None,
+                 dLbls=None,
+                 trendline=None,
+                 errBars=None,
+                 cat=None,
+                 val=None,
+                 shape=None,
+                 extLst=None,
+                ):
+        self.invertIfNegative = invertIfNegative
+        self.pictureOptions = pictureOptions
+        self.dPt = dPt
+        self.dLbls = dLbls
+        self.trendline = trendline
+        self.errBars = errBars
+        self.cat = cat
+        self.val = val
+        self.shape = shape
+        self.extLst = extLst
+
