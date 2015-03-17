@@ -67,11 +67,11 @@ class Marker(Serialisable):
 
 class DPt(Serialisable):
 
-    idx = Integer(expected_type=UnsignedInt, nested=True)
+    idx = Integer(nested=True)
     invertIfNegative = Bool(allow_none=True, nested=True)
     marker = Typed(expected_type=Marker, allow_none=True)
     bubble3D = Bool(allow_none=True, nested=True)
-    explosion = Typed(expected_type=UnsignedInt, allow_none=True)
+    explosion = Integer( allow_none=True)
     spPr = Typed(expected_type=ShapeProperties, allow_none=True)
     pictureOptions = Typed(expected_type=PictureOptions, allow_none=True)
     extLst = Typed(expected_type=ExtensionList, allow_none=True)

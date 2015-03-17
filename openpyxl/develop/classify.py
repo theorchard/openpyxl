@@ -204,7 +204,7 @@ class ClassMaker:
             if schema is not None:
                 src = srcs_mapping[schema]
                 if tagname not in self.classes:
-                    cm = ClassMaker("CT_" + tagname, src=src, classes=self.classes)
+                    cm = ClassMaker("ST_" + tagname, src=src, classes=self.classes)
                     self.body = cm.body + self.body # prepend dependent types
                     self.types.union(cm.types)
                     self.classes.add(tagname)
