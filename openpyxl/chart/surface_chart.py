@@ -59,6 +59,7 @@ class _SurfaceChartBase(Serialisable):
 
 class SurfaceChart(Serialisable):
 
+    tagname = "surfaceChart"
 
     axId = Integer(nested=True)
     extLst = Typed(expected_type=ExtensionList, allow_none=True)
@@ -71,3 +72,8 @@ class SurfaceChart(Serialisable):
                 ):
         self.axId = axId
         self.extLst = extLst
+
+
+class SurfaceChart3D(SurfaceChart):
+
+    tagname = "surface3DChart"
