@@ -201,3 +201,32 @@ class BubbleSer(_SeriesBase):
         self.bubbleSize = bubbleSize
         self.bubble3D = bubble3D
         self.extLst = extLst
+
+
+class PieSer(_SeriesBase):
+
+    explosion = Typed(expected_type=UnsignedInt, allow_none=True)
+    dPt = Typed(expected_type=DPt, allow_none=True)
+    dLbls = Typed(expected_type=DLbls, allow_none=True)
+    cat = Typed(expected_type=AxDataSource, allow_none=True)
+    val = Typed(expected_type=NumDataSource, allow_none=True)
+    extLst = Typed(expected_type=ExtensionList, allow_none=True)
+
+    __elements__ = _SeriesBase.__elements__ + ('explosion', 'dPt', 'dLbls',
+                                               'cat', 'val', 'extLst')
+
+    def __init__(self,
+                 explosion=None,
+                 dPt=None,
+                 dLbls=None,
+                 cat=None,
+                 val=None,
+                 extLst=None,
+                ):
+        self.explosion = explosion
+        self.dPt = dPt
+        self.dLbls = dLbls
+        self.cat = cat
+        self.val = val
+        self.extLst = extLst
+
