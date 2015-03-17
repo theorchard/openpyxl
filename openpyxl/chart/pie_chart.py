@@ -3,22 +3,91 @@
 from openpyxl.descriptors.serialisable import Serialisable
 from openpyxl.descriptors import (
     Typed,
-    Set,
+    Bool,
     MinMax,
+    Integer,
+    Set,
+    Float,
 )
+from openpyxl.descriptors.excel import ExtensionList
+
+from .chartBase import GapAmount
+from .series import PieSer
+from .label import DLbls
+from .bar_chart import ChartLines
 
 
-class ChartLines(Serialisable):
+class HoleSize(Serialisable):
 
-    spPr = Typed(expected_type=ShapeProperties, allow_none=True)
-
-    __elements__ = ('spPr',)
+    # needs to serialise to %
+    val = MinMax(min=0, max=100)
 
     def __init__(self,
-                 spPr=None,
+                 val=10,
                 ):
-        self.spPr = spPr
+        self.val = val
 
+
+class FirstSliceAng(Serialisable):
+
+    val = MinMax(min=0, max=360)
+
+    def __init__(self, val=0, ):
+        self.val = val
+
+
+
+class _PieChartBase(Serialisable):
+
+    varyColors = Bool(nested=True, allow_none=True)
+    ser = Typed(expected_type=PieSer, allow_none=True)
+    dLbls = Typed(expected_type=DLbls, allow_none=True)
+
+    __elements__ = ('varyColors', 'ser', 'dLbls')
+
+    def __init__(self,
+                 varyColors=None,
+                 ser=None,
+                 dLbls=None,
+                ):
+        self.varyColors = varyColors
+        self.ser = ser
+        self.dLbls = dLbls
+
+
+class PieChart(_PieChartBase):
+
+    as_3D = True
+
+    firstSliceAng = Typed(expected_type=FirstSliceAng, allow_none=True) #2d
+    extLst = Typed(expected_type=ExtensionList, allow_none=True)
+
+    __elements__ = ('firstSliceAng', 'extLst')
+
+    def __init__(self,
+                 firstSliceAng=None,
+                 extLst=None,
+                ):
+        self.firstSliceAng = firstSliceAng
+        self.extLst = extLst
+
+
+class DoughnutChart(_PieChartBase):
+
+    firstSliceAng = Typed(expected_type=FirstSliceAng, allow_none=True)
+    holeSize = Typed(expected_type=HoleSize, allow_none=True)
+    extLst = Typed(expected_type=ExtensionList, allow_none=True)
+
+    __elements__ = ('firstSliceAng', 'holeSize', 'extLst')
+
+    def __init__(self,
+                 firstSliceAng=None,
+                 holeSize=None,
+                 extLst=None,
+                ):
+        self.firstSliceAng = firstSliceAng
+        self.holeSize = holeSize
+        self.extLst = extLst
 
 class SecondPieSize(Serialisable):
 
@@ -33,7 +102,7 @@ class SecondPieSize(Serialisable):
 
 class CustSplit(Serialisable):
 
-    secondPiePt = Typed(expected_type=UnsignedInt, allow_none=True)
+    secondPiePt = Integer(allow_none=True, nested=True)
 
     __elements__ = ('secondPiePt',)
 
@@ -64,7 +133,7 @@ class OfPieType(Serialisable):
         self.val = val
 
 
-class OfPieChart(Serialisable):
+class OfPieChart(_PieChartBase):
 
     ofPieType = Typed(expected_type=OfPieType, )
     gapWidth = Typed(expected_type=GapAmount, allow_none=True)
@@ -95,4 +164,3 @@ class OfPieChart(Serialisable):
         self.secondPieSize = secondPieSize
         self.serLines = serLines
         self.extLst = extLst
-
