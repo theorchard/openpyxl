@@ -7,6 +7,7 @@ from openpyxl.descriptors import (
     Typed,
     MinMax
 )
+from .shapes import ShapeProperties
 
 
 class GapAmount(Serialisable):
@@ -30,3 +31,16 @@ class Overlap(Serialisable):
                  val=None,
                 ):
         self.val = val
+
+
+class ChartLines(Serialisable):
+
+    spPr = Typed(expected_type=ShapeProperties, allow_none=True)
+
+    __elements__ = ('spPr',)
+
+    def __init__(self,
+                 spPr=None,
+                ):
+        self.spPr = spPr
+

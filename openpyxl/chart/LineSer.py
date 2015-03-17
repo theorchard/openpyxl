@@ -18,7 +18,7 @@ from openpyxl.descriptors.excel import(
     TextPoint,
     ExtensionList,
 )
-from .Layout import Layout
+from .layout import Layout
 from .shapes import *
 from .text import *
 

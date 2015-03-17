@@ -3,19 +3,14 @@
 from openpyxl.descriptors.serialisable import Serialisable
 from openpyxl.descriptors import (
     Typed,
-    Set,)
+    Set,
+    Bool,
+    Integer,
+)
 
-
-class ChartLines(Serialisable):
-
-    spPr = Typed(expected_type=ShapeProperties, allow_none=True)
-
-    __elements__ = ('spPr',)
-
-    def __init__(self,
-                 spPr=None,
-                ):
-        self.spPr = spPr
+from openpyxl.descriptors.excel import ExtensionList
+from .chartBase import ChartLines, GapAmount
+from .LineSer import PictureOptions, DPt, DLbls, Trendline, ErrBars, AxDataSource, NumDataSource
 
 
 class AreaSer(Serialisable):
@@ -61,7 +56,7 @@ class Grouping(Serialisable):
         self.val = val
 
 
-class AreaChartShared(Serialisable):
+class _AreaChartBase(Serialisable):
 
     grouping = Typed(expected_type=Grouping, allow_none=True)
     varyColors = Bool(nested=True, allow_none=True)
@@ -84,3 +79,25 @@ class AreaChartShared(Serialisable):
         self.dLbls = dLbls
         self.dropLines = dropLines
 
+
+class AreaChart(_AreaChartBase):
+
+    tagname = "areaChart"
+
+    gapDepth = Typed(expected_type=GapAmount, allow_none=True, nested=True)
+    axId = Integer()
+    extLst = Typed(expected_type=ExtensionList, allow_none=True)
+
+    __elements__ = ('gapDepth', 'axId', 'extLst')
+
+    def __init__(self,
+                 axId=None,
+                 extLst=None,
+                ):
+        self.axId = axId
+        self.extLst = extLst
+
+
+class AreaChart3D(AreaChart):
+
+    tagname = "area3DChart"
