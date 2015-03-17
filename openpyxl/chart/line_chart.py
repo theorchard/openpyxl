@@ -77,7 +77,7 @@ class LineChart(_LineChartBase):
         self.extLst = extLst
 
 
-class LineChart(_LineChartBase):
+class LineChart3D(_LineChartBase):
 
 
     gapDepth = Typed(expected_type=GapAmount, allow_none=True)

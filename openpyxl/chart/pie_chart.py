@@ -6,35 +6,15 @@ from openpyxl.descriptors import (
     Bool,
     MinMax,
     Integer,
-    Set,
+    NoneSet,
     Float,
 )
-from openpyxl.descriptors.excel import ExtensionList
+from openpyxl.descriptors.excel import ExtensionList, Percentage
 
 from .chartBase import GapAmount
 from .series import PieSer
 from .label import DLbls
 from .bar_chart import ChartLines
-
-
-class HoleSize(Serialisable):
-
-    # needs to serialise to %
-    val = MinMax(min=0, max=100)
-
-    def __init__(self,
-                 val=10,
-                ):
-        self.val = val
-
-
-class FirstSliceAng(Serialisable):
-
-    val = MinMax(min=0, max=360)
-
-    def __init__(self, val=0, ):
-        self.val = val
-
 
 
 class _PieChartBase(Serialisable):
@@ -57,47 +37,38 @@ class _PieChartBase(Serialisable):
 
 class PieChart(_PieChartBase):
 
-    as_3D = True
-
-    firstSliceAng = Typed(expected_type=FirstSliceAng, allow_none=True) #2d
+    firstSliceAng = MinMax(min=0, max=360, nested=True)
     extLst = Typed(expected_type=ExtensionList, allow_none=True)
 
     __elements__ = ('firstSliceAng', 'extLst')
 
     def __init__(self,
-                 firstSliceAng=None,
+                 firstSliceAng=0,
                  extLst=None,
                 ):
         self.firstSliceAng = firstSliceAng
-        self.extLst = extLst
+
+
+class PieChart3D(_PieChartBase):
+
+    extLst = Typed(expected_type=ExtensionList, allow_none=True)
 
 
 class DoughnutChart(_PieChartBase):
 
-    firstSliceAng = Typed(expected_type=FirstSliceAng, allow_none=True)
-    holeSize = Typed(expected_type=HoleSize, allow_none=True)
+    firstSliceAng = MinMax(min=0, max=360, nested=True)
+    holeSize = Percentage(allow_none=True, nested=True)
     extLst = Typed(expected_type=ExtensionList, allow_none=True)
 
     __elements__ = ('firstSliceAng', 'holeSize', 'extLst')
 
     def __init__(self,
-                 firstSliceAng=None,
+                 firstSliceAng=0,
                  holeSize=None,
                  extLst=None,
                 ):
         self.firstSliceAng = firstSliceAng
         self.holeSize = holeSize
-        self.extLst = extLst
-
-class SecondPieSize(Serialisable):
-
-    # needs to serialise to %
-    val = MinMax(min=0, max=200)
-
-    def __init__(self,
-                 val=None,
-                ):
-        self.val = val
 
 
 class CustSplit(Serialisable):
@@ -112,39 +83,19 @@ class CustSplit(Serialisable):
         self.secondPiePt = secondPiePt
 
 
-class SplitType(Serialisable):
-
-    val = Set(values=(['auto', 'cust', 'percent', 'pos', 'val']))
-
-    def __init__(self,
-                 val=None,
-                ):
-        self.val = val
-
-
-
-class OfPieType(Serialisable):
-
-    val = Set(values=(['pie', 'bar']))
-
-    def __init__(self,
-                 val=None,
-                ):
-        self.val = val
-
-
 class OfPieChart(_PieChartBase):
 
-    ofPieType = Typed(expected_type=OfPieType, )
+    ofPieType = NoneSet(values=(['pie', 'bar']), nested=True)
     gapWidth = Typed(expected_type=GapAmount, allow_none=True)
-    splitType = Typed(expected_type=SplitType, allow_none=True)
+    splitType = NoneSet(values=(['auto', 'cust', 'percent', 'pos', 'val']), nested=True)
     splitPos = Float(nested=True, allow_none=True)
     custSplit = Typed(expected_type=CustSplit, allow_none=True)
-    secondPieSize = Typed(expected_type=SecondPieSize, allow_none=True)
+    secondPieSize = Percentage(allow_none=True, nested=True)
     serLines = Typed(expected_type=ChartLines, allow_none=True)
     extLst = Typed(expected_type=ExtensionList, allow_none=True)
 
-    __elements__ = ('ofPieType', 'gapWidth', 'splitType', 'splitPos', 'custSplit', 'secondPieSize', 'serLines', 'extLst')
+    __elements__ = ('ofPieType', 'gapWidth', 'splitType', 'splitPos',
+                    'custSplit', 'secondPieSize', 'serLines', 'extLst')
 
     def __init__(self,
                  ofPieType=None,
@@ -163,4 +114,3 @@ class OfPieChart(_PieChartBase):
         self.custSplit = custSplit
         self.secondPieSize = secondPieSize
         self.serLines = serLines
-        self.extLst = extLst
