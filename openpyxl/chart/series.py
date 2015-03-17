@@ -7,6 +7,10 @@ from openpyxl.descriptors import (
 from openpyxl.descriptors.excel import ExtensionList
 
 from .shapes import ShapeProperties
+from .chartBase import AxDataSource, NumDataSource
+from .error_bar import ErrBars
+from .LineSer import DLbls, DPt, PictureOptions, Trendline
+
 
 class StrVal(Serialisable):
 
@@ -62,7 +66,7 @@ class SerTx(Serialisable):
     strRef = Typed(expected_type=StrRef)
 
 
-class SerShared(Serialisable):
+class _SeriesBase(Serialisable):
 
     idx = Integer(nested=True)
     order = Integer(nested=True)
@@ -82,3 +86,36 @@ class SerShared(Serialisable):
         self.tx = tx
         self.spPr = spPr
 
+
+class AreaSer(_SeriesBase):
+
+    pictureOptions = Typed(expected_type=PictureOptions, allow_none=True)
+    dPt = Typed(expected_type=DPt, allow_none=True)
+    dLbls = Typed(expected_type=DLbls, allow_none=True)
+    trendline = Typed(expected_type=Trendline, allow_none=True)
+    errBars = Typed(expected_type=ErrBars, allow_none=True)
+    cat = Typed(expected_type=AxDataSource, allow_none=True)
+    val = Typed(expected_type=NumDataSource, allow_none=True)
+    extLst = Typed(expected_type=ExtensionList, allow_none=True)
+
+    __elements__ = _SeriesBase.__elements__ + ('pictureOptions', 'dPt',
+                                               'dLbls', 'errBars', 'trendline', 'cat', 'val', 'extLst')
+
+    def __init__(self,
+                 pictureOptions=None,
+                 dPt=None,
+                 dLbls=None,
+                 trendline=None,
+                 errBars=None,
+                 cat=None,
+                 val=None,
+                 extLst=None,
+                ):
+        self.pictureOptions = pictureOptions
+        self.dPt = dPt
+        self.dLbls = dLbls
+        self.trendline = trendline
+        self.errBars = errBars
+        self.cat = cat
+        self.val = val
+        self.extLst = extLst

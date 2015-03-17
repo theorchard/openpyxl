@@ -10,40 +10,6 @@ from openpyxl.descriptors import (
 
 from openpyxl.descriptors.excel import ExtensionList
 from .chartBase import ChartLines, GapAmount
-from .LineSer import PictureOptions, DPt, DLbls, Trendline, ErrBars, AxDataSource, NumDataSource
-
-
-class AreaSer(Serialisable):
-
-    pictureOptions = Typed(expected_type=PictureOptions, allow_none=True)
-    dPt = Typed(expected_type=DPt, allow_none=True)
-    dLbls = Typed(expected_type=DLbls, allow_none=True)
-    trendline = Typed(expected_type=Trendline, allow_none=True)
-    errBars = Typed(expected_type=ErrBars, allow_none=True)
-    cat = Typed(expected_type=AxDataSource, allow_none=True)
-    val = Typed(expected_type=NumDataSource, allow_none=True)
-    extLst = Typed(expected_type=ExtensionList, allow_none=True)
-
-    __elements__ = ('pictureOptions', 'dPt', 'dLbls', 'trendline', 'errBars', 'cat', 'val', 'extLst')
-
-    def __init__(self,
-                 pictureOptions=None,
-                 dPt=None,
-                 dLbls=None,
-                 trendline=None,
-                 errBars=None,
-                 cat=None,
-                 val=None,
-                 extLst=None,
-                ):
-        self.pictureOptions = pictureOptions
-        self.dPt = dPt
-        self.dLbls = dLbls
-        self.trendline = trendline
-        self.errBars = errBars
-        self.cat = cat
-        self.val = val
-        self.extLst = extLst
 
 
 class Grouping(Serialisable):
@@ -88,7 +54,7 @@ class AreaChart(_AreaChartBase):
     axId = Integer()
     extLst = Typed(expected_type=ExtensionList, allow_none=True)
 
-    __elements__ = ('gapDepth', 'axId', 'extLst')
+    __elements__ = _AreaChartBase.__elements__ + ('gapDepth', 'axId', 'extLst')
 
     def __init__(self,
                  axId=None,
