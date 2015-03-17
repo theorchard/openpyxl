@@ -47,9 +47,9 @@ class PictureFormat(Serialisable):
 
 class PictureOptions(Serialisable):
 
-    applyToFront = Typed(expected_type=Boolean, allow_none=True)
-    applyToSides = Typed(expected_type=Boolean, allow_none=True)
-    applyToEnd = Typed(expected_type=Boolean, allow_none=True)
+    applyToFront = Bool(allow_none=True, nested=True)
+    applyToSides = Bool(allow_none=True, nested=True)
+    applyToEnd = Bool(allow_none=True, nested=True)
     pictureFormat = Typed(expected_type=PictureFormat, allow_none=True)
     pictureStackUnit = Typed(expected_type=PictureStackUnit, allow_none=True)
 
@@ -99,9 +99,9 @@ class Marker(Serialisable):
 class DPt(Serialisable):
 
     idx = Typed(expected_type=UnsignedInt, )
-    invertIfNegative = Typed(expected_type=Boolean, allow_none=True)
+    invertIfNegative = Bool(allow_none=True, nested=True)
     marker = Typed(expected_type=Marker, allow_none=True)
-    bubble3D = Typed(expected_type=Boolean, allow_none=True)
+    bubble3D = Bool(allow_none=True, nested=True)
     explosion = Typed(expected_type=UnsignedInt, allow_none=True)
     spPr = Typed(expected_type=ShapeProperties, allow_none=True)
     pictureOptions = Typed(expected_type=PictureOptions, allow_none=True)

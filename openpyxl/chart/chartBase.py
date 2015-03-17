@@ -21,26 +21,6 @@ class NumDataSource(Serialisable):
     pass
 
 
-class Boolean(Serialisable):
-
-    val = Bool(allow_none=True)
-
-    def __init__(self,
-                 val=None,
-                ):
-        self.val = val
-
-
-class Double(Serialisable):
-
-    val = Float()
-
-    def __init__(self,
-                 val=None,
-                ):
-        self.val = val
-
-
 class GapAmount(Serialisable):
 
     # needs to serialise to %
