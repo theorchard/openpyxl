@@ -22,16 +22,6 @@ class Skip(Serialisable):
         self.val = val
 
 
-class Skip(Serialisable):
-
-    val = Integer()
-
-    def __init__(self,
-                 val=None,
-                ):
-        self.val = val
-
-
 class LblOffset(Serialisable):
 
     # need to serialise to %
