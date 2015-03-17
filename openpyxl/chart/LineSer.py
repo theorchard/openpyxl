@@ -251,36 +251,3 @@ class DPt(Serialisable):
         self.extLst = extLst
 
 
-class LineSer(Serialisable):
-
-    marker = Typed(expected_type=Marker, allow_none=True)
-    dPt = Typed(expected_type=DPt, allow_none=True)
-    dLbls = Typed(expected_type=DLbls, allow_none=True)
-    trendline = Typed(expected_type=Trendline, allow_none=True)
-    errBars = Typed(expected_type=ErrBars, allow_none=True)
-    cat = Typed(expected_type=AxDataSource, allow_none=True)
-    val = Typed(expected_type=NumDataSource, allow_none=True)
-    smooth = Typed(expected_type=Boolean, allow_none=True)
-    extLst = Typed(expected_type=ExtensionList, allow_none=True)
-
-    def __init__(self,
-                 marker=None,
-                 dPt=None,
-                 dLbls=None,
-                 trendline=None,
-                 errBars=None,
-                 cat=None,
-                 val=None,
-                 smooth=None,
-                 extLst=None,
-                ):
-        self.marker = marker
-        self.dPt = dPt
-        self.dLbls = dLbls
-        self.trendline = trendline
-        self.errBars = errBars
-        self.cat = cat
-        self.val = val
-        self.smooth = smooth
-        self.extLst = extLst
-
