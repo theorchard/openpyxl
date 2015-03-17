@@ -6,9 +6,10 @@ from openpyxl.descriptors import (
     Bool,
     Integer,
     MinMax,
+    NoneSet,
 )
 
-from openpyxl.descriptors.excel import ExtensionList
+from openpyxl.descriptors.excel import ExtensionList, Percentage
 
 from .layout import Layout
 from .text import Tx, TextBody
@@ -106,3 +107,51 @@ class CatAx(Serialisable):
         self.tickMarkSkip = tickMarkSkip
         self.noMultiLvlLbl = noMultiLvlLbl
 
+
+class DateAx(Serialisable):
+
+    auto = Bool(nested=True, allow_none=True)
+    lblOffset = Percentage(allow_none=True, nested=True)
+    baseTimeUnit = NoneSet(values=(['days', 'months', 'years']), nested=True)
+    majorUnit = Float(allow_none=True, nested=True)
+    majorTimeUnit = NoneSet(values=(['days', 'months', 'years']), nested=True)
+    minorUnit = Float(allow_none=True, nested=True)
+    minorTimeUnit = NoneSet(values=(['days', 'months', 'years']), nested=True)
+    extLst = Typed(expected_type=ExtensionList, allow_none=True)
+
+    __elements__ = ('auto', 'lblOffset', 'baseTimeUnit', 'majorUnit', 'majorTimeUnit', 'minorUnit', 'minorTimeUnit', 'extLst')
+
+    def __init__(self,
+                 auto=None,
+                 lblOffset=None,
+                 baseTimeUnit=None,
+                 majorUnit=None,
+                 majorTimeUnit=None,
+                 minorUnit=None,
+                 minorTimeUnit=None,
+                 extLst=None,
+                ):
+        self.auto = auto
+        self.lblOffset = lblOffset
+        self.baseTimeUnit = baseTimeUnit
+        self.majorUnit = majorUnit
+        self.majorTimeUnit = majorTimeUnit
+        self.minorUnit = minorUnit
+        self.minorTimeUnit = minorTimeUnit
+
+
+class SerAx(Serialisable):
+
+    tickLblSkip = Integer(allow_none=True, nested=True)
+    tickMarkSkip = Integer(allow_none=True, nested=True)
+    extLst = Typed(expected_type=ExtensionList, allow_none=True)
+
+    __elements__ = ('tickLblSkip', 'tickMarkSkip', 'extLst')
+
+    def __init__(self,
+                 tickLblSkip=None,
+                 tickMarkSkip=None,
+                 extLst=None,
+                ):
+        self.tickLblSkip = tickLblSkip
+        self.tickMarkSkip = tickMarkSkip
