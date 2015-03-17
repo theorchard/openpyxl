@@ -24,34 +24,13 @@ from .text import *
 from .error_bar import *
 
 
-
-class PictureStackUnit(Serialisable):
-
-    val = Typed(expected_type=Float())
-
-    def __init__(self,
-                 val=None,
-                ):
-        self.val = val
-
-
-class PictureFormat(Serialisable):
-
-    val = Set(values=(['stretch', 'stack', 'stackScale']))
-
-    def __init__(self,
-                 val=None,
-                ):
-        self.val = val
-
-
 class PictureOptions(Serialisable):
 
     applyToFront = Bool(allow_none=True, nested=True)
     applyToSides = Bool(allow_none=True, nested=True)
     applyToEnd = Bool(allow_none=True, nested=True)
-    pictureFormat = Typed(expected_type=PictureFormat, allow_none=True)
-    pictureStackUnit = Typed(expected_type=PictureStackUnit, allow_none=True)
+    pictureFormat = NoneSet(values=(['stretch', 'stack', 'stackScale']), nested=True)
+    pictureStackUnit = Float(allow_none=True, nested=True)
 
     def __init__(self,
                  applyToFront=None,
@@ -67,19 +46,10 @@ class PictureOptions(Serialisable):
         self.pictureStackUnit = pictureStackUnit
 
 
-class UnsignedInt(Serialisable):
-
-    val = Typed(expected_type=Integer, )
-
-    def __init__(self,
-                 val=None,
-                ):
-        self.val = val
-
-
 class Marker(Serialisable):
 
-    symbol = Set(values=(['circle', 'dash', 'diamond', 'dot', 'none', 'picture', 'plus', 'square', 'star', 'triangle', 'x', 'auto']), nested=True)
+    symbol = NoneSet(values=(['circle', 'dash', 'diamond', 'dot', 'picture',
+                              'plus', 'square', 'star', 'triangle', 'x', 'auto']), nested=True)
     size = MinMax(min=2, max=72, nested=True)
     spPr = Typed(expected_type=ShapeProperties, allow_none=True)
     extLst = Typed(expected_type=ExtensionList, allow_none=True)
@@ -93,12 +63,11 @@ class Marker(Serialisable):
         self.symbol = symbol
         self.size = size
         self.spPr = spPr
-        self.extLst = extLst
 
 
 class DPt(Serialisable):
 
-    idx = Typed(expected_type=UnsignedInt, )
+    idx = Integer(expected_type=UnsignedInt, nested=True)
     invertIfNegative = Bool(allow_none=True, nested=True)
     marker = Typed(expected_type=Marker, allow_none=True)
     bubble3D = Bool(allow_none=True, nested=True)
@@ -124,4 +93,3 @@ class DPt(Serialisable):
         self.explosion = explosion
         self.spPr = spPr
         self.pictureOptions = pictureOptions
-        self.extLst = extLst
