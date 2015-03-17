@@ -55,3 +55,48 @@ class ChartLines(Serialisable):
                 ):
         self.spPr = spPr
 
+
+class UpDownBar(Serialisable):
+
+    spPr = Typed(expected_type=ShapeProperties, allow_none=True)
+
+    __elements__ = ('spPr',)
+
+    def __init__(self,
+                 spPr=None,
+                ):
+        self.spPr = spPr
+
+
+class UpDownBar(Serialisable):
+
+    spPr = Typed(expected_type=ShapeProperties, allow_none=True)
+
+    __elements__ = ('spPr',)
+
+    def __init__(self,
+                 spPr=None,
+                ):
+        self.spPr = spPr
+
+
+class UpDownBars(Serialisable):
+
+    gapWidth = Typed(expected_type=GapAmount, allow_none=True)
+    upBars = Typed(expected_type=UpDownBar, allow_none=True)
+    downBars = Typed(expected_type=UpDownBar, allow_none=True)
+    extLst = Typed(expected_type=ExtensionList, allow_none=True)
+
+    __elements__ = ('gapWidth', 'upBars', 'downBars', 'extLst')
+
+    def __init__(self,
+                 gapWidth=None,
+                 upBars=None,
+                 downBars=None,
+                 extLst=None,
+                ):
+        self.gapWidth = gapWidth
+        self.upBars = upBars
+        self.downBars = downBars
+        self.extLst = extLst
+
