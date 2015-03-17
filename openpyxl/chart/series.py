@@ -230,3 +230,29 @@ class PieSer(_SeriesBase):
         self.val = val
         self.extLst = extLst
 
+
+class RadarSer(_SeriesBase):
+
+    marker = Typed(expected_type=Marker, allow_none=True)
+    dPt = Typed(expected_type=DPt, allow_none=True)
+    dLbls = Typed(expected_type=DLbls, allow_none=True)
+    cat = Typed(expected_type=AxDataSource, allow_none=True)
+    val = Typed(expected_type=NumDataSource, allow_none=True)
+    extLst = Typed(expected_type=ExtensionList, allow_none=True)
+
+    __elements__ = _SeriesBase.__elements__ + ('marker', 'dPt', 'dLbls', 'cat', 'val', 'extLst')
+
+    def __init__(self,
+                 marker=None,
+                 dPt=None,
+                 dLbls=None,
+                 cat=None,
+                 val=None,
+                 extLst=None,
+                ):
+        self.marker = marker
+        self.dPt = dPt
+        self.dLbls = dLbls
+        self.cat = cat
+        self.val = val
+        self.extLst = extLst
