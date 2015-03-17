@@ -8,6 +8,7 @@ from openpyxl.descriptors.excel import ExtensionList
 from .shapes import ShapeProperties
 from .chartBase import UpDownBars, ChartLines
 from .label import DLbls
+from .series import LineSer
 
 
 class StockChart(Serialisable):
@@ -20,7 +21,8 @@ class StockChart(Serialisable):
     axId = Integer(nested=True)
     extLst = Typed(expected_type=ExtensionList, allow_none=True)
 
-    __elements__ = ('ser', 'dLbls', 'dropLines', 'hiLowLines', 'upDownBars', 'axId', 'extLst')
+    __elements__ = ('ser', 'dLbls', 'dropLines', 'hiLowLines', 'upDownBars',
+                    'axId', 'extLst')
 
     def __init__(self,
                  ser=None,
@@ -37,4 +39,3 @@ class StockChart(Serialisable):
         self.hiLowLines = hiLowLines
         self.upDownBars = upDownBars
         self.axId = axId
-        self.extLst = extLst
