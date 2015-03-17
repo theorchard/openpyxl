@@ -2,7 +2,11 @@ from openpyxl.descriptors.serialisable import Serialisable
 from openpyxl.descriptors import (
     Typed,
     Float,
-    Set,)
+    NoneSet,
+    Bool,
+    Integer,
+    MinMax,
+)
 
 from openpyxl.descriptors.excel import ExtensionList
 
@@ -47,41 +51,13 @@ class DispUnits(Serialisable):
         self.extLst = extLst
 
 
-class AxisUnit(Serialisable):
-
-    val = Typed(expected_type=Float(), )
-
-    def __init__(self,
-                 val=None,
-                ):
-        self.val = val
-
-
-class AxisUnit(Serialisable):
-
-    val = Float()
-
-    def __init__(self,
-                 val=None,
-                ):
-        self.val = val
-
-
-class CrossBetween(Serialisable):
-
-    val = Set(values=(['between', 'midCat']))
-
-    def __init__(self,
-                 val=None,
-                ):
-        self.val = val
-
-
 class ValAx(Serialisable):
 
-    crossBetween = Typed(expected_type=CrossBetween, allow_none=True)
-    majorUnit = Typed(expected_type=AxisUnit, allow_none=True)
-    minorUnit = Typed(expected_type=AxisUnit, allow_none=True)
+    tagname = "valAx"
+
+    crossBetween = NoneSet(values=(['between', 'midCat']), nested=True)
+    majorUnit = Float(allow_none=True, nested=True)
+    minorUnit = Float(allow_none=True, nested=True)
     dispUnits = Typed(expected_type=DispUnits, allow_none=True)
     extLst = Typed(expected_type=ExtensionList, allow_none=True)
 
@@ -98,5 +74,35 @@ class ValAx(Serialisable):
         self.majorUnit = majorUnit
         self.minorUnit = minorUnit
         self.dispUnits = dispUnits
-        self.extLst = extLst
+
+
+class CatAx(Serialisable):
+
+    tagname = "catAx"
+
+    auto = Bool(nested=True, allow_none=True)
+    lblAlgn = NoneSet(values=(['ctr', 'l', 'r']), nested=True)
+    lblOffset = MinMax(min=0, max=1000, nested=True, allow_none=True)
+    tickLblSkip = Integer(allow_none=True, nested=True)
+    tickMarkSkip = Integer(allow_none=True, nested=True)
+    noMultiLvlLbl = Bool(nested=True, allow_none=True)
+    extLst = Typed(expected_type=ExtensionList, allow_none=True)
+
+    __elements__ = ('auto', 'lblAlgn', 'lblOffset', 'tickLblSkip', 'tickMarkSkip', 'noMultiLvlLbl', 'extLst')
+
+    def __init__(self,
+                 auto=None,
+                 lblAlgn=None,
+                 lblOffset=None,
+                 tickLblSkip=None,
+                 tickMarkSkip=None,
+                 noMultiLvlLbl=None,
+                 extLst=None,
+                ):
+        self.auto = auto
+        self.lblAlgn = lblAlgn
+        self.lblOffset = lblOffset
+        self.tickLblSkip = tickLblSkip
+        self.tickMarkSkip = tickMarkSkip
+        self.noMultiLvlLbl = noMultiLvlLbl
 
