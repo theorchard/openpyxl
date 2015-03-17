@@ -249,4 +249,4 @@ commands.add_argument('--schema',
 if __name__ == "__main__":
     args = commands.parse_args()
     schema = globals().get(args.schema)
-    make(args.element, schema, "openpyxl.chart.LineSer")
+    make(args.element, schema, "openpyxl.chart.series")
