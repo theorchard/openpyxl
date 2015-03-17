@@ -4,10 +4,41 @@ Collection of utility primitives for charts.
 
 from openpyxl.descriptors.serialisable import Serialisable
 from openpyxl.descriptors import (
+    Bool,
+    Float,
     Typed,
     MinMax
 )
 from .shapes import ShapeProperties
+
+
+class AxDataSource(Serialisable):
+
+    pass
+
+class NumDataSource(Serialisable):
+
+    pass
+
+
+class Boolean(Serialisable):
+
+    val = Bool(allow_none=True)
+
+    def __init__(self,
+                 val=None,
+                ):
+        self.val = val
+
+
+class Double(Serialisable):
+
+    val = Float()
+
+    def __init__(self,
+                 val=None,
+                ):
+        self.val = val
 
 
 class GapAmount(Serialisable):
