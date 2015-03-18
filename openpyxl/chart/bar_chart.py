@@ -4,6 +4,7 @@ from openpyxl.descriptors import (
     Set,
     Bool,
     Integer,
+    Sequence,
 )
 from openpyxl.descriptors.excel import ExtensionList
 
@@ -13,41 +14,22 @@ from .series import BarSer
 from .label import DLbls
 
 
-class BarGrouping(Serialisable):
-
-    val = Set(values=(['percentStacked', 'clustered', 'standard', 'stacked']))
-
-    def __init__(self,
-                 val=None,
-                ):
-        self.val = val
-
-
-class BarDir(Serialisable):
-
-    val = Set(values=(['bar', 'col']))
-
-    def __init__(self,
-                 val=None,
-                ):
-        self.val = val
-
-
 class _BarChartBase(Serialisable):
 
-    barDir = Typed(expected_type=BarDir, )
-    grouping = Typed(expected_type=BarGrouping, allow_none=True)
+    barDir = Set(values=(['bar', 'col']))
+    grouping = Set(values=(['percentStacked', 'clustered', 'standard', 'stacked']))
     varyColors = Bool(nested=True, allow_none=True)
-    ser = Typed(expected_type=BarSer, allow_none=True)
+    ser = Sequence(expected_type=BarSer, allow_none=True, nested=True)
     dLbls = Typed(expected_type=DLbls, allow_none=True)
 
-    __elements__ = ('barDir', 'grouping', 'varyColors', 'ser', 'dLbls')
+    __elements__ = ('varyColors', 'ser', 'dLbls')
+    __nested__ = ('barDir', 'grouping')
 
     def __init__(self,
-                 barDir=None,
-                 grouping=None,
+                 barDir="col",
+                 grouping="clustered",
                  varyColors=None,
-                 ser=None,
+                 ser=[],
                  dLbls=None,
                 ):
         self.barDir = barDir
@@ -70,15 +52,26 @@ class ChartLines(Serialisable):
         self.spPr = spPr
 
 
+class AxId(Serialisable):
+
+    val = Integer()
+
+    def __init__(self, value):
+        self.val = value
+
+
 class BarChart(_BarChartBase):
+
+    tagname = "barChart"
 
     gapWidth = Typed(expected_type=GapAmount, allow_none=True)
     overlap = Typed(expected_type=Overlap, allow_none=True)
     serLines = Typed(expected_type=ChartLines, allow_none=True)
-    axId = Integer(nested=True)
+    axId = Sequence(expected_type=AxId)
     extLst = Typed(expected_type=ExtensionList, allow_none=True)
 
-    __elements__ = ('gapWidth', 'overlap', 'serLines', 'axId', 'extLst')
+    __elements__ = _BarChartBase.__elements__ + ('gapWidth', 'overlap', 'serLines', 'axId', 'extLst')
+    __nested__ = _BarChartBase.__nested__
 
     def __init__(self,
                  gapWidth=None,
@@ -90,8 +83,11 @@ class BarChart(_BarChartBase):
         self.gapWidth = gapWidth
         self.overlap = overlap
         self.serLines = serLines
+        if axId is None:
+            axId = (AxId(60871424), AxId(60873344))
         self.axId = axId
         self.extLst = extLst
+        super(BarChart, self).__init__()
 
 
 class BarChart3D(_BarChartBase):
