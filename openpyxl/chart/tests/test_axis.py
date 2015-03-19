@@ -7,6 +7,50 @@ from openpyxl.tests.helper import compare_xml
 
 
 @pytest.fixture
+def Scaling():
+    from ..axis import Scaling
+    return Scaling
+
+
+def test_scaling(Scaling):
+
+    scale = Scaling()
+    xml = tostring(scale.to_tree())
+    expected = """
+    <scaling>
+       <orientation val="minMax"></orientation>
+    </scaling>
+    """
+    diff = compare_xml(xml, expected)
+    assert diff is None, diff
+
+
+@pytest.fixture
+def _BaseAxis():
+    from ..axis import _BaseAxis
+    return _BaseAxis
+
+
+class TestAxis:
+
+    def test_ctor(self, _BaseAxis, Scaling):
+        axis = _BaseAxis(axId=10, crossAx=100)
+        xml = tostring(axis.to_tree(tagname="baseAxis"))
+        expected = """
+        <baseAxis>
+            <axId val="10"></axId>
+            <crossAx val="100"></crossAx>
+            <scaling>
+              <orientation val="minMax"></orientation>
+            </scaling>
+        </baseAxis>
+        """
+        diff = compare_xml(xml, expected)
+        assert diff is None, diff
+
+
+
+@pytest.fixture
 def CatAx():
     from ..axis import CatAx
     return CatAx

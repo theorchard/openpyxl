@@ -7,13 +7,107 @@ from openpyxl.descriptors import (
     Integer,
     MinMax,
     NoneSet,
+    Set,
 )
 
 from openpyxl.descriptors.excel import ExtensionList, Percentage
 
+from openpyxl.styles.differential import NumFmt
+
 from .layout import Layout
 from .text import Tx, TextBody
 from .shapes import ShapeProperties
+from .chartBase import ChartLines
+from ._chart import Title
+
+
+class Scaling(Serialisable):
+
+    tagname = "scaling"
+
+    logBase = Float(allow_none=True, nested=True)
+    orientation = Set(values=(['maxMin', 'minMax']), nested=True)
+    max = Float(nested=True, allow_none=True)
+    min = Float(nested=True, allow_none=True)
+    extLst = Typed(expected_type=ExtensionList, allow_none=True)
+
+    __elements__ = ()
+    __nested__ = ('logBase', 'orientation', 'max', 'min',)
+
+    def __init__(self,
+                 logBase=None,
+                 orientation="minMax",
+                 max=None,
+                 min=None,
+                 extLst=None,
+                ):
+        self.logBase = logBase
+        self.orientation = orientation
+        self.max = max
+        self.min = min
+
+
+class _BaseAxis(Serialisable):
+
+    axId = Integer(nested=True)
+    scaling = Typed(expected_type=Scaling)
+    delete = Bool(nested=True, allow_none=True)
+    axPos = NoneSet(values=(['b', 'l', 'r', 't']))
+    majorGridlines = Typed(expected_type=ChartLines, allow_none=True)
+    minorGridlines = Typed(expected_type=ChartLines, allow_none=True)
+    title = Typed(expected_type=Title, allow_none=True)
+    numFmt = Typed(expected_type=NumFmt, allow_none=True)
+    majorTickMark = NoneSet(values=(['cross', 'in', 'out']), nested=True)
+    minorTickMark = NoneSet(values=(['cross', 'in', 'out']), nested=True)
+    tickLblPos = NoneSet(values=(['high', 'low', 'nextTo']), nested=True)
+    spPr = Typed(expected_type=ShapeProperties, allow_none=True)
+    txP = Typed(expected_type=TextBody, allow_none=True)
+    crossAx = Integer(nested=True) # references other axis
+    crosses = NoneSet(values=(['autoZero', 'max', 'min']), nested=True)
+    crossesAt = Float(nested=True, allow_none=True)
+
+    # crosses & crossesAt are mutually exclusive
+
+    __nested__ = ('axId', 'delete', 'majorTickMark', 'minorTickMark',
+                  'tickLblPos', 'crossAx', 'crosses', 'crossesAt')
+    __elements__ = ('majorGridlines', 'minorGridlines', 'numFmt', 'scaling',
+                    'spPr', 'title', 'txP')
+
+    def __init__(self,
+                 axId=None,
+                 scaling=None,
+                 delete=None,
+                 axPos=None,
+                 majorGridlines=None,
+                 minorGridlines=None,
+                 title=None,
+                 numFmt=None,
+                 majorTickMark=None,
+                 minorTickMark=None,
+                 tickLblPos=None,
+                 spPr=None,
+                 txP= None,
+                 crossAx=None,
+                 crosses=None,
+                 crossesAt=None,
+                ):
+        self.axId = axId
+        if scaling is None:
+            self.scaling = Scaling()
+        self.delete = delete
+        self.axPos = axPos
+        self.majorGridlines = majorGridlines
+        self.minorGridlines = minorGridlines
+        self.title = title
+        self.numFmt = numFmt
+        self.majorTickMark = majorTickMark
+        self.minorTickMark = minorTickMark
+        self.tickLblPos = tickLblPos
+        self.spPr = spPr
+        self.txP = txP
+        self.crossAx = crossAx
+        self.crosses = crosses
+        self.crossesAt = None
 
 
 class DispUnitsLbl(Serialisable):
