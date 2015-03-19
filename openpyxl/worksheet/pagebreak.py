@@ -12,6 +12,8 @@ from openpyxl.descriptors import (
 
 class Break(Serialisable):
 
+    tagname = "brk"
+
     id = Integer(allow_none=True)
     min = Integer(allow_none=True)
     max = Integer(allow_none=True)
@@ -33,6 +35,8 @@ class Break(Serialisable):
 
 
 class PageBreak(Serialisable):
+
+    tagname = "rowBreaks"
 
     count = Integer(allow_none=True)
     manualBreakCount = Integer(allow_none=True)
