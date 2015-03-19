@@ -83,7 +83,7 @@ class Serialisable(_Serialiasable):
                     if hasattr(v, 'to_tree'):
                         el.append(v.to_tree(tagname=child))
                     else:
-                        SubElement(el, child).text = v
+                        SubElement(el, child).text = safe_string(v)
             elif obj is not None:
                 el.append(obj.to_tree(tagname=child))
         return el
