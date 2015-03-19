@@ -52,13 +52,17 @@ class PageBreak(Serialisable):
         self.brk = brk
         self.__attrs__ = ("count", "manualBreakCount",)
 
-    @property
-    def count(self):
+
+    def __len__(self):
         return len(self.brk)
 
     @property
+    def count(self):
+        return len(self)
+
+    @property
     def manualBreakCount(self):
-        return len(self.brk)
+        return len(self)
 
     def append(self, brk=None):
         """
