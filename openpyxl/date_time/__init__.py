@@ -56,10 +56,15 @@ def from_excel(value, offset=CALENDAR_WINDOWS_1900):
         return
     parts = list(jd2gcal(MJD_0, value + offset - MJD_0))
     _, fraction = divmod(value, 1)
+    jumped = (parts[-1] == 0 and fraction > 0)
     diff = datetime.timedelta(days=fraction)
+
     if 0 < abs(value) < 1:
         return days_to_time(diff)
-    return datetime.datetime(*parts[:3]) + diff
+    if not jumped:
+        return datetime.datetime(*parts[:3]) + diff
+    else:
+        return datetime.datetime(*parts[:3] + [0])
 
 
 @lru_cache()
