@@ -57,6 +57,7 @@ from .protection import SheetProtection
 from .filters import AutoFilter
 from .views import SheetView, Pane, Selection
 from .properties import WorksheetProperties, Outline, PageSetupPr
+from .pagebreak import PageBreak
 
 
 def flatten(results):
@@ -108,7 +109,7 @@ class Worksheet(object):
         self.row_dimensions = BoundDictionary("index", self._add_row)
         self.column_dimensions = DimensionHolder(worksheet=self,
                                                  default_factory=self._add_column)
-        self.page_breaks = []
+        self.page_breaks = PageBreak()
         self._cells = {}
         self._charts = []
         self._images = []

@@ -166,17 +166,6 @@ def write_hyperlinks(worksheet):
         return tag
 
 
-def write_pagebreaks(worksheet):
-    breaks = worksheet.page_breaks
-    if breaks:
-        tag = Element('rowBreaks', {'count': str(len(breaks)),
-                                     'manualBreakCount': str(len(breaks))})
-        for b in breaks:
-            tag.append(Element('brk', id=str(b), man="true", max='16383',
-                               min='0'))
-        return tag
-
-
 def write_worksheet(worksheet, shared_strings):
     """Write a worksheet to an xml file."""
     if LXML is True:
@@ -257,9 +246,8 @@ def write_worksheet(worksheet, shared_strings):
                               {"{%s}id" % REL_NS : worksheet.vba_controls})
                 xf.write(xml)
 
-            pb = write_pagebreaks(worksheet)
-            if pb is not None:
-                xf.write(pb)
+            if worksheet.page_breaks.count:
+                xf.write(worksheet.page_breaks.to_tree())
 
             # add a legacyDrawing so that excel can draw comments
             if worksheet._comment_count > 0:

@@ -21,10 +21,10 @@ class Break(Serialisable):
     pt = Bool(allow_none=True)
 
     def __init__(self,
-                 id=None,
-                 min=None,
-                 max=None,
-                 man=None,
+                 id=0,
+                 min=0,
+                 max=16383,
+                 man=True,
                  pt=None,
                 ):
         self.id = id
@@ -43,15 +43,14 @@ class PageBreak(Serialisable):
     brk = Sequence(expected_type=Break, allow_none=True)
 
     __elements__ = ('brk',)
-    __attrs__ = ("count", "manualBreakCount",)
 
     def __init__(self,
                  count=None,
                  manualBreakCount=None,
-                 brk=None,
+                 brk=[],
                 ):
-        self.manualBreakCount = manualBreakCount
         self.brk = brk
+        self.__attrs__ = ("count", "manualBreakCount",)
 
     @property
     def count(self):
@@ -60,3 +59,13 @@ class PageBreak(Serialisable):
     @property
     def manualBreakCount(self):
         return len(self.brk)
+
+    def append(self, brk=None):
+        """
+        Add a page break
+        """
+        vals = list(self.brk)
+        if not isinstance(brk, Break):
+            brk = Break(id=self.count+1)
+        vals.append(brk)
+        self.brk = vals

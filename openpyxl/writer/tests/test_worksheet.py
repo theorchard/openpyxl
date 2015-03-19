@@ -464,28 +464,6 @@ def test_write_hyperlink_image_rels(Workbook, Image, datadir):
     # TODO write integration test with duplicate relation ids then fix
 
 
-def test_page_breaks(worksheet):
-    from ..worksheet import write_pagebreaks
-
-    ws = worksheet
-    ws.page_breaks = [1]
-    xml = tostring(write_pagebreaks(ws))
-    expected = """
-    <rowBreaks count="1" manualBreakCount="1">
-       <brk id="1" man="true" max="16383" min="0"></brk>
-    </rowBreaks>
-    """
-    diff = compare_xml(xml, expected)
-    assert diff is None, diff
-
-
-def test_no_pagebreaks(worksheet):
-    from .. worksheet import write_pagebreaks
-
-    pb = write_pagebreaks(worksheet)
-    assert pb is None
-
-
 @pytest.fixture
 def worksheet_with_cf(worksheet):
     from openpyxl.formatting import ConditionalFormatting
