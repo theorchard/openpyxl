@@ -219,7 +219,7 @@ def write_worksheet(worksheet, shared_strings):
                 xf.write(hyper)
 
             options = worksheet.print_options
-            if len(dict(options)) > 0:
+            if dict(options):
                 new_element = options.to_tree()
                 xf.write(new_element)
 
@@ -227,7 +227,7 @@ def write_worksheet(worksheet, shared_strings):
             xf.write(margins)
 
             setup = worksheet.page_setup
-            if len(dict(setup)) > 0:
+            if dict(setup):
                 new_element = setup.to_tree()
                 xf.write(new_element)
 
@@ -246,7 +246,7 @@ def write_worksheet(worksheet, shared_strings):
                               {"{%s}id" % REL_NS : worksheet.vba_controls})
                 xf.write(xml)
 
-            if worksheet.page_breaks.count:
+            if len(worksheet.page_breaks):
                 xf.write(worksheet.page_breaks.to_tree())
 
             # add a legacyDrawing so that excel can draw comments
