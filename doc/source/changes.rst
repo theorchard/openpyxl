@@ -6,6 +6,7 @@ Bug fixes
 ---------
 
 * `#429 <https://bitbucket.org/openpyxl/openpyxl/issue/429>`_ Workbook fails to load because header and footers cannot be parsed.
+* `#434 <https://bitbucket.org/openpyxl/openpyxl/issue/434>`_ SyntaxError when writing page breaks.
 
 
 
