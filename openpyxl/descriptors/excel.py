@@ -6,7 +6,8 @@ Excel specific descriptors
 """
 
 from openpyxl.compat import basestring
-from . import MatchPattern, MinMax, Integer
+from . import MatchPattern, MinMax, Integer, String, Typed
+from .serialisable import Serialisable
 
 
 class HexBinary(MatchPattern):
@@ -36,3 +37,23 @@ Coordinate = Integer
 class Percentage(MatchPattern):
 
     pattern = "((100)|([0-9][0-9]?))(\.[0-9][0-9]?)?%"
+
+
+class Extension(Serialisable):
+
+    uri = Typed(expected_type=String, )
+
+    def __init__(self,
+                 uri=None,
+                ):
+        self.uri = uri
+
+
+class ExtensionList(Serialisable):
+
+    ext = Typed(expected_type=Extension, allow_none=True)
+
+    def __init__(self,
+                 ext=None,
+                ):
+        self.ext = ext
