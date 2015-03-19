@@ -62,7 +62,8 @@ class ValAx(Serialisable):
     dispUnits = Typed(expected_type=DispUnits, allow_none=True)
     extLst = Typed(expected_type=ExtensionList, allow_none=True)
 
-    __elements__ = ('crossBetween', 'majorUnit', 'minorUnit', 'dispUnits', 'extLst')
+    __elements__ = ()
+    __nested__ = ('crossBetween', 'majorUnit', 'minorUnit', 'dispUnits',)
 
     def __init__(self,
                  crossBetween=None,
@@ -83,18 +84,19 @@ class CatAx(Serialisable):
 
     auto = Bool(nested=True, allow_none=True)
     lblAlgn = NoneSet(values=(['ctr', 'l', 'r']), nested=True)
-    lblOffset = MinMax(min=0, max=1000, nested=True, allow_none=True)
+    lblOffset = MinMax(min=0, max=1000, nested=True,)
     tickLblSkip = Integer(allow_none=True, nested=True)
     tickMarkSkip = Integer(allow_none=True, nested=True)
     noMultiLvlLbl = Bool(nested=True, allow_none=True)
     extLst = Typed(expected_type=ExtensionList, allow_none=True)
 
-    __elements__ = ('auto', 'lblAlgn', 'lblOffset', 'tickLblSkip', 'tickMarkSkip', 'noMultiLvlLbl', 'extLst')
+    __elements__ = ()
+    __nested__ = ('auto', 'lblAlgn', 'lblOffset', 'tickLblSkip', 'tickMarkSkip', 'noMultiLvlLbl')
 
     def __init__(self,
                  auto=None,
                  lblAlgn=None,
-                 lblOffset=None,
+                 lblOffset=100,
                  tickLblSkip=None,
                  tickMarkSkip=None,
                  noMultiLvlLbl=None,
