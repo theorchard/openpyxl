@@ -2,6 +2,12 @@
 ==================
 
 
+Minor changes
+-------------
+
+* `PR54 <https://bitbucket.org/openpyxl/openpyxl/pull-request/54>`_ Improved precision on times near midnight.
+
+
 Bug fixes
 ---------
 
