@@ -1,9 +1,10 @@
 from __future__ import absolute_import
-# Copyright (c) 2010-2014 openpyxl
+# Copyright (c) 2010-2015 openpyxl
 
 import pytest
 
-from openpyxl.collections import IndexedList
+from openpyxl.utils.indexed_list import IndexedList
+from openpyxl.styles.styleable import StyleId
 
 def test_invalid_dimension_ctor():
     from .. dimensions import Dimension
@@ -14,6 +15,9 @@ class DummyWorkbook:
 
     def __init__(self):
         self.shared_styles = IndexedList()
+        self._cell_styles = IndexedList()
+        self._cell_styles.add(StyleId())
+        self._cell_styles.add(StyleId(fontId=10, numFmtId=0, borderId=0, fillId=0, protectionId=0, alignmentId=0))
 
     def get_sheet_names(self):
         return []
@@ -33,15 +37,15 @@ def test_dimension():
 
 def test_dimension_interface():
     from .. dimensions import Dimension
-    d = Dimension(1, True, 1, False, None)
-    assert d.worksheet is None
+    d = Dimension(1, True, 1, False, DummyWorksheet())
+    assert isinstance(d.parent, DummyWorksheet)
     assert dict(d) == {'hidden': '1', 'outlineLevel': '1'}
 
 
 @pytest.mark.parametrize("key, value, expected",
                          [
                              ('ht', 1, {'ht':'1', 'customHeight':'1'}),
-                             ('_style', 10, {'s':'10', 'customFormat':'1'}),
+                             ('_font_id', 10, {'s':'1', 'customFormat':'1'}),
                          ]
                          )
 def test_row_dimension(key, value, expected):
@@ -59,7 +63,7 @@ def test_row_dimension(key, value, expected):
                          )
 def test_col_dimensions(key, value, expected):
     from .. dimensions import ColumnDimension
-    cd = ColumnDimension(worksheet=None)
+    cd = ColumnDimension(worksheet=DummyWorksheet())
     setattr(cd, key, value)
     assert dict(cd) == expected
 

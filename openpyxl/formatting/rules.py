@@ -1,5 +1,5 @@
 from __future__ import absolute_import
-# Copyright (c) 2010-2014 openpyxl
+# Copyright (c) 2010-2015 openpyxl
 
 
 from collections import Mapping
@@ -13,7 +13,7 @@ class FormatRule(Mapping):
 
     __slots__ = ('aboveAverage', 'bottom', 'dxfId', 'equalAverage',
                  'operator', 'percent', 'priority', 'rank', 'stdDev', 'stopIfTrue',
-                 'text', 'type')
+                 'text', 'type', 'formula', 'colorScale', 'iconSet')
 
     def update(self, dictionary):
         for k, v in iteritems(dictionary):
@@ -65,6 +65,8 @@ class FormatRule(Mapping):
 class ColorScaleRule(object):
     """Conditional formatting rule based on a color scale rule."""
     valid_types = ('min', 'max', 'num', 'percent', 'percentile', 'formula')
+    type = 'colorScale'
+    attrs = ('type', 'colorScale')
 
     def __init__(self,
                  start_type=None,
@@ -133,13 +135,17 @@ class ColorScaleRule(object):
         return vals
 
     @property
-    def colors(self):
-        """Return start, mid and end colours"""
-        return [v for v in (self.start_color, self.mid_color, self.end_color) if v is not None]
+    def colorScale(self):
+        colors = [v for v in (self.start_color, self.mid_color, self.end_color) if v is not None]
+        return {'color':colors, 'cfvo':self.cfvo}
+
+    def __iter__(self):
+        for attr in self.attrs:
+            yield attr, getattr(self, attr)
 
     @property
     def rule(self):
-        return {'type': 'colorScale', 'colorScale': {'color': self.colors, 'cfvo': self.cfvo}}
+        return dict(self)
 
 
 class FormulaRule(object):
@@ -193,5 +199,3 @@ class CellIsRule(object):
         if self.stopIfTrue:
             r['stopIfTrue'] = '1'
         return r
-
-

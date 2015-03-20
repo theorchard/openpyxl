@@ -1,14 +1,27 @@
-# Copyright (c) 2010-2014 openpyxl
+from __future__ import absolute_import
+# Copyright (c) 2010-2015 openpyxl
 
 import datetime
-import os.path
+from io import BytesIO
 
 import pytest
 
+from openpyxl.xml.functions import fromstring
 from openpyxl.worksheet.iter_worksheet import read_dimension
 from openpyxl.reader.excel import load_workbook
 from openpyxl.compat import range, zip
+from openpyxl.styles.styleable import StyleId
 
+
+@pytest.fixture
+def DummyWorkbook():
+    class Workbook:
+        excel_base_date = None
+        _cell_styles = [StyleId(0, 0, 0, 0, 0, 0)]
+
+        def get_sheet_names(self):
+            return []
+    return Workbook()
 
 def test_open_many_sheets(datadir):
     datadir.join("reader").chdir()
@@ -30,22 +43,26 @@ def test_read_dimension(datadir, filename, expected):
     assert dimension == expected
 
 
+def test_force_dimension(datadir, DummyWorkbook):
+    datadir.join("reader").chdir()
+    from openpyxl.worksheet.iter_worksheet import IterableWorksheet
+
+    ws = IterableWorksheet(DummyWorkbook, "Sheet", "", "sheet2_no_dimension.xml", [], [])
+    dims = ws.calculate_dimension(True)
+    assert dims == "A1:2730"
+
+
+
 @pytest.mark.parametrize("filename",
                          ["sheet2.xml",
                           "sheet2_no_dimension.xml"
                          ]
                          )
-def test_get_max_cell(datadir, filename):
+def test_get_max_cell(datadir, DummyWorkbook, filename):
     datadir.join("reader").chdir()
 
-    class Workbook:
-        excel_base_date = None
-
-        def get_sheet_names(self):
-            return []
-
     from openpyxl.worksheet.iter_worksheet import IterableWorksheet
-    ws = IterableWorksheet(Workbook(), "Sheet", "", filename, [], [])
+    ws = IterableWorksheet(DummyWorkbook, "Sheet", "", filename, [], [])
     rows = tuple(ws.rows)
     assert rows[-1][-1].coordinate == "AA30"
 
@@ -75,9 +92,6 @@ def test_calculate_dimension(datadir):
                          ]
                          )
 def test_get_missing_cell(read_only, datadir):
-    """
-    Behaviour differs between implementations
-    """
     datadir.join("genuine").chdir()
     wb = load_workbook(filename="empty.xlsx", read_only=read_only)
     ws = wb['Sheet2 - Numbers']
@@ -111,15 +125,22 @@ def test_max_column(sample_workbook, sheetname, col):
     assert ws.max_column == col
 
 
+def test_read_single_cell_range(sample_workbook):
+    wb = sample_workbook
+    ws = wb['Sheet1 - Text']
+    assert 'This is cell A1 in Sheet 1' == list(ws.iter_rows('A1'))[0][0].value
+
+
 expected = [['This is cell A1 in Sheet 1', None, None, None, None, None, None],
             [None, None, None, None, None, None, None],
             [None, None, None, None, None, None, None],
             [None, None, None, None, None, None, None],
             [None, None, None, None, None, None, 'This is cell G5'], ]
+
 def test_read_fast_integrated_text(sample_workbook):
     wb = sample_workbook
     ws = wb['Sheet1 - Text']
-    for row, expected_row in zip(ws.iter_rows(), expected):
+    for row, expected_row in zip(ws.rows, expected):
         row_values = [x.value for x in row]
         assert row_values == expected_row
 
@@ -201,7 +222,7 @@ def test_read_style_iter(tmpdir):
     '''
     tmpdir.chdir()
     from openpyxl import Workbook
-    from openpyxl.styles import Style, Font
+    from openpyxl.styles import Font
 
     FONT_NAME = "Times New Roman"
     FONT_SIZE = 15
@@ -210,7 +231,7 @@ def test_read_style_iter(tmpdir):
     wb = Workbook()
     ws = wb.worksheets[0]
     cell = ws.cell('A1')
-    cell.style = Style(font=ft)
+    cell.font = ft
 
     xlsx_file = "read_only_styles.xlsx"
     wb.save(xlsx_file)
@@ -219,25 +240,28 @@ def test_read_style_iter(tmpdir):
     ws_iter = wb_iter.worksheets[0]
     cell = ws_iter['A1']
 
-    assert cell.style.font == ft
+    assert cell.font == ft
 
 
-def test_read_with_missing_cells(datadir):
+def test_read_hyperlinks_read_only(datadir, Workbook):
+    from openpyxl.worksheet.iter_worksheet import IterableWorksheet
+
     datadir.join("reader").chdir()
-    from openpyxl.styles import Style
+    filename = 'bug328_hyperlinks.xml'
+    ws = IterableWorksheet(Workbook(data_only=True, read_only=True), "Sheet",
+                           "", filename, ['SOMETEXT'], [])
+    assert ws['F2'].value is None
 
-    class Workbook:
-        excel_base_date = None
-        shared_styles = [Style()]
 
-        def get_sheet_names(self):
-            return []
+def test_read_with_missing_cells(datadir, DummyWorkbook):
+    datadir.join("reader").chdir()
 
     filename = "bug393-worksheet.xml"
 
     from openpyxl.worksheet.iter_worksheet import IterableWorksheet
-    ws = IterableWorksheet(Workbook(), "Sheet", "", filename, [], [])
+    ws = IterableWorksheet(DummyWorkbook, "Sheet", "", filename, [], [])
     rows = tuple(ws.rows)
+
     row = rows[1] # second row
     values = [c.value for c in row]
     assert values == [None, None, 1, 2, 3]
@@ -245,3 +269,50 @@ def test_read_with_missing_cells(datadir):
     row = rows[3] # fourth row
     values = [c.value for c in row]
     assert values == [1, 2, None, None, 3]
+
+
+def test_read_row(datadir, DummyWorkbook):
+    datadir.join("reader").chdir()
+
+    src = b"""
+    <sheetData  xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main" >
+    <row r="1" spans="4:27">
+      <c r="D1">
+        <v>1</v>
+      </c>
+      <c r="K1">
+        <v>0.01</v>
+      </c>
+      <c r="AA1">
+        <v>100</v>
+      </c>
+    </row>
+    </sheetData>
+    """
+
+    from openpyxl.worksheet.iter_worksheet import IterableWorksheet
+    ws = IterableWorksheet(DummyWorkbook, "Sheet", "", "bug393-worksheet.xml", [], [])
+
+    xml = fromstring(src)
+    row = tuple(ws._get_row(xml, 11, 11))
+    values = [c.value for c in row]
+    assert values == [0.01]
+
+    row = tuple(ws._get_row(xml, 1, 11))
+    values = [c.value for c in row]
+    assert values == [None, None, None, 1, None, None, None, None, None, None, 0.01]
+
+
+def test_read_empty_row(datadir, DummyWorkbook):
+
+
+    from openpyxl.worksheet.iter_worksheet import IterableWorksheet
+    ws = IterableWorksheet(DummyWorkbook, "Sheet", "", "", [], [])
+
+    src = """
+    <row r="2" xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main" />
+    """
+    element = fromstring(src)
+    row = ws._get_row(element, max_col=10)
+    row = tuple(row)
+    assert len(row) == 10

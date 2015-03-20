@@ -1,5 +1,5 @@
 from __future__ import absolute_import
-# Copyright (c) 2010-2014 openpyxl
+# Copyright (c) 2010-2015 openpyxl
 
 # lru_cache backport copyright Raymong Hettinger
 # http://code.activestate.com/recipes/578078-py26-and-py30-backport-of-python-33s-lru-cache/?in=user-178123

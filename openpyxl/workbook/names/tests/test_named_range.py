@@ -1,5 +1,5 @@
 from __future__ import absolute_import
-# Copyright (c) 2010-2014 openpyxl
+# Copyright (c) 2010-2015 openpyxl
 
 # Python stdlib imports
 
@@ -10,7 +10,7 @@ from openpyxl.compat import zip
 # package imports
 from .. named_range import split_named_range, NamedRange, NamedValue
 from openpyxl.workbook.names.named_range import read_named_ranges
-from openpyxl.exceptions import NamedRangeException
+from openpyxl.utils.exceptions import NamedRangeException
 from openpyxl.reader.excel import load_workbook
 
 
@@ -186,6 +186,8 @@ def test_print_titles(Workbook):
     wb = Workbook()
     ws1 = wb.create_sheet()
     ws2 = wb.create_sheet()
+    scope1 = ws1._parent.worksheets.index(ws1)
+    scope2 = ws2._parent.worksheets.index(ws2)
     ws1.add_print_title(2)
     ws2.add_print_title(3, rows_or_cols='cols')
 
@@ -193,8 +195,8 @@ def test_print_titles(Workbook):
         return ','.join(['%s!%s' % (sheet.title, name) for sheet, name in nr.destinations])
 
     actual_named_ranges = set([(nr.name, nr.scope, mystr(nr)) for nr in wb.get_named_ranges()])
-    expected_named_ranges = set([('_xlnm.Print_Titles', ws1, 'Sheet1!$1:$2'),
-                                 ('_xlnm.Print_Titles', ws2, 'Sheet2!$A:$C')])
+    expected_named_ranges = set([('_xlnm.Print_Titles', scope1, 'Sheet1!$1:$2'),
+                                 ('_xlnm.Print_Titles', scope2, 'Sheet2!$A:$C')])
     assert(actual_named_ranges == expected_named_ranges)
 
 

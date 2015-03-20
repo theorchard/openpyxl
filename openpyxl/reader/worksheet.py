@@ -1,5 +1,5 @@
 from __future__ import absolute_import
-# Copyright (c) 2010-2014 openpyxl
+# Copyright (c) 2010-2015 openpyxl
 
 """Reader for a single worksheet."""
 from io import BytesIO
@@ -8,15 +8,22 @@ from io import BytesIO
 from openpyxl.xml.functions import iterparse
 
 # package imports
-from openpyxl.cell import get_column_letter
+from openpyxl.cell import Cell
 from openpyxl.worksheet import Worksheet, ColumnDimension, RowDimension
 from openpyxl.worksheet.iter_worksheet import IterableWorksheet
-from openpyxl.worksheet.page import PageMargins
+from openpyxl.worksheet.page import PageMargins, PrintOptions, PageSetup
 from openpyxl.worksheet.protection import SheetProtection
-from openpyxl.xml.constants import SHEET_MAIN_NS
+from openpyxl.worksheet.views import SheetView
+from openpyxl.xml.constants import SHEET_MAIN_NS, REL_NS
 from openpyxl.xml.functions import safe_iterator
 from openpyxl.styles import Color
 from openpyxl.formatting import ConditionalFormatting
+from openpyxl.worksheet.properties import parse_sheetPr
+from openpyxl.utils import (
+    coordinate_from_string,
+    get_column_letter,
+    column_index_from_string
+    )
 
 
 def _get_xml_iter(xml_source):
@@ -57,6 +64,7 @@ class WorkSheetParser(object):
         self.color_index = color_index
         self.guess_types = ws.parent._guess_types
         self.data_only = ws.parent.data_only
+        self.styles = [dict(style) for style in self.ws.parent._cell_styles]
 
     def parse(self):
         dispatcher = {
@@ -73,6 +81,7 @@ class WorkSheetParser(object):
             '{%s}dataValidations' % SHEET_MAIN_NS: self.parse_data_validation,
             '{%s}sheetPr' % SHEET_MAIN_NS: self.parse_properties,
             '{%s}legacyDrawing' % SHEET_MAIN_NS: self.parse_legacy_drawing,
+            '{%s}sheetViews' % SHEET_MAIN_NS: self.parse_sheet_views,
                       }
         tags = dispatcher.keys()
         stream = _get_xml_iter(self.source)
@@ -107,16 +116,23 @@ class WorkSheetParser(object):
             formula_type = formula.get('t')
             if formula_type:
                 self.ws.formula_attributes[coordinate] = {'t': formula_type}
-                si = formula.get('si') # Shared group index for shared formulas
+                si = formula.get('si')  # Shared group index for shared formulas
                 if si:
                     self.ws.formula_attributes[coordinate]['si'] = si
-                ref = formula.get('ref') # Range for shared formulas
+                ref = formula.get('ref')  # Range for shared formulas
                 if ref:
                     self.ws.formula_attributes[coordinate]['ref'] = ref
 
-        cell = self.ws[coordinate]
+
+        style = {}
         if style_id is not None:
-            cell._style = int(style_id)
+            style_id = int(style_id)
+            style = self.styles[style_id]
+
+
+        column, row = coordinate_from_string(coordinate)
+        cell = Cell(self.ws, column, row, **style)
+        self.ws._add_cell(cell)
 
         if value is not None:
             if data_type == 'n':
@@ -140,7 +156,8 @@ class WorkSheetParser(object):
         if self.guess_types or value is None:
             cell.value = value
         else:
-            cell.set_explicit_value(value=value, data_type=data_type)
+            cell._value=value
+            cell.data_type=data_type
 
 
     def parse_merge(self, element):
@@ -165,34 +182,24 @@ class WorkSheetParser(object):
     def parse_row_dimensions(self, row):
         attrs = dict(row.attrib)
         attrs['worksheet'] = self.ws
-        for key in set(attrs):
-            if key.startswith('{'): #ignore custom namespaces
-                del attrs[key]
         dim = RowDimension(**attrs)
-        if dim.index not in self.ws.row_dimensions:
-            self.ws.row_dimensions[dim.index] = dim
+        self.ws.row_dimensions[dim.index] = dim
+
         for cell in safe_iterator(row, self.CELL_TAG):
             self.parse_cell(cell)
 
     def parse_print_options(self, element):
-        hc = element.get('horizontalCentered')
-        if hc is not None:
-            self.ws.page_setup.horizontalCentered = hc
-        vc = element.get('verticalCentered')
-        if vc is not None:
-            self.ws.page_setup.verticalCentered = vc
+        self.ws.print_options = PrintOptions(**element.attrib)
 
     def parse_margins(self, element):
-        margins = dict(element.items())
-        self.page_margins = PageMargins(**margins)
+        self.page_margins = PageMargins(**element.attrib)
 
     def parse_page_setup(self, element):
-        for key in ("orientation", "paperSize", "scale", "fitToPage",
-                    "fitToHeight", "fitToWidth", "firstPageNumber",
-                    "useFirstPageNumber"):
-            value = element.get(key)
-            if value is not None:
-                setattr(self.ws.page_setup, key, value)
+        id_key = '{%s}id' % REL_NS
+        if id_key in element.attrib.keys():
+            element.attrib['id'] = element.attrib.pop(id_key)
+
+        self.ws.page_setup = PageSetup(**element.attrib)
 
     def parse_header_footer(self, element):
         oddHeader = element.find('{%s}oddHeader' % SHEET_MAIN_NS)
@@ -286,11 +293,18 @@ class WorkSheetParser(object):
 
 
     def parse_properties(self, element):
-        self.ws.vba_code = element.attrib
+        self.ws.sheet_properties = parse_sheetPr(element)
 
 
     def parse_legacy_drawing(self, element):
         self.ws.vba_controls = element.get("r:id")
+
+
+    def parse_sheet_views(self, element):
+        for el in element.findall("{%s}sheetView" % SHEET_MAIN_NS):
+            # according to the specification the last view wins
+            pass
+        self.ws.sheet_view = SheetView.from_tree(el)
 
 
 def fast_parse(ws, xml_source, shared_strings, style_table, color_index=None):

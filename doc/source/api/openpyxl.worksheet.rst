@@ -52,6 +52,14 @@ openpyxl.worksheet.page module
     :undoc-members:
     :show-inheritance:
 
+openpyxl.worksheet.properties module
+------------------------------------
+
+.. automodule:: openpyxl.worksheet.properties
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
 openpyxl.worksheet.protection module
 ------------------------------------
 
@@ -64,6 +72,14 @@ openpyxl.worksheet.relationship module
 --------------------------------------
 
 .. automodule:: openpyxl.worksheet.relationship
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
+openpyxl.worksheet.views module
+-------------------------------
+
+.. automodule:: openpyxl.worksheet.views
     :members:
     :undoc-members:
     :show-inheritance:

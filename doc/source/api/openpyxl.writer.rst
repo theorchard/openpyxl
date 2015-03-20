@@ -4,14 +4,6 @@ openpyxl.writer package
 Submodules
 ----------
 
-openpyxl.writer.charts module
------------------------------
-
-.. automodule:: openpyxl.writer.charts
-    :members:
-    :undoc-members:
-    :show-inheritance:
-
 openpyxl.writer.comments module
 -------------------------------
 
@@ -28,14 +20,6 @@ openpyxl.writer.drawings module
     :undoc-members:
     :show-inheritance:
 
-openpyxl.writer.dump_lxml module
---------------------------------
-
-.. automodule:: openpyxl.writer.dump_lxml
-    :members:
-    :undoc-members:
-    :show-inheritance:
-
 openpyxl.writer.dump_worksheet module
 -------------------------------------
 
@@ -44,10 +28,26 @@ openpyxl.writer.dump_worksheet module
     :undoc-members:
     :show-inheritance:
 
+openpyxl.writer.etree_worksheet module
+--------------------------------------
+
+.. automodule:: openpyxl.writer.etree_worksheet
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
 openpyxl.writer.excel module
 ----------------------------
 
 .. automodule:: openpyxl.writer.excel
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
+openpyxl.writer.lxml_worksheet module
+-------------------------------------
+
+.. automodule:: openpyxl.writer.lxml_worksheet
     :members:
     :undoc-members:
     :show-inheritance:

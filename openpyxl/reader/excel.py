@@ -1,5 +1,5 @@
 from __future__ import absolute_import
-# Copyright (c) 2010-2014 openpyxl
+# Copyright (c) 2010-2015 openpyxl
 
 """Read an xlsx file into Python"""
 
@@ -21,7 +21,7 @@ except ImportError:
 
 
 # package imports
-from openpyxl.exceptions import OpenModeError, InvalidFileException
+from openpyxl.utils.exceptions import InvalidFileException
 from openpyxl.xml.constants import (
     ARC_SHARED_STRINGS,
     ARC_CORE,
@@ -30,28 +30,30 @@ from openpyxl.xml.constants import (
     ARC_THEME,
     SHARED_STRINGS,
     EXTERNAL_LINK,
+    XLTM,
+    XLTX,
 )
 
-from openpyxl.workbook import Workbook, DocumentProperties
+from openpyxl.workbook import Workbook
 from openpyxl.workbook.names.external import detect_external_links
 from openpyxl.workbook.names.named_range import read_named_ranges
 from openpyxl.reader.strings import read_string_table
 from openpyxl.reader.style import read_style_table
 from openpyxl.reader.workbook import (
     read_content_types,
-    read_properties_core,
     read_excel_base_date,
     detect_worksheets,
     read_rels,
     read_workbook_code_name,
 )
+from openpyxl.workbook.properties import read_properties, DocumentProperties
 from openpyxl.reader.worksheet import read_worksheet
 from openpyxl.reader.comments import read_comments, get_comments_file
 # Use exc_info for Python 2 compatibility with "except Exception[,/ as] e"
 
 
 CENTRAL_DIRECTORY_SIGNATURE = b'\x50\x4b\x05\x06'
-SUPPORTED_FORMATS = ('.xlsx', '.xlsm')
+SUPPORTED_FORMATS = ('.xlsx', '.xlsm', '.xltx', '.xltm')
 
 
 def repair_central_directory(zipFile, is_file_instance):
@@ -59,7 +61,7 @@ def repair_central_directory(zipFile, is_file_instance):
     code taken from http://stackoverflow.com/a/7457686/570216, courtesy of Uri Cohen
     '''
 
-    f = zipFile if is_file_instance else open(zipFile, 'r+b')
+    f = zipFile if is_file_instance else open(zipFile, 'rb+')
     data = f.read()
     pos = data.find(CENTRAL_DIRECTORY_SIGNATURE)  # End of central directory signature
     if (pos > 0):
@@ -102,20 +104,11 @@ def load_workbook(filename, read_only=False, use_iterators=False, keep_vba=KEEP_
         and the returned workbook will be read-only.
 
     """
-
-    is_file_instance = isinstance(filename, file)
-
     read_only = read_only or use_iterators
 
-    if is_file_instance:
-        # fileobject must have been opened with 'rb' flag
-        # it is required by zipfile
-        if 'b' not in filename.mode:
-            raise OpenModeError("File-object must be opened in binary mode")
+    is_file_like = hasattr(filename, 'read')
 
-    try:
-        archive = ZipFile(filename, 'r', ZIP_DEFLATED)
-    except BadZipfile:
+    if not is_file_like and os.path.isfile(filename):
         file_format = os.path.splitext(filename)[-1]
         if file_format not in SUPPORTED_FORMATS:
             if file_format == '.xls':
@@ -131,18 +124,22 @@ def load_workbook(filename, read_only=False, use_iterators=False, keep_vba=KEEP_
                        'please check you can open '
                        'it with Excel first. '
                        'Supported formats are: %s') % (file_format,
-                                                     ','.join(SUPPORTED_FORMATS))
+                                                       ','.join(SUPPORTED_FORMATS))
             raise InvalidFileException(msg)
 
-        try:
-            f = repair_central_directory(filename, is_file_instance)
-            archive = ZipFile(f, 'r', ZIP_DEFLATED)
-        except BadZipfile:
-            e = exc_info()[1]
-            raise InvalidFileException(unicode(e))
-    except (BadZipfile, RuntimeError, IOError, ValueError):
-        e = exc_info()[1]
-        raise InvalidFileException(unicode(e))
+
+    if is_file_like:
+        # fileobject must have been opened with 'rb' flag
+        # it is required by zipfile
+        if hasattr(filename, 'encoding'):
+            raise IOError("File-object must be opened in binary mode")
+
+    try:
+        archive = ZipFile(filename, 'r', ZIP_DEFLATED)
+    except BadZipfile:
+        f = repair_central_directory(filename, is_file_like)
+        archive = ZipFile(f, 'r', ZIP_DEFLATED)
+
     wb = Workbook(guess_types=guess_types, data_only=data_only, read_only=read_only)
 
     if read_only and guess_types:
@@ -181,14 +178,13 @@ def _load_workbook(wb, archive, filename, read_only, keep_vba):
 
     # get workbook-level information
     try:
-        wb.properties = read_properties_core(archive.read(ARC_CORE))
+        wb.properties = read_properties(archive.read(ARC_CORE))
     except KeyError:
         wb.properties = DocumentProperties()
     wb._read_workbook_settings(archive.read(ARC_WORKBOOK))
 
     # what content types do we have?
     cts = dict(read_content_types(archive))
-    rels = dict
 
     strings_path = cts.get(SHARED_STRINGS)
     if strings_path is not None:
@@ -198,17 +194,28 @@ def _load_workbook(wb, archive, filename, read_only, keep_vba):
     else:
         shared_strings = []
 
+    wb.is_template = XLTX in cts or XLTM in cts
+
     try:
         wb.loaded_theme = archive.read(ARC_THEME)  # some writers don't output a theme, live with it (fixes #160)
     except KeyError:
         assert wb.loaded_theme == None, "even though the theme information is missing there is a theme object ?"
 
-    style_table, color_index, cond_styles = read_style_table(archive.read(ARC_STYLE))
-    wb.shared_styles = style_table
-    wb.style_properties = {'dxf_list':cond_styles}
-    wb.cond_styles = cond_styles
+    parsed_styles = read_style_table(archive)
+    if parsed_styles is not None:
+        wb._differential_styles = parsed_styles.cond_styles
+        wb.cond_styles = parsed_styles.cond_styles
+        wb._cell_styles = parsed_styles.cell_styles
+        wb._colors = parsed_styles.color_index
+        wb._borders = parsed_styles.border_list
+        wb._fonts = parsed_styles.font_list
+        wb._fills = parsed_styles.fill_list
+        wb._number_formats = parsed_styles.number_formats
+        wb._protections = parsed_styles.protections
+        wb._alignments = parsed_styles.alignments
+        wb._colors = parsed_styles.color_index
 
-    wb.properties.excel_base_date = read_excel_base_date(xml_source=archive.read(ARC_WORKBOOK))
+    wb.excel_base_date = read_excel_base_date(archive)
 
     # get worksheets
     wb.worksheets = []  # remove preset worksheet
@@ -218,17 +225,16 @@ def _load_workbook(wb, archive, filename, read_only, keep_vba):
         if not worksheet_path in valid_files:
             continue
 
-        if not read_only:
-            new_ws = read_worksheet(archive.read(worksheet_path), wb,
-                                    sheet_name, shared_strings, style_table,
-                                    color_index=color_index,
-                                    keep_vba=keep_vba)
-        else:
+        if read_only:
             new_ws = read_worksheet(None, wb, sheet_name, shared_strings,
-                                    style_table,
-                                    color_index=color_index,
+                                    wb.shared_styles,
+                                    color_index=wb._colors,
                                     worksheet_path=worksheet_path)
-
+        else:
+            new_ws = read_worksheet(archive.read(worksheet_path), wb,
+                                    sheet_name, shared_strings, wb.shared_styles,
+                                    color_index=wb._colors,
+                                    keep_vba=keep_vba)
         new_ws.sheet_state = sheet.get('state') or 'visible'
         wb._add_sheet(new_ws)
 

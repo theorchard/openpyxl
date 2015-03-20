@@ -1,5 +1,6 @@
-# Copyright (c) 2010-2014 openpyxl
-#
+from __future__ import absolute_import
+# Copyright (c) 2010-2015 openpyxl
+
 
 # stdlib imports
 from io import BytesIO

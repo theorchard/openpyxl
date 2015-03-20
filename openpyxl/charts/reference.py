@@ -1,35 +1,15 @@
 from __future__ import absolute_import
-# Copyright (c) 2010-2014 openpyxl
-#
-# Permission is hereby granted, free of charge, to any person obtaining a copy
-# of this software and associated documentation files (the "Software"), to deal
-# in the Software without restriction, including without limitation the rights
-# to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-# copies of the Software, and to permit persons to whom the Software is
-# furnished to do so, subject to the following conditions:
-#
-# The above copyright notice and this permission notice shall be included in
-# all copies or substantial portions of the Software.
-#
-# THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-# IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-# FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-# AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-# LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-# OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
-# THE SOFTWARE.
-#
-# @license: http://www.opensource.org/licenses/mit-license.php
-# @author: see AUTHORS file
+# Copyright (c) 2010-2015 openpyxl
+
 
 from openpyxl.cell import get_column_letter
-from openpyxl.descriptors import Tuple, Set, Strict
+from openpyxl.descriptors import Tuple, NoneSet, Strict
 
 
 class Reference(Strict):
     """ a simple wrapper around a serie of reference data """
 
-    data_type = Set(values=['n', 's', None])
+    data_type = NoneSet(values=['n', 's', 'f'])
     pos1 = Tuple()
     pos2 = Tuple(allow_none=True)
 
@@ -79,8 +59,8 @@ class Reference(Strict):
         else:
             self._values = []
 
-            for row in range(int(self.pos1[0]), int(self.pos2[0] + 1)):
-                for col in range(int(self.pos1[1]), int(self.pos2[1] + 1)):
+            for row in range(self.pos1[0], self.pos2[0] + 1):
+                for col in range(self.pos1[1], self.pos2[1] + 1):
                     cell = self.sheet.cell(row=row, column=col)
                     self._values.append(cell.internal_value)
                     if cell.internal_value == '':

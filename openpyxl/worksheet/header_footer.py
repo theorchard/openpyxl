@@ -1,5 +1,5 @@
 from __future__ import absolute_import
-# Copyright (c) 2010-2014 openpyxl
+# Copyright (c) 2010-2015 openpyxl
 #
 # Permission is hereby granted, free of charge, to any person obtaining a copy
 # of this software and associated documentation files (the "Software"), to deal
@@ -95,23 +95,29 @@ class HeaderFooterItem(object):
             t.append(text)
         return ''.join(t)
 
-    def set(self, itemArray):
-        textArray = []
-        for item in itemArray[1:]:
-            if len(item) and textArray:
-                textArray.append('&%s' % item)
-            elif len(item) and not textArray:
-                if item[0] == '"':
-                    self.font_name = item.replace('"', '')
-                elif item[0] == 'K':
-                    self.font_color = item[1:7]
-                    textArray.append(item[7:])
-                else:
-                    try:
-                        self.font_size = int(item)
-                    except:
-                        textArray.append('&%s' % item)
-        self.text = ''.join(textArray)
+    def set(self, text):
+        """
+        Convert a compound string into attributes
+        # incomplete because formatting commands can be nested
+        """
+        if text is None:
+            return
+        m = FONT_REGEX.search(text)
+        if m:
+            self.font_name = m.group('font')
+            text = FONT_REGEX.sub('', text)
+
+        m = SIZE_REGEX.search(text)
+        if m:
+            self.font_size = int(m.group('size'))
+            text = SIZE_REGEX.sub('', text)
+
+        m = COLOR_REGEX.search(text)
+        if m:
+            self.font_color = m.group('color')
+            text = COLOR_REGEX.sub('', text)
+
+        self.text = text
 
 
 class HeaderFooter(object):
@@ -158,42 +164,53 @@ class HeaderFooter(object):
             t.append(self.right_footer.get())
         return ''.join(t)
 
+
     def setHeader(self, item):
-        itemArray = [i.replace('#DOUBLEAMP#', '&&') for i in item.replace('&&', '#DOUBLEAMP#').split('&')]
-        l = itemArray.index('L') if 'L' in itemArray else None
-        c = itemArray.index('C') if 'C' in itemArray else None
-        r = itemArray.index('R') if 'R' in itemArray else None
-        if l:
-            if c:
-                self.left_header.set(itemArray[l:c])
-            elif r:
-                self.left_header.set(itemArray[l:r])
-            else:
-                self.left_header.set(itemArray[l:])
-        if c:
-            if r:
-                self.center_header.set(itemArray[c:r])
-            else:
-                self.center_header.set(itemArray[c:])
-        if r:
-            self.right_header.set(itemArray[r:])
+        matches = _split_string(item)
+        l = matches['left']
+        c = matches['center']
+        r = matches['right']
+
+        self.left_header.set(l)
+        self.center_header.set(c)
+        self.right_header.set(r)
+
 
     def setFooter(self, item):
-        itemArray = [i.replace('#DOUBLEAMP#', '&&') for i in item.replace('&&', '#DOUBLEAMP#').split('&')]
-        l = itemArray.index('L') if 'L' in itemArray else None
-        c = itemArray.index('C') if 'C' in itemArray else None
-        r = itemArray.index('R') if 'R' in itemArray else None
-        if l:
-            if c:
-                self.left_footer.set(itemArray[l:c])
-            elif r:
-                self.left_footer.set(itemArray[l:r])
-            else:
-                self.left_footer.set(itemArray[l:])
-        if c:
-            if r:
-                self.center_footer.set(itemArray[c:r])
-            else:
-                self.center_footer.set(itemArray[c:])
-        if r:
-            self.right_footer.set(itemArray[r:])
+        matches = _split_string(item)
+        l = matches['left']
+        c = matches['center']
+        r = matches['right']
+
+        self.left_footer.set(l)
+        self.center_footer.set(c)
+        self.right_footer.set(r)
+
+
+# See http://stackoverflow.com/questions/27711175/regex-with-multiple-optional-groups for discussion
+import re
+
+ITEM_REGEX = re.compile("""
+(&L(?P<left>.+?))?
+(&C(?P<center>.+?))?
+(&R(?P<right>.+?))?
+$""", re.VERBOSE | re.DOTALL)
+
+# add support for multiline strings (how do re.flags combine?)
+
+from warnings import warn
+
+def _split_string(text):
+    """Split the combined (decoded) string into left, center and right parts"""
+    m = ITEM_REGEX.match(text)
+    try:
+        parts = m.groupdict()
+    except AttributeError:
+        warn("""Cannot parse header or footer so it will be ignored""")
+        parts = {'left':'', 'right':'', 'center':''}
+    return parts
+
+HEADER_REGEX = re.compile(r"(&[ABDEGHINOPSTUXYZ\+\-])") # split part into commands
+FONT_REGEX = re.compile('&"(?P<font>.+)"')
+COLOR_REGEX = re.compile("&K(?P<color>[A-F0-9]{6})")
+SIZE_REGEX = re.compile(r"&(?P<size>\d+)")

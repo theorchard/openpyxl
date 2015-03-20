@@ -1,3 +1,78 @@
+2.2.1 (unreleased)
+==================
+
+
+Bug fixes
+---------
+
+* `#429 <https://bitbucket.org/openpyxl/openpyxl/issue/429>`_ Workbook fails to load because header and footers cannot be parsed.
+* `#434 <https://bitbucket.org/openpyxl/openpyxl/issue/434>`_ SyntaxError when writing page breaks.
+
+
+
+2.2.0 (2015-03-11)
+==================
+
+
+Bug fixes
+---------
+* `#415 <https://bitbucket.org/openpyxl/openpyxl/issue/415>`_ Improved exception when passing in invalid in memory files.
+
+
+2.2.0-b1 (2015-02-18)
+=====================
+
+
+Major changes
+-------------
+* Cell styles deprecated, use formatting objects (fonts, fills, borders, etc.) directly instead
+* Charts will no longer try and calculate axes by default
+* Support for template file types - PR21
+* Moved ancillary functions and classes into utils package - single place of reference
+* `PR 34 <https://bitbucket.org/openpyxl/openpyxl/pull-request/34/>`_ Fully support page setup
+* Removed SAX-based XML Generator. Special thanks to Elias Rabel for implementing xmlfile for xml.etree
+* Preserve sheet view definitions in existing files (frozen panes, zoom, etc.)
+
+
+Bug fixes
+---------
+* `#103 <https://bitbucket.org/openpyxl/openpyxl/issue/103>`_ Set the zoom of a sheet
+* `#199 <https://bitbucket.org/openpyxl/openpyxl/issue/199>`_ Hide gridlines
+* `#215 <https://bitbucket.org/openpyxl/openpyxl/issue/215>`_ Preserve sheet view setings
+* `#262 <https://bitbucket.org/openpyxl/openpyxl/issue/262>`_ Set the zoom of a sheet
+* `#392 <https://bitbucket.org/openpyxl/openpyxl/issue/392>`_ Worksheet header not read
+* `#387 <https://bitbucket.org/openpyxl/openpyxl/issue/387>`_ Cannot read files without styles.xml
+* `#410 <https://bitbucket.org/openpyxl/openpyxl/issue/410>`_ Exception when preserving whitespace in strings
+* `#417 <https://bitbucket.org/openpyxl/openpyxl/issue/417>`_ Cannot create print titles
+* `#420 <https://bitbucket.org/openpyxl/openpyxl/issue/420>`_ Rename confusing constants
+* `#422 <https://bitbucket.org/openpyxl/openpyxl/issue/422>`_ Preserve color index in a workbook if it differs from the standard
+
+
+Minor changes
+-------------
+* Use a 2-way cache for column index lookups
+* Clean up tests in cells
+* `PR 40 <https://bitbucket.org/openpyxl/openpyxl/pull-request/40/>`_ Support frozen panes and autofilter in write-only mode
+* Use ws.calculate_dimension(force=True) in read-only mode for unsized worksheets
+
+
+2.1.5 (2015-02-18)
+==================
+
+
+Bug fixes
+---------
+* `#403 <https://bitbucket.org/openpyxl/openpyxl/issue/403>`_ Cannot add comments in write-only mode
+* `#401 <https://bitbucket.org/openpyxl/openpyxl/issue/401>`_ Creating cells in an empty row raises an exception
+* `#408 <https://bitbucket.org/openpyxl/openpyxl/issue/408>`_ from_excel adjustment for Julian dates 1 < x < 60
+* `#409 <https://bitbucket.org/openpyxl/openpyxl/issue/409>`_ refersTo is an optional attribute
+
+
+Minor changes
+-------------
+* Allow cells to be appended to standard worksheets for code compatibility with write-only mode.
+
+
 2.1.4 (2014-12-16)
 ==================
 
@@ -24,7 +99,6 @@ Minor changes
 
 Minor changes
 -------------
-
 * `PR 31 <https://bitbucket.org/openpyxl/openpyxl/pull-request/31/>`_ Correct tutorial
 * `PR 32 <https://bitbucket.org/openpyxl/openpyxl/pull-request/32/>`_ See #380
 * `PR 37 <https://bitbucket.org/openpyxl/openpyxl/pull-request/37/>`_ Bind worksheet to ColumnDimension objects
@@ -32,7 +106,6 @@ Minor changes
 
 Bug fixes
 ---------
-
 * `#379 <https://bitbucket.org/openpyxl/openpyxl/issue/379>`_ ws.append() doesn't set RowDimension Correctly
 * `#380 <https://bitbucket.org/openpyxl/openpyxl/issue/379>`_ empty cells formatted as datetimes raise exceptions
 
@@ -44,13 +117,11 @@ Bug fixes
 Minor changes
 -------------
 * `PR 30 <https://bitbucket.org/openpyxl/openpyxl/pull-request/30/>`_ Fix regex for positive exponentials
-* `PR 28 <https://bitbucket.org/openpyxl/openpyxl/pull-request/28/>`_ `#328 <https://bitbucket.org/openpyxl/openpyxl/issue/328/valueerror-when-using-rows-on-sheet-with>`_ ValueError when using .rows on sheet with hyperlinks
+* `PR 28 <https://bitbucket.org/openpyxl/openpyxl/pull-request/28/>`_ Fix for #328
 
 
 Bug fixes
 ---------
-
-
 * `#120 <https://bitbucket.org/openpyxl/openpyxl/issue/120>`_, `#168 <https://bitbucket.org/openpyxl/openpyxl/issue/168>`_ defined names with formulae raise exceptions, `#292 <https://bitbucket.org/openpyxl/openpyxl/issue/292>`_
 * `#328 <https://bitbucket.org/openpyxl/openpyxl/issue/328/>`_ ValueError when reading cells with hyperlinks
 * `#369 <https://bitbucket.org/openpyxl/openpyxl/issue/369>`_ IndexError when reading definedNames
@@ -156,11 +227,13 @@ Bug fixes
 
 
 2.0.2 (2014-05-13)
+==================
 
 2.0.1 (2014-05-13)  brown bag
+=============================
 
 2.0.0 (2014-05-13)  brown bag
-==================
+=============================
 
 
 Major changes

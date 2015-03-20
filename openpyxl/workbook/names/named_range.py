@@ -1,5 +1,5 @@
 from __future__ import absolute_import
-# Copyright (c) 2010-2014 openpyxl
+# Copyright (c) 2010-2015 openpyxl
 
 """Track named groups of cells in a worksheet"""
 
@@ -8,9 +8,9 @@ import re
 import warnings
 
 # package imports
-from openpyxl.cell import absolute_coordinate
+from openpyxl.utils import absolute_coordinate
 from openpyxl.compat import unicode
-from openpyxl.exceptions import NamedRangeException
+from openpyxl.utils.exceptions import NamedRangeException
 from openpyxl.xml.functions import fromstring, safe_iterator
 from openpyxl.xml.constants import SHEET_MAIN_NS
 

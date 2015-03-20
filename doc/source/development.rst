@@ -37,12 +37,6 @@ Contributions without tests will **not** be accepted.
 We use pytest as the test runner with pytest-cov for coverage information and
 pytest-flakes for static code analysis.
 
-.. note ::
-
-    In order to test on Windows you will need to manually install the relevant lxml binary.
-    These can usually be downloaded from http://www.lfd.uci.edu/~gohlke/pythonlibs/#lxml
-    `pip install path/to/downloaded-file`
-
 
 Coverage
 ++++++++
@@ -87,6 +81,8 @@ Office OpenXML. http://www.microsoft.com/en-us/download/details.aspx?id=30425
 
 It allows you to quickly inspect a whole Excel file. Unfortunately,
 validation errors contain many false positives.
+
+Please see :doc:`windows-development` for additional information on setting up and testing on Windows.
 
 
 Contributing

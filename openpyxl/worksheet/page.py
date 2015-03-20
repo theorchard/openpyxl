@@ -1,72 +1,160 @@
 from __future__ import absolute_import
-# Copyright (c) 2010-2014 openpyxl
-#
-# Permission is hereby granted, free of charge, to any person obtaining a copy
-# of this software and associated documentation files (the "Software"), to deal
-# in the Software without restriction, including without limitation the rights
-# to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-# copies of the Software, and to permit persons to whom the Software is
-# furnished to do so, subject to the following conditions:
-#
-# The above copyright notice and this permission notice shall be included in
-# all copies or substantial portions of the Software.
-#
-# THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-# IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-# FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-# AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-# LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-# OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
-# THE SOFTWARE.
-#
-# @license: http://www.opensource.org/licenses/mit-license.php
-# @author: see AUTHORS file
+# Copyright (c) 2010-2015 openpyxl
+
+from openpyxl.compat import safe_string
+from openpyxl.descriptors import (
+    Strict,
+    Float,
+    Typed,
+    Bool,
+    Integer,
+    String,
+    NoneSet,
+    )
+from openpyxl.descriptors.excel import UniversalMeasure
+from openpyxl.xml.functions import Element
+from openpyxl.xml.constants import SHEET_MAIN_NS, REL_NS
+from openpyxl.compat import deprecated
 
 
-from openpyxl.compat import OrderedDict, safe_string
-from openpyxl.descriptors import Strict, Float
+class PageSetup(Strict):
+    """ Worksheet page setup """
 
+    tag = "{%s}pageSetup" % SHEET_MAIN_NS
 
-class PageSetup(object):
-    """Information about page layout for this sheet"""
-    valid_setup = ("orientation", "paperSize", "scale", "fitToPage",
-                   "fitToHeight", "fitToWidth", "firstPageNumber", "useFirstPageNumber")
-    valid_options = ("horizontalCentered", "verticalCentered")
-    orientation = None
-    paperSize = None
-    scale = None
-    fitToPage = None
-    fitToHeight = None
-    fitToWidth = None
-    firstPageNumber = None
-    useFirstPageNumber = None
-    horizontalCentered = None
-    verticalCentered = None
+    orientation = NoneSet(values=("default", "portrait", "landscape"))
+    paperSize = Integer(allow_none=True)
+    scale = Integer(allow_none=True)
+    fitToHeight = Integer(allow_none=True)
+    fitToWidth = Integer(allow_none=True)
+    firstPageNumber = Integer(allow_none=True)
+    useFirstPageNumber = Bool(allow_none=True)
+    paperHeight = UniversalMeasure(allow_none=True)
+    paperWidth = UniversalMeasure(allow_none=True)
+    pageOrder = NoneSet(values=("downThenOver", "overThenDown"))
+    usePrinterDefaults = Bool(allow_none=True)
+    blackAndWhite = Bool(allow_none=True)
+    draft = Bool(allow_none=True)
+    cellComments = NoneSet(values=("asDisplayed", "atEnd"))
+    errors = NoneSet(values=("displayed", "blank", "dash", "NA"))
+    horizontalDpi = Integer(allow_none=True)
+    verticalDpi = Integer(allow_none=True)
+    copies = Integer(allow_none=True)
+    id = String(allow_none=True)
 
-    @property
+    def __init__(self, orientation=None,
+                 paperSize=None,
+                 scale=None,
+                 fitToHeight=None,
+                 fitToWidth=None,
+                 firstPageNumber=None,
+                 useFirstPageNumber=None,
+                 paperHeight=None,
+                 paperWidth=None,
+                 pageOrder=None,
+                 usePrinterDefaults=None,
+                 blackAndWhite=None,
+                 draft=None,
+                 cellComments=None,
+                 errors=None,
+                 horizontalDpi=None,
+                 verticalDpi=None,
+                 copies=None,
+                 id=None):
+        self.orientation = orientation
+        self.paperSize = paperSize
+        self.scale = scale
+        self.fitToHeight = fitToHeight
+        self.fitToWidth = fitToWidth
+        self.firstPageNumber = firstPageNumber
+        self.useFirstPageNumber = useFirstPageNumber
+        self.paperHeight = paperHeight
+        self.paperWidth = paperWidth
+        self.pageOrder = pageOrder
+        self.usePrinterDefaults = usePrinterDefaults
+        self.blackAndWhite = blackAndWhite
+        self.draft = draft
+        self.cellComments = cellComments
+        self.errors = errors
+        self.horizontalDpi = horizontalDpi
+        self.verticalDpi = verticalDpi
+        self.copies = copies
+        self.id = id
+
+    @deprecated("this property does not exists anymore")
     def setup(self):
-        setupGroup = OrderedDict()
-        for setup_name in self.valid_setup:
-            setup_value = getattr(self, setup_name)
-            if setup_value is not None:
-                if setup_name == 'orientation':
-                    setupGroup[setup_name] = '%s' % setup_value
-                elif setup_name in ('paperSize', 'scale'):
-                    setupGroup[setup_name] = '%d' % int(setup_value)
-                elif setup_name in ('fitToHeight', 'fitToWidth') and int(setup_value) >= 0:
-                    setupGroup[setup_name] = '%d' % int(setup_value)
+        pass
 
-        return setupGroup
-
-    @property
+    @deprecated("this property does not exists anymore")
     def options(self):
-        optionsGroup = OrderedDict()
-        for options_name in self.valid_options:
-            options_value = getattr(self, options_name)
-            if options_value is not None:
-                optionsGroup[options_name] = '1'
+        pass
 
-        return optionsGroup
+    @deprecated("this property has to be called via print_options")
+    def horizontalCentered(self):
+        pass
+
+    @deprecated("this property has to be called via print_options")
+    def verticalCentered(self):
+        pass
+
+    @deprecated("this property has to be called via sheet_properties")
+    def fitToPage(self):
+        pass
+
+    def __iter__(self):
+        for attr in ("orientation", "paperSize", "scale", "fitToHeight",
+                     "fitToWidth", "firstPageNumber", "useFirstPageNumber" ,
+                     "paperHeight", "paperWidth", "pageOrder", "usePrinterDefaults",
+                     "blackAndWhite", "draft", "cellComments", "errors" , "horizontalDpi",
+                     "verticalDpi", "copies", "id"):
+            value = getattr(self, attr)
+            if value is not None:
+                yield attr, safe_string(value)
+
+    def write_xml_element(self):
+
+        attrs = dict(self)
+        if 'id' in attrs:
+            attrs['{%s}id' % REL_NS] = attrs['id']
+            del attrs['id']
+        return Element(self.tag, attrs)
+
+
+class PrintOptions(Strict):
+    """ Worksheet print options """
+
+    tag = "{%s}printOptions" % SHEET_MAIN_NS
+    horizontalCentered = Bool(allow_none=True)
+    verticalCentered = Bool(allow_none=True)
+    headings = Bool(allow_none=True)
+    gridLines = Bool(allow_none=True)
+    gridLinesSet = Bool(allow_none=True)
+
+    def __init__(self, horizontalCentered=None,
+                 verticalCentered=None,
+                 headings=None,
+                 gridLines=None,
+                 gridLinesSet=None,
+                 ):
+        self.horizontalCentered = horizontalCentered
+        self.verticalCentered = verticalCentered
+        self.headings = headings
+        self.gridLines = gridLines
+        self.gridLinesSet = gridLinesSet
+
+    def __iter__(self):
+        for attr in ("horizontalCentered", "verticalCentered", "headings",
+                     "gridLines", "gridLinesSet"):
+            value = getattr(self, attr)
+            if value is not None:
+                yield attr, safe_string(value)
+
+
+    def write_xml_element(self):
+
+        el = Element(self.tag, dict(self))
+
+        return el
 
 
 class PageMargins(Strict):
@@ -85,11 +173,12 @@ class PageMargins(Strict):
     header = Float()
     footer = Float()
 
-    def __init__(self, left=0.75, right=0.75, top=1, bottom=1, header=0.5, footer=0.5):
+    def __init__(self, left=0.75, right=0.75, top=1, bottom=1, header=0.5,
+                 footer=0.5):
         self.left = left
         self.right = right
         self.top = top
-        self.bottom =  bottom
+        self.bottom = bottom
         self.header = header
         self.footer = footer
 

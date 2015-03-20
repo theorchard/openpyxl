@@ -1,6 +1,8 @@
-# Copyright (c) 2010-2014 openpyxl
+from __future__ import absolute_import
+# Copyright (c) 2010-2015 openpyxl
 
 import pytest
+
 
 @pytest.fixture
 def PageMargins():
@@ -26,21 +28,40 @@ def test_dict_interface(PageMargins):
 
 @pytest.fixture
 def PageSetup():
-    from openpyxl.worksheet import PageSetup
+    from .. page import PageSetup
     return PageSetup
 
 
-@pytest.mark.xfail
 def test_page_setup(PageSetup):
     p = PageSetup()
-    assert p.setup == {}
+    assert dict(p) == {}
     p.scale = 1
-    assert p.setup['scale'] == 1
+    assert p.scale == 1
+    p.paperHeight = "24.73mm"
+    assert p.paperHeight == "24.73mm"
+    assert p.cellComments == None
+    p.orientation = "default"
+    assert p.orientation == "default"
+    p.id = 'a12'
+    assert dict(p) == {'scale':'1', 'paperHeight': '24.73mm', 'orientation': 'default', 'id':'a12'}
 
 
-def test_page_options(PageSetup):
+def test_wrong_page_setup(PageSetup):
     p = PageSetup()
-    assert p.options == {}
+    """ providing a not standard parameter """
+    with pytest.raises(ValueError):
+        p.orientation = "tagada"
+
+
+@pytest.fixture
+def PrintOptions():
+    from .. page import PrintOptions
+    return PrintOptions
+
+
+def test_print_options(PrintOptions):
+    p = PrintOptions()
+    assert dict(p) == {}
     p.horizontalCentered = True
     p.verticalCentered = True
-    assert p.options == {'verticalCentered': '1', 'horizontalCentered': '1'}
+    assert dict(p) == {'verticalCentered': '1', 'horizontalCentered': '1'}

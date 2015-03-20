@@ -1,4 +1,5 @@
-# Copyright (c) 2010-2014 openpyxl
+from __future__ import absolute_import
+# Copyright (c) 2010-2015 openpyxl
 
 import pytest
 
@@ -29,7 +30,7 @@ class TestReference:
 
     def test_data_type(self, cell):
         with pytest.raises(ValueError):
-            cell.data_type = 'f'
+            cell.data_type = 'd'
             cell.data_type = None
 
     def test_type_inference(self, cell, cell_range, column_of_letters,

@@ -1,5 +1,5 @@
 from __future__ import absolute_import
-# Copyright (c) 2010-2014 openpyxl
+# Copyright (c) 2010-2015 openpyxl
 
 import re
 from openpyxl.compat import safe_string, basestring
@@ -40,7 +40,13 @@ DARKYELLOW = COLOR_INDEX[19]
 aRGB_REGEX = re.compile("^([A-Fa-f0-9]{8}|[A-Fa-f0-9]{6})$")
 
 
-class RGB(Descriptor):
+class RGB(Typed):
+    """
+    Descriptor for aRGB values
+    If not supplied alpha is 00
+    """
+
+    expected_type = basestring
 
     def __set__(self, instance, value):
         m = aRGB_REGEX.match(value)
@@ -53,6 +59,8 @@ class RGB(Descriptor):
 
 class Color(HashableObject):
     """Named colors for use in styles."""
+
+    tagname = "color"
 
     rgb = RGB()
     indexed = Integer()
@@ -68,7 +76,7 @@ class Color(HashableObject):
             indexed = index
         if indexed is not None:
             self.type = 'indexed'
-            self.indexed = int(indexed)
+            self.indexed = indexed
         elif theme is not None:
             self.type = 'theme'
             self.theme = theme
@@ -83,6 +91,10 @@ class Color(HashableObject):
     @property
     def value(self):
         return getattr(self, self.type)
+
+    @value.setter
+    def value(self, value):
+        setattr(self, self.type, value)
 
     def __iter__(self):
         attrs = [(self.type, self.value)]

@@ -1,10 +1,13 @@
 from __future__ import absolute_import
-# Copyright (c) 2010-2014 openpyxl
+# Copyright (c) 2010-2015 openpyxl
 
 
 from openpyxl.descriptors import Float, Integer, Set, Bool, String, Alias, MinMax, NoneSet
 from .hashable import HashableObject
 from .colors import ColorDescriptor, BLACK
+
+from openpyxl.compat import safe_string
+from openpyxl.xml.functions import Element, SubElement
 
 
 class Font(HashableObject):
@@ -18,48 +21,58 @@ class Font(HashableObject):
     UNDERLINE_SINGLE_ACCOUNTING = 'singleAccounting'
 
 
-    name = String()
-    charset = Integer(allow_none=True)
-    family = MinMax(min=0, max=14)
-    sz = Float()
+    name = String(nested=True)
+    charset = Integer(allow_none=True, nested=True)
+    family = MinMax(min=0, max=14, nested=True)
+    sz = Float(nested=True)
     size = Alias("sz")
-    b = Bool()
+    b = Bool(nested=True)
     bold = Alias("b")
-    i = Bool()
+    i = Bool(nested=True)
     italic = Alias("i")
-    strike = Bool()
+    strike = Bool(nested=True)
     strikethrough = Alias("strike")
-    outline = Bool()
-    shadow = Bool()
-    condense = Bool()
-    extend = Bool()
-    u = NoneSet(values=(
-        UNDERLINE_DOUBLE,
-        UNDERLINE_DOUBLE_ACCOUNTING,
-        UNDERLINE_SINGLE,
-        UNDERLINE_SINGLE_ACCOUNTING
-    )
+    outline = Bool(nested=True)
+    shadow = Bool(nested=True)
+    condense = Bool(nested=True)
+    extend = Bool(nested=True)
+    u = NoneSet(values=('single', 'double', 'singleAccounting',
+                        'doubleAccounting'), nested=True
                 )
     underline = Alias("u")
-    vertAlign = NoneSet(values=('superscript', 'subscript', 'baseline'))
+    vertAlign = NoneSet(values=('superscript', 'subscript', 'baseline'), nested=True)
     color = ColorDescriptor()
-    scheme = NoneSet(values=("major", "minor"))
+    scheme = NoneSet(values=("major", "minor"), nested=True)
 
-    __fields__ = ('name',
-                  'sz',
-                  'b',
-                  'i',
-                  'u',
-                  'strike',
-                  'color',
-                  'vertAlign',
-                  'charset',
-                  'outline',
-                  'shadow',
-                  'condense',
-                  'extend',
-                  'family',
-                  )
+    tagname = "font"
+
+    __nested__ = ('name', 'charset', 'family', 'b', 'i', 'strike', 'outline',
+                  'shadow', 'condense', 'extend', 'sz', 'u', 'vertAlign',
+                  'scheme')
+
+    __fields__ = ('name', 'charset', 'family', 'b', 'i', 'strike', 'outline',
+                  'shadow', 'condense', 'extend', 'sz', 'u', 'vertAlign',
+                  'scheme', 'color')
+
+    @classmethod
+    def _create_nested(cls, el, tag):
+        if tag == "u":
+            return el.get("val", "single")
+        return super(Font, cls)._create_nested(el, tag)
+
+    def to_tree(self, tagname=None):
+        el = Element(self.tagname)
+        attrs = list(self.__nested__)
+        attrs.insert(10, 'color')
+        for attr in attrs:
+            value = getattr(self, attr)
+            if value:
+                if attr == 'color':
+                    color = value.to_tree()
+                    el.append(color)
+                else:
+                    SubElement(el, attr, val=safe_string(value))
+        return el
 
     def __init__(self, name='Calibri', sz=11, b=False, i=False, charset=None,
                  u=None, strike=False, color=BLACK, scheme=None, family=2, size=None,
@@ -91,3 +104,8 @@ class Font(HashableObject):
         self.condense = condense
         self.extend = extend
         self.scheme = scheme
+
+
+from . colors import Color
+
+DEFAULT_FONT = Font(color=Color(theme=1), scheme="minor")

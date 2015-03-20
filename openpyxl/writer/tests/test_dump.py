@@ -1,15 +1,22 @@
 from __future__ import absolute_import
-# Copyright (c) 2010-2014 openpyxl
+# Copyright (c) 2010-2015 openpyxl
 
-import pytest
 
-from datetime import date
+import datetime
+import decimal
+from io import BytesIO
+
+from openpyxl.xml.functions import tostring, xmlfile
+
+from openpyxl.utils.indexed_list import IndexedList
+from openpyxl.utils.datetime  import CALENDAR_WINDOWS_1900
+
+from openpyxl.styles import Style
+from openpyxl.styles.styleable import StyleId
 
 from openpyxl.tests.helper import compare_xml
 
-from openpyxl.collections import IndexedList
-from openpyxl.workbook import CALENDAR_WINDOWS_1900
-from openpyxl.styles import Style
+import pytest
 
 
 class DummyLocalData:
@@ -21,8 +28,9 @@ class DummyWorkbook:
 
     def __init__(self):
         self.shared_strings = IndexedList()
-        self.shared_styles = IndexedList()
-        self.shared_styles.add(Style())
+        self.shared_styles = [Style()]
+        self._cell_styles = IndexedList([StyleId(0, 0, 0, 0, 0, 0)])
+        self._number_formats = IndexedList()
         self._local_data = DummyLocalData()
         self.encoding = "UTF-8"
         self.excel_base_date = CALENDAR_WINDOWS_1900
@@ -31,100 +39,123 @@ class DummyWorkbook:
         return []
 
 
+
 @pytest.fixture
 def DumpWorksheet():
     from .. dump_worksheet import DumpWorksheet
-    return DumpWorksheet(DummyWorkbook(), "TestWorkSheet")
+    return DumpWorksheet(DummyWorkbook(), title="TestWorksheet")
 
 
-def test_ctor(DumpWorksheet):
-    ws = DumpWorksheet
-    assert isinstance(ws._parent, DummyWorkbook)
-    assert ws.title == "TestWorkSheet"
-    assert ws._max_col == 0
-    assert ws._max_row == 0
-    assert hasattr(ws, '_fileobj_header_name')
-    assert hasattr(ws, '_fileobj_content_name')
-    assert hasattr(ws, '_fileobj_name')
-    assert ws._comments == []
-
-
-def test_cache(DumpWorksheet):
-    ws = DumpWorksheet
-    assert ws._descriptors_cache == {}
-
-
-def test_filename(DumpWorksheet):
-    ws = DumpWorksheet
-    assert ws.filename == ws._fileobj_name
-
-
-def test_get_temporary_file(DumpWorksheet):
-    ws = DumpWorksheet
-    fobj = ws.get_temporary_file(ws.filename)
-    assert fobj.mode == "rb+"
-
-
-def test_get_content_generator(DumpWorksheet):
-    from xml.sax.saxutils import XMLGenerator
-    ws = DumpWorksheet
-    doc = ws._get_content_generator()
-    assert isinstance(doc, XMLGenerator)
-
-
-def test_dimensions(DumpWorksheet):
-    ws = DumpWorksheet
-    assert ws.get_dimensions() == 'A1'
-
-
+@pytest.mark.lxml_required
 def test_write_header(DumpWorksheet):
     ws = DumpWorksheet
-    ws.write_header()
-    header = ws.get_temporary_file(ws._fileobj_header_name)
-    header.seek(0)
+    doc = ws._write_header()
+    next(doc)
+    doc.close()
+    header = open(ws.filename)
     xml = header.read()
-    xml += b"</worksheet>"
-    expected = """<worksheet xmlns:r="http://schemas.openxmlformats.org/officeDocument/2006/relationships" xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main">
+    expected = """
+    <worksheet xmlns:r="http://schemas.openxmlformats.org/officeDocument/2006/relationships" xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main">
     <sheetPr>
       <outlinePr summaryRight="1" summaryBelow="1"/>
     </sheetPr>
-    <dimension ref="A1:A1"/>
     <sheetViews>
       <sheetView workbookViewId="0">
         <selection sqref="A1" activeCell="A1"/>
       </sheetView>
     </sheetViews>
     <sheetFormatPr baseColWidth="10" defaultRowHeight="15"/>
+    <sheetData/>
     </worksheet>
     """
     diff = compare_xml(xml, expected)
     assert diff is None, diff
 
 
-def test_append_data(DumpWorksheet):
+
+
+def test_append(DumpWorksheet):
     ws = DumpWorksheet
-    ws.append([1])
-    assert ws._max_col == 1
-    assert ws._max_row == 1
-    content = ws.get_temporary_file(ws._fileobj_content_name)
-    content.seek(0)
-    xml = content.read()
-    expected = """<row r="1" spans="1:1"><c r="A1" t="n"><v>1</v></c></row>"""
+
+    def _writer(doc):
+        with xmlfile(doc) as xf:
+            with xf.element('sheetData'):
+                try:
+                    while True:
+                        body = (yield)
+                        xf.write(body)
+                except GeneratorExit:
+                    pass
+
+    doc = BytesIO()
+    ws.writer = _writer(doc)
+    next(ws.writer)
+
+    ws.append([1, "s"])
+    ws.append(['2', 3])
+    ws.append(i for i in [1, 2])
+    ws.writer.close()
+    xml = doc.getvalue()
+    expected = """
+    <sheetData>
+      <row r="1" spans="1:2">
+        <c r="A1" t="n">
+          <v>1</v>
+        </c>
+        <c r="B1" t="s">
+          <v>0</v>
+        </c>
+      </row>
+      <row r="2" spans="1:2">
+        <c r="A2" t="s">
+          <v>1</v>
+        </c>
+        <c r="B2" t="n">
+          <v>3</v>
+        </c>
+      </row>
+      <row r="3" spans="1:2">
+        <c r="A3" t="n">
+          <v>1</v>
+        </c>
+        <c r="B3" t="n">
+          <v>2</v>
+        </c>
+      </row>
+    </sheetData>
+    """
     diff = compare_xml(xml, expected)
     assert diff is None, diff
 
 
 def test_dirty_cell(DumpWorksheet):
     ws = DumpWorksheet
-    ws.append((date(2001, 1, 1), 1))
-    content = ws.get_temporary_file(ws._fileobj_content_name)
-    content.seek(0)
-    xml = content.read()
+
+    def _writer(doc):
+        with xmlfile(doc) as xf:
+            with xf.element('sheetData'):
+                try:
+                    while True:
+                        body = (yield)
+                        xf.write(body)
+                except GeneratorExit:
+                    pass
+
+    doc = BytesIO()
+    ws.writer = _writer(doc)
+    next(ws.writer)
+
+    ws.append((datetime.date(2001, 1, 1), 1))
+    ws.writer.close()
+    xml = doc.getvalue()
     expected = """
+    <sheetData>
     <row r="1" spans="1:2">
       <c r="A1" t="n" s="1"><v>36892</v></c>
       <c r="B1" t="n"><v>1</v></c>
-      </row>"""
+      </row>
+    </sheetData>
+    """
     diff = compare_xml(xml, expected)
     assert diff is None, diff
 
@@ -136,97 +167,122 @@ def test_invalid_append(DumpWorksheet, row):
         ws.append(row)
 
 
-def test_write_only_cell():
-    from .. dump_worksheet import WriteOnlyCell
-    c = WriteOnlyCell()
-    assert c.parent is None
-    assert c.value is None
-    assert c.column == 'A'
-    assert c.row == 1
-
-
-def test_append_cell(DumpWorksheet):
-    from .. dump_worksheet import WriteOnlyCell
+@pytest.mark.lxml_required
+def test_cell_comment(DumpWorksheet):
     ws = DumpWorksheet
-    cell = WriteOnlyCell(ws, "Hello there")
-    assert ws.parent.shared_strings == []
-    cell._style = 5
-    ws.append([cell])
-    assert ws.parent.shared_strings == ['Hello there']
-    content = ws.get_temporary_file(ws._fileobj_content_name)
-    content.seek(0)
-    xml = content.read()
-    expected = """<row r="1" spans="1:1"><c r="A1" t="s" s="5"><v>0</v></c></row>"""
-    diff = compare_xml(xml, expected)
-    assert diff is None, diff
-
-
-def test_close_content(DumpWorksheet):
-    ws = DumpWorksheet
-    ws.close()
-    content = open(ws._fileobj_content_name).read()
-    expected = "</sheetData></worksheet>"
-    assert content == expected
-
-
-def test_dump_with_comment(DumpWorksheet):
-    ws = DumpWorksheet
-    from openpyxl.writer.dump_worksheet import WriteOnlyCell
     from openpyxl.comments import Comment
-
-    user_comment = Comment(text='hello world', author='me')
-    cell = WriteOnlyCell(ws, value="hello")
-    cell.comment = user_comment
-
+    from .. dump_worksheet import WriteOnlyCell
+    cell = WriteOnlyCell(ws, 1)
+    comment = Comment('hello', 'me')
+    cell.comment = comment
     ws.append([cell])
-    assert user_comment in ws._comments
-    ws.write_header()
-    header = ws.get_temporary_file(ws._fileobj_header_name)
-    header.write(b"<sheetData>") # well-formed XML needed
+    assert ws._comments == [comment]
     ws.close()
-    content = open(ws._fileobj_name).read()
+
+    with open(ws.filename) as src:
+        xml = src.read()
     expected = """
-    <worksheet xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main" xmlns:r="http://schemas.openxmlformats.org/officeDocument/2006/relationships">
+    <worksheet xmlns:r="http://schemas.openxmlformats.org/officeDocument/2006/relationships" xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main">
     <sheetPr>
       <outlinePr summaryRight="1" summaryBelow="1"/>
     </sheetPr>
-     <dimension ref="A1:A1"/>
     <sheetViews>
       <sheetView workbookViewId="0">
-        <selection activeCell="A1" sqref="A1"/>
+        <selection sqref="A1" activeCell="A1"/>
       </sheetView>
     </sheetViews>
-    <sheetFormatPr defaultRowHeight="15" baseColWidth="10"/>
+    <sheetFormatPr baseColWidth="10" defaultRowHeight="15"/>
     <sheetData>
-    <row r="1" spans="1:1"><c r="A1" t="s"><v>0</v></c></row>
+    <row r="1" spans="1:1"><c r="A1" t="n"><v>1</v></c></row>
     </sheetData>
     <legacyDrawing r:id="commentsvml"></legacyDrawing>
     </worksheet>
     """
-    diff = compare_xml(content, expected)
+    diff = compare_xml(xml, expected)
     assert diff is None, diff
 
 
+@pytest.mark.lxml_required
+def test_cannot_save_twice(DumpWorksheet):
+    from .. dump_worksheet import WorkbookAlreadySaved
+
+    ws = DumpWorksheet
+    ws.close()
+    with pytest.raises(WorkbookAlreadySaved):
+        ws.close()
+    with pytest.raises(WorkbookAlreadySaved):
+        ws.append([1])
+
+
+@pytest.mark.lxml_required
 def test_close(DumpWorksheet):
     ws = DumpWorksheet
-    ws.write_header()
-    header = ws.get_temporary_file(ws._fileobj_header_name)
-    header.write(b"<sheetData>") # well-formed XML needed
     ws.close()
-    with open(ws.filename) as content:
-        xml = content.read()
+    with open(ws.filename) as src:
+        xml = src.read()
     expected = """
-    <worksheet xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main" xmlns:r="http://schemas.openxmlformats.org/officeDocument/2006/relationships">
+    <worksheet xmlns:r="http://schemas.openxmlformats.org/officeDocument/2006/relationships" xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main">
     <sheetPr>
       <outlinePr summaryRight="1" summaryBelow="1"/>
     </sheetPr>
-    <dimension ref="A1:A1"/>
     <sheetViews>
       <sheetView workbookViewId="0">
-        <selection activeCell="A1" sqref="A1"/>
+        <selection sqref="A1" activeCell="A1"/>
       </sheetView>
     </sheetViews>
-    <sheetFormatPr defaultRowHeight="15" baseColWidth="10"/>
+    <sheetFormatPr baseColWidth="10" defaultRowHeight="15"/>
+    <sheetData/>
+    </worksheet>
+    """
+    diff = compare_xml(xml, expected)
+    assert diff is None, diff
+
+@pytest.mark.lxml_required
+def test_auto_filter(DumpWorksheet):
+    ws = DumpWorksheet
+    ws.auto_filter.ref = 'A1:F1'
+    ws.close()
+    with open(ws.filename) as src:
+        xml = src.read()
+    expected = """
+    <worksheet xmlns:r="http://schemas.openxmlformats.org/officeDocument/2006/relationships" xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main">
+    <sheetPr>
+      <outlinePr summaryRight="1" summaryBelow="1"/>
+    </sheetPr>
+    <sheetViews>
+      <sheetView workbookViewId="0">
+        <selection sqref="A1" activeCell="A1"/>
+      </sheetView>
+    </sheetViews>
+    <sheetFormatPr baseColWidth="10" defaultRowHeight="15"/>
+    <sheetData/>
+    <autoFilter ref="A1:F1"/>
+    </worksheet>
+    """
+    diff = compare_xml(xml, expected)
+    assert diff is None, diff
+
+@pytest.mark.lxml_required
+def test_frozen_panes(DumpWorksheet):
+    ws = DumpWorksheet
+    ws.freeze_panes = 'D4'
+    ws.close()
+    with open(ws.filename) as src:
+        xml = src.read()
+    expected = """
+    <worksheet xmlns:r="http://schemas.openxmlformats.org/officeDocument/2006/relationships" xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main">
+    <sheetPr>
+      <outlinePr summaryRight="1" summaryBelow="1"/>
+    </sheetPr>
+    <sheetViews>
+      <sheetView workbookViewId="0">
+        <pane xSplit="3" ySplit="3" topLeftCell="D4" activePane="bottomRight" state="frozen"/>
+        <selection pane="topRight"/>
+        <selection pane="bottomLeft"/>
+        <selection pane="bottomRight" activeCell="A1" sqref="A1"/>
+      </sheetView>
+    </sheetViews>
+    <sheetFormatPr baseColWidth="10" defaultRowHeight="15"/>
     <sheetData/>
     </worksheet>
     """
@@ -234,20 +290,42 @@ def test_close(DumpWorksheet):
     assert diff is None, diff
 
 
-def test_cleanup(DumpWorksheet):
+@pytest.mark.lxml_required
+def test_write_empty_row(DumpWorksheet):
     ws = DumpWorksheet
+    ws.append(['1', '2', '3'])
+    ws.append([])
     ws.close()
-    ws._cleanup()
-    assert ws._fileobj_header_name is None
-    assert ws._fileobj_content_name is None
-    assert ws._fileobj_name is None
 
+    with open(ws.filename) as src:
+        xml = src.read()
 
-def test_cannot_save_twice(DumpWorksheet):
-    from .. dump_worksheet import WorkbookAlreadySaved
-    ws = DumpWorksheet
-    fname = ws.filename
-    ws.close()
-    ws._cleanup()
-    with pytest.raises(WorkbookAlreadySaved):
-        ws.get_temporary_file(fname)
+    expected = """
+    <worksheet xmlns:r="http://schemas.openxmlformats.org/officeDocument/2006/relationships" xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main">
+    <sheetPr>
+      <outlinePr summaryRight="1" summaryBelow="1"/>
+    </sheetPr>
+    <sheetViews>
+      <sheetView workbookViewId="0">
+        <selection sqref="A1" activeCell="A1"/>
+      </sheetView>
+    </sheetViews>
+    <sheetFormatPr baseColWidth="10" defaultRowHeight="15"/>
+    <sheetData>
+    <row r="1" spans="1:3">
+      <c r="A1" t="s">
+        <v>0</v>
+      </c>
+      <c r="B1" t="s">
+        <v>1</v>
+      </c>
+      <c r="C1" t="s">
+        <v>2</v>
+      </c>
+    </row>
+    <row r="2"/>
+    </sheetData>
+    </worksheet>
+    """
+    diff = compare_xml(xml, expected)
+    assert diff is None, diff

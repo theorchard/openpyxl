@@ -1,4 +1,5 @@
-# Copyright (c) 2010-2014 openpyxl
+from __future__ import absolute_import
+# Copyright (c) 2010-2015 openpyxl
 import pytest
 
 
@@ -7,7 +8,7 @@ import pytest
                           ('s', 's'),
                           (2.0/3, '0.6666666666666666'),
                           (1, '1'),
-                          (None, 'None')
+                          (None, 'none')
                          ]
                          )
 def test_safe_string(value, result):

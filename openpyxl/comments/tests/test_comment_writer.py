@@ -1,25 +1,5 @@
-# Copyright (c) 2010-2014 openpyxl
-#
-# Permission is hereby granted, free of charge, to any person obtaining a copy
-# of this software and associated documentation files (the "Software"), to deal
-# in the Software without restriction, including without limitation the rights
-# to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-# copies of the Software, and to permit persons to whom the Software is
-# furnished to do so, subject to the following conditions:
-#
-# The above copyright notice and this permission notice shall be included in
-# all copies or substantial portions of the Software.
-#
-# THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-# IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-# FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-# AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-# LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-# OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
-# THE SOFTWARE.
-#
-# @license: http://www.opensource.org/licenses/mit-license.php
-# @author: see AUTHORS file
+from __future__ import absolute_import
+# Copyright (c) 2010-2015 openpyxl
 
 from openpyxl.compat import zip
 from openpyxl.workbook import Workbook
@@ -123,3 +103,45 @@ def test_write_comments_vml(datadir):
         assert set(correct_ids) == set(check_ids)
         diff = compare_xml(get_document_content(correct), get_document_content(check))
         assert diff is None, diff
+
+
+def test_write_only_cell_vml(datadir):
+    from openpyxl.xml.functions import Element, tostring
+    datadir.chdir()
+    wb = Workbook()
+    ws = wb.active
+    cell = ws['A1'] # write-only cells are always A1
+    cell.comment = Comment("Some text", "an author")
+    cell.coordinate = "B2" # coordinate calculcated on-demand
+
+    writer = CommentWriter(ws)
+    root = Element("root")
+    xml = writer._write_comment_shape(cell.comment, 1)
+    xml = tostring(xml)
+    expected = """
+    <v:shape
+    xmlns:v="urn:schemas-microsoft-com:vml"
+    xmlns:x="urn:schemas-microsoft-com:office:excel"
+    xmlns:o="urn:schemas-microsoft-com:office:office"
+    fillcolor="#ffffe1"
+    id="_x0000_s0001"
+    style="position:absolute; margin-left:59.25pt;margin-top:1.5pt;width:108pt;height:59.25pt;z-index:1;visibility:hidden"
+    type="#_x0000_t202"
+    o:insetmode="auto">
+      <v:fill color2="#ffffe1"/>
+      <v:shadow color="black" obscured="t"/>
+      <v:path o:connecttype="none"/>
+      <v:textbox style="mso-direction-alt:auto">
+        <div style="text-align:left"/>
+      </v:textbox>
+      <x:ClientData ObjectType="Note">
+        <x:MoveWithCells/>
+        <x:SizeWithCells/>
+        <x:AutoFill>False</x:AutoFill>
+        <x:Row>1</x:Row>
+        <x:Column>1</x:Column>
+      </x:ClientData>
+    </v:shape>
+    """
+    diff = compare_xml(xml, expected)
+    assert diff is None, diff

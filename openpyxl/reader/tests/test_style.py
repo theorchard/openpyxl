@@ -1,13 +1,18 @@
-# Copyright (c) 2010-2014 openpyxl
+from __future__ import absolute_import
+# Copyright (c) 2010-2015 openpyxl
 
 import pytest
 
+from io import BytesIO
+from zipfile import ZipFile
+
 # package imports
-from openpyxl.compat import safe_string
+from openpyxl.compat import safe_string, OrderedDict
 from openpyxl.reader.excel import load_workbook
-from openpyxl.reader.style import read_style_table
+from openpyxl.utils.indexed_list import IndexedList
 
 from openpyxl.styles import (
+    borders,
     numbers,
     Color,
     Font,
@@ -15,9 +20,9 @@ from openpyxl.styles import (
     GradientFill,
     Border,
     Side,
-    Alignment
+    Alignment,
+    Protection,
 )
-from openpyxl.styles import borders
 from openpyxl.xml.functions import Element
 
 
@@ -42,49 +47,16 @@ def test_bool_attrib(value, expected):
     el = Element("root", value=value)
     assert bool_attrib(el, "value") is expected
 
-def test_read_pattern_fill(StyleReader, datadir):
-    datadir.chdir()
-    expected = [
-        PatternFill(),
-        PatternFill(fill_type='gray125'),
-        PatternFill(fill_type='solid',
-             start_color=Color(theme=0, tint=-0.14999847407452621),
-             end_color=Color(indexed=64)
-             ),
-        PatternFill(fill_type='solid',
-             start_color=Color(theme=0),
-             end_color=Color(indexed=64)
-             ),
-        PatternFill(fill_type='solid',
-             start_color=Color(indexed=62),
-             end_color=Color(indexed=64)
-             )
-    ]
-    with open("bug311-styles.xml") as src:
-        reader = StyleReader(src.read())
-        for val, exp in zip(reader.parse_fills(), expected):
-            assert val == exp
-
-
-def test_read_gradient_fill(StyleReader, datadir):
-    datadir.chdir()
-    expected = [
-        GradientFill(degree=90, stop=(Color(theme=0), Color(theme=4)))
-    ]
-    with open("bug284-styles.xml") as src:
-        reader = StyleReader(src.read())
-        assert list(reader.parse_fills()) == expected
-
-
 
 def test_unprotected_cell(StyleReader, datadir):
     datadir.chdir()
     with open ("worksheet_unprotected_style.xml") as src:
         reader = StyleReader(src.read())
     from openpyxl.styles import Font
-    reader.font_list = [Font(), Font(), Font(), Font(), Font()]
-    reader.parse_cell_xfs()
-    assert len(reader.shared_styles) == 3
+    reader.font_list = IndexedList([Font(), Font(), Font(), Font(), Font()])
+    reader.protections = IndexedList([Protection()])
+    reader.parse_cell_styles()
+    assert len(reader.cell_styles) == 3
     # default is cells are locked
     style = reader.shared_styles[0]
     assert style.protection.locked is True
@@ -93,11 +65,13 @@ def test_unprotected_cell(StyleReader, datadir):
     assert style.protection.locked is False
 
 
-def test_read_cell_style(datadir):
+def test_read_cell_style(datadir, StyleReader):
     datadir.chdir()
     with open("empty-workbook-styles.xml") as content:
-        style_properties = read_style_table(content.read())
-        assert len(style_properties) == 3
+        reader = StyleReader(content.read())
+    reader.parse()
+    style_properties = reader.shared_styles
+    assert len(style_properties) == 2
 
 
 def test_read_xf_no_number_format(datadir, StyleReader):
@@ -107,7 +81,7 @@ def test_read_xf_no_number_format(datadir, StyleReader):
 
     from openpyxl.styles import Font
     reader.font_list = [Font(), Font()]
-    reader.parse_cell_xfs()
+    reader.parse_cell_styles()
 
     styles = reader.shared_styles
     assert len(styles) == 3
@@ -116,23 +90,51 @@ def test_read_xf_no_number_format(datadir, StyleReader):
     assert styles[2].number_format == 'mm-dd-yy'
 
 
-
-
-def test_read_simple_style_mappings(datadir):
-    datadir.chdir()
-    with open("simple-styles.xml") as content:
-        style_properties = read_style_table(content.read())[0]
-        assert len(style_properties) == 4
-        assert numbers.BUILTIN_FORMATS[9] == style_properties[1].number_format
-        assert 'yyyy-mm-dd' == style_properties[2].number_format
-
-
-def test_read_complex_style_mappings(datadir):
+def test_read_complex_style_mappings(datadir, StyleReader):
     datadir.chdir()
     with open("complex-styles.xml") as content:
-        style_properties = read_style_table(content.read())[0]
-        assert len(style_properties) == 29
-        assert style_properties[-1].font.bold is False
+        reader = StyleReader(content.read())
+    reader.parse()
+    style_properties = reader.shared_styles
+    assert len(style_properties) == 29
+    assert style_properties[-1].font.bold is False
+
+
+def test_read_complex_fonts(datadir, StyleReader):
+    from openpyxl.styles import Font
+    datadir.chdir()
+    with open("complex-styles.xml") as content:
+        reader = StyleReader(content.read())
+    fonts = list(reader.parse_fonts())
+    assert len(fonts) == 8
+    assert fonts[7] == Font(size=12, color=Color(theme=9), name="Calibri", scheme="minor")
+
+
+def test_read_complex_fills(datadir, StyleReader):
+    datadir.chdir()
+    with open("complex-styles.xml") as content:
+        reader = StyleReader(content.read())
+    fills = list(reader.parse_fills())
+    assert len(fills) == 6
+
+
+def test_read_complex_borders(datadir, StyleReader):
+    datadir.chdir()
+    with open("complex-styles.xml") as content:
+        reader = StyleReader(content.read())
+    borders = list(reader.parse_borders())
+    assert len(borders) == 7
+
+
+def test_read_simple_style_mappings(datadir, StyleReader):
+    datadir.chdir()
+    with open("simple-styles.xml") as content:
+        reader = StyleReader(content.read())
+    reader.parse()
+    style_properties = reader.shared_styles
+    assert len(style_properties) == 4
+    assert numbers.BUILTIN_FORMATS[9] == style_properties[1].number_format
+    assert 'yyyy-mm-dd' == style_properties[2].number_format
 
 
 def test_read_complex_style(datadir):
@@ -141,8 +143,8 @@ def test_read_complex_style(datadir):
     ws = wb.get_active_sheet()
     assert ws.column_dimensions['A'].width == 31.1640625
 
-    assert ws.column_dimensions['I'].style.font == Font(sz=12.0, color='FF3300FF')
-    assert ws.column_dimensions['I'].style.fill == PatternFill(patternType='solid', fgColor='FF006600', bgColor=Color(indexed=64))
+    assert ws.column_dimensions['I'].font == Font(sz=12.0, color='FF3300FF', scheme='minor')
+    assert ws.column_dimensions['I'].fill == PatternFill(patternType='solid', fgColor='FF006600', bgColor=Color(indexed=64))
 
     assert ws['A2'].font == Font(sz=10, name='Arial', color=Color(theme=1))
     assert ws['A3'].font == Font(sz=12, name='Arial', bold=True, color=Color(theme=1))
@@ -157,7 +159,6 @@ def test_read_complex_style(datadir):
     assert ws['A11'].alignment.horizontal == 'center'
     assert ws['A12'].alignment.vertical == 'top'
     assert ws['A13'].alignment.vertical == 'center'
-    assert ws['A14'].alignment.vertical == 'bottom'
     assert ws['A15'].number_format == '0.00'
     assert ws['A16'].number_format == 'mm-dd-yy'
     assert ws['A17'].number_format == '0.00%'
@@ -187,134 +188,6 @@ def test_read_complex_style(datadir):
     assert ws['A26'].alignment == Alignment(shrinkToFit=True)
 
 
-def test_change_existing_styles(datadir):
-    wb = load_workbook("complex-styles.xlsx")
-    ws = wb.get_active_sheet()
-
-    ws.column_dimensions['A'].width = 20
-    i_style = ws.column_dimensions['I'].style
-    ws.column_dimensions['I'].style = i_style.copy(fill=PatternFill(fill_type='solid',
-                                             start_color=Color('FF442200')),
-                                   font=Font(color=Color('FF002244')))
-
-    assert ws.column_dimensions['I'].style.fill.start_color.value == 'FF442200'
-    assert ws.column_dimensions['I'].style.font.color.value == 'FF002244'
-
-    ws.cell('A2').style = ws.cell('A2').style.copy(font=Font(name='Times New Roman',
-                                                             size=12,
-                                                             bold=True,
-                                                             italic=True))
-    assert ws['A2'].font == Font(name='Times New Roman', size=12, bold=True,
-                                 italic=True)
-
-    ws.cell('A3').style = ws.cell('A3').style.copy(font=Font(name='Times New Roman',
-                                                             size=14,
-                                                             bold=False,
-                                                             italic=True))
-    assert ws['A3'].font == Font(name='Times New Roman', size=14,
-                                    bold=False, italic=True)
-
-
-    ws.cell('A4').style = ws.cell('A4').style.copy(font=Font(name='Times New Roman',
-                                                             size=16,
-                                                             bold=True,
-                                                             italic=False))
-    assert ws['A4'].font == Font(name='Times New Roman', size=16, bold=True,
-                                 italic=False)
-
-    ws.cell('A5').style = ws.cell('A5').style.copy(font=Font(color=Color('FF66FF66')))
-    assert ws['A5'].font == Font(color='FF66FF66')
-
-
-    ws.cell('A6').style = ws.cell('A6').style.copy(font=Font(color=Color(theme='1')))
-    assert ws['A6'].font == Font(color=Color(theme='1'))
-
-    ws.cell('A7').style = ws.cell('A7').style.copy(fill=PatternFill(fill_type='solid',
-                                                             start_color=Color('FF330066')))
-    assert ws['A7'].fill == PatternFill(fill_type='solid',
-                                        start_color=Color('FF330066'))
-
-    ws.cell('A8').style = ws.cell('A8').style.copy(fill=PatternFill(fill_type='solid',
-                                                             start_color=Color(theme='2')))
-    assert ws['A8'].fill == PatternFill(fill_type='solid',
-                                        start_color=Color(theme='2'))
-
-    ws.cell('A9').style = ws.cell('A9').style.copy(alignment=Alignment(horizontal='center'))
-    assert ws['A9'].alignment == Alignment(horizontal='center')
-
-    ws.cell('A10').style = ws.cell('A10').style.copy(alignment=Alignment(horizontal='left'))
-    assert ws['A10'].alignment == Alignment(horizontal='left')
-
-    ws.cell('A11').style = ws.cell('A11').style.copy(alignment=Alignment(horizontal='right'))
-    assert ws['A11'].alignment == Alignment(horizontal='right')
-
-    ws.cell('A12').style = ws.cell('A12').style.copy(alignment=Alignment(vertical='bottom'))
-    assert ws['A12'].alignment == Alignment(vertical='bottom')
-
-    ws.cell('A13').style = ws.cell('A13').style.copy(alignment=Alignment(vertical='top'))
-    assert ws['A13'].alignment == Alignment(vertical='top')
-
-    ws.cell('A14').style = ws.cell('A14').style.copy(alignment=Alignment(vertical='center'))
-    assert ws['A14'].alignment == Alignment(vertical='center')
-
-    ws.cell('A15').style = ws.cell('A15').style.copy(number_format='0.00%')
-    assert ws['A15'].number_format == '0.00%'
-
-    ws.cell('A16').style = ws.cell('A16').style.copy(number_format='0.00')
-    assert ws['A16'].number_format == '0.00'
-
-    ws.cell('A17').style = ws.cell('A17').style.copy(number_format='mm-dd-yy')
-    assert ws['A17'].number_format == 'mm-dd-yy'
-
-    ws.unmerge_cells('A18:B18')
-
-    ws.cell('A19').style = ws.cell('A19').style.copy(border=Border(top=Side(border_style=borders.BORDER_THIN,
-                                                                                color=Color('FF006600')),
-                                                                     bottom=Side(border_style=borders.BORDER_THIN,
-                                                                                   color=Color('FF006600')),
-                                                                     left=Side(border_style=borders.BORDER_THIN,
-                                                                                 color=Color('FF006600')),
-                                                                     right=Side(border_style=borders.BORDER_THIN,
-                                                                                  color=Color('FF006600'))))
-    assert ws['A19'].border == Border(
-        top=Side(border_style=borders.BORDER_THIN, color='FF006600'),
-        bottom=Side(border_style=borders.BORDER_THIN, color='FF006600'),
-        left=Side(border_style=borders.BORDER_THIN, color='FF006600'),
-        right=Side(border_style=borders.BORDER_THIN, color='FF006600'))
-
-    ws.cell('A21').style = ws.cell('A21').style.copy(border=Border(top=Side(border_style=borders.BORDER_THIN,
-                                                                                color=Color(theme=7)),
-                                                                     bottom=Side(border_style=borders.BORDER_THIN,
-                                                                                   color=Color(theme=7)),
-                                                                     left=Side(border_style=borders.BORDER_THIN,
-                                                                                 color=Color(theme=7)),
-                                                                     right=Side(border_style=borders.BORDER_THIN,
-                                                                                  color=Color(theme=7))))
-    assert ws['A21'].border == Border(
-        top=Side(border_style=borders.BORDER_THIN, color=Color(theme=7)),
-        bottom=Side(border_style=borders.BORDER_THIN, color=Color(theme=7)),
-        left=Side(border_style=borders.BORDER_THIN, color=Color(theme=7)),
-        right=Side(border_style=borders.BORDER_THIN, color=Color(theme=7)))
-
-    ws.cell('A23').style = ws.cell('A23').style.copy(border=Border(top=Side(border_style=borders.BORDER_THIN,
-                                                                                color=Color(theme=6))),
-                                                     fill=PatternFill(fill_type='solid',
-                                                               start_color=Color('FFCCCCFF')))
-    assert ws['A23'].border == Border(
-        top=Side(style=borders.BORDER_THIN, color=Color(theme=6))
-    )
-
-    ws.unmerge_cells('A23:B24')
-
-    ws.cell('A25').style = ws.cell('A25').style.copy(alignment=Alignment(wrap_text=False))
-    assert ws['A25'].alignment == Alignment(wrap_text=False)
-
-    ws.cell('A26').style = ws.cell('A26').style.copy(alignment=Alignment(shrink_to_fit=False))
-    assert ws['A26'].alignment == Alignment(shrink_to_fit=False)
-
-    assert ws.column_dimensions['A'].width == 20.0
-
-
 def test_none_values(datadir, StyleReader):
     datadir.chdir()
     with open("none_value_styles.xml") as src:
@@ -329,6 +202,68 @@ def test_alignment(datadir, StyleReader):
     datadir.chdir()
     with open("alignment_styles.xml") as src:
         reader = StyleReader(src.read())
-    reader.parse_cell_xfs()
+    reader.parse_cell_styles()
     st1 = reader.shared_styles[2]
+    assert len(reader.alignments) == 3
     assert st1.alignment.textRotation == 255
+
+
+def test_style_names(datadir, StyleReader):
+    datadir.chdir()
+    with open("complex-styles.xml") as src:
+        reader = StyleReader(src.read())
+
+    styles = list(reader._parse_style_names())
+    assert styles == [
+        ('Followed Hyperlink', 2),
+        ('Followed Hyperlink', 4),
+        ('Followed Hyperlink', 6),
+        ('Followed Hyperlink', 8),
+        ('Followed Hyperlink', 10),
+        ('Hyperlink', 1),
+        ('Hyperlink', 3),
+        ('Hyperlink', 5),
+        ('Hyperlink', 7),
+        ('Hyperlink', 9),
+        ('Normal', 0),
+    ]
+
+
+@pytest.mark.xfail
+def test_named_styles(datadir, StyleReader):
+    from openpyxl.styles.named_styles import NamedStyle
+    from openpyxl.styles.fonts import DEFAULT_FONT
+    from openpyxl.styles.fills import DEFAULT_EMPTY_FILL
+
+    datadir.chdir()
+    with open("complex-styles.xml") as src:
+        reader = StyleReader(src.read())
+
+    reader.border_list = list(reader.parse_borders())
+    reader.fill_list = list(reader.parse_fills())
+    reader.font_list = list(reader.parse_fonts())
+    reader.parse_cell_styles()
+    reader.parse_named_styles()
+    assert len(reader.named_styles) == 11
+    first_style = reader.named_styles[0]
+    assert first_style.name == "Followed Hyperlink"
+    assert first_style.font == Font(size=12, color=Color(theme=11), underline="single", scheme="minor")
+    assert first_style.fill == DEFAULT_EMPTY_FILL
+    assert first_style.border == Border()
+
+
+def test_no_styles():
+    from .. style import read_style_table
+    archive = ZipFile(BytesIO(), "a")
+    assert read_style_table(archive) is None
+
+
+def test_rgb_colors(StyleReader, datadir):
+    datadir.chdir()
+    with open("rgb_colors.xml") as src:
+        reader = StyleReader(src.read())
+
+    reader.parse_color_index()
+    assert len(reader.color_index) == 64
+    assert reader.color_index[0] == "00000000"
+    assert reader.color_index[-1] == "00333333"

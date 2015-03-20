@@ -1,4 +1,5 @@
-# Copyright (c) 2010-2014 openpyxl
+from __future__ import absolute_import
+# Copyright (c) 2010-2015 openpyxl
 
 import pytest
 
@@ -10,7 +11,7 @@ def Alignment():
 
 def test_default(Alignment):
     al = Alignment()
-    assert dict(al) == {'horizontal':'general', 'vertical':'bottom'}
+    assert dict(al) == {}
 
 
 def test_round_trip(Alignment):
@@ -21,7 +22,6 @@ def test_round_trip(Alignment):
 
 def test_alias(Alignment):
     al = Alignment(text_rotation=90, shrink_to_fit=True, wrap_text=True)
-    assert dict(al) == {'horizontal':'general', 'vertical':'bottom',
-                        'textRotation':'90',
-                        'shrinkToFit':'1',
-                        'wrapText':'1'}
+    assert dict(al) == { 'textRotation':'90',
+                         'shrinkToFit':'1',
+                         'wrapText':'1'}
