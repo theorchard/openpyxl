@@ -96,7 +96,7 @@ class IterableWorksheet(Worksheet):
         if max_col is not None:
             empty_row = tuple(EMPTY_CELL for column in range(min_col, max_col + 1))
         else:
-            expected_columns = []
+            empty_row = []
         row_counter = min_row
 
         p = iterparse(self.xml_source, tag=[ROW_TAG], remove_blank_text=True)
@@ -110,6 +110,7 @@ class IterableWorksheet(Worksheet):
 
                 # some rows are missing
                 for row_counter in range(row_counter, row_id):
+                    row_counter += 1
                     yield empty_row
 
                 # return cells from a row

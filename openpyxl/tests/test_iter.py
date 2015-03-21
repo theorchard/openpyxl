@@ -305,7 +305,6 @@ def test_read_row(datadir, DummyWorkbook):
 
 def test_read_empty_row(datadir, DummyWorkbook):
 
-
     from openpyxl.worksheet.iter_worksheet import IterableWorksheet
     ws = IterableWorksheet(DummyWorkbook, "Sheet", "", "", [], [])
 
@@ -316,3 +315,11 @@ def test_read_empty_row(datadir, DummyWorkbook):
     row = ws._get_row(element, max_col=10)
     row = tuple(row)
     assert len(row) == 10
+
+
+def test_read_empty_rows(datadir, DummyWorkbook):
+
+    from openpyxl.worksheet.iter_worksheet import IterableWorksheet
+    ws = IterableWorksheet(DummyWorkbook, "Sheet", "", "empty_rows.xml", [], [])
+    rows = tuple(ws.rows)
+    assert len(rows) == 7
