@@ -20,14 +20,6 @@ openpyxl.formatting.rule module
     :undoc-members:
     :show-inheritance:
 
-openpyxl.formatting.rules module
---------------------------------
-
-.. automodule:: openpyxl.formatting.rules
-    :members:
-    :undoc-members:
-    :show-inheritance:
-
 
 Module contents
 ---------------

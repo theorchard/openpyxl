@@ -37,18 +37,20 @@ from openpyxl.xml.constants import (
 from openpyxl.workbook import Workbook
 from openpyxl.workbook.names.external import detect_external_links
 from openpyxl.workbook.names.named_range import read_named_ranges
-from openpyxl.reader.strings import read_string_table
-from openpyxl.reader.style import read_style_table
-from openpyxl.reader.workbook import (
+from .strings import read_string_table
+from .style import read_style_table
+from .workbook import (
     read_content_types,
     read_excel_base_date,
     detect_worksheets,
     read_rels,
     read_workbook_code_name,
+    read_workbook_settings,
 )
 from openpyxl.workbook.properties import read_properties, DocumentProperties
-from openpyxl.reader.worksheet import read_worksheet
-from openpyxl.reader.comments import read_comments, get_comments_file
+from openpyxl.worksheet.read_only import ReadOnlyWorksheet
+from .worksheet import WorkSheetParser
+from .comments import read_comments, get_comments_file
 # Use exc_info for Python 2 compatibility with "except Exception[,/ as] e"
 
 
@@ -75,37 +77,11 @@ def repair_central_directory(zipFile, is_file_instance):
     return f
 
 
-def load_workbook(filename, read_only=False, use_iterators=False, keep_vba=KEEP_VBA, guess_types=False, data_only=False):
-    """Open the given filename and return the workbook
 
-    :param filename: the path to open or a file-like object
-    :type filename: string or a file-like object open in binary mode c.f., :class:`zipfile.ZipFile`
-
-    :param read_only: optimised for reading, content cannot be edited
-    :type read_only: bool
-
-    :param use_iterators: use lazy load for cells
-    :type use_iterators: bool
-
-    :param keep_vba: preseve vba content (this does NOT mean you can use it)
-    :type keep_vba: bool
-
-    :param guess_types: guess cell content type and do not read it from the file
-    :type guess_types: bool
-
-    :param data_only: controls whether cells with formulae have either the formula (default) or the value stored the last time Excel read the sheet
-    :type data_only: bool
-
-    :rtype: :class:`openpyxl.workbook.Workbook`
-
-    .. note::
-
-        When using lazy load, all worksheets will be :class:`openpyxl.worksheet.iter_worksheet.IterableWorksheet`
-        and the returned workbook will be read-only.
-
+def _validate_archive(filename):
     """
-    read_only = read_only or use_iterators
-
+    Check the file is a valid zipfile
+    """
     is_file_like = hasattr(filename, 'read')
 
     if not is_file_like and os.path.isfile(filename):
@@ -139,23 +115,45 @@ def load_workbook(filename, read_only=False, use_iterators=False, keep_vba=KEEP_
     except BadZipfile:
         f = repair_central_directory(filename, is_file_like)
         archive = ZipFile(f, 'r', ZIP_DEFLATED)
+    return archive
+
+
+def load_workbook(filename, read_only=False, use_iterators=False, keep_vba=KEEP_VBA, guess_types=False, data_only=False):
+    """Open the given filename and return the workbook
+
+    :param filename: the path to open or a file-like object
+    :type filename: string or a file-like object open in binary mode c.f., :class:`zipfile.ZipFile`
+
+    :param read_only: optimised for reading, content cannot be edited
+    :type read_only: bool
+
+    :param use_iterators: use lazy load for cells
+    :type use_iterators: bool
+
+    :param keep_vba: preseve vba content (this does NOT mean you can use it)
+    :type keep_vba: bool
+
+    :param guess_types: guess cell content type and do not read it from the file
+    :type guess_types: bool
+
+    :param data_only: controls whether cells with formulae have either the formula (default) or the value stored the last time Excel read the sheet
+    :type data_only: bool
+
+    :rtype: :class:`openpyxl.workbook.Workbook`
+
+    .. note::
+
+        When using lazy load, all worksheets will be :class:`openpyxl.worksheet.iter_worksheet.IterableWorksheet`
+        and the returned workbook will be read-only.
+
+    """
+    archive = _validate_archive(filename)
+    read_only = read_only or use_iterators
 
     wb = Workbook(guess_types=guess_types, data_only=data_only, read_only=read_only)
 
     if read_only and guess_types:
         warnings.warn('Data types are not guessed when using iterator reader')
-
-    try:
-        _load_workbook(wb, archive, filename, read_only, keep_vba)
-    except KeyError:
-        e = exc_info()[1]
-        raise InvalidFileException(unicode(e))
-
-    archive.close()
-    return wb
-
-
-def _load_workbook(wb, archive, filename, read_only, keep_vba):
 
     valid_files = archive.namelist()
 
@@ -181,7 +179,7 @@ def _load_workbook(wb, archive, filename, read_only, keep_vba):
         wb.properties = read_properties(archive.read(ARC_CORE))
     except KeyError:
         wb.properties = DocumentProperties()
-    wb._read_workbook_settings(archive.read(ARC_WORKBOOK))
+    wb.active = read_workbook_settings(archive.read(ARC_WORKBOOK)) or 0
 
     # what content types do we have?
     cts = dict(read_content_types(archive))
@@ -203,8 +201,7 @@ def _load_workbook(wb, archive, filename, read_only, keep_vba):
 
     parsed_styles = read_style_table(archive)
     if parsed_styles is not None:
-        wb._differential_styles = parsed_styles.cond_styles
-        wb.cond_styles = parsed_styles.cond_styles
+        wb._differential_styles = parsed_styles.differential_styles
         wb._cell_styles = parsed_styles.cell_styles
         wb._colors = parsed_styles.color_index
         wb._borders = parsed_styles.border_list
@@ -226,17 +223,15 @@ def _load_workbook(wb, archive, filename, read_only, keep_vba):
             continue
 
         if read_only:
-            new_ws = read_worksheet(None, wb, sheet_name, shared_strings,
-                                    wb.shared_styles,
-                                    color_index=wb._colors,
-                                    worksheet_path=worksheet_path)
+            new_ws = ReadOnlyWorksheet(wb, sheet_name, worksheet_path, None,
+                                       shared_strings)
+            wb._add_sheet(new_ws)
         else:
-            new_ws = read_worksheet(archive.read(worksheet_path), wb,
-                                    sheet_name, shared_strings, wb.shared_styles,
-                                    color_index=wb._colors,
-                                    keep_vba=keep_vba)
-        new_ws.sheet_state = sheet.get('state') or 'visible'
-        wb._add_sheet(new_ws)
+            parser = WorkSheetParser(wb, sheet_name, archive.read(worksheet_path),
+                            shared_strings)
+            parser.parse()
+            new_ws = wb[sheet_name]
+        new_ws.sheet_state = sheet['state']
 
         if not read_only:
         # load comments into the worksheet cells
@@ -244,6 +239,7 @@ def _load_workbook(wb, archive, filename, read_only, keep_vba):
             if comments_file is not None:
                 read_comments(new_ws, archive.read(comments_file))
 
+    wb._differential_styles = [] # reset
     wb._named_ranges = list(read_named_ranges(archive.read(ARC_WORKBOOK), wb))
 
     wb.code_name = read_workbook_code_name(archive.read(ARC_WORKBOOK))
@@ -251,3 +247,7 @@ def _load_workbook(wb, archive, filename, read_only, keep_vba):
     if EXTERNAL_LINK in cts:
         rels = read_rels(archive)
         wb._external_links = list(detect_external_links(rels, archive))
+
+
+    archive.close()
+    return wb

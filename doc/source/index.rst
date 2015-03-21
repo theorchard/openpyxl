@@ -21,7 +21,6 @@ the Office Open XML format.
 
 All kudos to the PHPExcel team as openpyxl was initially based on PHPExcel http://www.phpexcel.net/
 
-
 Sample code:
 ++++++++++++
 

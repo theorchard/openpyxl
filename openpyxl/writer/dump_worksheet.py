@@ -13,7 +13,6 @@ import atexit
 from openpyxl.compat import OrderedDict
 from openpyxl.cell import get_column_letter, Cell
 from openpyxl.worksheet import Worksheet
-from openpyxl.worksheet.properties import write_sheetPr
 
 from openpyxl.utils.exceptions import WorkbookAlreadySaved
 from openpyxl.writer.excel import ExcelWriter
@@ -106,7 +105,7 @@ class DumpWorksheet(Worksheet):
             with xf.element("worksheet", xmlns=SHEET_MAIN_NS):
 
                 if self.sheet_properties:
-                    pr = write_sheetPr(self.sheet_properties)
+                    pr = self.sheet_properties.to_tree()
 
                 xf.write(pr)
                 views = Element('sheetViews')
@@ -167,14 +166,13 @@ class DumpWorksheet(Worksheet):
         for col_idx, value in enumerate(row, 1):
             if value is None:
                 continue
-            column = get_column_letter(col_idx)
-
             if isinstance(value, Cell):
                 cell = value
             else:
                 cell.value = value
 
-            cell.coordinate = '%s%d' % (column, row_idx)
+            cell.col_idx = col_idx
+            cell.row = row_idx
             if cell.comment is not None:
                 comment = cell.comment
                 comment._parent = CommentParentCell(cell)

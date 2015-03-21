@@ -10,6 +10,7 @@ Subpackages
     openpyxl.charts
     openpyxl.comments
     openpyxl.descriptors
+    openpyxl.develop
     openpyxl.drawing
     openpyxl.formatting
     openpyxl.reader

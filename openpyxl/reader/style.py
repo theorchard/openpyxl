@@ -7,7 +7,6 @@ from __future__ import absolute_import
 from openpyxl.compat import OrderedDict, zip
 from openpyxl.utils.indexed_list import IndexedList
 from openpyxl.styles import (
-    Style,
     numbers,
     Font,
     Fill,
@@ -32,10 +31,8 @@ class SharedStylesParser(object):
 
     def __init__(self, xml_source):
         self.root = fromstring(xml_source)
-        self.shared_styles = []
         self.cell_styles = IndexedList()
-        self.cond_styles = []
-        self.style_prop = {}
+        self.differential_styles = []
         self.color_index = COLOR_INDEX
         self.font_list = IndexedList()
         self.fill_list = IndexedList()
@@ -47,7 +44,6 @@ class SharedStylesParser(object):
     def parse(self):
         self.parse_custom_num_formats()
         self.parse_color_index()
-        self.style_prop['color_index'] = self.color_index
         self.font_list = IndexedList(self.parse_fonts())
         self.fill_list = IndexedList(self.parse_fills())
         self.border_list = IndexedList(self.parse_borders())
@@ -76,7 +72,7 @@ class SharedStylesParser(object):
     def parse_dxfs(self):
         """Read in the dxfs effects - used by conditional formatting."""
         for node in self.root.findall("{%s}dxfs/{%s}dxf" % (SHEET_MAIN_NS, SHEET_MAIN_NS) ):
-            self.cond_styles.append(DifferentialStyle.from_tree(node))
+            self.differential_styles.append(DifferentialStyle.from_tree(node))
 
 
     def parse_fonts(self):
@@ -139,64 +135,32 @@ class SharedStylesParser(object):
 
     def _parse_xfs(self, node):
         """Read styles from the shared style table"""
-        _styles  = []
         _style_ids = []
 
-        builtin_formats = numbers.BUILTIN_FORMATS
         xfs = safe_iterator(node, '{%s}xf' % SHEET_MAIN_NS)
-        for index, xf in enumerate(xfs):
-            _style = {}
+        for xf in xfs:
             attrs = dict(xf.attrib)
 
-            alignmentId = protectionId = 0
-            numFmtId = int(xf.get("numFmtId", 0))
-            fontId = int(xf.get("fontId", 0))
-            fillId = int(xf.get("fillId", 0))
-            borderId = int(xf.get("borderId", 0))
+            al = xf.find('{%s}alignment' % SHEET_MAIN_NS)
+            if al is not None:
+                alignment = Alignment(**al.attrib)
+                attrs['alignmentId'] = self.alignments.add(alignment)
 
-            if numFmtId < 164:
-                format_code = builtin_formats.get(numFmtId, 'General')
-            else:
-                format_code = self.number_formats[numFmtId-165]
-            _style['number_format'] = format_code
+            prot = xf.find('{%s}protection' % SHEET_MAIN_NS)
+            if prot is not None:
+                protection = Protection(**prot.attrib)
+                attrs['protectionId'] = self.protections.add(protection)
 
-            if bool_attrib(xf, 'applyAlignment'):
-                al = xf.find('{%s}alignment' % SHEET_MAIN_NS)
-                if al is not None:
-                    alignment = Alignment(**al.attrib)
-                    attrs['alignmentId'] = self.alignments.add(alignment)
-                    _style['alignment'] = alignment
-
-            if bool_attrib(xf, 'applyFont'):
-                _style['font'] = self.font_list[fontId]
-
-            if bool_attrib(xf, 'applyFill'):
-                _style['fill'] = self.fill_list[fillId]
-
-            if bool_attrib(xf, 'applyBorder'):
-                _style['border'] = self.border_list[borderId]
-
-            if bool_attrib(xf, 'applyProtection'):
-                prot = xf.find('{%s}protection' % SHEET_MAIN_NS)
-                if prot is not None:
-                    protection = Protection(**prot.attrib)
-                    attrs['protectionId'] = self.protections.add(protection)
-                    _style['protection'] = protection
-
-            _styles.append(Style(**_style))
             _style_ids.append(StyleId(**attrs))
-        self.shared_styles = _styles
         self.cell_styles = IndexedList(_style_ids)
 
 
 def read_style_table(archive):
     if ARC_STYLE in archive.namelist():
         xml_source = archive.read(ARC_STYLE)
-    else:
-        return
-    p = SharedStylesParser(xml_source)
-    p.parse()
-    return p
+        p = SharedStylesParser(xml_source)
+        p.parse()
+        return p
 
 
 def bool_attrib(element, attr):

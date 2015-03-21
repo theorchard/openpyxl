@@ -1,7 +1,7 @@
 from openpyxl import load_workbook
 
 wb = load_workbook("files/concatenate.xlsx")
-ws = wb.get_active_sheet()
+ws = wb.active
 
 b1 = ws.cell('B1')
 a6 = ws.cell('A6')
@@ -15,7 +15,7 @@ assert a6.data_type == 'f'
 # test iterator
 
 wb = load_workbook("files/concatenate.xlsx", True)
-ws = wb.get_active_sheet()
+ws = wb.active
 
 for row in ws.iter_rows():
     for col in row:
