@@ -291,7 +291,7 @@ def test_read_row(datadir, DummyWorkbook):
     """
 
     from openpyxl.worksheet.iter_worksheet import IterableWorksheet
-    ws = IterableWorksheet(DummyWorkbook, "Sheet", "", "bug393-worksheet.xml", [], [])
+    ws = IterableWorksheet(DummyWorkbook, "Sheet", "", "", [], [])
 
     xml = fromstring(src)
     row = tuple(ws._get_row(xml, 11, 11))
