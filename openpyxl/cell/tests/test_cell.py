@@ -41,8 +41,7 @@ def build_dummy_worksheet():
         _comment_count = 0
 
         def cell(self, column, row):
-            column = get_column_letter(column)
-            return Cell(self, column, row)
+            return Cell(self, row=row, col_idx=column)
 
     return Ws()
 

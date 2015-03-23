@@ -371,7 +371,7 @@ class Cell(StyleableObject):
 
         :rtype: :class:`openpyxl.cell.Cell`
         """
-        offset_column = column_index_from_string(self.column) + column
+        offset_column = self.col_idx + column
         offset_row = self.row + row
         return self.parent.cell(column=offset_column, row=offset_row)
 
