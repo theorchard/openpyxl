@@ -13,6 +13,7 @@ import pytest
 
 from openpyxl.comments import Comment
 from ..cell import Cell
+from openpyxl.utils import get_column_letter
 
 
 @pytest.fixture
@@ -40,6 +41,7 @@ def build_dummy_worksheet():
         _comment_count = 0
 
         def cell(self, column, row):
+            column = get_column_letter(column)
             return Cell(self, column, row)
 
     return Ws()
@@ -48,7 +50,7 @@ def build_dummy_worksheet():
 @pytest.fixture
 def dummy_cell(request):
     ws = build_dummy_worksheet()
-    cell = ws.cell('A', 1)
+    cell = ws.cell(column=1, row=1)
     return cell
 
 
@@ -265,7 +267,7 @@ def test_only_one_cell_per_comment(dummy_cell):
     comm = Comment('text', 'author')
     dummy_cell.comment = comm
 
-    c2 = ws.cell(column='A', row=2)
+    c2 = ws.cell(column=1, row=2)
     with pytest.raises(AttributeError):
         c2.comment = comm
 
