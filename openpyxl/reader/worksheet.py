@@ -297,7 +297,7 @@ class WorkSheetParser(object):
 
 
     def parse_legacy_drawing(self, element):
-        self.ws.vba_controls = element.get("r:id")
+        self.ws.vba_controls = element.get("{%s}id" % REL_NS)
 
 
     def parse_sheet_views(self, element):
