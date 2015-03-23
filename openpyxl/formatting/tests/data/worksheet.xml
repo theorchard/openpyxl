@@ -1,0 +1,233 @@
+<stylesheet xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main">
+<conditionalFormatting sqref="A1:A1048576">
+  <cfRule type="colorScale" priority="30">
+    <colorScale>
+      <cfvo type="min"/>
+      <cfvo type="max"/>
+      <color rgb="FFFF7128"/>
+      <color rgb="FFFFEF9C"/>
+    </colorScale>
+  </cfRule>
+</conditionalFormatting>
+<conditionalFormatting sqref="B1:B10">
+  <cfRule type="colorScale" priority="29">
+    <colorScale>
+      <cfvo type="num" val="3"/>
+      <cfvo type="num" val="7"/>
+      <color theme="6"/>
+      <color theme="4"/>
+    </colorScale>
+  </cfRule>
+</conditionalFormatting>
+<conditionalFormatting sqref="C1:C10">
+  <cfRule type="colorScale" priority="28">
+    <colorScale>
+      <cfvo type="percent" val="10"/>
+      <cfvo type="percent" val="90"/>
+      <color rgb="FFFF7128"/>
+      <color rgb="FFFFEF9C"/>
+    </colorScale>
+  </cfRule>
+</conditionalFormatting>
+<conditionalFormatting sqref="D1:D10">
+  <cfRule type="colorScale" priority="27">
+    <colorScale>
+      <cfvo type="formula" val="2"/>
+      <cfvo type="formula" val="4"/>
+      <color theme="6"/>
+      <color theme="5"/>
+    </colorScale>
+  </cfRule>
+</conditionalFormatting>
+<conditionalFormatting sqref="E1:E10">
+  <cfRule type="colorScale" priority="26">
+    <colorScale>
+      <cfvo type="percentile" val="10"/>
+      <cfvo type="percentile" val="90"/>
+      <color rgb="FFFF7128"/>
+      <color rgb="FFFFEF9C"/>
+    </colorScale>
+  </cfRule>
+</conditionalFormatting>
+<conditionalFormatting sqref="F1:F10">
+  <cfRule type="colorScale" priority="25">
+    <colorScale>
+      <cfvo type="min"/>
+      <cfvo type="percentile" val="50"/>
+      <cfvo type="max"/>
+      <color rgb="FFFF7128"/>
+      <color rgb="FFFFEB84"/>
+      <color rgb="FF63BE7B"/>
+    </colorScale>
+  </cfRule>
+</conditionalFormatting>
+<conditionalFormatting sqref="G1:G10">
+  <cfRule type="colorScale" priority="24">
+    <colorScale>
+      <cfvo type="num" val="0"/>
+      <cfvo type="percentile" val="50"/>
+      <cfvo type="num" val="10"/>
+      <color theme="4"/>
+      <color rgb="FFFFEB84"/>
+      <color theme="5"/>
+    </colorScale>
+  </cfRule>
+</conditionalFormatting>
+<conditionalFormatting sqref="H1:H10">
+  <cfRule type="colorScale" priority="23">
+    <colorScale>
+      <cfvo type="percent" val="0"/>
+      <cfvo type="percent" val="50"/>
+      <cfvo type="percent" val="100"/>
+      <color rgb="FFFF7128"/>
+      <color rgb="FFFFEB84"/>
+      <color rgb="FF63BE7B"/>
+    </colorScale>
+  </cfRule>
+</conditionalFormatting>
+<conditionalFormatting sqref="I1:I10">
+  <cfRule type="colorScale" priority="22">
+    <colorScale>
+      <cfvo type="formula" val="2"/>
+      <cfvo type="formula" val="7"/>
+      <cfvo type="formula" val="9"/>
+      <color rgb="FF0000FF"/>
+      <color rgb="FFFF6600"/>
+      <color rgb="FF008000"/>
+    </colorScale>
+  </cfRule>
+</conditionalFormatting>
+<conditionalFormatting sqref="J1:J10">
+  <cfRule type="colorScale" priority="21">
+    <colorScale>
+      <cfvo type="percentile" val="10"/>
+      <cfvo type="percentile" val="50"/>
+      <cfvo type="percentile" val="90"/>
+      <color rgb="FFFF7128"/>
+      <color rgb="FFFFEB84"/>
+      <color rgb="FF63BE7B"/>
+    </colorScale>
+  </cfRule>
+</conditionalFormatting>
+<conditionalFormatting sqref="K1:K10">
+  <cfRule type="dataBar" priority="20">
+    <dataBar>
+      <cfvo type="min"/>
+      <cfvo type="max"/>
+      <color rgb="FF638EC6"/>
+    </dataBar>
+    <extLst>
+      <ext xmlns:x14="http://schemas.microsoft.com/office/spreadsheetml/2009/9/main" uri="{B025F937-C7B1-47D3-B67F-A62EFF666E3E}">
+        <x14:id>{C3EAC63A-32F4-3D48-91EF-229CFD089A27}</x14:id>
+      </ext>
+    </extLst>
+  </cfRule>
+</conditionalFormatting>
+<conditionalFormatting sqref="L1:L10">
+  <cfRule type="dataBar" priority="19">
+    <dataBar showValue="0">
+      <cfvo type="min"/>
+      <cfvo type="max"/>
+      <color rgb="FF638EC6"/>
+    </dataBar>
+    <extLst>
+      <ext xmlns:x14="http://schemas.microsoft.com/office/spreadsheetml/2009/9/main" uri="{B025F937-C7B1-47D3-B67F-A62EFF666E3E}">
+        <x14:id>{ED8ED187-9497-EB42-AFFD-C4DCE79D01B9}</x14:id>
+      </ext>
+    </extLst>
+  </cfRule>
+</conditionalFormatting>
+<conditionalFormatting sqref="M1:M10">
+  <cfRule type="dataBar" priority="18">
+    <dataBar>
+      <cfvo type="percentile" val="10"/>
+      <cfvo type="percentile" val="90"/>
+      <color rgb="FF638EC6"/>
+    </dataBar>
+    <extLst>
+      <ext xmlns:x14="http://schemas.microsoft.com/office/spreadsheetml/2009/9/main" uri="{B025F937-C7B1-47D3-B67F-A62EFF666E3E}">
+        <x14:id>{CCEF6E8A-65EB-0F4B-A9F7-D3719BD225D4}</x14:id>
+      </ext>
+    </extLst>
+  </cfRule>
+</conditionalFormatting>
+<conditionalFormatting sqref="N1:N10">
+  <cfRule type="iconSet" priority="17">
+    <iconSet>
+      <cfvo type="percent" val="0"/>
+      <cfvo type="percent" val="33"/>
+      <cfvo type="percent" val="67"/>
+    </iconSet>
+  </cfRule>
+</conditionalFormatting>
+<conditionalFormatting sqref="O1:O10">
+  <cfRule type="iconSet" priority="16">
+    <iconSet iconSet="4ArrowsGray" showValue="0" reverse="1">
+      <cfvo type="percent" val="0"/>
+      <cfvo type="num" val="2"/>
+      <cfvo type="num" val="4"/>
+      <cfvo type="num" val="6"/>
+    </iconSet>
+  </cfRule>
+</conditionalFormatting>
+<conditionalFormatting sqref="P1:P10">
+  <cfRule type="iconSet" priority="15">
+    <iconSet iconSet="5Rating">
+      <cfvo type="percent" val="0"/>
+      <cfvo type="percentile" val="20"/>
+      <cfvo type="percentile" val="40"/>
+      <cfvo type="percentile" val="60"/>
+      <cfvo type="percentile" val="80"/>
+    </iconSet>
+  </cfRule>
+</conditionalFormatting>
+<conditionalFormatting sqref="Q1:Q10">
+  <cfRule type="containsText" dxfId="27" priority="14" operator="containsText" text="3">
+    <formula>NOT(ISERROR(SEARCH("3",Q1)))</formula>
+  </cfRule>
+</conditionalFormatting>
+<conditionalFormatting sqref="R1:R10">
+  <cfRule type="cellIs" dxfId="26" priority="13" operator="between">
+    <formula>2</formula>
+    <formula>7</formula>
+  </cfRule>
+</conditionalFormatting>
+<conditionalFormatting sqref="S1:S10">
+  <cfRule type="top10" dxfId="25" priority="12" percent="1" rank="10"/>
+</conditionalFormatting>
+<conditionalFormatting sqref="T1:T10">
+  <cfRule type="top10" dxfId="24" priority="11" bottom="1" rank="4"/>
+</conditionalFormatting>
+<conditionalFormatting sqref="U1:U10">
+  <cfRule type="aboveAverage" dxfId="23" priority="10"/>
+</conditionalFormatting>
+<conditionalFormatting sqref="V1:V10">
+  <cfRule type="aboveAverage" dxfId="22" priority="9" aboveAverage="0"/>
+</conditionalFormatting>
+<conditionalFormatting sqref="W1:W10">
+  <cfRule type="aboveAverage" dxfId="21" priority="8" equalAverage="1"/>
+</conditionalFormatting>
+<conditionalFormatting sqref="X1:X10">
+  <cfRule type="aboveAverage" dxfId="20" priority="7" aboveAverage="0" equalAverage="1"/>
+</conditionalFormatting>
+<conditionalFormatting sqref="Y1:Y10">
+  <cfRule type="aboveAverage" dxfId="19" priority="6" stdDev="1"/>
+</conditionalFormatting>
+<conditionalFormatting sqref="Z1:Z10">
+  <cfRule type="aboveAverage" dxfId="18" priority="5" aboveAverage="0" stdDev="1"/>
+</conditionalFormatting>
+<conditionalFormatting sqref="AA1:AA10">
+  <cfRule type="aboveAverage" dxfId="17" priority="4" stdDev="2"/>
+</conditionalFormatting>
+<conditionalFormatting sqref="AB1:AB10">
+  <cfRule type="duplicateValues" dxfId="16" priority="3"/>
+</conditionalFormatting>
+<conditionalFormatting sqref="AC1:AC10">
+  <cfRule type="uniqueValues" dxfId="15" priority="2"/>
+</conditionalFormatting>
+<conditionalFormatting sqref="AD1:AD10">
+  <cfRule type="expression" dxfId="14" priority="1">
+    <formula>AD1&gt;3</formula>
+  </cfRule>
+</conditionalFormatting>
+</stylesheet>
