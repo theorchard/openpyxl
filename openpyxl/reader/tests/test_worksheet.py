@@ -434,7 +434,7 @@ def test_cell(WorkSheetParser, datadir):
     element = sheet.find("{%s}sheetData/{%s}row[2]/{%s}c[1]" % (SHEET_MAIN_NS, SHEET_MAIN_NS, SHEET_MAIN_NS))
     assert element.get('r') == 'A2'
     parser.parse_cell(element)
-    #assert ws['A2']._font_id == 3
+    assert ws['A2'].style_id == 2
 
 
 def test_sheet_views(WorkSheetParser, datadir):
