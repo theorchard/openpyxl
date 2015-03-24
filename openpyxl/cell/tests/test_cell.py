@@ -17,7 +17,7 @@ from openpyxl.utils import get_column_letter
 
 
 @pytest.fixture
-def build_dummy_worksheet():
+def DummyWorksheet():
     from openpyxl.utils.indexed_list import IndexedList
     from openpyxl.utils.datetime  import CALENDAR_WINDOWS_1900
     from openpyxl.cell import Cell
@@ -48,8 +48,8 @@ def build_dummy_worksheet():
 
 
 @pytest.fixture
-def dummy_cell(request):
-    ws = build_dummy_worksheet()
+def dummy_cell(DummyWorksheet):
+    ws = DummyWorksheet
     cell = ws.cell(column=1, row=1)
     return cell
 
@@ -193,8 +193,6 @@ def test_illegal_chacters(dummy_cell):
     from openpyxl.compat import range
     from itertools import chain
     cell = dummy_cell
-    #ws = build_dummy_worksheet()
-    #cell = Cell(ws, 'A', 1)
 
     # The bytes 0x00 through 0x1F inclusive must be manually escaped in values.
 
@@ -318,7 +316,7 @@ class TestEncoding:
 def test_font(build_dummy_worksheet):
     from openpyxl.styles import Font
     font = Font(bold=True)
-    ws = build_dummy_worksheet
+    ws = DummyWorksheet
     ws.parent._fonts.add(font)
 
     cell = Cell(ws, column='A', row=1, fontId=0)
@@ -328,7 +326,7 @@ def test_font(build_dummy_worksheet):
 def test_fill(build_dummy_worksheet):
     from openpyxl.styles import PatternFill
     fill = PatternFill(patternType="solid", fgColor="FF0000")
-    ws = build_dummy_worksheet
+    ws = DummyWorksheet
     ws.parent._fills.add(fill)
 
     cell = Cell(ws, column='A', row=1, fillId=0)
@@ -338,7 +336,7 @@ def test_fill(build_dummy_worksheet):
 def test_border(build_dummy_worksheet):
     from openpyxl.styles import Border
     border = Border()
-    ws = build_dummy_worksheet
+    ws = DummyWorksheet
     ws.parent._borders.add(border)
 
     cell = Cell(ws, column='A', row=1, borderId=0)
@@ -346,7 +344,7 @@ def test_border(build_dummy_worksheet):
 
 
 def test_number_format(build_dummy_worksheet):
-    ws = build_dummy_worksheet
+    ws = DummyWorksheet
     ws.parent._number_formats.add("dd--hh--mm")
 
     cell = Cell(ws, column="A", row=1, numFmtId=164)
@@ -356,7 +354,7 @@ def test_number_format(build_dummy_worksheet):
 def test_alignment(build_dummy_worksheet):
     from openpyxl.styles import Alignment
     align = Alignment(wrapText=True)
-    ws = build_dummy_worksheet
+    ws = DummyWorksheet
     ws.parent._alignments.add(align)
 
     cell = Cell(ws, column="A", row=1, alignmentId=0)
@@ -366,7 +364,7 @@ def test_alignment(build_dummy_worksheet):
 def test_protection(build_dummy_worksheet):
     from openpyxl.styles import Protection
     prot = Protection(locked=False)
-    ws = build_dummy_worksheet
+    ws = DummyWorksheet
     ws.parent._protections.add(prot)
 
     cell = Cell(ws, column="A", row=1, protectionId=0)
@@ -374,14 +372,14 @@ def test_protection(build_dummy_worksheet):
 
 
 def test_pivot_button(build_dummy_worksheet):
-    ws = build_dummy_worksheet
+    ws = DummyWorksheet
 
     cell = Cell(ws, column="A", row=1, pivotButton=True)
     assert cell.pivotButton is True
 
 
 def test_quote_prefix(build_dummy_worksheet):
-    ws = build_dummy_worksheet
+    ws = DummyWorksheet
 
     cell = Cell(ws, column="A", row=1, quotePrefix=True)
     assert cell.quotePrefix is True
