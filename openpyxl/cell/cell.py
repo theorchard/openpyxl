@@ -111,14 +111,17 @@ class Cell(StyleableObject):
                    TYPE_NULL, TYPE_INLINE, TYPE_ERROR, TYPE_FORMULA_CACHE_STRING)
 
 
-    def __init__(self, worksheet, column, row, value=None, fontId=0, fillId=0,
-                 borderId=0, alignmentId=0, protectionId=0, numFmtId=0, xfId=None):
+    def __init__(self, worksheet, column, row, value=None, fontId=0,
+                 fillId=0, borderId=0, alignmentId=0, protectionId=0, numFmtId=0,
+                 pivotButton=None, quotePrefix=None, xfId=None):
         self._font_id = fontId
         self._fill_id = fillId
         self._border_id = borderId
         self._alignment_id = alignmentId
         self._protection_id = protectionId
         self._number_format_id = numFmtId
+        self.quotePrefix = quotePrefix
+        self.pivotButton = pivotButton
         self.parent = worksheet
         self.column = column
         self.row = row
