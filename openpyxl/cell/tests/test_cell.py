@@ -315,9 +315,73 @@ class TestEncoding:
         cell.value = self.test_string
 
 
-def test_style(dummy_cell):
-    from openpyxl.styles import Font, Style
-    cell = dummy_cell
-    new_style = Style(font=Font(bold=True))
-    cell.style = new_style
-    assert cell.parent.parent._fonts == [Font(bold=True)]
+def test_font(build_dummy_worksheet):
+    from openpyxl.styles import Font
+    font = Font(bold=True)
+    ws = build_dummy_worksheet
+    ws.parent._fonts.add(font)
+
+    cell = Cell(ws, column='A', row=1, fontId=0)
+    assert cell.font == font
+
+
+def test_fill(build_dummy_worksheet):
+    from openpyxl.styles import PatternFill
+    fill = PatternFill(patternType="solid", fgColor="FF0000")
+    ws = build_dummy_worksheet
+    ws.parent._fills.add(fill)
+
+    cell = Cell(ws, column='A', row=1, fillId=0)
+    assert cell.fill == fill
+
+
+def test_border(build_dummy_worksheet):
+    from openpyxl.styles import Border
+    border = Border()
+    ws = build_dummy_worksheet
+    ws.parent._borders.add(border)
+
+    cell = Cell(ws, column='A', row=1, borderId=0)
+    assert cell.border == border
+
+
+def test_number_format(build_dummy_worksheet):
+    ws = build_dummy_worksheet
+    ws.parent._number_formats.add("dd--hh--mm")
+
+    cell = Cell(ws, column="A", row=1, numFmtId=164)
+    assert cell.number_format == "dd--hh--mm"
+
+
+def test_alignment(build_dummy_worksheet):
+    from openpyxl.styles import Alignment
+    align = Alignment(wrapText=True)
+    ws = build_dummy_worksheet
+    ws.parent._alignments.add(align)
+
+    cell = Cell(ws, column="A", row=1, alignmentId=0)
+    assert cell.alignment == align
+
+
+def test_protection(build_dummy_worksheet):
+    from openpyxl.styles import Protection
+    prot = Protection(locked=False)
+    ws = build_dummy_worksheet
+    ws.parent._protections.add(prot)
+
+    cell = Cell(ws, column="A", row=1, protectionId=0)
+    assert cell.protection == prot
+
+
+def test_pivot_button(build_dummy_worksheet):
+    ws = build_dummy_worksheet
+
+    cell = Cell(ws, column="A", row=1, pivotButton=True)
+    assert cell.pivotButton is True
+
+
+def test_quote_prefix(build_dummy_worksheet):
+    ws = build_dummy_worksheet
+
+    cell = Cell(ws, column="A", row=1, quotePrefix=True)
+    assert cell.quotePrefix is True
