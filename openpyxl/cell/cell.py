@@ -82,9 +82,8 @@ class Cell(StyleableObject):
 
     """
     __slots__ =  StyleableObject.__slots__ + (
-        'column',
         'row',
-        'coordinate',
+        'col_idx',
         '_value',
         'data_type',
         'parent',
@@ -108,7 +107,7 @@ class Cell(StyleableObject):
                    TYPE_NULL, TYPE_INLINE, TYPE_ERROR, TYPE_FORMULA_CACHE_STRING)
 
 
-    def __init__(self, worksheet, column, row, value=None, fontId=0,
+    def __init__(self, worksheet, column=None, row=0, value=None, col_idx=0, fontId=0,
                  fillId=0, borderId=0, alignmentId=0, protectionId=0, numFmtId=0,
                  pivotButton=None, quotePrefix=None, xfId=None):
         self._font_id = fontId
@@ -120,9 +119,7 @@ class Cell(StyleableObject):
         self.quotePrefix = quotePrefix
         self.pivotButton = pivotButton
         self.parent = worksheet
-        self.column = column
         self.row = row
-        self.coordinate = '%s%d' % (self.column, self.row)
         # _value is the stored value, while value is the displayed value
         self._value = None
         self._hyperlink_rel = None
@@ -131,7 +128,18 @@ class Cell(StyleableObject):
             self.value = value
         self.xf_index = 0
         self._comment = None
+        if column is not None:
+            col_idx = column_index_from_string(column)
+        self.col_idx = col_idx
 
+
+    @property
+    def coordinate(self):
+        return '%s%d' % (self.column, self.row)
+
+    @property
+    def column(self):
+        return get_column_letter(self.col_idx)
 
     @property
     def encoding(self):
@@ -190,7 +198,7 @@ class Cell(StyleableObject):
 
         self.data_type = "n"
 
-        if isinstance(value, bool):
+        if value is True or value is False:
             self.data_type = self.TYPE_BOOL
 
         elif isinstance(value, NUMERIC_TYPES):
@@ -363,7 +371,7 @@ class Cell(StyleableObject):
 
         :rtype: :class:`openpyxl.cell.Cell`
         """
-        offset_column = column_index_from_string(self.column) + column
+        offset_column = self.col_idx + column
         offset_row = self.row + row
         return self.parent.cell(column=offset_column, row=offset_row)
 

@@ -10,19 +10,20 @@ from openpyxl.xml.functions import iterparse
 # package imports
 from openpyxl.cell import Cell
 from openpyxl.worksheet import Worksheet, ColumnDimension, RowDimension
-from openpyxl.worksheet.iter_worksheet import IterableWorksheet
 from openpyxl.worksheet.page import PageMargins, PrintOptions, PageSetup
 from openpyxl.worksheet.protection import SheetProtection
 from openpyxl.worksheet.views import SheetView
+from openpyxl.worksheet.datavalidation import DataValidation
 from openpyxl.xml.constants import SHEET_MAIN_NS, REL_NS
 from openpyxl.xml.functions import safe_iterator
 from openpyxl.styles import Color
 from openpyxl.formatting import ConditionalFormatting
-from openpyxl.worksheet.properties import parse_sheetPr
+from openpyxl.worksheet.properties import WorksheetProperties
 from openpyxl.utils import (
     coordinate_from_string,
     get_column_letter,
-    column_index_from_string
+    column_index_from_string,
+    coordinate_to_tuple,
     )
 
 
@@ -45,6 +46,14 @@ def _get_xml_iter(xml_source):
         return xml_source
 
 
+def _cast_number(value):
+    "Convert numbers as string to an int or float"
+
+    if "." in value:
+        return float(value)
+    return int(value)
+
+
 class WorkSheetParser(object):
 
     COL_TAG = '{%s}col' % SHEET_MAIN_NS
@@ -56,15 +65,14 @@ class WorkSheetParser(object):
     INLINE_STRING = "{%s}is/{%s}t" % (SHEET_MAIN_NS, SHEET_MAIN_NS)
     INLINE_RICHTEXT = "{%s}is/{%s}r/{%s}t" % (SHEET_MAIN_NS, SHEET_MAIN_NS, SHEET_MAIN_NS)
 
-    def __init__(self, ws, xml_source, shared_strings, style_table, color_index=None):
-        self.ws = ws
+    def __init__(self, wb, title, xml_source, shared_strings):
+        self.ws = wb.create_sheet(title=title)
         self.source = xml_source
         self.shared_strings = shared_strings
-        self.style_table = style_table
-        self.color_index = color_index
-        self.guess_types = ws.parent._guess_types
-        self.data_only = ws.parent.data_only
-        self.styles = [dict(style) for style in self.ws.parent._cell_styles]
+        self.guess_types = wb._guess_types
+        self.data_only = wb.data_only
+        self.styles = [dict(v) for v in self.ws.parent._cell_styles]
+        self.differential_styles = wb._differential_styles
 
     def parse(self):
         dispatcher = {
@@ -93,9 +101,7 @@ class WorkSheetParser(object):
                 dispatcher[tag_name](element)
                 element.clear()
 
-        # Handle parsed conditional formatting rules together.
-        if len(self.ws.conditional_formatting.parse_rules):
-            self.ws.conditional_formatting.update(self.ws.conditional_formatting.parse_rules)
+        self.ws._current_row = self.ws.max_row
 
     def parse_cell(self, element):
         value = element.find(self.VALUE_TAG)
@@ -129,13 +135,13 @@ class WorkSheetParser(object):
             style_id = int(style_id)
             style = self.styles[style_id]
 
-        column, row = coordinate_from_string(coordinate)
-        cell = Cell(self.ws, column, row, **style)
-        self.ws._add_cell(cell)
+        row, column = coordinate_to_tuple(coordinate)
+        cell = Cell(self.ws, row=row, col_idx=column, **style)
+        self.ws._cells[(row, column)] = cell
 
         if value is not None:
             if data_type == 'n':
-                value = cell._cast_numeric(value)
+                value = _cast_number(value)
             elif data_type == 'b':
                 value = bool(int(value))
             elif data_type == 's':
@@ -164,41 +170,32 @@ class WorkSheetParser(object):
             self.ws.merge_cells(mergeCell.get('ref'))
 
     def parse_column_dimensions(self, col):
-        min = int(col.get('min')) if col.get('min') else 1
-        max = int(col.get('max')) if col.get('max') else 1
-        # Ignore ranges that go up to the max column 16384.  Columns need to be extended to handle
-        # ranges without creating an entry for every single one.
-        if max != 16384:
-            for colId in range(min, max + 1):
-                column = get_column_letter(colId)
-                attrs = dict(col.attrib)
-                attrs['index'] = column
-                attrs['worksheet'] = self.ws
-                if column not in self.ws.column_dimensions:
-                    dim = ColumnDimension(**attrs)
-                    self.ws.column_dimensions[column] = dim
+        attrs = dict(col.attrib)
+        column = get_column_letter(int(attrs['min']))
+        attrs['index'] = column
+        dim = ColumnDimension(self.ws, **attrs)
+        self.ws.column_dimensions[column] = dim
+
 
     def parse_row_dimensions(self, row):
         attrs = dict(row.attrib)
-        attrs['worksheet'] = self.ws
-        dim = RowDimension(**attrs)
-        self.ws.row_dimensions[dim.index] = dim
+        if set(attrs) - set(['r', 'span']):
+            attrs['worksheet'] = self.ws
+            dim = RowDimension(**attrs)
+            self.ws.row_dimensions[dim.index] = dim
 
         for cell in safe_iterator(row, self.CELL_TAG):
             self.parse_cell(cell)
 
+
     def parse_print_options(self, element):
-        self.ws.print_options = PrintOptions(**element.attrib)
+        self.ws.print_options = PrintOptions.from_tree(element)
 
     def parse_margins(self, element):
-        self.page_margins = PageMargins(**element.attrib)
+        self.page_margins = PageMargins.from_tree(element)
 
     def parse_page_setup(self, element):
-        id_key = '{%s}id' % REL_NS
-        if id_key in element.attrib.keys():
-            element.attrib['id'] = element.attrib.pop(id_key)
-
-        self.ws.page_setup = PageSetup(**element.attrib)
+        self.ws.page_setup = PageSetup.from_tree(element)
 
     def parse_header_footer(self, element):
         oddHeader = element.find('{%s}oddHeader' % SHEET_MAIN_NS)
@@ -211,59 +208,15 @@ class WorkSheetParser(object):
     def parser_conditional_formatting(self, element):
         range_string = element.get('sqref')
         cfRules = element.findall('{%s}cfRule' % SHEET_MAIN_NS)
-        if range_string not in self.ws.conditional_formatting.parse_rules:
-            self.ws.conditional_formatting.parse_rules[range_string] = []
-        for cfRule in cfRules:
-            if not cfRule.get('type') or cfRule.get('type') == 'dataBar':
-                # dataBar conditional formatting isn't supported, as it relies on the complex <extLst> tag
-                continue
-            rule = {'type': cfRule.get('type')}
-            for attr in ConditionalFormatting.rule_attributes:
-                if cfRule.get(attr) is not None:
-                    if attr == 'priority':
-                        rule[attr] = int(cfRule.get(attr))
-                    else:
-                        rule[attr] = cfRule.get(attr)
+        from openpyxl.formatting.rule import Rule
+        if range_string not in self.ws.conditional_formatting.cf_rules:
+            self.ws.conditional_formatting.cf_rules[range_string] = []
+        for node in cfRules:
+            rule = Rule.from_tree(node)
+            if rule.dxfId is not None:
+                rule.dxf = self.differential_styles[rule.dxfId]
+            self.ws.conditional_formatting.cf_rules[range_string].append(rule)
 
-            formula = cfRule.findall('{%s}formula' % SHEET_MAIN_NS)
-            for f in formula:
-                if 'formula' not in rule:
-                    rule['formula'] = []
-                rule['formula'].append(f.text)
-
-            colorScale = cfRule.find('{%s}colorScale' % SHEET_MAIN_NS)
-            if colorScale is not None:
-                rule['colorScale'] = {'cfvo': [], 'color': []}
-                cfvoNodes = colorScale.findall('{%s}cfvo' % SHEET_MAIN_NS)
-                for node in cfvoNodes:
-                    cfvo = {}
-                    if node.get('type') is not None:
-                        cfvo['type'] = node.get('type')
-                    if node.get('val') is not None:
-                        cfvo['val'] = node.get('val')
-                    rule['colorScale']['cfvo'].append(cfvo)
-                colorNodes = colorScale.findall('{%s}color' % SHEET_MAIN_NS)
-                for color in colorNodes:
-                    attrs = dict(color.items())
-                    color = Color(**attrs)
-                    rule['colorScale']['color'].append(color)
-
-            iconSet = cfRule.find('{%s}iconSet' % SHEET_MAIN_NS)
-            if iconSet is not None:
-                rule['iconSet'] = {'cfvo': []}
-                for iconAttr in ConditionalFormatting.icon_attributes:
-                    if iconSet.get(iconAttr) is not None:
-                        rule['iconSet'][iconAttr] = iconSet.get(iconAttr)
-                cfvoNodes = iconSet.findall('{%s}cfvo' % SHEET_MAIN_NS)
-                for node in cfvoNodes:
-                    cfvo = {}
-                    if node.get('type') is not None:
-                        cfvo['type'] = node.get('type')
-                    if node.get('val') is not None:
-                        cfvo['val'] = node.get('val')
-                    rule['iconSet']['cfvo'].append(cfvo)
-
-            self.ws.conditional_formatting.parse_rules[range_string].append(rule)
 
     def parse_auto_filter(self, element):
         self.ws.auto_filter.ref = element.get("ref")
@@ -285,14 +238,13 @@ class WorkSheetParser(object):
             self.ws.protection.set_password(password, True)
 
     def parse_data_validation(self, element):
-        from openpyxl.worksheet.datavalidation import parser
-        for tag in safe_iterator(element, "{%s}dataValidation" % SHEET_MAIN_NS):
-            dv = parser(tag)
+        for node in safe_iterator(element, "{%s}dataValidation" % SHEET_MAIN_NS):
+            dv = DataValidation.from_tree(node)
             self.ws._data_validations.append(dv)
 
 
     def parse_properties(self, element):
-        self.ws.sheet_properties = parse_sheetPr(element)
+        self.ws.sheet_properties = WorksheetProperties.from_tree(element)
 
 
     def parse_legacy_drawing(self, element):
@@ -306,19 +258,7 @@ class WorkSheetParser(object):
         self.ws.sheet_view = SheetView.from_tree(el)
 
 
-def fast_parse(ws, xml_source, shared_strings, style_table, color_index=None):
-    parser = WorkSheetParser(ws, xml_source, shared_strings, style_table, color_index)
+def fast_parse(xml_source, parent, sheet_title, shared_strings):
+    parser = WorkSheetParser(parent, sheet_title, xml_source, shared_strings)
     parser.parse()
-    del parser
-
-
-def read_worksheet(xml_source, parent, preset_title, shared_strings,
-                   style_table, color_index=None, worksheet_path=None, keep_vba=False):
-    """Read an xml worksheet"""
-    if worksheet_path:
-        ws = IterableWorksheet(parent, preset_title,
-                worksheet_path, xml_source, shared_strings, style_table)
-    else:
-        ws = Worksheet(parent, preset_title)
-        fast_parse(ws, xml_source, shared_strings, style_table, color_index)
-    return ws
+    return parser.ws

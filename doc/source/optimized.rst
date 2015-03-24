@@ -6,7 +6,7 @@ and the common routines in openpyxl won't be able to handle that load.
 Hopefully, there are two modes that enable you to read and write unlimited
 amounts of data with (near) constant memory consumption.
 
-Introducing :class:`openpyxl.worksheet.iter_worksheet.IterableWorksheet`::
+Introducing :class:`openpyxl.worksheet.read_only.ReadOnlyWorksheet`::
 
     from openpyxl import load_workbook
     wb = load_workbook(filename='large_file.xlsx', read_only=True)
@@ -18,7 +18,7 @@ Introducing :class:`openpyxl.worksheet.iter_worksheet.IterableWorksheet`::
 
 .. warning::
 
-    * :class:`openpyxl.worksheet.iter_worksheet.IterableWorksheet` are read-only
+    * :class:`openpyxl.worksheet.read_only.ReadOnlyWorksheet` is read-only
 
 Cells returned are not regular :class:`openpyxl.cell.cell.Cell` but
 :class:`openpyxl.cell.read_only.ReadOnlyCell`.
