@@ -397,9 +397,10 @@ def test_header_footer(WorkSheetParser, datadir):
     assert ws.header_footer.right_footer.text == "Right Footer"
 
 
-def test_cell(WorkSheetParser, datadir):
+def test_cell_style(WorkSheetParser, datadir):
     datadir.chdir()
     parser = WorkSheetParser
+    ws = parser.ws
     parser.shared_strings[1] = "Arial Font, 10"
 
     with open("complex-styles-worksheet.xml") as src:
@@ -408,6 +409,27 @@ def test_cell(WorkSheetParser, datadir):
     element = sheet.find("{%s}sheetData/{%s}row[2]/{%s}c[1]" % (SHEET_MAIN_NS, SHEET_MAIN_NS, SHEET_MAIN_NS))
     assert element.get('r') == 'A2'
     parser.parse_cell(element)
+    assert ws['A2'].style_id == 2
+
+
+def test_cell_exotic_style(WorkSheetParser, datadir):
+    datadir.chdir()
+    parser = WorkSheetParser
+    ws = parser.ws
+    parser.styles = [None, None, {'pivotButton':True, 'quotePrefix':True}]
+
+    src = """
+    <x:c xmlns:x="http://schemas.openxmlformats.org/spreadsheetml/2006/main" r="D4" s="2">
+    </x:c>
+    """
+
+    sheet = fromstring(src)
+    parser.parse_cell(sheet)
+    assert ws['A1'].pivotButton is None
+
+    cell = ws['D4']
+    assert cell.pivotButton is True
+    assert cell.quotePrefix is True
 
 
 def test_sheet_views(WorkSheetParser, datadir):
