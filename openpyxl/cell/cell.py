@@ -107,7 +107,7 @@ class Cell(StyleableObject):
                    TYPE_NULL, TYPE_INLINE, TYPE_ERROR, TYPE_FORMULA_CACHE_STRING)
 
 
-    def __init__(self, worksheet, column=None, row=0, value=None, col_idx=0, fontId=0,
+    def __init__(self, worksheet, column=None, row=None, value=None, col_idx=None, fontId=0,
                  fillId=0, borderId=0, alignmentId=0, protectionId=0, numFmtId=0,
                  pivotButton=None, quotePrefix=None, xfId=None):
         self._font_id = fontId
