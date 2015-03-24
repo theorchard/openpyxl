@@ -422,7 +422,7 @@ def test_header_footer(WorkSheetParser, datadir):
     assert ws.header_footer.right_footer.text == "Right Footer"
 
 
-def test_cell(WorkSheetParser, datadir):
+def test_cell_style(WorkSheetParser, datadir):
     datadir.chdir()
     parser = WorkSheetParser
     ws = parser.ws
