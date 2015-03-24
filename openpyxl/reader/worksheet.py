@@ -128,8 +128,6 @@ class WorkSheetParser(object):
         if style_id is not None:
             style_id = int(style_id)
             style = self.styles[style_id]
-            if style.get('pivotButton'):
-                print(self.ws.title, coordinate)
 
         column, row = coordinate_from_string(coordinate)
         cell = Cell(self.ws, column, row, **style)
