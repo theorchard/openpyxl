@@ -295,7 +295,8 @@ def write_worksheet(worksheet, shared_strings):
 
             # add a legacyDrawing so that excel can draw comments
             if worksheet._comment_count > 0:
-                comments = Element('legacyDrawing', {'{%s}id' % REL_NS: 'commentsvml'})
+                comments = Element('{%s}legacyDrawing' % SHEET_MAIN_NS,
+	                  	{'{%s}id' % REL_NS: 'commentsvml'})
                 xf.write(comments)
 
     xml = out.getvalue()
