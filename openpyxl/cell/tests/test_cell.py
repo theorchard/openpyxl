@@ -12,11 +12,12 @@ import pytest
 # package imports
 
 from openpyxl.comments import Comment
-from ..cell import Cell
+from openpyxl.utils import get_column_letter
+from openpyxl.cell.cell import ERROR_CODES
 
 
 @pytest.fixture
-def build_dummy_worksheet():
+def DummyWorksheet():
     from openpyxl.utils.indexed_list import IndexedList
     from openpyxl.utils.datetime  import CALENDAR_WINDOWS_1900
     from openpyxl.cell import Cell
@@ -40,15 +41,22 @@ def build_dummy_worksheet():
         _comment_count = 0
 
         def cell(self, column, row):
+            column = get_column_letter(column)
             return Cell(self, column, row)
 
     return Ws()
 
 
 @pytest.fixture
-def dummy_cell(request):
-    ws = build_dummy_worksheet()
-    cell = ws.cell('A', 1)
+def Cell():
+    from ..cell import Cell
+    return Cell
+
+
+@pytest.fixture
+def dummy_cell(DummyWorksheet, Cell):
+    ws = DummyWorksheet
+    cell = Cell(ws, column="A", row=1)
     return cell
 
 
@@ -130,7 +138,7 @@ def test_boolean(dummy_cell, value):
     assert cell.data_type == 'b'
 
 
-@pytest.mark.parametrize("error_string", Cell.ERROR_CODES)
+@pytest.mark.parametrize("error_string", ERROR_CODES)
 def test_error_codes(dummy_cell, error_string):
     cell = dummy_cell
     cell.value = error_string
@@ -191,8 +199,6 @@ def test_illegal_chacters(dummy_cell):
     from openpyxl.compat import range
     from itertools import chain
     cell = dummy_cell
-    #ws = build_dummy_worksheet()
-    #cell = Cell(ws, 'A', 1)
 
     # The bytes 0x00 through 0x1F inclusive must be manually escaped in values.
 
@@ -265,7 +271,7 @@ def test_only_one_cell_per_comment(dummy_cell):
     comm = Comment('text', 'author')
     dummy_cell.comment = comm
 
-    c2 = ws.cell(column='A', row=2)
+    c2 = ws.cell(column=1, row=2)
     with pytest.raises(AttributeError):
         c2.comment = comm
 
@@ -313,9 +319,73 @@ class TestEncoding:
         cell.value = self.test_string
 
 
-def test_style(dummy_cell):
-    from openpyxl.styles import Font, Style
-    cell = dummy_cell
-    new_style = Style(font=Font(bold=True))
-    cell.style = new_style
-    assert cell.parent.parent._fonts == [Font(bold=True)]
+def test_font(DummyWorksheet, Cell):
+    from openpyxl.styles import Font
+    font = Font(bold=True)
+    ws = DummyWorksheet
+    ws.parent._fonts.add(font)
+
+    cell = Cell(ws, column='A', row=1, fontId=0)
+    assert cell.font == font
+
+
+def test_fill(DummyWorksheet, Cell):
+    from openpyxl.styles import PatternFill
+    fill = PatternFill(patternType="solid", fgColor="FF0000")
+    ws = DummyWorksheet
+    ws.parent._fills.add(fill)
+
+    cell = Cell(ws, column='A', row=1, fillId=0)
+    assert cell.fill == fill
+
+
+def test_border(DummyWorksheet, Cell):
+    from openpyxl.styles import Border
+    border = Border()
+    ws = DummyWorksheet
+    ws.parent._borders.add(border)
+
+    cell = Cell(ws, column='A', row=1, borderId=0)
+    assert cell.border == border
+
+
+def test_number_format(DummyWorksheet, Cell):
+    ws = DummyWorksheet
+    ws.parent._number_formats.add("dd--hh--mm")
+
+    cell = Cell(ws, column="A", row=1, numFmtId=164)
+    assert cell.number_format == "dd--hh--mm"
+
+
+def test_alignment(DummyWorksheet, Cell):
+    from openpyxl.styles import Alignment
+    align = Alignment(wrapText=True)
+    ws = DummyWorksheet
+    ws.parent._alignments.add(align)
+
+    cell = Cell(ws, column="A", row=1, alignmentId=0)
+    assert cell.alignment == align
+
+
+def test_protection(DummyWorksheet, Cell):
+    from openpyxl.styles import Protection
+    prot = Protection(locked=False)
+    ws = DummyWorksheet
+    ws.parent._protections.add(prot)
+
+    cell = Cell(ws, column="A", row=1, protectionId=0)
+    assert cell.protection == prot
+
+
+def test_pivot_button(DummyWorksheet, Cell):
+    ws = DummyWorksheet
+
+    cell = Cell(ws, column="A", row=1, pivotButton=True)
+    assert cell.pivotButton is True
+
+
+def test_quote_prefix(DummyWorksheet, Cell):
+    ws = DummyWorksheet
+
+    cell = Cell(ws, column="A", row=1, quotePrefix=True)
+    assert cell.quotePrefix is True

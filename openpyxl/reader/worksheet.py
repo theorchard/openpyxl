@@ -130,7 +130,6 @@ class WorkSheetParser(object):
             style_id = int(style_id)
             style = self.styles[style_id]
 
-
         column, row = coordinate_from_string(coordinate)
         cell = Cell(self.ws, column, row, **style)
         self.ws._add_cell(cell)

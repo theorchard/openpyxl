@@ -62,9 +62,11 @@ class StyleableObject(object):
     alignment = StyleDescriptor('_alignments', '_alignment_id')
 
     __slots__ = ('parent', '_font_id', '_border_id', '_fill_id',
-                 '_alignment_id', '_protection_id', '_number_format_id')
+                 '_alignment_id', '_protection_id', '_number_format_id', 'pivotButton',
+                 'quotePrefix')
 
-    def __init__(self, sheet, fontId=0, fillId=0, borderId=0, alignmentId=0, protectionId=0, numFmtId=0):
+    def __init__(self, sheet, fontId=0, fillId=0, borderId=0, alignmentId=0,
+                 protectionId=0, numFmtId=0, pivotButton=None, quotePrefix=None):
         self._font_id = fontId
         self._fill_id = fillId
         self._border_id = borderId
@@ -72,6 +74,8 @@ class StyleableObject(object):
         self._protection_id = protectionId
         self._number_format_id = numFmtId
         self.parent = sheet
+        self.pivotButton = pivotButton
+        self.quotePrefix = quotePrefix
 
 
     @property
@@ -82,7 +86,10 @@ class StyleableObject(object):
             fillId=self._fill_id,
             fontId=self._font_id,
             numFmtId=self._number_format_id,
-            protectionId=self._protection_id)
+            protectionId=self._protection_id,
+            pivotButton=self.pivotButton,
+            quotePrefix=self.quotePrefix
+        )
 
         return self.parent.parent._cell_styles.add(style)
 
@@ -93,7 +100,10 @@ class StyleableObject(object):
                or self._fill_id
                or self._font_id
                or self._number_format_id
-               or self._protection_id)
+               or self._protection_id
+               or self.pivotButton
+               or self.quotePrefix
+               )
 
     #legacy
     @property
