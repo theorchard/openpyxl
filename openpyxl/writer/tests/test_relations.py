@@ -23,7 +23,7 @@ def test_write_hyperlink_rels(datadir):
     ws.cell('A2').hyperlink = "http://test2.com/"
     assert 2 == len(ws.relationships)
 
-    el = write_rels(ws, 1, 1)
+    el = write_rels(ws, 1, 1, 1)
     xml = tostring(el)
 
     datadir.chdir()

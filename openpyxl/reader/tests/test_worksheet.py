@@ -78,6 +78,7 @@ def Worksheet(Workbook):
             self._alignments = IndexedList()
             self._protections = IndexedList()
             self._cell_styles = IndexedList()
+	    self.vba_controls = None
             for i in range(29):
                 self._cell_styles.add((StyleId(i, i, i, i, i, i)))
             self._cell_styles.add(StyleId(fillId=4, borderId=6, alignmentId=1, protectionId=0))
@@ -109,6 +110,7 @@ def Worksheet(Workbook):
             self._cells = {}
             self._data_validations = []
             self.header_footer = HeaderFooter()
+	    self.vba_controls = None
 
         def _add_cell(self, cell):
             self._cells[cell.coordinate] = cell
@@ -132,6 +134,12 @@ def WorkSheetParser(Worksheet):
     """Setup a parser instance with an empty source"""
     from .. worksheet import WorkSheetParser
     return WorkSheetParser(Worksheet, None, {0:'a'}, {})
+
+@pytest.fixture
+def WorkSheetParserKeepVBA(Worksheet):
+    """Setup a parser instance with an empty source and keep_vba=True"""
+    from .. worksheet import WorkSheetParser
+    return WorkSheetParser(Worksheet, None, {0:'a'}, {}, keep_vba=True)
 
 
 def test_col_width(datadir, Worksheet, WorkSheetParser):
@@ -451,3 +459,27 @@ def test_sheet_views(WorkSheetParser, datadir):
 
     assert view.zoomScale == 200
     assert len(view.selection) == 3
+
+def test_legacy_document_keep(Worksheet, WorkSheetParserKeepVBA, datadir):
+    ws = Worksheet
+    parser = WorkSheetParserKeepVBA
+    datadir.chdir()
+
+    with open("legacy_drawing_worksheet.xml") as src:
+        sheet = fromstring(src.read())
+
+    element = sheet.find("{%s}legacyDrawing" % SHEET_MAIN_NS)
+    parser.parse_legacy_drawing(element)
+    assert ws.vba_controls == 'vbaControlId'
+
+def test_legacy_document_no_keep(Worksheet, WorkSheetParser, datadir):
+    ws = Worksheet
+    parser = WorkSheetParser
+    datadir.chdir()
+
+    with open("legacy_drawing_worksheet.xml") as src:
+        sheet = fromstring(src.read())
+
+    element = sheet.find("{%s}legacyDrawing" % SHEET_MAIN_NS)
+    parser.parse_legacy_drawing(element)
+    assert ws.vba_controls is None

@@ -41,7 +41,7 @@ def test_legacy_controls(datadir):
     sheet = fromstring(zipfile.ZipFile(BytesIO(buf), 'r').open('xl/worksheets/sheet1.xml').read())
     el = sheet.find('{%s}legacyDrawing' % SHEET_MAIN_NS)
     assert el is not None, "Missing legacyDrawing tag"
-    assert ('{%s}id' % REL_NS) in el.keys(), "legacyDrawing element has no id attribute"
+    assert el.get('{%s}id' % REL_NS) == 'vbaControlId'
 
 
 def test_save_without_vba(datadir):
