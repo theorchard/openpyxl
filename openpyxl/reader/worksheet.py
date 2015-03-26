@@ -56,7 +56,7 @@ class WorkSheetParser(object):
     INLINE_STRING = "{%s}is/{%s}t" % (SHEET_MAIN_NS, SHEET_MAIN_NS)
     INLINE_RICHTEXT = "{%s}is/{%s}r/{%s}t" % (SHEET_MAIN_NS, SHEET_MAIN_NS, SHEET_MAIN_NS)
 
-    def __init__(self, ws, xml_source, shared_strings, style_table, color_index=None, keep_vba=False):
+    def __init__(self, ws, xml_source, shared_strings, style_table, color_index=None):
         self.ws = ws
         self.source = xml_source
         self.shared_strings = shared_strings
@@ -65,7 +65,7 @@ class WorkSheetParser(object):
         self.guess_types = ws.parent._guess_types
         self.data_only = ws.parent.data_only
         self.styles = [dict(style) for style in self.ws.parent._cell_styles]
-        self.keep_vba = keep_vba
+        self.keep_vba = ws.parent.vba_archive is not None
 
     def parse(self):
         dispatcher = {
@@ -311,18 +311,18 @@ class WorkSheetParser(object):
 
 
 def fast_parse(ws, xml_source, shared_strings, style_table, color_index=None, keep_vba=False):
-    parser = WorkSheetParser(ws, xml_source, shared_strings, style_table, color_index, keep_vba)
+    parser = WorkSheetParser(ws, xml_source, shared_strings, style_table, color_index)
     parser.parse()
     del parser
 
 
 def read_worksheet(xml_source, parent, preset_title, shared_strings,
-                   style_table, color_index=None, worksheet_path=None, keep_vba=False):
+                   style_table, color_index=None, worksheet_path=None):
     """Read an xml worksheet"""
     if worksheet_path:
         ws = IterableWorksheet(parent, preset_title,
                 worksheet_path, xml_source, shared_strings, style_table)
     else:
         ws = Worksheet(parent, preset_title)
-        fast_parse(ws, xml_source, shared_strings, style_table, color_index, keep_vba)
+        fast_parse(ws, xml_source, shared_strings, style_table, color_index)
     return ws

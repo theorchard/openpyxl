@@ -30,6 +30,7 @@ def test_read_standalone_worksheet(datadir):
         excel_base_date = CALENDAR_WINDOWS_1900
         _guess_types = True
         data_only = False
+        vba_archive = None
 
         def __init__(self):
             self.shared_styles = [Style()]
