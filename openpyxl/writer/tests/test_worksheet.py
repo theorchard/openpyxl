@@ -180,14 +180,14 @@ def test_write_cell(worksheet, value, expected):
 def test_write_formula(worksheet, write_rows):
     ws = worksheet
 
-    ws.cell('F1').value = 10
-    ws.cell('F2').value = 32
-    ws.cell('F3').value = '=F1+F2'
-    ws.cell('A4').value = '=A1+A2+A3'
+    ws['F1'] = 10
+    ws['F2'] = 32
+    ws['F3'] = '=F1+F2'
+    ws['A4'] = '=A1+A2+A3'
     ws.formula_attributes['A4'] = {'t': 'shared', 'ref': 'A4:C4', 'si': '0'}
-    ws.cell('B4').value = '=1'
+    ws['B4'] = '=1'
     ws.formula_attributes['B4'] = {'t': 'shared', 'si': '0'}
-    ws.cell('C4').value = '=1'
+    ws['C4'] = '=1'
     ws.formula_attributes['C4'] = {'t': 'shared', 'si': '0'}
 
     out = BytesIO()
@@ -234,11 +234,12 @@ def test_write_formula(worksheet, write_rows):
 
 
 def test_write_height(worksheet, write_rows):
+    from openpyxl.worksheet.dimensions import RowDimension
     ws = worksheet
-    ws.cell('F1').value = 10
-    ws.row_dimensions[ws.cell('F1').row].height = 30
-    ws.row_dimensions[ws.cell('F2').row].height = 30
-    ws._garbage_collect()
+    ws['F1'] = 10
+
+    ws.row_dimensions[1] = RowDimension(ws, height=30)
+    ws.row_dimensions[2] = RowDimension(ws, height=30)
 
     out = BytesIO()
     with xmlfile(out) as xf:
@@ -262,21 +263,20 @@ def test_get_rows_to_write(worksheet):
     from .. etree_worksheet import get_rows_to_write
 
     ws = worksheet
-    ws.cell('A10').value = "test"
-    ws.row_dimensions[ws.cell('A10').row].height = 30
-    ws.row_dimensions[ws.cell('C2').row].height = 30
-    ws._garbage_collect()
+    ws['A10'] = "test"
+    ws.row_dimensions[10] = None
+    ws.row_dimensions[2] = None
 
     cells_by_row = get_rows_to_write(ws)
 
-    assert len(cells_by_row) == 2
-    assert len(cells_by_row[10]) == 1
-    assert len(cells_by_row[2]) == 0
-
+    assert cells_by_row == [
+        (2, []),
+        (10, [(1, ws['A10'])])
+    ]
 
 @pytest.fixture
 def write_autofilter():
-    from .. lxml_worksheet import write_autofilter
+    from .. worksheet import write_autofilter
     return write_autofilter
 
 
@@ -405,7 +405,7 @@ def test_header_footer(worksheet):
     ws.header_footer.right_footer.font_size = 14
     ws.header_footer.right_footer.font_color = "AABBCC"
 
-    from .. lxml_worksheet import write_header_footer
+    from .. worksheet import write_header_footer
     hf = write_header_footer(ws)
     xml = tostring(hf)
     expected = """
@@ -419,14 +419,14 @@ def test_header_footer(worksheet):
 
 
 def test_no_header(worksheet):
-    from .. lxml_worksheet import write_header_footer
+    from .. worksheet import write_header_footer
 
     hf = write_header_footer(worksheet)
     assert hf is None
 
 
 def test_hyperlink(worksheet):
-    from .. lxml_worksheet import write_hyperlinks
+    from .. worksheet import write_hyperlinks
 
     ws = worksheet
     ws.cell('A1').value = "test"
@@ -444,7 +444,7 @@ def test_hyperlink(worksheet):
 
 
 def test_no_hyperlink(worksheet):
-    from .. lxml_worksheet import write_hyperlinks
+    from .. worksheet import write_hyperlinks
 
     l = write_hyperlinks(worksheet)
     assert l is None
@@ -464,28 +464,6 @@ def test_write_hyperlink_image_rels(Workbook, Image, datadir):
     # TODO write integration test with duplicate relation ids then fix
 
 
-def test_page_breaks(worksheet):
-    from ..worksheet import write_pagebreaks
-
-    ws = worksheet
-    ws.page_breaks = [1]
-    xml = tostring(write_pagebreaks(ws))
-    expected = """
-    <rowBreaks count="1" manualBreakCount="1">
-       <brk id="1" man="true" max="16383" min="0"></brk>
-    </rowBreaks>
-    """
-    diff = compare_xml(xml, expected)
-    assert diff is None, diff
-
-
-def test_no_pagebreaks(worksheet):
-    from .. worksheet import write_pagebreaks
-
-    pb = write_pagebreaks(worksheet)
-    assert pb is None
-
-
 @pytest.fixture
 def worksheet_with_cf(worksheet):
     from openpyxl.formatting import ConditionalFormatting
@@ -495,17 +473,19 @@ def worksheet_with_cf(worksheet):
 
 @pytest.fixture
 def write_conditional_formatting():
-    from .. lxml_worksheet import write_conditional_formatting
+    from .. worksheet import write_conditional_formatting
     return write_conditional_formatting
 
 
 def test_conditional_formatting_customRule(worksheet_with_cf, write_conditional_formatting):
-    from .. lxml_worksheet import write_conditional_formatting
-
     ws = worksheet_with_cf
+    from openpyxl.formatting.rule import Rule
 
-    ws.conditional_formatting.add('C1:C10', {'type': 'expression', 'formula': ['ISBLANK(C1)'],
-                                                    'stopIfTrue': '1', 'dxf': {}})
+    ws.conditional_formatting.add('C1:C10',
+                                  Rule(**{'type': 'expression',
+                                          'formula': ['ISBLANK(C1)'], 'stopIfTrue': '1'}
+                                       )
+                                  )
     cfs = write_conditional_formatting(ws)
     xml = b""
     for cf in cfs:
@@ -526,7 +506,7 @@ def test_conditional_font(worksheet_with_cf, write_conditional_formatting):
 
     # Create cf rule
     from openpyxl.styles import PatternFill, Font, Color
-    from openpyxl.formatting import CellIsRule
+    from openpyxl.formatting.rule import CellIsRule
 
     redFill = PatternFill(start_color=Color('FFEE1111'),
                    end_color=Color('FFEE1111'),
@@ -547,7 +527,7 @@ def test_conditional_font(worksheet_with_cf, write_conditional_formatting):
         xml += tostring(cf)
     diff = compare_xml(xml, """
     <conditionalFormatting sqref="A1:A3">
-      <cfRule operator="equal" priority="1" type="cellIs">
+      <cfRule operator="equal" priority="1" type="cellIs" dxfId="0" stopIfTrue="0">
         <formula>"Fail"</formula>
       </cfRule>
     </conditionalFormatting>
@@ -556,7 +536,7 @@ def test_conditional_font(worksheet_with_cf, write_conditional_formatting):
 
 
 def test_formula_rule(worksheet_with_cf, write_conditional_formatting):
-    from openpyxl.formatting import FormulaRule
+    from openpyxl.formatting.rule import FormulaRule
 
     ws = worksheet_with_cf
     ws.conditional_formatting.add('C1:C10',
@@ -603,91 +583,6 @@ def test_write_empty(worksheet, write_worksheet):
       <sheetData/>
       <pageMargins left="0.75" right="0.75" top="1" bottom="1" header="0.5" footer="0.5"/>
     </worksheet>
-    """
-    diff = compare_xml(xml, expected)
-    assert diff is None, diff
-
-
-def test_page_margins(worksheet, write_worksheet):
-    ws = worksheet
-    ws.page_margins.left = 2.0
-    ws.page_margins.right = 2.0
-    ws.page_margins.top = 2.0
-    ws.page_margins.bottom = 2.0
-    ws.page_margins.header = 1.5
-    ws.page_margins.footer = 1.5
-    xml = write_worksheet(ws, None)
-    expected = """
-    <worksheet xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main" xmlns:r="http://schemas.openxmlformats.org/officeDocument/2006/relationships">
-      <sheetPr>
-        <outlinePr summaryRight="1" summaryBelow="1"/>
-      </sheetPr>
-      <dimension ref="A1:A1"/>
-      <sheetViews>
-        <sheetView workbookViewId="0">
-          <selection sqref="A1" activeCell="A1"/>
-        </sheetView>
-      </sheetViews>
-      <sheetFormatPr baseColWidth="10" defaultRowHeight="15"/>
-      <sheetData/>
-      <pageMargins left="2" right="2" top="2" bottom="2" header="1.5" footer="1.5"/>
-    </worksheet>
-    """
-    diff = compare_xml(xml, expected)
-    assert diff is None, diff
-
-
-def test_printer_settings(worksheet, write_worksheet):
-    ws = worksheet
-    ws.page_setup.orientation = ws.ORIENTATION_LANDSCAPE
-    ws.page_setup.paperSize = ws.PAPERSIZE_TABLOID
-    ws.page_setup.fitToHeight = 0
-    ws.page_setup.fitToWidth = 1
-    ws.print_options.horizontalCentered = True
-    ws.print_options.verticalCentered = True
-    page_setup_prop = PageSetupPr(fitToPage=True)
-    ws.sheet_properties.pageSetUpPr = page_setup_prop
-    xml = write_worksheet(ws, None)
-    expected = """
-    <worksheet xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main" xmlns:r="http://schemas.openxmlformats.org/officeDocument/2006/relationships">
-      <sheetPr>
-        <outlinePr summaryRight="1" summaryBelow="1"/>
-        <pageSetUpPr fitToPage="1"/>
-      </sheetPr>
-      <dimension ref="A1:A1"/>
-      <sheetViews>
-        <sheetView workbookViewId="0">
-          <selection sqref="A1" activeCell="A1"/>
-        </sheetView>
-      </sheetViews>
-      <sheetFormatPr baseColWidth="10" defaultRowHeight="15"/>
-      <sheetData/>
-      <printOptions horizontalCentered="1" verticalCentered="1"/>
-      <pageMargins left="0.75" right="0.75" top="1" bottom="1" header="0.5" footer="0.5"/>
-      <pageSetup orientation="landscape" paperSize="3" fitToHeight="0" fitToWidth="1"/>
-    </worksheet>
-    """
-    diff = compare_xml(xml, expected)
-    assert diff is None, diff
-
-
-def test_data_validation(worksheet):
-    from .. worksheet import write_datavalidation
-    from openpyxl.worksheet.datavalidation import DataValidation, ValidationType
-
-    ws = worksheet
-    dv = DataValidation(ValidationType.LIST, formula1='"Dog,Cat,Fish"')
-    dv.add_cell(ws['A1'])
-    ws.add_data_validation(dv)
-
-    xml = write_datavalidation(worksheet)
-    xml = tostring(xml)
-    expected = """
-    <dataValidations xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main" count="1">
-    <dataValidation allowBlank="0" showErrorMessage="1" showInputMessage="1" sqref="A1" type="list">
-      <formula1>&quot;Dog,Cat,Fish&quot;</formula1>
-    </dataValidation>
-    </dataValidations>
     """
     diff = compare_xml(xml, expected)
     assert diff is None, diff
