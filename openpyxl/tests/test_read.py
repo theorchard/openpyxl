@@ -32,6 +32,7 @@ def test_read_standalone_worksheet(datadir):
         _guess_types = True
         data_only = False
         _colors = []
+        vba_archive = None
 
         def __init__(self):
             self.shared_styles = [Style()]

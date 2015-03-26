@@ -90,6 +90,7 @@ def Workbook():
             self._alignments = IndexedList()
             self._protections = IndexedList()
             self._cell_styles = IndexedList()
+            self.vba_archive = None
             for i in range(29):
                 self._cell_styles.add((StyleId(i, i, i, i, i, i)))
             self._cell_styles.add(StyleId(fillId=4, borderId=6, alignmentId=1))
@@ -109,6 +110,14 @@ def WorkSheetParser(Workbook):
     """Setup a parser instance with an empty source"""
     from .. worksheet import WorkSheetParser
     return WorkSheetParser(Workbook, 'sheet', None, {0:'a'})
+
+
+@pytest.fixture
+def WorkSheetParserKeepVBA(Workbook):
+    """Setup a parser instance with an empty source"""
+    Workbook.vba_archive=True
+    from .. worksheet import WorkSheetParser
+    return WorkSheetParser(Workbook, "sheet", {0:'a'}, {})
 
 
 def test_col_width(datadir, WorkSheetParser):
@@ -446,3 +455,27 @@ def test_sheet_views(WorkSheetParser, datadir):
 
     assert view.zoomScale == 200
     assert len(view.selection) == 3
+
+
+def test_legacy_document_keep(WorkSheetParserKeepVBA, datadir):
+    parser = WorkSheetParserKeepVBA
+    datadir.chdir()
+
+    with open("legacy_drawing_worksheet.xml") as src:
+        sheet = fromstring(src.read())
+
+    element = sheet.find("{%s}legacyDrawing" % SHEET_MAIN_NS)
+    parser.parse_legacy_drawing(element)
+    assert parser.ws.vba_controls == 'vbaControlId'
+
+
+def test_legacy_document_no_keep(WorkSheetParser, datadir):
+    parser = WorkSheetParser
+    datadir.chdir()
+
+    with open("legacy_drawing_worksheet.xml") as src:
+        sheet = fromstring(src.read())
+
+    element = sheet.find("{%s}legacyDrawing" % SHEET_MAIN_NS)
+    parser.parse_legacy_drawing(element)
+    assert parser.ws.vba_controls is None

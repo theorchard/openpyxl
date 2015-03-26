@@ -101,6 +101,7 @@ class ExcelWriter(object):
         image_id = 1
         shape_id = 1
         comments_id = 1
+        vba_controls_id = 1
 
         for i, sheet in enumerate(self.workbook.worksheets):
             archive.writestr(PACKAGE_WORKSHEETS + '/sheet%d.xml' % (i + 1),
@@ -108,8 +109,9 @@ class ExcelWriter(object):
                                              ))
             if (sheet._charts or sheet._images
                 or sheet.relationships
-                or sheet._comment_count > 0):
-                rels = write_rels(sheet, drawing_id, comments_id)
+                or sheet._comment_count > 0
+                or sheet.vba_controls is not None):
+                rels = write_rels(sheet, drawing_id, comments_id, vba_controls_id)
                 archive.writestr(
                     PACKAGE_WORKSHEETS + '/_rels/sheet%d.xml.rels' % (i + 1),
                     tostring(rels)
@@ -147,6 +149,9 @@ class ExcelWriter(object):
                 archive.writestr(PACKAGE_XL + '/drawings/commentsDrawing%d.vml' % comments_id,
                     cw.write_comments_vml())
                 comments_id += 1
+
+            if sheet.vba_controls is not None:
+                vba_controls_id += 1
 
     def _write_external_links(self, archive):
         """Write links to external workbooks"""

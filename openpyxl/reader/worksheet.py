@@ -73,6 +73,7 @@ class WorkSheetParser(object):
         self.data_only = wb.data_only
         self.styles = [dict(v) for v in self.ws.parent._cell_styles]
         self.differential_styles = wb._differential_styles
+        self.keep_vba = wb.vba_archive is not None
 
     def parse(self):
         dispatcher = {
@@ -248,7 +249,10 @@ class WorkSheetParser(object):
 
 
     def parse_legacy_drawing(self, element):
-        self.ws.vba_controls = element.get("r:id")
+        if self.keep_vba:
+            # Create an id that will not clash with any other ids that will
+            # be generated.
+            self.ws.vba_controls = 'vbaControlId'
 
 
     def parse_sheet_views(self, element):
