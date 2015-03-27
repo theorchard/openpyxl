@@ -39,6 +39,7 @@ class SharedStylesParser(object):
         self.border_list = IndexedList()
         self.alignments = IndexedList([Alignment()])
         self.protections = IndexedList([Protection()])
+        self.custom_number_formats = {}
         self.number_formats = IndexedList()
 
     def parse(self):
@@ -54,9 +55,10 @@ class SharedStylesParser(object):
         """Read in custom numeric formatting rules from the shared style table"""
         custom_formats = {}
         num_fmts = self.root.findall('{%s}numFmts/{%s}numFmt' % (SHEET_MAIN_NS, SHEET_MAIN_NS))
-        for num_fmt_node in num_fmts:
-            fmt_code = num_fmt_node.get('formatCode').lower()
-            self.number_formats.append(fmt_code)
+        for node in num_fmts:
+            idx = int(node.get('numFmtId'))
+            self.custom_number_formats[idx] = node.get('formatCode')
+            self.number_formats.append(node.get('formatCode'))
 
 
     def parse_color_index(self):
@@ -150,6 +152,13 @@ class SharedStylesParser(object):
             if prot is not None:
                 protection = Protection(**prot.attrib)
                 attrs['protectionId'] = self.protections.add(protection)
+
+            numFmtId = int(xf.get("numFmtId", 0))
+            # check for custom formats and normalise indices
+
+            if numFmtId in self.custom_number_formats:
+                format_code = self.custom_number_formats[numFmtId]
+                attrs["numFmtId"] = self.number_formats.add(format_code) + 164
 
             _style_ids.append(StyleId(**attrs))
         self.cell_styles = IndexedList(_style_ids)

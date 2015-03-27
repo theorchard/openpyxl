@@ -10,6 +10,7 @@ from zipfile import ZipFile
 from openpyxl.reader.excel import load_workbook
 from openpyxl.utils.indexed_list import IndexedList
 from openpyxl.styles.style import StyleId
+from openpyxl.xml.functions import fromstring
 
 from openpyxl.styles import (
     borders,
@@ -135,7 +136,7 @@ def test_read_simple_style_mappings(datadir, StyleReader):
     styles  = reader.cell_styles
     assert len(styles) == 4
     assert styles[1] == StyleId(numFmtId=9)
-    assert styles[2] == StyleId(numFmtId=165)
+    assert styles[2] == StyleId(numFmtId=164)
 
 
 def test_read_complex_style(datadir):
@@ -275,3 +276,41 @@ def test_rgb_colors(StyleReader, datadir):
     assert len(reader.color_index) == 64
     assert reader.color_index[0] == "00000000"
     assert reader.color_index[-1] == "00333333"
+
+
+def test_custom_number_formats(StyleReader, datadir):
+    datadir.chdir()
+    with open("styles_number_formats.xml") as src:
+        reader = StyleReader(src.read())
+
+    reader.parse_custom_num_formats()
+    assert reader.custom_number_formats == {
+        43:'_ * #,##0.00_ ;_ * \-#,##0.00_ ;_ * "-"??_ ;_ @_ ',
+        176: "#,##0.00_ ",
+        180: "yyyy/m/d;@",
+        181: "0.00000_ "
+    }
+    assert reader.number_formats == [
+        '_ * #,##0.00_ ;_ * \-#,##0.00_ ;_ * "-"??_ ;_ @_ ',
+        "#,##0.00_ ",
+        "yyyy/m/d;@",
+        "0.00000_ "
+    ]
+
+
+def test_assign_number_formats(StyleReader):
+
+    reader = StyleReader("<root />")
+    reader.custom_number_formats = {43:'_ * #,##0.00_ ;_ * \-#,##0.00_ ;_ * "-"??_ ;_ @_ '}
+    reader.number_formats = IndexedList(['_ * #,##0.00_ ;_ * \-#,##0.00_ ;_ * "-"??_ ;_ @_ '])
+
+    node = fromstring("""
+    <xf xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main"
+         numFmtId="43" fontId="2" fillId="0" borderId="0"
+         applyFont="0" applyFill="0" applyBorder="0" applyAlignment="0" applyProtection="0">
+          <alignment vertical="center"/>
+    </xf>
+    """)
+    reader._parse_xfs(node)
+
+    assert reader.cell_styles[0] == StyleId(numFmtId=164, fontId=2, alignmentId=1)
