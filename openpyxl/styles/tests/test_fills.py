@@ -177,4 +177,4 @@ def test_create_empty_fill():
     from ..fills import Fill
 
     src = fromstring("<fill/>")
-    fill = Fill.from_tree(src)
+    assert Fill.from_tree(src) is None
