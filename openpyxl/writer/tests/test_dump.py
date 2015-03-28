@@ -41,14 +41,14 @@ class DummyWorkbook:
 
 
 @pytest.fixture
-def DumpWorksheet():
-    from .. dump_worksheet import DumpWorksheet
-    return DumpWorksheet(DummyWorkbook(), title="TestWorksheet")
+def WriteOnlyWorksheet():
+    from ..write_only import WriteOnlyWorksheet
+    return WriteOnlyWorksheet(DummyWorkbook(), title="TestWorksheet")
 
 
 @pytest.mark.lxml_required
-def test_write_header(DumpWorksheet):
-    ws = DumpWorksheet
+def test_write_header(WriteOnlyWorksheet):
+    ws = WriteOnlyWorksheet
     doc = ws._write_header()
     next(doc)
     doc.close()
@@ -74,8 +74,8 @@ def test_write_header(DumpWorksheet):
 
 
 
-def test_append(DumpWorksheet):
-    ws = DumpWorksheet
+def test_append(WriteOnlyWorksheet):
+    ws = WriteOnlyWorksheet
 
     def _writer(doc):
         with xmlfile(doc) as xf:
@@ -128,8 +128,8 @@ def test_append(DumpWorksheet):
     assert diff is None, diff
 
 
-def test_dirty_cell(DumpWorksheet):
-    ws = DumpWorksheet
+def test_dirty_cell(WriteOnlyWorksheet):
+    ws = WriteOnlyWorksheet
 
     def _writer(doc):
         with xmlfile(doc) as xf:
@@ -161,17 +161,17 @@ def test_dirty_cell(DumpWorksheet):
 
 
 @pytest.mark.parametrize("row", ("string", dict()))
-def test_invalid_append(DumpWorksheet, row):
-    ws = DumpWorksheet
+def test_invalid_append(WriteOnlyWorksheet, row):
+    ws = WriteOnlyWorksheet
     with pytest.raises(TypeError):
         ws.append(row)
 
 
 @pytest.mark.lxml_required
-def test_cell_comment(DumpWorksheet):
-    ws = DumpWorksheet
+def test_cell_comment(WriteOnlyWorksheet):
+    ws = WriteOnlyWorksheet
     from openpyxl.comments import Comment
-    from .. dump_worksheet import WriteOnlyCell
+    from .. write_only import WriteOnlyCell
     cell = WriteOnlyCell(ws, 1)
     comment = Comment('hello', 'me')
     cell.comment = comment
@@ -203,10 +203,10 @@ def test_cell_comment(DumpWorksheet):
 
 
 @pytest.mark.lxml_required
-def test_cannot_save_twice(DumpWorksheet):
-    from .. dump_worksheet import WorkbookAlreadySaved
+def test_cannot_save_twice(WriteOnlyWorksheet):
+    from .. write_only import WorkbookAlreadySaved
 
-    ws = DumpWorksheet
+    ws = WriteOnlyWorksheet
     ws.close()
     with pytest.raises(WorkbookAlreadySaved):
         ws.close()
@@ -215,8 +215,8 @@ def test_cannot_save_twice(DumpWorksheet):
 
 
 @pytest.mark.lxml_required
-def test_close(DumpWorksheet):
-    ws = DumpWorksheet
+def test_close(WriteOnlyWorksheet):
+    ws = WriteOnlyWorksheet
     ws.close()
     with open(ws.filename) as src:
         xml = src.read()
@@ -238,8 +238,8 @@ def test_close(DumpWorksheet):
     assert diff is None, diff
 
 @pytest.mark.lxml_required
-def test_auto_filter(DumpWorksheet):
-    ws = DumpWorksheet
+def test_auto_filter(WriteOnlyWorksheet):
+    ws = WriteOnlyWorksheet
     ws.auto_filter.ref = 'A1:F1'
     ws.close()
     with open(ws.filename) as src:
@@ -263,8 +263,8 @@ def test_auto_filter(DumpWorksheet):
     assert diff is None, diff
 
 @pytest.mark.lxml_required
-def test_frozen_panes(DumpWorksheet):
-    ws = DumpWorksheet
+def test_frozen_panes(WriteOnlyWorksheet):
+    ws = WriteOnlyWorksheet
     ws.freeze_panes = 'D4'
     ws.close()
     with open(ws.filename) as src:
@@ -291,8 +291,8 @@ def test_frozen_panes(DumpWorksheet):
 
 
 @pytest.mark.lxml_required
-def test_write_empty_row(DumpWorksheet):
-    ws = DumpWorksheet
+def test_write_empty_row(WriteOnlyWorksheet):
+    ws = WriteOnlyWorksheet
     ws.append(['1', '2', '3'])
     ws.append([])
     ws.close()

@@ -68,7 +68,7 @@ def WriteOnlyCell(ws=None, value=None):
     return Cell(worksheet=ws, column='A', row=1, value=value)
 
 
-class DumpWorksheet(Worksheet):
+class WriteOnlyWorksheet(Worksheet):
     """
     Streaming worksheet using lxml
     Optimised to reduce memory by writing rows just in time
@@ -204,11 +204,11 @@ class DumpWorksheet(Worksheet):
 def removed_method(*args, **kw):
     raise NotImplementedError
 
-setattr(DumpWorksheet, '__getitem__', removed_method)
-setattr(DumpWorksheet, '__setitem__', removed_method)
-setattr(DumpWorksheet, 'cell', removed_method)
-setattr(DumpWorksheet, 'range', removed_method)
-setattr(DumpWorksheet, 'merge_cells', removed_method)
+setattr(WriteOnlyWorksheet, '__getitem__', removed_method)
+setattr(WriteOnlyWorksheet, '__setitem__', removed_method)
+setattr(WriteOnlyWorksheet, 'cell', removed_method)
+setattr(WriteOnlyWorksheet, 'range', removed_method)
+setattr(WriteOnlyWorksheet, 'merge_cells', removed_method)
 
 
 def save_dump(workbook, filename):

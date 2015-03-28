@@ -13,7 +13,7 @@ import threading
 from openpyxl.utils.indexed_list import IndexedList
 from openpyxl.utils.datetime  import CALENDAR_WINDOWS_1900
 from openpyxl.worksheet import Worksheet
-from openpyxl.writer.dump_worksheet import DumpWorksheet, save_dump
+from openpyxl.writer.write_only import WriteOnlyWorksheet, save_dump
 from . names.named_range import NamedRange
 from openpyxl.styles import Style
 from openpyxl.styles.style import StyleId
@@ -151,7 +151,7 @@ class Workbook(object):
             raise ReadOnlyWorkbookException('Cannot create new sheet in a read-only workbook')
 
         if self.write_only :
-            new_ws = DumpWorksheet(parent_workbook=self, title=title)
+            new_ws = WriteOnlyWorksheet(parent_workbook=self, title=title)
         else:
             new_ws = Worksheet(parent_workbook=self, title=title)
 
@@ -166,7 +166,7 @@ class Workbook(object):
         """Add an existing worksheet (at an optional index)."""
         cls = Worksheet
         if self.write_only:
-            cls = DumpWorksheet
+            cls = WriteOnlyWorksheet
         if not isinstance(worksheet, cls):
             raise TypeError("The parameter you have given is not of the type '%s'" % cls.__name__)
         if worksheet.parent != self:
