@@ -131,7 +131,7 @@ def load_workbook(filename, read_only=False, use_iterators=False, keep_vba=KEEP_
     if is_file_like:
         # fileobject must have been opened with 'rb' flag
         # it is required by zipfile
-        if hasattr(filename, 'encoding'):
+        if getattr(filename, 'encoding', None) is not None:
             raise IOError("File-object must be opened in binary mode")
 
     try:
