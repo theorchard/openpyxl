@@ -1,3 +1,13 @@
+2.3.0 (unreleased)
+==================
+
+
+Major changes
+-------------
+* Shift to using (row, column) indexing for cells. Cells will at some point *lose* coordinates.
+* New implementation of conditional formatting. Databars now partially preserved.
+
+
 2.2.1 (unreleased)
 ==================
 
@@ -20,7 +30,6 @@ Bug fixes
 * `#438 <https://bitbucket.org/openpyxl/openpyxl/issue/438>`_ Cells with pivotButton and quotePrefix styles cannot be read
 * `#440 <https://bitbucket.org/openpyxl/openpyxl/issue/440>`_ Error when customised versions of builtin formats
 * `#442 <https://bitbucket.org/openpyxl/openpyxl/issue/442>`_ Exception raised when a fill element contains no children
-
 
 
 2.2.0 (2015-03-11)

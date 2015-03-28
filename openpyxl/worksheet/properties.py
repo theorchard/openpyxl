@@ -4,15 +4,18 @@ from __future__ import absolute_import
 """Worksheet Properties"""
 
 from openpyxl.compat import safe_string
-from openpyxl.descriptors import Strict, String, Bool, Typed
+from openpyxl.descriptors.serialisable import Serialisable
+from openpyxl.descriptors import String, Bool, Typed
 from openpyxl.styles.colors import ColorDescriptor
 from openpyxl.xml.constants import SHEET_MAIN_NS
 from openpyxl.xml.functions import Element
 from openpyxl.styles.colors import Color
 
-class Outline(Strict):
+
+class Outline(Serialisable):
 
     tag = "{%s}outlinePr" % SHEET_MAIN_NS
+    tagname = "outlinePr"
 
     applyStyles = Bool(allow_none=True)
     summaryBelow = Bool(allow_none=True)
@@ -32,16 +35,10 @@ class Outline(Strict):
         self.showOutlineSymbols = showOutlineSymbols
 
 
-    def __iter__(self):
-        for attr in ("applyStyles", "summaryBelow", "summaryRight", "showOutlineSymbols"):
-            value = getattr(self, attr)
-            if value is not None:
-                yield attr, safe_string(value)
-
-
-class PageSetupPr(Strict):
+class PageSetupPr(Serialisable):
 
     tag = "{%s}pageSetUpPr" % SHEET_MAIN_NS
+    tagname = "pageSetupPr"
 
     autoPageBreaks = Bool(allow_none=True)
     fitToPage = Bool(allow_none=True)
@@ -50,16 +47,11 @@ class PageSetupPr(Strict):
         self.autoPageBreaks = autoPageBreaks
         self.fitToPage = fitToPage
 
-    def __iter__(self):
-        for attr in ("autoPageBreaks", "fitToPage"):
-            value = getattr(self, attr)
-            if value is not None:
-                yield attr, safe_string(value)
 
-
-class WorksheetProperties(Strict):
+class WorksheetProperties(Serialisable):
 
     tag = "{%s}sheetPr" % SHEET_MAIN_NS
+    tagname = "sheetPr"
 
     codeName = String(allow_none=True)
     enableFormatConditionsCalculation = Bool(allow_none=True)
@@ -103,53 +95,3 @@ class WorksheetProperties(Strict):
         self.tabColor = tabColor
         self.outlinePr = outlinePr
         self.pageSetUpPr = pageSetUpPr
-
-
-    def __iter__(self):
-        for attr in ("codeName", "enableFormatConditionsCalculation",
-                     "filterMode", "published", "syncHorizontal", "syncRef",
-                     "syncVertical", "transitionEvaluation", "transitionEntry"):
-            value = getattr(self, attr)
-            if value is not None:
-                yield attr, safe_string(value)
-
-
-def parse_sheetPr(node):
-    props = WorksheetProperties(**node.attrib)
-
-    outline = node.find(Outline.tag)
-    if outline is not None:
-        props.outlinePr = Outline(**outline.attrib)
-
-    page_setup = node.find(PageSetupPr.tag)
-    if page_setup is not None:
-        props.pageSetUpPr = PageSetupPr(**page_setup.attrib)
-
-    tab_color = node.find('{%s}tabColor' % SHEET_MAIN_NS)
-    if tab_color is not None:
-        props.tabColor = Color(**dict(tab_color.attrib))
-
-    return props
-
-
-def write_sheetPr(props):
-
-    attributes = {}
-    for k, v in dict(props).items():
-        if not isinstance(v, dict):
-            attributes[k] = v
-
-    el = Element(props.tag, attributes)
-
-    outline = props.outlinePr
-    if outline:
-        el.append(Element(outline.tag, dict(outline)))
-
-    page_setup = props.pageSetUpPr
-    if page_setup:
-        el.append(Element(page_setup.tag, dict(page_setup)))
-
-    if props.tabColor:
-        el.append(Element('{%s}tabColor' % SHEET_MAIN_NS, rgb=props.tabColor.value))
-
-    return el

@@ -14,14 +14,6 @@ from openpyxl.descriptors import (
     Integer,)
 from openpyxl.descriptors.excel import HexBinary
 from openpyxl.styles.colors import Color, ColorDescriptor
-
-from openpyxl.xml.functions import (
-    localname,
-    Element,
-    SubElement,
-)
-
-
 from openpyxl.styles.differential import DifferentialStyle
 
 
@@ -155,14 +147,14 @@ class Rule(Serialisable):
     dataBar = Typed(expected_type=DataBar, allow_none=True)
     iconSet = Typed(expected_type=IconSet, allow_none=True)
     extLst = Typed(expected_type=ExtensionList, allow_none=True)
-    style = Typed(expected_type=DifferentialStyle, allow_none=True)
+    dxf = Typed(expected_type=DifferentialStyle, allow_none=True)
 
     __elements__ = ('colorScale', 'dataBar', 'extLst', 'iconSet', 'formula')
 
     def __init__(self,
                  type,
                  dxfId=None,
-                 priority=None,
+                 priority=0,
                  stopIfTrue=None,
                  aboveAverage=None,
                  percent=None,
@@ -178,7 +170,7 @@ class Rule(Serialisable):
                  dataBar=None,
                  iconSet=None,
                  extLst=None,
-                 style=None,
+                 dxf=None,
                 ):
         self.type = type
         self.dxfId = dxfId
@@ -198,4 +190,84 @@ class Rule(Serialisable):
         self.dataBar = dataBar
         self.iconSet = iconSet
         self.extLst = extLst
-        self.style = style
+        self.dxf = dxf
+
+
+def ColorScaleRule(start_type=None,
+                 start_value=None,
+                 start_color=None,
+                 mid_type=None,
+                 mid_value=None,
+                 mid_color=None,
+                 end_type=None,
+                 end_value=None,
+                 end_color=None):
+
+    """Backwards compatibility"""
+    formats = []
+    if start_type is not None:
+        formats.append(FormatObject(type=start_type, val=start_value))
+    if mid_type is not None:
+        formats.append(FormatObject(type=mid_type, val=mid_value))
+    if end_type is not None:
+        formats.append(FormatObject(type=end_type, val=end_value))
+    colors = []
+    for v in (start_color, mid_color, end_color):
+        if v is not None:
+            if not isinstance(v, Color):
+                v = Color(v)
+            colors.append(v)
+    cs = ColorScale(cfvo=formats, color=colors)
+    rule = Rule(type="colorScale", colorScale=cs)
+    return rule
+
+
+def FormulaRule(formula=None, stopIfTrue=None, font=None, border=None,
+                fill=None):
+    """
+    Conditional formatting with custom differential style
+    """
+    rule = Rule(type="expression", formula=formula, stopIfTrue=stopIfTrue)
+    rule.dxf =  DifferentialStyle(font=font, border=border, fill=fill)
+    return rule
+
+
+def CellIsRule(operator=None, formula=None, stopIfTrue=None, font=None, border=None, fill=None):
+    """
+    Conditional formatting rule based on cell contents.
+    """
+    # Excel doesn't use >, >=, etc, but allow for ease of python development
+    expand = {">": "greaterThan", ">=": "greaterThanOrEqual", "<": "lessThan", "<=": "lessThanOrEqual",
+              "=": "equal", "==": "equal", "!=": "notEqual"}
+
+    operator = expand.get(operator, operator)
+
+    rule = Rule(type='cellIs', operator=operator, formula=formula, stopIfTrue=stopIfTrue)
+    rule.dxf = DifferentialStyle(font=font, border=border, fill=fill)
+
+    return rule
+
+
+def IconSetRule(icon_style=None, type=None, values=None, showValue=None, percent=None, reverse=None):
+    """
+    Convenience function for creating icon set rules
+    """
+    cfvo = []
+    for val in values:
+        cfvo.append(FormatObject(type, val))
+    icon_set = IconSet(iconSet=icon_style, cfvo=cfvo, showValue=showValue,
+                       percent=percent, reverse=reverse)
+    rule = Rule(type='iconSet', iconSet=icon_set)
+
+    return rule
+
+
+def DataBarRule(start_type=None, start_value=None, end_type=None,
+                end_value=None, color=None, showValue=None, minLength=None, maxLength=None):
+    start = FormatObject(start_type, start_value)
+    end = FormatObject(end_type, end_value)
+    data_bar = DataBar(cfvo=[start, end], color=color, showValue=showValue,
+                       minLength=minLength, maxLength=maxLength)
+    rule = Rule(type='dataBar', dataBar=data_bar)
+
+    return rule
