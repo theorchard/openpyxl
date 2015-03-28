@@ -25,7 +25,7 @@ class Style(HashableObject):
     __base__ = True
 
     _font = Typed(expected_type=Font)
-    _fill = Typed(expected_type=Fill)
+    _fill = Typed(expected_type=Fill, allow_none=True)
     _border = Typed(expected_type=Border)
     _alignment = Typed(expected_type=Alignment)
     number_format = NumberFormatDescriptor()

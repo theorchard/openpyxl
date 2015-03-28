@@ -48,7 +48,10 @@ class Fill(HashableObject):
 
     @classmethod
     def from_tree(cls, el):
-        child = [c for c in el][0]
+        children = [c for c in el]
+        if not children:
+            return
+        child = children[0]
         if "patternFill" in child.tag:
             return PatternFill._from_tree(child)
         else:
