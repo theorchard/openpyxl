@@ -1,5 +1,5 @@
-Optimized reader
-================
+Read-only mode
+==============
 
 Sometimes, you will need to open or write extremely large XLSX files,
 and the common routines in openpyxl won't be able to handle that load.
@@ -23,11 +23,12 @@ Introducing :class:`openpyxl.worksheet.read_only.ReadOnlyWorksheet`::
 Cells returned are not regular :class:`openpyxl.cell.cell.Cell` but
 :class:`openpyxl.cell.read_only.ReadOnlyCell`.
 
-Optimized writer
-================
+
+Write-only mode
+===============
 
 Here again, the regular :class:`openpyxl.worksheet.worksheet.Worksheet` has been replaced
-by a faster alternative, the :class:`openpyxl.writer.dump_worksheet.DumpWorksheet`.
+by a faster alternative, the :class:`openpyxl.writer.write_only.WriteOnlyWorksheet`.
 When you want to dump large amounts of data, you might find optimized writer helpful.
 
 .. :: doctest
@@ -43,14 +44,14 @@ When you want to dump large amounts of data, you might find optimized writer hel
 >>> # save the file
 >>> wb.save('new_big_file.xlsx') # doctest: +SKIP
 
-If you want to have cells with styles or comments then use a :func:`openpyxl.writer.dump_worksheet.WriteOnlyCell`
+If you want to have cells with styles or comments then use a :func:`openpyxl.writer.write_only.WriteOnlyCell`
 
 .. :: doctest
 
 >>> from openpyxl import Workbook
 >>> wb = Workbook(optimized_write = True)
 >>> ws = wb.create_sheet()
->>> from openpyxl.writer.dump_worksheet import WriteOnlyCell
+>>> from openpyxl.writer.write_only import WriteOnlyCell
 >>> from openpyxl.comments import Comment
 >>> from openpyxl.styles import Style, Font
 >>> cell = WriteOnlyCell(ws, value="hello world")

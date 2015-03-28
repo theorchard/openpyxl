@@ -44,6 +44,14 @@ openpyxl.worksheet.page module
     :undoc-members:
     :show-inheritance:
 
+openpyxl.worksheet.pagebreak module
+-----------------------------------
+
+.. automodule:: openpyxl.worksheet.pagebreak
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
 openpyxl.worksheet.properties module
 ------------------------------------
 
