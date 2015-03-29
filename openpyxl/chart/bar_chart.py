@@ -16,14 +16,13 @@ from .label import DLbls
 
 class _BarChartBase(Serialisable):
 
-    barDir = Set(values=(['bar', 'col']))
-    grouping = Set(values=(['percentStacked', 'clustered', 'standard', 'stacked']))
+    barDir = Set(values=(['bar', 'col']), nested=True)
+    grouping = Set(values=(['percentStacked', 'clustered', 'standard', 'stacked']), nested=True)
     varyColors = Bool(nested=True, allow_none=True)
     ser = Sequence(expected_type=BarSer, allow_none=True, nested=True)
     dLbls = Typed(expected_type=DLbls, allow_none=True)
 
-    __elements__ = ('varyColors', 'ser', 'dLbls')
-    __nested__ = ('barDir', 'grouping')
+    __elements__ = ('barDir', 'grouping', 'varyColors', 'ser', 'dLbls')
 
     def __init__(self,
                  barDir="col",

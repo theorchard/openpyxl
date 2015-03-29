@@ -31,8 +31,7 @@ class Scaling(Serialisable):
     min = Float(nested=True, allow_none=True)
     extLst = Typed(expected_type=ExtensionList, allow_none=True)
 
-    __elements__ = ()
-    __nested__ = ('logBase', 'orientation', 'max', 'min',)
+    __elements__ = ('logBase', 'orientation', 'max', 'min',)
 
     def __init__(self,
                  logBase=None,
@@ -68,10 +67,9 @@ class _BaseAxis(Serialisable):
 
     # crosses & crossesAt are mutually exclusive
 
-    __nested__ = ('axId', 'delete', 'majorTickMark', 'minorTickMark',
-                  'tickLblPos', 'crossAx', 'crosses', 'crossesAt')
-    __elements__ = ('majorGridlines', 'minorGridlines', 'numFmt', 'scaling',
-                    'spPr', 'title', 'txP')
+    __elements__ = ('axId', 'scaling', 'delete', 'majorGridlines',
+                    'minorGridlines', 'numFmt', 'majorTickMark', 'minorTickMark',
+                    'tickLblPos', 'spPr', 'title', 'txP', 'crossAx', 'crosses', 'crossesAt')
 
     def __init__(self,
                  axId=None,
@@ -156,8 +154,8 @@ class ValAx(Serialisable):
     dispUnits = Typed(expected_type=DispUnits, allow_none=True)
     extLst = Typed(expected_type=ExtensionList, allow_none=True)
 
-    __elements__ = ()
-    __nested__ = ('crossBetween', 'majorUnit', 'minorUnit', 'dispUnits',)
+    __elements__ = ('crossBetween', 'majorUnit', 'minorUnit', 'dispUnits',)
+
 
     def __init__(self,
                  crossBetween=None,
@@ -184,8 +182,7 @@ class CatAx(Serialisable):
     noMultiLvlLbl = Bool(nested=True, allow_none=True)
     extLst = Typed(expected_type=ExtensionList, allow_none=True)
 
-    __elements__ = ()
-    __nested__ = ('auto', 'lblAlgn', 'lblOffset', 'tickLblSkip', 'tickMarkSkip', 'noMultiLvlLbl')
+    __elements__ = ('auto', 'lblAlgn', 'lblOffset', 'tickLblSkip', 'tickMarkSkip', 'noMultiLvlLbl')
 
     def __init__(self,
                  auto=None,

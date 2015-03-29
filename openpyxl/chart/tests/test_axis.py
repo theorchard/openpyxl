@@ -39,10 +39,10 @@ class TestAxis:
         expected = """
         <baseAxis>
             <axId val="10"></axId>
-            <crossAx val="100"></crossAx>
             <scaling>
               <orientation val="minMax"></orientation>
             </scaling>
+            <crossAx val="100"></crossAx>
         </baseAxis>
         """
         diff = compare_xml(xml, expected)
