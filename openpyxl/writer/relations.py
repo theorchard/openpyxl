@@ -37,8 +37,7 @@ def write_rels(worksheet, drawing_id, comments_id, vba_controls_id):
         SubElement(root, '{%s}Relationship' % PKG_REL_NS, attrs)
     if worksheet.vba_controls is not None:
         attrs = {'Id': worksheet.vba_controls,
-	         'Type': VML_NS,
-		 'Target': '../drawings/vmlDrawing%s.vml' % vba_controls_id}
+                 'Type': VML_NS,
+                 'Target': '../drawings/vmlDrawing%s.vml' % vba_controls_id}
         SubElement(root, '{%s}Relationship' % PKG_REL_NS, attrs)
     return root
-
