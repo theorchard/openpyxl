@@ -4,6 +4,7 @@ from __future__ import absolute_import
 
 import pytest
 from openpyxl.tests.helper import compare_xml
+from openpyxl.tests.schema import rel_src, XMLSchema
 from openpyxl.xml.functions import tostring
 
 
@@ -21,5 +22,8 @@ def test_ctor(Relationship):
                          'external', 'type':
                          'http://schemas.openxmlformats.org/officeDocument/2006/relationships/drawing'}
     xml = tostring(rel.to_tree())
+    schema = XMLSchema(file=rel_src)
+    schema.validate(rel.to_tree())
+
     diff = compare_xml(xml, expected)
     assert diff is None, diff
