@@ -3,10 +3,7 @@ from __future__ import absolute_import
 
 from operator import itemgetter
 
-from openpyxl.compat import (
-    itervalues,
-    safe_string,
-)
+from openpyxl.compat import safe_string
 
 from .etree_worksheet import get_rows_to_write
 from openpyxl.xml.functions import xmlfile
