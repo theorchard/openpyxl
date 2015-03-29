@@ -239,10 +239,6 @@ class TestWorksheet:
         assert "http://test2.com" == ws.relationships[1].target
         assert "External" == ws.relationships[1].target_mode
 
-    def test_bad_relationship_type(self, Worksheet):
-        with pytest.raises(ValueError):
-            Relationship('bad_type')
-
 
     def test_append(self, Worksheet):
         ws = Worksheet(Workbook())

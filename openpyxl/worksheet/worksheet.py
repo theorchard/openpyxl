@@ -599,13 +599,12 @@ class Worksheet(object):
         self.page_setup.orientation = orientation
 
 
-    def _create_relationship(self, rel_type):
+    def _create_relationship(self, type, target, mode=None):
         """Add a relationship for this sheet."""
-        rel = Relationship(rel_type)
+        rel_id = "rId%d" %(len(self.relationships) + 1)
+        rel = Relationship(type, target, mode, rel_id)
         self.relationships.append(rel)
-        rel_id = self.relationships.index(rel)
-        rel.id = 'rId' + str(rel_id + 1)
-        return self.relationships[rel_id]
+        return rel
 
     def add_data_validation(self, data_validation):
         """ Add a data-validation object to the sheet.  The data-validation
