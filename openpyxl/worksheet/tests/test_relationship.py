@@ -4,6 +4,7 @@ from __future__ import absolute_import
 
 import pytest
 from openpyxl.tests.helper import compare_xml
+from openpyxl.xml.functions import tostring
 
 
 @pytest.fixture
@@ -14,11 +15,11 @@ def Relationship():
 
 def test_ctor(Relationship):
     rel = Relationship("drawing", "drawings.xml", "external", "4")
-    expected = """
-    <Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships">
-      <Relationship id="4" target="drawings.xml" target_mode="external" type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/drawing" />
-    </Relationships>
+    expected = """<Relationship id="4" target="drawings.xml" targetMode="external" type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/drawing" />
     """
-    xml = repr(rel)
+    assert dict(rel) == {'id': '4', 'target': 'drawings.xml', 'targetMode':
+                         'external', 'type':
+                         'http://schemas.openxmlformats.org/officeDocument/2006/relationships/drawing'}
+    xml = tostring(rel.to_tree())
     diff = compare_xml(xml, expected)
     assert diff is None, diff

@@ -13,20 +13,17 @@ class Relationship(Serialisable):
     # TODO: Use this object for workbook relationships as well as
     # worksheet relationships
 
+    tagname = "Relationship"
+
     type = String()
-    target = String(allow_none=True)
-    targetMode = NoneSet(values=("external"))
-    id = String(allow_none=True)
+    target = String()
+    targetMode = String(allow_none=True)
+    id = String()
 
 
     def __init__(self, type, target=None, targetMode=None, id=None):
         self.type = "%s/%s" % (REL_NS, type)
         self.target = target
-        self.target_mode = targetMode
+        self.targetMode = targetMode
         self.id = id
-
-    def __repr__(self):
-        root = Element("{%s}Relationships" % PKG_REL_NS)
-        SubElement(root, "{%s}Relationship" % PKG_REL_NS, self.__dict__)
-        return tostring(root).decode("utf-8")
 
