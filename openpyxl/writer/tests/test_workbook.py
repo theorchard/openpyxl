@@ -190,9 +190,9 @@ def test_write_root_rels():
     xml = write_root_rels(wb)
     expected = """
     <Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships">
-      <Relationship Id="rId1" Target="xl/workbook.xml" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/officeDocument"/>
-      <Relationship Id="rId2" Target="docProps/core.xml" Type="http://schemas.openxmlformats.org/package/2006/relationships/metadata/core-properties"/>
-      <Relationship Id="rId3" Target="docProps/app.xml" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/extended-properties"/>
+      <Relationship id="rId1" target="xl/workbook.xml" type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/officeDocument"/>
+      <Relationship id="rId2" target="docProps/core.xml" type="http://schemas.openxmlformats.org/package/2006/relationships/metadata/core-properties"/>
+      <Relationship id="rId3" target="docProps/app.xml" type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/extended-properties"/>
     </Relationships>
     """
     diff = compare_xml(xml, expected)

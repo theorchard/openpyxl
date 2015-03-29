@@ -38,6 +38,7 @@ from openpyxl.xml.constants import (
 from openpyxl.xml.functions import tostring, fromstring
 from openpyxl.utils.datetime  import datetime_to_W3CDTF
 from openpyxl.worksheet import Worksheet
+from openpyxl.worksheet.relationship import Relationship
 from openpyxl.workbook.properties import write_properties
 
 
@@ -205,14 +206,20 @@ def write_properties_app(workbook):
 
 def write_root_rels(workbook):
     """Write the relationships xml."""
-    root = Element('{%s}Relationships' % PKG_REL_NS)
+    root = Element('Relationships', xmlns=PKG_REL_NS)
     relation_tag = '{%s}Relationship' % PKG_REL_NS
-    SubElement(root, relation_tag, {'Id': 'rId1', 'Target': ARC_WORKBOOK,
-                                    'Type': '%s/officeDocument' % REL_NS})
-    SubElement(root, relation_tag, {'Id': 'rId2', 'Target': ARC_CORE,
-                                    'Type': '%s/metadata/core-properties' % PKG_REL_NS})
-    SubElement(root, relation_tag, {'Id': 'rId3', 'Target': ARC_APP,
-                                    'Type': '%s/extended-properties' % REL_NS})
+
+    rel = Relationship(type="officeDocument", target=ARC_WORKBOOK, id="rId1")
+    root.append(rel.to_tree())
+
+    rel = Relationship("", target=ARC_CORE, id='rId2',)
+    rel.type = "%s/metadata/core-properties" % PKG_REL_NS
+    root.append(rel.to_tree())
+
+    rel = Relationship("extended-properties", target=ARC_APP, id='rId3')
+
+    root.append(rel.to_tree())
+
     if workbook.vba_archive is not None:
         # See if there was a customUI relation and reuse its id
         arc = fromstring(workbook.vba_archive.read(ARC_ROOT_RELS))
@@ -223,8 +230,10 @@ def write_root_rels(workbook):
                         rId = rel.get('Id')
                         break
         if rId is not None:
-            SubElement(root, relation_tag, {'Id': rId, 'Target': ARC_CUSTOM_UI,
-                                            'Type': '%s' % CUSTOMUI_NS})
+            vba = Relationship("", target=ARC_CUSTOM_UI, id=rId)
+            vba.type = CUSTOMUI_NS
+            root.append(vba.to_tree())
+
     return tostring(root)
 
 
