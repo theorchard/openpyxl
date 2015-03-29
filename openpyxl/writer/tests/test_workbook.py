@@ -181,3 +181,19 @@ def test_write_content_types(has_vba, as_template, content_type):
     root = fromstring(xml)
     node = root.find('{%s}Override[@PartName="/xl/workbook.xml"]'% CONTYPES_NS)
     assert node.get("ContentType") == content_type
+
+
+def test_write_root_rels():
+    from ..workbook import write_root_rels
+
+    wb = Workbook()
+    xml = write_root_rels(wb)
+    expected = """
+    <Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships">
+      <Relationship Id="rId1" Target="xl/workbook.xml" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/officeDocument"/>
+      <Relationship Id="rId2" Target="docProps/core.xml" Type="http://schemas.openxmlformats.org/package/2006/relationships/metadata/core-properties"/>
+      <Relationship Id="rId3" Target="docProps/app.xml" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/extended-properties"/>
+    </Relationships>
+    """
+    diff = compare_xml(xml, expected)
+    assert diff is None, diff
