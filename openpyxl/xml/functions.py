@@ -55,7 +55,7 @@ else:
         QName
         )
     from .namespace import register_namespace
-    from .xmlfile import xmlfile
+    from et_xmlfile import xmlfile
 
 
 from openpyxl.xml.constants import (

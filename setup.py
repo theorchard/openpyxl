@@ -59,7 +59,7 @@ setup(name='openpyxl',
     packages=find_packages(),
     # metadata
     version=get_version(),
-    description="A Python library to read/write Excel 2007 xlsx/xlsm files",
+    description="A Python library to read/write Excel 2010 xlsx/xlsm files",
     long_description=README,
     author=__author__,
     author_email=__author_email__,
@@ -69,7 +69,7 @@ setup(name='openpyxl',
         'python (>=2.6.0)',
         ],
     install_requires=[
-        'jdcal',
+        'jdcal', 'et_xmlfile',
         ],
     classifiers=[
                  'Development Status :: 5 - Production/Stable',
