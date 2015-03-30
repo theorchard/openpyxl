@@ -1,11 +1,8 @@
 from __future__ import absolute_import
 # Copyright (c) 2010-2015 openpyxl
 
-"""Shared xml tools.
-
-Shortcut functions taken from:
-    http://lethain.com/entry/2009/jan/22/handling-very-large-csv-and-xml-files-in-python/
-
+"""
+XML compatability functions
 """
 
 # Python stdlib imports
