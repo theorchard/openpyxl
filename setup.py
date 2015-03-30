@@ -38,27 +38,20 @@ except IOError:
     README = ''
 
 
-__author__ = 'See AUTHORS'
-__license__ = 'MIT/Expat'
-__author_email__ = 'eric.gazoni@gmail.com'
-__maintainer_email__ = 'openpyxl-users@googlegroups.com'
-__url__ = 'http://openpyxl.readthedocs.org'
+from openpyxl import (
+    __author__,
+    __license__,
+    __author_email__,
+    __maintainer_email__,
+    __url__,
+    __version__
+)
 
-
-def get_version():
-    f = open(os.path.join(here, 'openpyxl', '__init__.py'))
-    version_file = f.read()
-    f.close()
-    version_match = re.search(r"^__version__ = ['\"]([^'\"]*)['\"]",
-                              version_file, re.M)
-    if version_match:
-        return version_match.group(1)
-    raise RuntimeError("Unable to find version string.")
 
 setup(name='openpyxl',
     packages=find_packages(),
     # metadata
-    version=get_version(),
+    version=__version__,
     description="A Python library to read/write Excel 2010 xlsx/xlsm files",
     long_description=README,
     author=__author__,
