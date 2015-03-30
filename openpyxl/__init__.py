@@ -13,7 +13,7 @@ from openpyxl.reader.excel import load_workbook
 # constants
 __version__ = '2.3.0'
 
-__author__ = 'Eric Gazoni'
+__author__ = 'See AUTHORS'
 __license__ = 'MIT/Expat'
 __author_email__ = 'eric.gazoni@gmail.com'
 __maintainer_email__ = 'openpyxl-users@googlegroups.com'
