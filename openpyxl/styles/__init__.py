@@ -2,6 +2,7 @@ from __future__ import absolute_import
 # Copyright (c) 2010-2015 openpyxl
 
 from openpyxl.descriptors import Typed
+from openpyxl.compat import deprecated
 
 from .alignment import Alignment
 from .borders import Border, Side
@@ -24,12 +25,12 @@ class Style(HashableObject):
                   'protection')
     __base__ = True
 
-    _font = Typed(expected_type=Font)
-    _fill = Typed(expected_type=Fill, allow_none=True)
-    _border = Typed(expected_type=Border)
-    _alignment = Typed(expected_type=Alignment)
+    font = Typed(expected_type=Font)
+    fill = Typed(expected_type=Fill, allow_none=True)
+    border = Typed(expected_type=Border)
+    alignment = Typed(expected_type=Alignment)
     number_format = NumberFormatDescriptor()
-    _protection = Typed(expected_type=Protection)
+    protection = Typed(expected_type=Protection)
 
     def __init__(self,
                  font=Font(),
@@ -39,33 +40,24 @@ class Style(HashableObject):
                  number_format=None,
                  protection=Protection()
                  ):
-        self._font = font
-        self._fill = fill
-        self._border = border
-        self._alignment = alignment
+        self.font = font
+        self.fill = fill
+        self.border = border
+        self.alignment = alignment
         self.number_format = number_format
-        self._protection = protection
+        self.protection = protection
 
 
-    @property
-    def font(self):
-        return StyleProxy(self._font)
-
-    @property
-    def fill(self):
-        return StyleProxy(self._fill)
-
-    @property
-    def border(self):
-        return StyleProxy(self._border)
-
-    @property
-    def alignment(self):
-        return StyleProxy(self._alignment)
-
-    @property
-    def protection(self):
-        return StyleProxy(self._protection)
+    @deprecated("Copy formatting objects like font directly")
+    def copy(self):
+        cls = self.__class__
+        return cls(font=self.font.copy(),
+                   fill=self.fill.copy(),
+                   border=self.border.copy(),
+                   alignment=self.alignment.copy(),
+                   number_format=self.number_format,
+                   protection=self.protection.copy()
+                   )
 
 
 DEFAULTS = Style()
