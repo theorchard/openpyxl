@@ -45,9 +45,3 @@ class IndexedList(list):
     def add(self, value):
         self.append(value)
         return self._dict[value]
-
-    #def get(self, key, default=None):
-        #if key in self:
-            #return self[self.index(key)]
-        #else:
-            #return default

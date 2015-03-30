@@ -12,3 +12,4 @@ omit =
     */benchmarks/*
     */tests/*
     */test_*
+    openpyxl/worksheet/pivot.py

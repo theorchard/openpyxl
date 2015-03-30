@@ -86,80 +86,6 @@ FORMAT_CURRENCY_USD = '$#,##0_-'
 FORMAT_CURRENCY_EUR_SIMPLE = '[$EUR ]#,##0.00_-'
 
 
-from openpyxl.compat import deprecated
-
-@deprecated("Number formats are strings. Use module functions")
-class NumberFormat(HashableObject):
-    """Numer formatting for use in styles."""
-
-    FORMAT_GENERAL = FORMAT_GENERAL
-    FORMAT_TEXT = FORMAT_TEXT
-    FORMAT_NUMBER = FORMAT_NUMBER
-    FORMAT_NUMBER_00 = FORMAT_NUMBER_00
-    FORMAT_NUMBER_COMMA_SEPARATED1 = FORMAT_NUMBER_COMMA_SEPARATED1
-    FORMAT_NUMBER_COMMA_SEPARATED2 = FORMAT_NUMBER_COMMA_SEPARATED2
-    FORMAT_PERCENTAGE = FORMAT_PERCENTAGE
-    FORMAT_PERCENTAGE_00 = FORMAT_PERCENTAGE_00
-    FORMAT_DATE_YYYYMMDD2 = FORMAT_DATE_YYYYMMDD2
-    FORMAT_DATE_YYMMDD = FORMAT_DATE_YYMMDD
-    FORMAT_DATE_DDMMYY = FORMAT_DATE_DDMMYY
-    FORMAT_DATE_DMYSLASH = FORMAT_DATE_DMYSLASH
-    FORMAT_DATE_DMYMINUS = FORMAT_DATE_DMYMINUS
-    FORMAT_DATE_DMMINUS = FORMAT_DATE_DMMINUS
-    FORMAT_DATE_MYMINUS = FORMAT_DATE_MYMINUS
-    FORMAT_DATE_XLSX14 = FORMAT_DATE_XLSX14
-    FORMAT_DATE_XLSX14 = FORMAT_DATE_XLSX14
-    FORMAT_DATE_XLSX14 = FORMAT_DATE_XLSX14
-    FORMAT_DATE_XLSX14 = FORMAT_DATE_XLSX14
-    FORMAT_DATE_XLSX22 = FORMAT_DATE_XLSX22
-    FORMAT_DATE_DATETIME = FORMAT_DATE_DATETIME
-    FORMAT_DATE_TIME1 = FORMAT_DATE_TIME1
-    FORMAT_DATE_TIME2 = FORMAT_DATE_TIME2
-    FORMAT_DATE_TIME3 = FORMAT_DATE_TIME3
-    FORMAT_DATE_TIME4 = FORMAT_DATE_TIME4
-    FORMAT_DATE_TIME5 = FORMAT_DATE_TIME5
-    FORMAT_DATE_TIME6 = FORMAT_DATE_TIME6
-    FORMAT_DATE_TIME7 = FORMAT_DATE_TIME7
-    FORMAT_DATE_TIME8 = FORMAT_DATE_TIME8
-    FORMAT_DATE_TIMEDELTA = FORMAT_DATE_TIMEDELTA
-    FORMAT_DATE_YYMMDDSLASH = FORMAT_DATE_YYMMDDSLASH
-    FORMAT_CURRENCY_USD_SIMPLE = FORMAT_CURRENCY_USD_SIMPLE
-    FORMAT_CURRENCY_USD = FORMAT_CURRENCY_USD
-    FORMAT_CURRENCY_EUR_SIMPLE = FORMAT_CURRENCY_EUR_SIMPLE
-
-    _BUILTIN_FORMATS = BUILTIN_FORMATS
-
-    __fields__ = ('format_code',)
-    __slots__ = __fields__
-
-    def __init__(self, format_code=FORMAT_GENERAL):
-        self.format_code = format_code
-
-    def __eq__(self, other):
-        if isinstance(other, NumberFormat):
-            return self.format_code == other.format_code
-        return self.format_code == other
-
-    def __hash__(self):
-        return super(NumberFormat, self).__hash__()
-
-    def builtin_format_code(self, index):
-        """Return one of the standard format codes by index."""
-        return builtin_format_code(index)
-
-    def is_builtin(self):
-        """Check if a format code is a standard format code."""
-        return is_builtin(self.format_code)
-
-    def builtin_format_id(self, fmt):
-        """Return the id of a standard style."""
-        return builtin_format_id(fmt)
-
-    def is_date_format(self):
-        """Check if the number format is actually representing a date."""
-        return is_date_format(self.format_code)
-
-
 DATE_INDICATORS = 'dmyhs'
 BAD_DATE_RE = re.compile(r'(\[|").*[dmhys].*(\]|")')
 
@@ -186,7 +112,6 @@ def builtin_format_id(fmt):
 
 
 class NumberFormatDescriptor(String):
-
 
     def __set__(self, instance, value):
         if value is None:

@@ -22,6 +22,14 @@ from openpyxl.styles.colors import Color
 from ..properties import WorksheetProperties
 
 
+class DummyWorkbook:
+
+    encoding = "UTF-8"
+
+    def get_sheet_names(self):
+        return []
+
+
 @pytest.fixture
 def Worksheet():
     from ..worksheet import Worksheet
@@ -59,7 +67,7 @@ class TestWorksheet:
 
     def test_new_sheet_name(self, Worksheet):
         ws = Worksheet(Workbook(), title='')
-        assert repr(ws) == '<Worksheet "Sheet2">'
+        assert repr(ws) == '<Worksheet "Sheet1">'
 
     def test_get_cell(self, Worksheet):
         ws = Worksheet(Workbook())
@@ -98,7 +106,7 @@ class TestWorksheet:
         ws = Worksheet(Workbook())
         assert 'A1:A1' == ws.calculate_dimension()
         ws.cell('B12').value = 'AAA'
-        assert 'A12:B12' == ws.calculate_dimension()
+        assert 'B12:B12' == ws.calculate_dimension()
 
 
     def test_squared_range(self, Worksheet):
@@ -231,17 +239,11 @@ class TestWorksheet:
         assert "http://test2.com" == ws.relationships[1].target
         assert "External" == ws.relationships[1].target_mode
 
-    def test_bad_relationship_type(self, Worksheet):
-        with pytest.raises(ValueError):
-            Relationship('bad_type')
-
 
     def test_append(self, Worksheet):
         ws = Worksheet(Workbook())
         ws.append(['value'])
         assert ws['A1'].value == "value"
-        assert ws.row_dimensions[1].parent is ws
-        assert ws.column_dimensions['A'].parent is ws
 
 
     def test_append_list(self, Worksheet):
@@ -270,10 +272,8 @@ class TestWorksheet:
 
     def test_bad_append(self, Worksheet):
         ws = Worksheet(Workbook())
-        assert ws.max_row == 0
         with pytest.raises(TypeError):
             ws.append("test")
-        assert ws.max_row == 0
 
 
     def test_append_range(self, Worksheet):
@@ -468,8 +468,8 @@ class TestWorksheet:
         ws = Worksheet(Workbook())
         ws._merged_cells = ["A1:D4"]
         ws.unmerge_cells(start_row=1, start_column=1, end_row=4, end_column=4)
-        
-    
+
+
     def test_print_titles(self):
         wb = Workbook()
         ws = wb.active
@@ -484,13 +484,13 @@ class TestWorksheet:
 class TestPositioning(object):
     def test_point(self):
         wb = Workbook()
-        ws = wb.get_active_sheet()
+        ws = wb.active
         assert ws.point_pos(top=40, left=150), ('C' == 3)
 
     @pytest.mark.parametrize("value", ('A1', 'D52', 'X11'))
     def test_roundtrip(self, value):
         wb = Workbook()
-        ws = wb.get_active_sheet()
+        ws = wb.active
         assert ws.point_pos(*ws.cell(value).anchor) == coordinate_from_string(value)
 
 
@@ -527,3 +527,31 @@ def test_freeze_panes_both(Worksheet):
     assert dict(view.selection[2]) == {'activeCell': 'A1', 'pane': 'bottomRight', 'sqref': 'A1'}
     assert dict(view.pane) == {'activePane': 'bottomRight', 'state': 'frozen',
                                'topLeftCell': 'D4', 'xSplit': '3', "ySplit":"3"}
+
+
+def test_min_column(Worksheet):
+    ws = Worksheet(DummyWorkbook())
+    assert ws.min_column == 1
+
+
+def test_max_column(Worksheet):
+    ws = Worksheet(DummyWorkbook())
+    ws['F1'] = 10
+    ws['F2'] = 32
+    ws['F3'] = '=F1+F2'
+    ws['A4'] = '=A1+A2+A3'
+    assert ws.max_column == 6
+
+
+def test_min_row(Worksheet):
+    ws = Worksheet(DummyWorkbook())
+    assert ws.min_row == 1
+
+
+def test_max_row(Worksheet):
+    ws = Worksheet(DummyWorkbook())
+    ws.append([])
+    ws.append([5])
+    ws.append([])
+    ws.append([4])
+    assert ws.max_row == 4

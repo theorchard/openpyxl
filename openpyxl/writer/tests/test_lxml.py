@@ -86,14 +86,14 @@ def test_write_sheetdata(worksheet, write_rows):
 def test_write_formula(worksheet, write_rows):
     ws = worksheet
 
-    ws.cell('F1').value = 10
-    ws.cell('F2').value = 32
-    ws.cell('F3').value = '=F1+F2'
-    ws.cell('A4').value = '=A1+A2+A3'
+    ws['F1'] = 10
+    ws['F2'] = 32
+    ws['F3'] = '=F1+F2'
+    ws['A4'] = '=A1+A2+A3'
     ws.formula_attributes['A4'] = {'t': 'shared', 'ref': 'A4:C4', 'si': '0'}
-    ws.cell('B4').value = '=1'
+    ws['B4'] = '=1'
     ws.formula_attributes['B4'] = {'t': 'shared', 'si': '0'}
-    ws.cell('C4').value = '=1'
+    ws['C4'] = '=1'
     ws.formula_attributes['C4'] = {'t': 'shared', 'si': '0'}
 
     out = BytesIO()
@@ -141,11 +141,11 @@ def test_write_formula(worksheet, write_rows):
 
 @pytest.mark.lxml_required
 def test_row_height(worksheet, write_rows):
+    from openpyxl.worksheet.dimensions import RowDimension
     ws = worksheet
-    ws.cell('F1').value = 10
-    ws.row_dimensions[ws.cell('F1').row].height = 30
-    ws.row_dimensions[ws.cell('F2').row].height = 30
-    ws._garbage_collect()
+    ws['F1'] = 10
+    ws.row_dimensions[1] = RowDimension(ws, height=30)
+    ws.row_dimensions[2] = RowDimension(ws, height=30)
 
     out = BytesIO()
     with xmlfile(out) as xf:
