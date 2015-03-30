@@ -211,7 +211,7 @@ htmlhelp_basename = 'openpyxldoc'
 # (source start file, target name, title, author, documentclass [howto/manual]).
 latex_documents = [
   ('index', 'openpyxl.tex', u'openpyxl Documentation',
-   u'Eric Gazoni', 'manual'),
+   openpyxl.__author__, 'manual'),
 ]
 
 # The name of an image file (relative to this directory) to place at the top of
@@ -244,7 +244,7 @@ latex_documents = [
 # (source start file, name, description, authors, manual section).
 man_pages = [
     ('index', 'openpyxl', u'openpyxl Documentation',
-     [u'Eric Gazoni'], 1)
+     [openpyxl.__author__], 1)
 ]
 
 
