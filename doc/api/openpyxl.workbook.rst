@@ -1,6 +1,11 @@
 openpyxl.workbook package
 =========================
 
+.. automodule:: openpyxl.workbook
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
 Subpackages
 -----------
 
@@ -11,27 +16,8 @@ Subpackages
 Submodules
 ----------
 
-openpyxl.workbook.properties module
------------------------------------
+.. toctree::
 
-.. automodule:: openpyxl.workbook.properties
-    :members:
-    :undoc-members:
-    :show-inheritance:
+   openpyxl.workbook.properties
+   openpyxl.workbook.workbook
 
-openpyxl.workbook.workbook module
----------------------------------
-
-.. automodule:: openpyxl.workbook.workbook
-    :members:
-    :undoc-members:
-    :show-inheritance:
-
-
-Module contents
----------------
-
-.. automodule:: openpyxl.workbook
-    :members:
-    :undoc-members:
-    :show-inheritance:

@@ -1,6 +1,11 @@
 openpyxl package
 ================
 
+.. automodule:: openpyxl
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
 Subpackages
 -----------
 
@@ -20,10 +25,3 @@ Subpackages
     openpyxl.writer
     openpyxl.xml
 
-Module contents
----------------
-
-.. automodule:: openpyxl
-    :members:
-    :undoc-members:
-    :show-inheritance:

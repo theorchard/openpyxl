@@ -19,7 +19,8 @@ import sys, os
 #sys.path.insert(0, os.path.abspath('.'))
 
 up = os.path.dirname
-sys.path.insert(0, os.path.abspath(os.path.join(up(up(os.getcwd())), '.')))
+HERE = os.path.split(__file__)[0]
+sys.path.insert(0, os.path.abspath(os.path.join(up(HERE), '.')))
 
 import openpyxl
 
