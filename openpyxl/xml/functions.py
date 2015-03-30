@@ -90,29 +90,6 @@ register_namespace('cdr', CHART_DRAWING_NS)
 tostring = partial(tostring, encoding="utf-8")
 
 
-def get_document_content(xml_node):
-    """Print nicely formatted xml to a string."""
-    pretty_indent(xml_node)
-    return tostring(xml_node)
-
-
-def pretty_indent(elem, level=0):
-    """Format xml with nice indents and line breaks."""
-    i = "\n" + level * "  "
-    if len(elem):
-        if not elem.text or not elem.text.strip():
-            elem.text = i + "  "
-        if not elem.tail or not elem.tail.strip():
-            elem.tail = i
-        for elem in elem:
-            pretty_indent(elem, level + 1)
-        if not elem.tail or not elem.tail.strip():
-            elem.tail = i
-    else:
-        if level and (not elem.tail or not elem.tail.strip()):
-            elem.tail = i
-
-
 def safe_iterator(node, tag=None):
     """Return an iterator that is compatible with Python 2.6"""
     if node is None:
