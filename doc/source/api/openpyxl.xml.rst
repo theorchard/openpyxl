@@ -28,14 +28,6 @@ openpyxl.xml.namespace module
     :undoc-members:
     :show-inheritance:
 
-openpyxl.xml.xmlfile module
----------------------------
-
-.. automodule:: openpyxl.xml.xmlfile
-    :members:
-    :undoc-members:
-    :show-inheritance:
-
 
 Module contents
 ---------------
