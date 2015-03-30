@@ -11,10 +11,6 @@ Shortcut functions taken from:
 # Python stdlib imports
 import re
 from functools import partial
-from xml.sax.saxutils import XMLGenerator
-
-XMLGenerator = partial(XMLGenerator, encoding="utf-8")
-
 # compatibility
 
 # package imports
