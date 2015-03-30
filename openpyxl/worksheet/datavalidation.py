@@ -4,12 +4,13 @@ from __future__ import absolute_import
 from itertools import groupby, chain
 import warnings
 
-from openpyxl.descriptors import Strict, Bool, NoneSet, Set, String
+from openpyxl.descriptors.serialisable import Serialisable
+from openpyxl.descriptors import Bool, NoneSet, Set, String
 from openpyxl.compat import OrderedDict, safe_string, deprecated
 from openpyxl.cell import coordinate_from_string
 from openpyxl.worksheet import cells_from_range
 from openpyxl.xml.constants import SHEET_MAIN_NS
-from openpyxl.xml.functions import Element, safe_iterator
+from openpyxl.xml.functions import Element, safe_iterator, SubElement
 
 
 def collapse_cell_addresses(cells, input_ranges=()):
@@ -61,7 +62,9 @@ def expand_cell_ranges(range_string):
     return list(chain.from_iterable(cells))
 
 
-class DataValidation(Strict):
+class DataValidation(Serialisable):
+
+    tagname = "dataValidation"
 
     showErrorMessage = Bool()
     showDropDown = Bool(allow_none=True)
@@ -75,8 +78,8 @@ class DataValidation(Strict):
     promptTitle = String(allow_none = True)
     prompt = String(allow_none = True)
     sqref = String(allow_none = True)
-    formula1 = String(allow_none = True)
-    formula2 = String(allow_none = True)
+    formula1 = String(allow_none=True, nested=True)
+    formula2 = String(allow_none=True, nested=True)
 
     type = NoneSet(values=("whole", "decimal", "list", "date", "time",
                            "textLength", "custom"))
@@ -131,6 +134,20 @@ class DataValidation(Strict):
         self.error = error
         self.prompt = prompt
         self.errorTitle = errorTitle
+
+    def to_tree(self, tagname=None):
+        attrs = dict(self)
+        el = Element(self.tagname, attrs)
+        for n in self.__nested__:
+            value = getattr(self, n)
+            if value:
+                SubElement(el, n).text = value
+        return el
+
+    @classmethod
+    def _create_nested(cls, el, tag):
+        return el.text
+
 
     @deprecated("Use DataValidation.add()")
     def add_cell(self, cell):
@@ -201,29 +218,3 @@ class ValidationErrorStyle(object):
     STOP = "stop"
     WARNING = "warning"
     INFORMATION = "information"
-
-
-def writer(data_validation):
-    """
-    Serialse a data validation
-    """
-    attrs = dict(data_validation)
-    el = Element("{%s}dataValidation" % SHEET_MAIN_NS, attrs)
-    for attr in ("formula1", "formula2"):
-        value = getattr(data_validation, attr, None)
-        if value is not None:
-            f = Element("{%s}%s" % (SHEET_MAIN_NS, attr))
-            f.text = value
-            el.append(f)
-    return el
-
-
-def parser(element):
-    """
-    Parse dataValidation tag
-    """
-    dv = DataValidation(**element.attrib)
-    for attr in ("formula1", "formula2"):
-        for f in safe_iterator(element, "{%s}%s" % (SHEET_MAIN_NS, attr)):
-            setattr(dv, attr, f.text)
-    return dv

@@ -37,7 +37,6 @@ from openpyxl.workbook.properties import write_properties
 from openpyxl.writer.theme import write_theme
 from openpyxl.writer.styles import StyleWriter
 from openpyxl.writer.drawings import DrawingWriter, ShapeWriter
-from openpyxl.charts.writer import ChartWriter
 from .relations import write_rels
 from openpyxl.writer.worksheet import write_worksheet
 from openpyxl.workbook.names.external import (
@@ -78,9 +77,6 @@ class ExcelWriter(object):
                     if name.startswith(s):
                         archive.writestr(name, vba_archive.read(name))
                         break
-
-        for sheet in self.workbook.worksheets:
-            sheet.conditional_formatting._save_styles(self.workbook)
 
         self._write_worksheets(archive)
         self._write_string_table(archive)

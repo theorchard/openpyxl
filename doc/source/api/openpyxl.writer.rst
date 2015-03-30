@@ -20,14 +20,6 @@ openpyxl.writer.drawings module
     :undoc-members:
     :show-inheritance:
 
-openpyxl.writer.dump_worksheet module
--------------------------------------
-
-.. automodule:: openpyxl.writer.dump_worksheet
-    :members:
-    :undoc-members:
-    :show-inheritance:
-
 openpyxl.writer.etree_worksheet module
 --------------------------------------
 
@@ -96,6 +88,14 @@ openpyxl.writer.worksheet module
 --------------------------------
 
 .. automodule:: openpyxl.writer.worksheet
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
+openpyxl.writer.write_only module
+---------------------------------
+
+.. automodule:: openpyxl.writer.write_only
     :members:
     :undoc-members:
     :show-inheritance:
