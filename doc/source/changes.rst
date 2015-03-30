@@ -20,6 +20,7 @@ Bug fixes
 * `#438 <https://bitbucket.org/openpyxl/openpyxl/issue/438>`_ Cells with pivotButton and quotePrefix styles cannot be read
 * `#440 <https://bitbucket.org/openpyxl/openpyxl/issue/440>`_ Error when customised versions of builtin formats
 * `#442 <https://bitbucket.org/openpyxl/openpyxl/issue/442>`_ Exception raised when a fill element contains no children
+* `#444 <https://bitbucket.org/openpyxl/openpyxl/issue/442>`_ Styles cannot be copied
 
 
 
