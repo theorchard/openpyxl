@@ -116,7 +116,7 @@ def ConditionalElement(node, tag, condition, attr=None):
         return elem
 
 
-NS_REGEX = re.compile("{(?P<namespace>.*)}(?P<localname>.*)")
+NS_REGEX = re.compile("({(?P<namespace>.*)})?(?P<localname>.*)")
 
 def localname(node):
     m = NS_REGEX.match(node.tag)
