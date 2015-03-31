@@ -5,7 +5,11 @@
 
 
 import json
-with open("openpyxl/.constants.json") as src:
+import os
+
+here = os.path.abspath(os.path.dirname(__file__))
+src_file = os.path.join(here, ".constants.json")
+with open(src_file) as src:
     constants = json.load(src)
     __author__ = constants['__author__']
     __author_email__ = constants["__author_email__"]
