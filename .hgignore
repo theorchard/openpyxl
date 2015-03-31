@@ -24,3 +24,4 @@ Include/
 Lib/
 Scripts/
 downloads/
+pip-selfcheck.json
