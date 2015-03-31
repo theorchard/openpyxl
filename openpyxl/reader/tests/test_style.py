@@ -3,6 +3,7 @@ from __future__ import absolute_import
 
 import pytest
 
+import codecs
 from io import BytesIO
 from zipfile import ZipFile
 
@@ -280,8 +281,9 @@ def test_rgb_colors(StyleReader, datadir):
 
 def test_custom_number_formats(StyleReader, datadir):
     datadir.chdir()
-    with open("styles_number_formats.xml") as src:
-        reader = StyleReader(src.read())
+    with codecs.open("styles_number_formats.xml", encoding="utf-8") as src:
+        content = src.read().encode("utf8") # Python 2.6, Windows
+        reader = StyleReader(content)
 
     reader.parse_custom_num_formats()
     assert reader.custom_number_formats == {

@@ -16,7 +16,7 @@ Minor changes
 * Read-only and write-only worksheets renamed.
 
 
-2.2.1 (unreleased)
+2.2.1 (2015-03-31)
 ==================
 
 
