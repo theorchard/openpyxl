@@ -37,15 +37,15 @@ try:
 except IOError:
     README = ''
 
-
-from openpyxl import (
-    __author__,
-    __license__,
-    __author_email__,
-    __maintainer_email__,
-    __url__,
-    __version__
-)
+import json
+with open("openpyxl/.constants.json") as src:
+    constants = json.load(src)
+    __author__ = constants['__author__']
+    __author_email__ = constants["__author_email__"]
+    __license__ = constants["__license__"]
+    __maintainer_email__ = constants["__maintainer_email__"]
+    __url__ = constants["__url__"]
+    __version__ = constants["__version__"]
 
 
 setup(name='openpyxl',
