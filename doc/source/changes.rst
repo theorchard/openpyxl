@@ -1,3 +1,29 @@
+2.2.1 (2015-03-31)
+==================
+
+
+Minor changes
+-------------
+
+* `PR54 <https://bitbucket.org/openpyxl/openpyxl/pull-request/54>`_ Improved precision on times near midnight.
+* `PR55 <https://bitbucket.org/openpyxl/openpyxl/pull-request/55>`_ Preserve macro buttons
+
+
+Bug fixes
+---------
+
+* `#429 <https://bitbucket.org/openpyxl/openpyxl/issue/429>`_ Workbook fails to load because header and footers cannot be parsed.
+* `#433 <https://bitbucket.org/openpyxl/openpyxl/issue/433>`_ File-like object with encoding=None
+* `#434 <https://bitbucket.org/openpyxl/openpyxl/issue/434>`_ SyntaxError when writing page breaks.
+* `#436 <https://bitbucket.org/openpyxl/openpyxl/issue/436>`_ Read-only mode duplicates empty rows.
+* `#437 <https://bitbucket.org/openpyxl/openpyxl/issue/437>`_ Cell.offset raises an exception
+* `#438 <https://bitbucket.org/openpyxl/openpyxl/issue/438>`_ Cells with pivotButton and quotePrefix styles cannot be read
+* `#440 <https://bitbucket.org/openpyxl/openpyxl/issue/440>`_ Error when customised versions of builtin formats
+* `#442 <https://bitbucket.org/openpyxl/openpyxl/issue/442>`_ Exception raised when a fill element contains no children
+* `#444 <https://bitbucket.org/openpyxl/openpyxl/issue/442>`_ Styles cannot be copied
+
+
+
 2.2.0 (2015-03-11)
 ==================
 
@@ -5,7 +31,6 @@
 Bug fixes
 ---------
 * `#415 <https://bitbucket.org/openpyxl/openpyxl/issue/415>`_ Improved exception when passing in invalid in memory files.
-
 
 
 2.2.0-b1 (2015-02-18)

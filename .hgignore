@@ -20,3 +20,7 @@ syntax: glob
 .git
 travis.yml
 cover
+Include/
+Lib/
+Scripts/
+downloads/

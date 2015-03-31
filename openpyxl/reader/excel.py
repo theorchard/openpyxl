@@ -131,7 +131,7 @@ def load_workbook(filename, read_only=False, use_iterators=False, keep_vba=KEEP_
     if is_file_like:
         # fileobject must have been opened with 'rb' flag
         # it is required by zipfile
-        if hasattr(filename, 'encoding'):
+        if getattr(filename, 'encoding', None) is not None:
             raise IOError("File-object must be opened in binary mode")
 
     try:
@@ -233,8 +233,7 @@ def _load_workbook(wb, archive, filename, read_only, keep_vba):
         else:
             new_ws = read_worksheet(archive.read(worksheet_path), wb,
                                     sheet_name, shared_strings, wb.shared_styles,
-                                    color_index=wb._colors,
-                                    keep_vba=keep_vba)
+                                    color_index=wb._colors)
         new_ws.sheet_state = sheet.get('state') or 'visible'
         wb._add_sheet(new_ws)
 

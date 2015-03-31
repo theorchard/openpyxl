@@ -78,6 +78,7 @@ def Worksheet(Workbook):
             self._alignments = IndexedList()
             self._protections = IndexedList()
             self._cell_styles = IndexedList()
+            self.vba_archive = None
             for i in range(29):
                 self._cell_styles.add((StyleId(i, i, i, i, i, i)))
             self._cell_styles.add(StyleId(fillId=4, borderId=6, alignmentId=1, protectionId=0))
@@ -92,7 +93,7 @@ def Worksheet(Workbook):
         protection = ""
 
         def copy(self, **kw):
-            return self
+            return selfexc
 
 
     class DummyWorksheet:
@@ -109,6 +110,7 @@ def Worksheet(Workbook):
             self._cells = {}
             self._data_validations = []
             self.header_footer = HeaderFooter()
+            self.vba_controls = None
 
         def _add_cell(self, cell):
             self._cells[cell.coordinate] = cell
@@ -130,6 +132,14 @@ def Worksheet(Workbook):
 @pytest.fixture
 def WorkSheetParser(Worksheet):
     """Setup a parser instance with an empty source"""
+    from .. worksheet import WorkSheetParser
+    return WorkSheetParser(Worksheet, None, {0:'a'}, {})
+
+
+@pytest.fixture
+def WorkSheetParserKeepVBA(Worksheet):
+    """Setup a parser instance with an empty source"""
+    Worksheet.parent.vba_archive=True
     from .. worksheet import WorkSheetParser
     return WorkSheetParser(Worksheet, None, {0:'a'}, {})
 
@@ -422,7 +432,7 @@ def test_header_footer(WorkSheetParser, datadir):
     assert ws.header_footer.right_footer.text == "Right Footer"
 
 
-def test_cell(WorkSheetParser, datadir):
+def test_cell_style(WorkSheetParser, datadir):
     datadir.chdir()
     parser = WorkSheetParser
     ws = parser.ws
@@ -434,7 +444,27 @@ def test_cell(WorkSheetParser, datadir):
     element = sheet.find("{%s}sheetData/{%s}row[2]/{%s}c[1]" % (SHEET_MAIN_NS, SHEET_MAIN_NS, SHEET_MAIN_NS))
     assert element.get('r') == 'A2'
     parser.parse_cell(element)
-    #assert ws['A2']._font_id == 3
+    assert ws['A2'].style_id == 2
+
+
+def test_cell_exotic_style(WorkSheetParser, datadir):
+    datadir.chdir()
+    parser = WorkSheetParser
+    ws = parser.ws
+    parser.styles = [None, None, {'pivotButton':True, 'quotePrefix':True}]
+
+    src = """
+    <x:c xmlns:x="http://schemas.openxmlformats.org/spreadsheetml/2006/main" r="D4" s="2">
+    </x:c>
+    """
+
+    sheet = fromstring(src)
+    parser.parse_cell(sheet)
+    assert ws['A1'].pivotButton is None
+
+    cell = ws['D4']
+    assert cell.pivotButton is True
+    assert cell.quotePrefix is True
 
 
 def test_sheet_views(WorkSheetParser, datadir):
@@ -451,3 +481,27 @@ def test_sheet_views(WorkSheetParser, datadir):
 
     assert view.zoomScale == 200
     assert len(view.selection) == 3
+
+
+def test_legacy_document_keep(WorkSheetParserKeepVBA, datadir):
+    parser = WorkSheetParserKeepVBA
+    datadir.chdir()
+
+    with open("legacy_drawing_worksheet.xml") as src:
+        sheet = fromstring(src.read())
+
+    element = sheet.find("{%s}legacyDrawing" % SHEET_MAIN_NS)
+    parser.parse_legacy_drawing(element)
+    assert parser.ws.vba_controls == 'vbaControlId'
+
+
+def test_legacy_document_no_keep(WorkSheetParser, datadir):
+    parser = WorkSheetParser
+    datadir.chdir()
+
+    with open("legacy_drawing_worksheet.xml") as src:
+        sheet = fromstring(src.read())
+
+    element = sheet.find("{%s}legacyDrawing" % SHEET_MAIN_NS)
+    parser.parse_legacy_drawing(element)
+    assert parser.ws.vba_controls is None

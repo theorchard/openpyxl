@@ -31,7 +31,7 @@ ARC_THEME = PACKAGE_THEME + '/theme1.xml'
 ARC_SHARED_STRINGS = PACKAGE_XL + '/sharedStrings.xml'
 ARC_CUSTOM_UI = 'customUI/customUI.xml'
 ARC_VBA = ('xl/vba', 'xl/activeX', 'xl/drawings', 'xl/media', 'xl/ctrlProps',
-           'xl/worksheets/_rels', 'customUI', 'xl/printerSettings')
+           'customUI', 'xl/printerSettings')
 
 ## namespaces
 # Dublin Core

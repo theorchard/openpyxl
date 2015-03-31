@@ -199,7 +199,7 @@ def write_pagebreaks(worksheet):
         tag = Element('rowBreaks', {'count': str(len(breaks)),
                                      'manualBreakCount': str(len(breaks))})
         for b in breaks:
-            tag.append(Element('brk', id=str(b), man=true, max='16383',
+            tag.append(Element('brk', id=str(b), man="true", max='16383',
                                min='0'))
         return tag
 
@@ -295,7 +295,8 @@ def write_worksheet(worksheet, shared_strings):
 
             # add a legacyDrawing so that excel can draw comments
             if worksheet._comment_count > 0:
-                comments = Element('legacyDrawing', {'{%s}id' % REL_NS: 'commentsvml'})
+                comments = Element('{%s}legacyDrawing' % SHEET_MAIN_NS,
+                                {'{%s}id' % REL_NS: 'commentsvml'})
                 xf.write(comments)
 
     xml = out.getvalue()

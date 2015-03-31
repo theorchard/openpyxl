@@ -290,6 +290,8 @@ class Workbook(object):
             you will only be able to call this function once. Subsequents attempts to
             modify or save the file will raise an :class:`openpyxl.shared.exc.WorkbookAlreadySaved` exception.
         """
+        if self.read_only:
+            raise TypeError("""Workbook is read-only""")
         if self.write_only:
             save_dump(self, filename)
         else:

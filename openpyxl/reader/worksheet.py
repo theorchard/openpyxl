@@ -65,6 +65,7 @@ class WorkSheetParser(object):
         self.guess_types = ws.parent._guess_types
         self.data_only = ws.parent.data_only
         self.styles = [dict(style) for style in self.ws.parent._cell_styles]
+        self.keep_vba = ws.parent.vba_archive is not None
 
     def parse(self):
         dispatcher = {
@@ -128,7 +129,6 @@ class WorkSheetParser(object):
         if style_id is not None:
             style_id = int(style_id)
             style = self.styles[style_id]
-
 
         column, row = coordinate_from_string(coordinate)
         cell = Cell(self.ws, column, row, **style)
@@ -297,7 +297,10 @@ class WorkSheetParser(object):
 
 
     def parse_legacy_drawing(self, element):
-        self.ws.vba_controls = element.get("r:id")
+        if self.keep_vba:
+            # Create an id that will not clash with any other ids that will
+            # be generated.
+            self.ws.vba_controls = 'vbaControlId'
 
 
     def parse_sheet_views(self, element):
@@ -307,14 +310,14 @@ class WorkSheetParser(object):
         self.ws.sheet_view = SheetView.from_tree(el)
 
 
-def fast_parse(ws, xml_source, shared_strings, style_table, color_index=None):
+def fast_parse(ws, xml_source, shared_strings, style_table, color_index=None, keep_vba=False):
     parser = WorkSheetParser(ws, xml_source, shared_strings, style_table, color_index)
     parser.parse()
     del parser
 
 
 def read_worksheet(xml_source, parent, preset_title, shared_strings,
-                   style_table, color_index=None, worksheet_path=None, keep_vba=False):
+                   style_table, color_index=None, worksheet_path=None):
     """Read an xml worksheet"""
     if worksheet_path:
         ws = IterableWorksheet(parent, preset_title,

@@ -71,6 +71,9 @@ TIME_REGEX = re.compile(r"""
 NUMBER_REGEX = re.compile(r'^-?([\d]|[\d]+\.[\d]*|\.[\d]+|[1-9][\d]+\.?[\d]*)((E|e)[-+]?[\d]+)?$')
 ILLEGAL_CHARACTERS_RE = re.compile(r'[\000-\010]|[\013-\014]|[\016-\037]')
 
+ERROR_CODES = ('#NULL!', '#DIV/0!', '#VALUE!', '#REF!', '#NAME?', '#NUM!',
+               '#N/A')
+
 
 class Cell(StyleableObject):
     """Describes cell associated properties.
@@ -90,13 +93,7 @@ class Cell(StyleableObject):
         '_comment',
                  )
 
-    ERROR_CODES = ('#NULL!',
-                   '#DIV/0!',
-                   '#VALUE!',
-                   '#REF!',
-                   '#NAME?',
-                   '#NUM!',
-                   '#N/A')
+    ERROR_CODES = ERROR_CODES
 
     TYPE_STRING = 's'
     TYPE_FORMULA = 'f'
@@ -111,14 +108,17 @@ class Cell(StyleableObject):
                    TYPE_NULL, TYPE_INLINE, TYPE_ERROR, TYPE_FORMULA_CACHE_STRING)
 
 
-    def __init__(self, worksheet, column, row, value=None, fontId=0, fillId=0,
-                 borderId=0, alignmentId=0, protectionId=0, numFmtId=0, xfId=None):
+    def __init__(self, worksheet, column, row, value=None, fontId=0,
+                 fillId=0, borderId=0, alignmentId=0, protectionId=0, numFmtId=0,
+                 pivotButton=None, quotePrefix=None, xfId=None):
         self._font_id = fontId
         self._fill_id = fillId
         self._border_id = borderId
         self._alignment_id = alignmentId
         self._protection_id = protectionId
         self._number_format_id = numFmtId
+        self.quotePrefix = quotePrefix
+        self.pivotButton = pivotButton
         self.parent = worksheet
         self.column = column
         self.row = row
@@ -363,8 +363,7 @@ class Cell(StyleableObject):
 
         :rtype: :class:`openpyxl.cell.Cell`
         """
-        offset_column = get_column_letter(
-            column_index_from_string(self.column) + column)
+        offset_column = column_index_from_string(self.column) + column
         offset_row = self.row + row
         return self.parent.cell(column=offset_column, row=offset_row)
 

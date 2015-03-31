@@ -171,3 +171,10 @@ class TestPatternFill:
     def test_create(self, PatternFill, src, args):
         xml = fromstring(src)
         assert PatternFill.from_tree(xml) == PatternFill(**args)
+
+
+def test_create_empty_fill():
+    from ..fills import Fill
+
+    src = fromstring("<fill/>")
+    assert Fill.from_tree(src) is None

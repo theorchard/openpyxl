@@ -37,3 +37,11 @@ def test_serialise(StyleId):
     """
     diff = compare_xml(xml, expected)
     assert diff is None, diff
+
+
+def test_style_copy():
+    from .. import Style
+    st1 = Style()
+    st2 = st1.copy()
+    assert st1 == st2
+    assert st1.font is not st2.font

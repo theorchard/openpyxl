@@ -59,6 +59,8 @@ def test_to_excel_mac(value, expected):
                              (40372.27616898148, datetime(2010, 7, 13, 6, 37, 41)),
                              (40196.5939815, datetime(2010, 1, 18, 14, 15, 20, 1600)),
                              (0.125, time(3, 0)),
+                             (42126.958333333219, datetime(2015, 5, 2, 22, 59, 59, 999990)),
+                             (42126.999999999884, datetime(2015, 5, 3, 0, 0, 0)),
                              (None, None),
                          ])
 def test_from_excel(value, expected):

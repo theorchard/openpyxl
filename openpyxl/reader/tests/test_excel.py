@@ -16,6 +16,14 @@ def test_read_empty_file(datadir):
     with pytest.raises(BadZipfile):
         load_workbook('null_file.xlsx')
 
+def test_load_workbook_from_fileobj(datadir):
+    """ can a workbook be loaded from a file object without exceptions
+    This tests for regressions of
+    https://bitbucket.org/openpyxl/openpyxl/issue/433
+    """
+    datadir.chdir()
+    with open('empty_with_no_properties.xlsx', 'rb') as f:
+        load_workbook(f)
 
 def test_repair_central_directory():
     from ..excel import repair_central_directory, CENTRAL_DIRECTORY_SIGNATURE
