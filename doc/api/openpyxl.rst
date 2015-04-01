@@ -17,6 +17,7 @@ Subpackages
     openpyxl.descriptors
     openpyxl.drawing
     openpyxl.formatting
+    openpyxl.packaging
     openpyxl.reader
     openpyxl.styles
     openpyxl.utils
