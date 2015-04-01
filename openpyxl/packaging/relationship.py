@@ -1,7 +1,7 @@
 from __future__ import absolute_import
 # Copyright (c) 2010-2015 openpyxl
 
-from openpyxl.descriptors import String, Set, NoneSet
+from openpyxl.descriptors import String, Set, NoneSet, Alias
 from openpyxl.descriptors.serialisable import Serialisable
 
 from openpyxl.xml.constants import REL_NS, PKG_REL_NS
@@ -15,10 +15,14 @@ class Relationship(Serialisable):
 
     tagname = "Relationship"
 
-    type = String()
-    target = String()
-    targetMode = String(allow_none=True)
-    id = String()
+    Type = String()
+    type = Alias('Type')
+    Target = String()
+    target = Alias('Target')
+    TargetMode = String(allow_none=True)
+    targetMode = Alias('TargetMode')
+    Id = String()
+    id = Alias('Id')
 
 
     def __init__(self, type, target=None, targetMode=None, id=None):
@@ -26,4 +30,3 @@ class Relationship(Serialisable):
         self.target = target
         self.targetMode = targetMode
         self.id = id
-

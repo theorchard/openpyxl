@@ -50,7 +50,6 @@ from openpyxl.workbook.names.named_range import NamedRange
 from openpyxl.utils.bound_dictionary import BoundDictionary
 
 from .header_footer import HeaderFooter
-from .relationship import Relationship
 from .page import PageSetup, PageMargins, PrintOptions
 from .dimensions import ColumnDimension, RowDimension, DimensionHolder
 from .protection import SheetProtection
@@ -58,6 +57,8 @@ from .filters import AutoFilter
 from .views import SheetView, Pane, Selection
 from .properties import WorksheetProperties, Outline, PageSetupPr
 from .pagebreak import PageBreak
+
+from openpyxl.packaging.relationship import Relationship
 
 
 def flatten(results):

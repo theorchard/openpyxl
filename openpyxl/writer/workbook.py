@@ -38,7 +38,7 @@ from openpyxl.xml.constants import (
 from openpyxl.xml.functions import tostring, fromstring
 from openpyxl.utils.datetime  import datetime_to_W3CDTF
 from openpyxl.worksheet import Worksheet
-from openpyxl.worksheet.relationship import Relationship
+from openpyxl.packaging.relationship import Relationship
 from openpyxl.workbook.properties import write_properties
 
 
