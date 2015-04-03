@@ -12,6 +12,7 @@ from openpyxl.tests.schema import (
     sheet_src,
     chart_src,
     drawing_main_src,
+    drawing_src,
     shared_src,
     )
 
@@ -225,7 +226,7 @@ commands = argparse.ArgumentParser(description="Generate Python classes for a sp
 commands.add_argument('element', help='The XML type to be converted')
 commands.add_argument('--schema',
                       help='The relevant schema. The default is for worksheets',
-                      choices=["sheet_src", "chart_src", "shared_src"],
+                      choices=["sheet_src", "chart_src", "shared_src", "drawing_src"],
                       default="sheet_src",
                       )
 
