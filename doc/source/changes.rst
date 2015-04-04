@@ -1,3 +1,13 @@
+2.2.2 (unreleased)
+==================
+
+
+Bug fixes
+---------
+
+* `#447 <https://bitbucket.org/openpyxl/openpyxl/issue/447>`_ Uppercase datetime number formats not recognised.
+
+
 2.2.1 (2015-03-31)
 ==================
 
