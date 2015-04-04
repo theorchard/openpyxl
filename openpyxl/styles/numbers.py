@@ -92,7 +92,7 @@ BAD_DATE_RE = re.compile(r'(\[|").*[dmhys].*(\]|")')
 def is_date_format(fmt):
     if fmt is None:
         return False
-    if any([x in fmt for x in DATE_INDICATORS]):
+    if any([x in fmt.lower() for x in DATE_INDICATORS]):
         return not BAD_DATE_RE.search(fmt)
     return False
 
