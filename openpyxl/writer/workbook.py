@@ -3,8 +3,6 @@ from __future__ import absolute_import
 
 """Write the workbook global settings to the archive."""
 
-from functools import partial
-
 # package imports
 
 from openpyxl import LXML
@@ -311,9 +309,6 @@ def _write_defined_names(workbook, names):
         name = Element('{%s}definedName' % SHEET_MAIN_NS, attrs)
         name.text = named_range.value
         names.append(name)
-
-
-RelationElement = partial(Element, '{%s}Relationship' % PKG_REL_NS)
 
 
 def write_workbook_rels(workbook):
