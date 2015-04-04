@@ -318,39 +318,35 @@ RelationElement = partial(Element, '{%s}Relationship' % PKG_REL_NS)
 
 def write_workbook_rels(workbook):
     """Write the workbook relationships xml."""
-    root = Element('{%s}Relationships' % PKG_REL_NS)
+    root = Element('Relationships', xmlns=PKG_REL_NS)
 
     for i, _ in enumerate(workbook.worksheets, 1):
-        attrs = {'Id': 'rId%d' % i, 'Target': 'worksheets/sheet%s.xml' % i,
-                 'Type': '%s/worksheet' % REL_NS}
-        root.append(RelationElement(attrs))
+        rel = Relationship(type='worksheet', target='worksheets/sheet%s.xml' % i, id='rId%d' % i)
+        root.append(rel.to_tree())
 
     i += 1
-    attrs = {'Id': 'rId%d' % i, 'Target': 'sharedStrings.xml',
-             'Type': '%s/sharedStrings' % REL_NS}
-    root.append(RelationElement(attrs))
+    strings =  Relationship(type='sharedStrings', target='sharedStrings.xml', id='rId%d' % i)
+    root.append(strings.to_tree())
 
     i += 1
-    attrs = {'Id': 'rId%d' % i, 'Target': 'styles.xml',
-             'Type': '%s/styles' % REL_NS}
-    root.append(RelationElement(attrs))
+    styles =  Relationship(type='styles', target='styles.xml', id='rId%d' % i)
+    root.append(styles.to_tree())
 
     i += 1
-    attrs = {'Id': 'rId%d' % i, 'Target': 'theme/theme1.xml',
-             'Type': '%s/theme' % REL_NS}
-    root.append(RelationElement(attrs))
+    styles =  Relationship(type='theme', target='theme/theme1.xml', id='rId%d' % i)
+    root.append(styles.to_tree())
 
     if workbook.vba_archive:
         i += 1
-        attrs = {'Id': 'rId%d' % i, 'Target': 'vbaProject.bin',
-                 'Type': 'http://schemas.microsoft.com/office/2006/relationships/vbaProject'}
-        root.append(RelationElement(attrs))
+        vba =  Relationship(type='vbaProject', target='vbaProject.bin', id='rId%d' % i)
+        root.append(vba.to_tree())
 
     external_links = workbook._external_links
     if external_links:
         for idx, link in enumerate(external_links, 1):
-            attrs = {'Id':'rId%d' % (i + idx), 'Target':'externalLinks/externalLink%d.xml' % idx,
-                     'Type':'%s/externalLink' % REL_NS}
-            root.append(RelationElement(attrs))
+            ext =  Relationship(type='externalLink',
+                                target='externalLinks/externalLink%d.xml' % idx,
+                                id='rId%d' % (i +idx))
+            root.append(ext.to_tree())
 
     return tostring(root)
