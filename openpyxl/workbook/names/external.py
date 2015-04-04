@@ -4,6 +4,7 @@ from __future__ import absolute_import
 import os
 
 from openpyxl.descriptors import String, Strict
+from openpyxl.packaging.relationship import Relationship
 from openpyxl.xml.constants import (
     SHEET_MAIN_NS,
     REL_NS,
@@ -16,8 +17,6 @@ from openpyxl.xml.functions import (
     Element,
     SubElement,
 )
-
-from openpyxl.writer.workbook import RelationElement
 
 
 """Manage links to external Workbooks"""
@@ -112,8 +111,8 @@ def write_external_link(links):
 
 def write_external_book_rel(book):
     """Serialise link to external file"""
-    root = Element("{%s}Relationships" % PKG_REL_NS)
-    attrs = {"Id":"rId1", "Target":book.Target, "TargetMode":book.TargetMode,
-             "Type":book.Type}
-    root.append(RelationElement(attrs))
+    root = Element("Relationships", xmlns=PKG_REL_NS)
+    rel = Relationship("", target=book.Target, targetMode=book.TargetMode, id="rId1")
+    rel.type = book.Type
+    root.append(rel.to_tree())
     return root
