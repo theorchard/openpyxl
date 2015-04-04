@@ -1,0 +1,410 @@
+<?xml version="1.0" standalone="yes"?>
+<worksheet xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main" xmlns:r="http://schemas.openxmlformats.org/officeDocument/2006/relationships" xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" xmlns:x14ac="http://schemas.microsoft.com/office/spreadsheetml/2009/9/ac" mc:Ignorable="x14ac">
+  <dimension ref="A1:I26"/>
+  <sheetViews>
+    <sheetView tabSelected="1" topLeftCell="C1" workbookViewId="0">
+      <selection activeCell="I1" sqref="I1:I1048576"/>
+    </sheetView>
+  </sheetViews>
+  <sheetFormatPr baseColWidth="10" defaultRowHeight="15" x14ac:dyDescent="0"/>
+  <cols>
+    <col min="1" max="1" width="31.1640625" customWidth="1"/>
+    <col min="3" max="3" width="31.1640625" customWidth="1"/>
+    <col min="5" max="5" width="31.1640625" customWidth="1"/>
+    <col min="7" max="7" width="31.1640625" customWidth="1"/>
+    <col min="9" max="9" width="25" style="28" customWidth="1"/>
+  </cols>
+  <sheetData>
+    <row r="1" spans="1:9">
+      <c r="A1" t="s">
+        <v>20</v>
+      </c>
+      <c r="C1" t="s">
+        <v>20</v>
+      </c>
+      <c r="E1" t="s">
+        <v>20</v>
+      </c>
+      <c r="G1" t="s">
+        <v>20</v>
+      </c>
+      <c r="I1" s="28" t="s">
+        <v>22</v>
+      </c>
+    </row>
+    <row r="2" spans="1:9">
+      <c r="A2" s="2" t="s">
+        <v>1</v>
+      </c>
+      <c r="C2" s="2" t="s">
+        <v>1</v>
+      </c>
+      <c r="E2" s="2" t="s">
+        <v>1</v>
+      </c>
+      <c r="G2" s="2" t="s">
+        <v>1</v>
+      </c>
+      <c r="I2" s="28" t="s">
+        <v>21</v>
+      </c>
+    </row>
+    <row r="3" spans="1:9">
+      <c r="A3" s="1" t="s">
+        <v>2</v>
+      </c>
+      <c r="C3" s="1" t="s">
+        <v>2</v>
+      </c>
+      <c r="E3" s="1" t="s">
+        <v>2</v>
+      </c>
+      <c r="G3" s="1" t="s">
+        <v>2</v>
+      </c>
+    </row>
+    <row r="4" spans="1:9" ht="17">
+      <c r="A4" s="3" t="s">
+        <v>0</v>
+      </c>
+      <c r="C4" s="3" t="s">
+        <v>0</v>
+      </c>
+      <c r="E4" s="3" t="s">
+        <v>0</v>
+      </c>
+      <c r="G4" s="3" t="s">
+        <v>0</v>
+      </c>
+    </row>
+    <row r="5" spans="1:9">
+      <c r="A5" s="4" t="s">
+        <v>4</v>
+      </c>
+      <c r="C5" s="4" t="s">
+        <v>4</v>
+      </c>
+      <c r="E5" s="4" t="s">
+        <v>4</v>
+      </c>
+      <c r="G5" s="4" t="s">
+        <v>4</v>
+      </c>
+    </row>
+    <row r="6" spans="1:9">
+      <c r="A6" s="5" t="s">
+        <v>3</v>
+      </c>
+      <c r="C6" s="5" t="s">
+        <v>3</v>
+      </c>
+      <c r="E6" s="5" t="s">
+        <v>3</v>
+      </c>
+      <c r="G6" s="5" t="s">
+        <v>3</v>
+      </c>
+    </row>
+    <row r="7" spans="1:9">
+      <c r="A7" s="7" t="s">
+        <v>6</v>
+      </c>
+      <c r="C7" s="7" t="s">
+        <v>6</v>
+      </c>
+      <c r="E7" s="7" t="s">
+        <v>6</v>
+      </c>
+      <c r="G7" s="7" t="s">
+        <v>6</v>
+      </c>
+    </row>
+    <row r="8" spans="1:9">
+      <c r="A8" s="6" t="s">
+        <v>5</v>
+      </c>
+      <c r="C8" s="6" t="s">
+        <v>5</v>
+      </c>
+      <c r="E8" s="6" t="s">
+        <v>5</v>
+      </c>
+      <c r="G8" s="6" t="s">
+        <v>5</v>
+      </c>
+    </row>
+    <row r="9" spans="1:9">
+      <c r="A9" s="8" t="s">
+        <v>7</v>
+      </c>
+      <c r="C9" s="8" t="s">
+        <v>7</v>
+      </c>
+      <c r="E9" s="8" t="s">
+        <v>7</v>
+      </c>
+      <c r="G9" s="8" t="s">
+        <v>7</v>
+      </c>
+    </row>
+    <row r="10" spans="1:9">
+      <c r="A10" s="9" t="s">
+        <v>8</v>
+      </c>
+      <c r="C10" s="9" t="s">
+        <v>8</v>
+      </c>
+      <c r="E10" s="9" t="s">
+        <v>8</v>
+      </c>
+      <c r="G10" s="9" t="s">
+        <v>8</v>
+      </c>
+    </row>
+    <row r="11" spans="1:9">
+      <c r="A11" s="10" t="s">
+        <v>9</v>
+      </c>
+      <c r="C11" s="17" t="s">
+        <v>9</v>
+      </c>
+      <c r="E11" s="17" t="s">
+        <v>9</v>
+      </c>
+      <c r="G11" s="17" t="s">
+        <v>9</v>
+      </c>
+    </row>
+    <row r="12" spans="1:9">
+      <c r="A12" s="11" t="s">
+        <v>10</v>
+      </c>
+      <c r="C12" s="11" t="s">
+        <v>10</v>
+      </c>
+      <c r="E12" s="11" t="s">
+        <v>10</v>
+      </c>
+      <c r="G12" s="11" t="s">
+        <v>10</v>
+      </c>
+    </row>
+    <row r="13" spans="1:9">
+      <c r="A13" s="12" t="s">
+        <v>11</v>
+      </c>
+      <c r="C13" s="12" t="s">
+        <v>11</v>
+      </c>
+      <c r="E13" s="12" t="s">
+        <v>11</v>
+      </c>
+      <c r="G13" s="12" t="s">
+        <v>11</v>
+      </c>
+    </row>
+    <row r="14" spans="1:9">
+      <c r="A14" s="13" t="s">
+        <v>12</v>
+      </c>
+      <c r="C14" s="13" t="s">
+        <v>12</v>
+      </c>
+      <c r="E14" s="13" t="s">
+        <v>12</v>
+      </c>
+      <c r="G14" s="13" t="s">
+        <v>12</v>
+      </c>
+    </row>
+    <row r="15" spans="1:9">
+      <c r="A15" s="14">
+        <v>1.1234500000000001</v>
+      </c>
+      <c r="C15" s="14">
+        <v>1.1234500000000001</v>
+      </c>
+      <c r="E15" s="14">
+        <v>1.1234500000000001</v>
+      </c>
+      <c r="G15" s="14">
+        <v>1.1234500000000001</v>
+      </c>
+    </row>
+    <row r="16" spans="1:9">
+      <c r="A16" s="15">
+        <v>40939</v>
+      </c>
+      <c r="C16" s="15">
+        <v>40939</v>
+      </c>
+      <c r="E16" s="15">
+        <v>40939</v>
+      </c>
+      <c r="G16" s="15">
+        <v>40939</v>
+      </c>
+    </row>
+    <row r="17" spans="1:8">
+      <c r="A17" s="16">
+        <v>0.1234</v>
+      </c>
+      <c r="C17" s="16">
+        <v>0.1234</v>
+      </c>
+      <c r="E17" s="16">
+        <v>0.1234</v>
+      </c>
+      <c r="G17" s="16">
+        <v>0.1234</v>
+      </c>
+    </row>
+    <row r="18" spans="1:8">
+      <c r="A18" s="23" t="s">
+        <v>13</v>
+      </c>
+      <c r="B18" s="23"/>
+      <c r="C18" s="23" t="s">
+        <v>13</v>
+      </c>
+      <c r="D18" s="23"/>
+      <c r="E18" s="23" t="s">
+        <v>13</v>
+      </c>
+      <c r="F18" s="23"/>
+      <c r="G18" s="23" t="s">
+        <v>13</v>
+      </c>
+      <c r="H18" s="23"/>
+    </row>
+    <row r="19" spans="1:8">
+      <c r="A19" s="18" t="s">
+        <v>14</v>
+      </c>
+      <c r="C19" s="18" t="s">
+        <v>14</v>
+      </c>
+      <c r="E19" s="18" t="s">
+        <v>14</v>
+      </c>
+      <c r="G19" s="18" t="s">
+        <v>14</v>
+      </c>
+    </row>
+    <row r="20" spans="1:8" ht="16" thickBot="1">
+      <c r="A20" t="s">
+        <v>19</v>
+      </c>
+      <c r="C20" t="s">
+        <v>19</v>
+      </c>
+      <c r="E20" t="s">
+        <v>19</v>
+      </c>
+      <c r="G20" t="s">
+        <v>19</v>
+      </c>
+    </row>
+    <row r="21" spans="1:8" ht="17" thickTop="1" thickBot="1">
+      <c r="A21" s="19" t="s">
+        <v>15</v>
+      </c>
+      <c r="C21" s="19" t="s">
+        <v>15</v>
+      </c>
+      <c r="E21" s="19" t="s">
+        <v>15</v>
+      </c>
+      <c r="G21" s="19" t="s">
+        <v>15</v>
+      </c>
+    </row>
+    <row r="22" spans="1:8" ht="17" thickTop="1" thickBot="1">
+      <c r="A22" s="22" t="s">
+        <v>19</v>
+      </c>
+      <c r="C22" s="22" t="s">
+        <v>19</v>
+      </c>
+      <c r="E22" s="22" t="s">
+        <v>19</v>
+      </c>
+      <c r="G22" s="22" t="s">
+        <v>19</v>
+      </c>
+    </row>
+    <row r="23" s="28" spans="1:8">
+      <c r="A23" s="24" t="s">
+        <v>16</v>
+      </c>
+      <c r="B23" s="25"/>
+      <c r="C23" s="24" t="s">
+        <v>16</v>
+      </c>
+      <c r="D23" s="25"/>
+      <c r="E23" s="24" t="s">
+        <v>16</v>
+      </c>
+      <c r="F23" s="25"/>
+      <c r="G23" s="24" t="s">
+        <v>16</v>
+      </c>
+      <c r="H23" s="25"/>
+    </row>
+    <row r="24" spans="1:8" ht="16" thickBot="1">
+      <c r="A24" s="26"/>
+      <c r="B24" s="27"/>
+      <c r="C24" s="26"/>
+      <c r="D24" s="27"/>
+      <c r="E24" s="26"/>
+      <c r="F24" s="27"/>
+      <c r="G24" s="26"/>
+      <c r="H24" s="27"/>
+    </row>
+    <row r="25" spans="1:8" ht="30">
+      <c r="A25" s="20" t="s">
+        <v>17</v>
+      </c>
+      <c r="C25" s="20" t="s">
+        <v>17</v>
+      </c>
+      <c r="E25" s="20" t="s">
+        <v>17</v>
+      </c>
+      <c r="G25" s="20" t="s">
+        <v>17</v>
+      </c>
+    </row>
+    <row r="26" spans="1:8">
+      <c r="A26" s="21" t="s">
+        <v>18</v>
+      </c>
+      <c r="C26" s="21" t="s">
+        <v>18</v>
+      </c>
+      <c r="E26" s="21" t="s">
+        <v>18</v>
+      </c>
+      <c r="G26" s="21" t="s">
+        <v>18</v>
+      </c>
+    </row>
+  </sheetData>
+  <mergeCells count="8">
+    <mergeCell ref="G18:H18"/>
+    <mergeCell ref="G23:H24"/>
+    <mergeCell ref="A18:B18"/>
+    <mergeCell ref="A23:B24"/>
+    <mergeCell ref="C18:D18"/>
+    <mergeCell ref="C23:D24"/>
+    <mergeCell ref="E18:F18"/>
+    <mergeCell ref="E23:F24"/>
+  </mergeCells>
+  <pageMargins left="0.75" right="0.75" top="1" bottom="1" header="0.5" footer="0.5"/>
+  <pageSetup orientation="portrait" horizontalDpi="4294967292" verticalDpi="4294967292"/>
+  <extLst>
+    <ext xmlns:mx="http://schemas.microsoft.com/office/mac/excel/2008/main" uri="{64002731-A6B0-56B0-2670-7721B7C09600}">
+      <mx:PLV Mode="0" OnePage="0" WScale="0"/>
+    </ext>
+  </extLst>
+</worksheet>
