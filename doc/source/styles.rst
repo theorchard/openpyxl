@@ -145,7 +145,7 @@ yourself. This is a restriction of the file format::
 >>> col = ws.column_dimensions['A']
 >>> col.font = Font(bold=True)
 >>> row = ws.row_dimensions[1]
->>> row.style = Font(underline="single")
+>>> row.font = Font(underline="single")
 
 
 Edit Page Setup
