@@ -120,7 +120,7 @@ class Workbook(object):
         for sid in self._cell_styles:
             font = self._fonts[sid.font]
             fill = self._fills[sid.fill]
-            border = self._borders[sid.fill]
+            border = self._borders[sid.border]
             alignment = self._alignments[sid.alignment]
             protection = self._protections[sid.protection]
             nf_id = sid.number_format
