@@ -1,0 +1,21 @@
+<?xml version="1.0" standalone="yes"?>
+<worksheet xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main" xmlns:r="http://schemas.openxmlformats.org/officeDocument/2006/relationships" xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" xmlns:x14ac="http://schemas.microsoft.com/office/spreadsheetml/2009/9/ac" mc:Ignorable="x14ac">
+  <dimension ref="A1"/>
+  <sheetViews>
+    <sheetView tabSelected="1" workbookViewId="0"/>
+  </sheetViews>
+  <sheetFormatPr baseColWidth="10" defaultRowHeight="16" x14ac:dyDescent="0"/>
+  <sheetData/>
+  <phoneticPr fontId="1" type="noConversion"/>
+  <pageMargins left="0.75000000000000011" right="0.75000000000000011" top="1" bottom="1" header="0.5" footer="0.5"/>
+  <pageSetup paperSize="9" orientation="portrait" horizontalDpi="4294967292" verticalDpi="4294967292"/>
+  <headerFooter>
+    <oddHeader>&amp;L&amp;"Lucida Grande,Standard"&amp;K000000Left top&amp;C&amp;"Lucida Grande,Standard"&amp;K000000Middle top&amp;R&amp;"Lucida Grande,Standard"&amp;K000000Right top</oddHeader>
+    <oddFooter>&amp;L&amp;"Lucida Grande,Standard"&amp;K000000Left footer&amp;C&amp;"Lucida Grande,Standard"&amp;K000000Middle Footer&amp;R&amp;"Lucida Grande,Standard"&amp;K000000Right Footer</oddFooter>
+  </headerFooter>
+  <extLst>
+    <ext xmlns:mx="http://schemas.microsoft.com/office/mac/excel/2008/main" uri="{64002731-A6B0-56B0-2670-7721B7C09600}">
+      <mx:PLV Mode="0" OnePage="0" WScale="0"/>
+    </ext>
+  </extLst>
+</worksheet>
