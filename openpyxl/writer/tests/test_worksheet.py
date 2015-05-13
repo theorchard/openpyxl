@@ -13,7 +13,7 @@ from openpyxl import Workbook
 from .. worksheet import write_worksheet
 
 from openpyxl.tests.helper import compare_xml
-from openpyxl.worksheet.properties import PageSetupPr
+from openpyxl.worksheet.properties import PageSetupProperties
 
 
 @pytest.fixture
@@ -338,6 +338,7 @@ def test_auto_filter_worksheet(worksheet, write_worksheet):
     <worksheet xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main">
       <sheetPr>
         <outlinePr summaryBelow="1" summaryRight="1"/>
+        <pageSetUpPr/>
       </sheetPr>
       <dimension ref="A1:A1"/>
       <sheetViews>
@@ -592,6 +593,7 @@ def test_write_empty(worksheet, write_worksheet):
     <worksheet xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main" xmlns:r="http://schemas.openxmlformats.org/officeDocument/2006/relationships">
       <sheetPr>
         <outlinePr summaryRight="1" summaryBelow="1"/>
+        <pageSetUpPr/>
       </sheetPr>
       <dimension ref="A1:A1"/>
       <sheetViews>
@@ -621,6 +623,7 @@ def test_page_margins(worksheet, write_worksheet):
     <worksheet xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main" xmlns:r="http://schemas.openxmlformats.org/officeDocument/2006/relationships">
       <sheetPr>
         <outlinePr summaryRight="1" summaryBelow="1"/>
+        <pageSetUpPr/>
       </sheetPr>
       <dimension ref="A1:A1"/>
       <sheetViews>
@@ -645,7 +648,7 @@ def test_printer_settings(worksheet, write_worksheet):
     ws.page_setup.fitToWidth = 1
     ws.print_options.horizontalCentered = True
     ws.print_options.verticalCentered = True
-    page_setup_prop = PageSetupPr(fitToPage=True)
+    page_setup_prop = PageSetupProperties(fitToPage=True)
     ws.sheet_properties.pageSetUpPr = page_setup_prop
     xml = write_worksheet(ws, None)
     expected = """
@@ -703,6 +706,7 @@ def test_vba(worksheet, write_worksheet):
     xmlns:r="http://schemas.openxmlformats.org/officeDocument/2006/relationships">
       <sheetPr codeName="Sheet1">
         <outlinePr summaryBelow="1" summaryRight="1"/>
+        <pageSetUpPr/>
       </sheetPr>
       <dimension ref="A1:A1"/>
       <sheetViews>
@@ -728,6 +732,7 @@ def test_protection(worksheet, write_worksheet):
     <worksheet xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main">
       <sheetPr>
         <outlinePr summaryBelow="1" summaryRight="1"/>
+        <pageSetUpPr/>
       </sheetPr>
       <dimension ref="A1:A1"/>
       <sheetViews>
@@ -754,6 +759,7 @@ def test_write_comments(worksheet, write_worksheet):
     xmlns:r="http://schemas.openxmlformats.org/officeDocument/2006/relationships">
       <sheetPr>
         <outlinePr summaryBelow="1" summaryRight="1"/>
+        <pageSetUpPr/>
       </sheetPr>
       <dimension ref="A1:A1"/>
       <sheetViews>
@@ -778,7 +784,8 @@ def test_write_with_tab_color(worksheet, write_worksheet):
     <worksheet xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main" xmlns:r="http://schemas.openxmlformats.org/officeDocument/2006/relationships">
       <sheetPr>
         <outlinePr summaryRight="1" summaryBelow="1"/>
-        <tabColor rgb="00F0F0F0"/>
+        <pageSetUpPr/>
+       <tabColor rgb="00F0F0F0"/>
       </sheetPr>
       <dimension ref="A1:A1"/>
       <sheetViews>
@@ -794,3 +801,28 @@ def test_write_with_tab_color(worksheet, write_worksheet):
     diff = compare_xml(xml, expected)
     assert diff is None, diff
 
+
+def test_write_with_fit_to_page(worksheet, write_worksheet):
+    ws = worksheet
+    ws.page_setup.fitToPage = True
+    ws.page_setup.autoPageBreaks = False
+    xml = write_worksheet(ws, None)
+    expected = """
+    <worksheet xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main" xmlns:r="http://schemas.openxmlformats.org/officeDocument/2006/relationships">
+      <sheetPr>
+        <outlinePr summaryRight="1" summaryBelow="1"/>
+        <pageSetUpPr fitToPage="1" autoPageBreaks="0"/>
+      </sheetPr>
+      <dimension ref="A1:A1"/>
+      <sheetViews>
+        <sheetView workbookViewId="0">
+          <selection sqref="A1" activeCell="A1"/>
+        </sheetView>
+      </sheetViews>
+      <sheetFormatPr baseColWidth="10" defaultRowHeight="15"/>
+      <sheetData/>
+      <pageMargins left="0.75" right="0.75" top="1" bottom="1" header="0.5" footer="0.5"/>
+    </worksheet>
+    """
+    diff = compare_xml(xml, expected)
+    assert diff is None, diff

@@ -22,8 +22,8 @@ def test_preseve_space():
     content = write_string_table(table)
     expected = """
     <sst xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main" uniqueCount="1">
-    <si xml:space="preserve">
-      <t>String with trailing space</t>
+    <si>
+      <t xml:space="preserve">String with trailing space</t>
     </si>
     </sst>
     """
