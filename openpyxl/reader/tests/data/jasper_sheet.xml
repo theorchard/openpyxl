@@ -1,0 +1,2324 @@
+<x:worksheet xmlns:r="http://schemas.openxmlformats.org/officeDocument/2006/relationships" xmlns:x="http://schemas.openxmlformats.org/spreadsheetml/2006/main">
+  <x:sheetPr>
+    <x:outlinePr summaryBelow="0" />
+  </x:sheetPr>
+  <x:dimension ref="A1" />
+  <x:sheetViews>
+    <x:sheetView workbookViewId="0" />
+  </x:sheetViews>
+  <x:sheetFormatPr defaultRowHeight="15" />
+  <x:cols>
+    <x:col min="1" max="1" width="3.3333333" customWidth="1" />
+    <x:col min="2" max="2" width="10.0" customWidth="1" />
+    <x:col min="3" max="3" width="6.5" customWidth="1" />
+    <x:col min="4" max="4" width="0.6666667" customWidth="1" />
+    <x:col min="5" max="5" width="1.8333334" customWidth="1" />
+    <x:col min="6" max="6" width="2.5" customWidth="1" />
+    <x:col min="7" max="7" width="4.3333335" customWidth="1" />
+    <x:col min="8" max="8" width="2.3333333" customWidth="1" />
+    <x:col min="9" max="9" width="2.0" customWidth="1" />
+    <x:col min="10" max="10" width="4.3333335" customWidth="1" />
+    <x:col min="11" max="11" width="3.0" customWidth="1" />
+    <x:col min="12" max="12" width="1.1666666" customWidth="1" />
+    <x:col min="13" max="13" width="5.0" customWidth="1" />
+    <x:col min="14" max="14" width="9.666667" customWidth="1" />
+    <x:col min="15" max="15" width="32.166668" customWidth="1" />
+    <x:col min="16" max="16" width="0.16666667" customWidth="1" />
+    <x:col min="17" max="17" width="6.8333335" customWidth="1" />
+    <x:col min="18" max="18" width="14.166667" customWidth="1" />
+    <x:col min="19" max="19" width="0.6666667" customWidth="1" />
+    <x:col min="20" max="20" width="5.8333335" customWidth="1" />
+    <x:col min="21" max="21" width="6.3333335" customWidth="1" />
+    <x:col min="22" max="22" width="0.8333333" customWidth="1" />
+    <x:col min="23" max="23" width="3.6666667" customWidth="1" />
+    <x:col min="24" max="24" width="3.3333333" customWidth="1" />
+    <x:col min="25" max="25" width="2.3333333" customWidth="1" />
+    <x:col min="26" max="26" width="0.6666667" customWidth="1" />
+    <x:col min="27" max="27" width="3.3333333" customWidth="1" />
+    <x:col min="28" max="28" width="3.3333333" customWidth="1" />
+  </x:cols>
+  <x:sheetData>
+    <x:row r="1" ht="20" customHeight="1">
+      <x:c r="A1" s="1" t="inlineStr" />
+      <x:c r="B1" s="1" t="inlineStr" />
+      <x:c r="C1" s="1" t="inlineStr" />
+      <x:c r="D1" s="1" t="inlineStr" />
+      <x:c r="E1" s="1" t="inlineStr" />
+      <x:c r="F1" s="1" t="inlineStr" />
+      <x:c r="G1" s="1" t="inlineStr" />
+      <x:c r="H1" s="1" t="inlineStr" />
+      <x:c r="I1" s="1" t="inlineStr" />
+      <x:c r="J1" s="1" t="inlineStr" />
+      <x:c r="K1" s="1" t="inlineStr" />
+      <x:c r="L1" s="1" t="inlineStr" />
+      <x:c r="M1" s="1" t="inlineStr" />
+      <x:c r="N1" s="1" t="inlineStr" />
+      <x:c r="O1" s="1" t="inlineStr" />
+      <x:c r="P1" s="1" t="inlineStr" />
+      <x:c r="Q1" s="1" t="inlineStr" />
+      <x:c r="R1" s="1" t="inlineStr" />
+      <x:c r="S1" s="1" t="inlineStr" />
+      <x:c r="T1" s="1" t="inlineStr" />
+      <x:c r="U1" s="1" t="inlineStr" />
+      <x:c r="V1" s="1" t="inlineStr" />
+      <x:c r="W1" s="1" t="inlineStr" />
+      <x:c r="X1" s="1" t="inlineStr" />
+      <x:c r="Y1" s="1" t="inlineStr" />
+      <x:c r="Z1" s="1" t="inlineStr" />
+      <x:c r="AA1" s="1" t="inlineStr" />
+      <x:c r="AB1" s="1" t="inlineStr" />
+    </x:row>
+    <x:row r="2" ht="20" customHeight="1">
+      <x:c r="A2" s="1" t="inlineStr" />
+      <x:c r="B2" s="2" t="inlineStr">
+        <x:is>
+          <x:r>
+            <x:rPr>
+              <x:sz val="14.0" />
+              <x:b val="true" />
+            </x:rPr>
+            <x:t xml:space="preserve">Stock Ventas Recepción</x:t>
+          </x:r>
+        </x:is>
+      </x:c>
+      <x:c r="C2" s="3" t="inlineStr" />
+      <x:c r="D2" s="3" t="inlineStr" />
+      <x:c r="E2" s="3" t="inlineStr" />
+      <x:c r="F2" s="3" t="inlineStr" />
+      <x:c r="G2" s="3" t="inlineStr" />
+      <x:c r="H2" s="3" t="inlineStr" />
+      <x:c r="I2" s="3" t="inlineStr" />
+      <x:c r="J2" s="3" t="inlineStr" />
+      <x:c r="K2" s="3" t="inlineStr" />
+      <x:c r="L2" s="1" t="inlineStr" />
+      <x:c r="M2" s="1" t="inlineStr" />
+      <x:c r="N2" s="4" t="inlineStr">
+        <x:is>
+          <x:r>
+            <x:rPr>
+              <x:sz val="8.0" />
+            </x:rPr>
+            <x:t xml:space="preserve">  </x:t>
+          </x:r>
+        </x:is>
+      </x:c>
+      <x:c r="O2" s="5" t="inlineStr" />
+      <x:c r="P2" s="5" t="inlineStr" />
+      <x:c r="Q2" s="5" t="inlineStr" />
+      <x:c r="R2" s="6" t="inlineStr">
+        <x:is>
+          <x:r>
+            <x:rPr />
+            <x:t xml:space="preserve">11 de September de 2014</x:t>
+          </x:r>
+        </x:is>
+      </x:c>
+      <x:c r="S2" s="7" t="inlineStr" />
+      <x:c r="T2" s="7" t="inlineStr" />
+      <x:c r="U2" s="7" t="inlineStr" />
+      <x:c r="V2" s="7" t="inlineStr" />
+      <x:c r="W2" s="7" t="inlineStr" />
+      <x:c r="X2" s="7" t="inlineStr" />
+      <x:c r="Y2" s="7" t="inlineStr" />
+      <x:c r="Z2" s="7" t="inlineStr" />
+      <x:c r="AA2" s="7" t="inlineStr" />
+      <x:c r="AB2" s="1" t="inlineStr" />
+    </x:row>
+    <x:row r="3" ht="5" customHeight="1">
+      <x:c r="A3" s="1" t="inlineStr" />
+      <x:c r="B3" s="1" t="inlineStr" />
+      <x:c r="C3" s="1" t="inlineStr" />
+      <x:c r="D3" s="1" t="inlineStr" />
+      <x:c r="E3" s="1" t="inlineStr" />
+      <x:c r="F3" s="1" t="inlineStr" />
+      <x:c r="G3" s="1" t="inlineStr" />
+      <x:c r="H3" s="1" t="inlineStr" />
+      <x:c r="I3" s="1" t="inlineStr" />
+      <x:c r="J3" s="1" t="inlineStr" />
+      <x:c r="K3" s="1" t="inlineStr" />
+      <x:c r="L3" s="1" t="inlineStr" />
+      <x:c r="M3" s="1" t="inlineStr" />
+      <x:c r="N3" s="1" t="inlineStr" />
+      <x:c r="O3" s="1" t="inlineStr" />
+      <x:c r="P3" s="1" t="inlineStr" />
+      <x:c r="Q3" s="1" t="inlineStr" />
+      <x:c r="R3" s="1" t="inlineStr" />
+      <x:c r="S3" s="1" t="inlineStr" />
+      <x:c r="T3" s="1" t="inlineStr" />
+      <x:c r="U3" s="1" t="inlineStr" />
+      <x:c r="V3" s="1" t="inlineStr" />
+      <x:c r="W3" s="1" t="inlineStr" />
+      <x:c r="X3" s="1" t="inlineStr" />
+      <x:c r="Y3" s="1" t="inlineStr" />
+      <x:c r="Z3" s="1" t="inlineStr" />
+      <x:c r="AA3" s="1" t="inlineStr" />
+      <x:c r="AB3" s="1" t="inlineStr" />
+    </x:row>
+    <x:row r="4" ht="1" customHeight="1">
+      <x:c r="A4" s="1" t="inlineStr" />
+      <x:c r="B4" s="8" t="inlineStr" />
+      <x:c r="C4" s="8" t="inlineStr" />
+      <x:c r="D4" s="8" t="inlineStr" />
+      <x:c r="E4" s="8" t="inlineStr" />
+      <x:c r="F4" s="8" t="inlineStr" />
+      <x:c r="G4" s="8" t="inlineStr" />
+      <x:c r="H4" s="8" t="inlineStr" />
+      <x:c r="I4" s="8" t="inlineStr" />
+      <x:c r="J4" s="8" t="inlineStr" />
+      <x:c r="K4" s="8" t="inlineStr" />
+      <x:c r="L4" s="8" t="inlineStr" />
+      <x:c r="M4" s="8" t="inlineStr" />
+      <x:c r="N4" s="8" t="inlineStr" />
+      <x:c r="O4" s="8" t="inlineStr" />
+      <x:c r="P4" s="8" t="inlineStr" />
+      <x:c r="Q4" s="8" t="inlineStr" />
+      <x:c r="R4" s="8" t="inlineStr" />
+      <x:c r="S4" s="8" t="inlineStr" />
+      <x:c r="T4" s="8" t="inlineStr" />
+      <x:c r="U4" s="8" t="inlineStr" />
+      <x:c r="V4" s="8" t="inlineStr" />
+      <x:c r="W4" s="8" t="inlineStr" />
+      <x:c r="X4" s="8" t="inlineStr" />
+      <x:c r="Y4" s="8" t="inlineStr" />
+      <x:c r="Z4" s="8" t="inlineStr" />
+      <x:c r="AA4" s="8" t="inlineStr" />
+      <x:c r="AB4" s="1" t="inlineStr" />
+    </x:row>
+    <x:row r="5" ht="2" customHeight="1">
+      <x:c r="A5" s="1" t="inlineStr" />
+      <x:c r="B5" s="1" t="inlineStr" />
+      <x:c r="C5" s="1" t="inlineStr" />
+      <x:c r="D5" s="1" t="inlineStr" />
+      <x:c r="E5" s="1" t="inlineStr" />
+      <x:c r="F5" s="1" t="inlineStr" />
+      <x:c r="G5" s="1" t="inlineStr" />
+      <x:c r="H5" s="1" t="inlineStr" />
+      <x:c r="I5" s="1" t="inlineStr" />
+      <x:c r="J5" s="1" t="inlineStr" />
+      <x:c r="K5" s="1" t="inlineStr" />
+      <x:c r="L5" s="1" t="inlineStr" />
+      <x:c r="M5" s="1" t="inlineStr" />
+      <x:c r="N5" s="1" t="inlineStr" />
+      <x:c r="O5" s="1" t="inlineStr" />
+      <x:c r="P5" s="1" t="inlineStr" />
+      <x:c r="Q5" s="1" t="inlineStr" />
+      <x:c r="R5" s="1" t="inlineStr" />
+      <x:c r="S5" s="1" t="inlineStr" />
+      <x:c r="T5" s="1" t="inlineStr" />
+      <x:c r="U5" s="1" t="inlineStr" />
+      <x:c r="V5" s="1" t="inlineStr" />
+      <x:c r="W5" s="1" t="inlineStr" />
+      <x:c r="X5" s="1" t="inlineStr" />
+      <x:c r="Y5" s="1" t="inlineStr" />
+      <x:c r="Z5" s="1" t="inlineStr" />
+      <x:c r="AA5" s="1" t="inlineStr" />
+      <x:c r="AB5" s="1" t="inlineStr" />
+    </x:row>
+    <x:row r="6" ht="15" customHeight="1">
+      <x:c r="A6" s="1" t="inlineStr" />
+      <x:c r="B6" s="1" t="inlineStr" />
+      <x:c r="C6" s="1" t="inlineStr" />
+      <x:c r="D6" s="1" t="inlineStr" />
+      <x:c r="E6" s="1" t="inlineStr" />
+      <x:c r="F6" s="9" t="inlineStr">
+        <x:is>
+          <x:r>
+            <x:rPr>
+              <x:sz val="8.0" />
+            </x:rPr>
+            <x:t xml:space="preserve">Marca:</x:t>
+          </x:r>
+        </x:is>
+      </x:c>
+      <x:c r="G6" s="10" t="inlineStr" />
+      <x:c r="H6" s="10" t="inlineStr" />
+      <x:c r="I6" s="11" t="inlineStr">
+        <x:is>
+          <x:r>
+            <x:rPr>
+              <x:sz val="8.0" />
+            </x:rPr>
+            <x:t xml:space="preserve">ADIDAS</x:t>
+          </x:r>
+        </x:is>
+      </x:c>
+      <x:c r="J6" s="12" t="inlineStr" />
+      <x:c r="K6" s="12" t="inlineStr" />
+      <x:c r="L6" s="12" t="inlineStr" />
+      <x:c r="M6" s="12" t="inlineStr" />
+      <x:c r="N6" s="9" t="inlineStr">
+        <x:is>
+          <x:r>
+            <x:rPr>
+              <x:sz val="8.0" />
+            </x:rPr>
+            <x:t xml:space="preserve">Desc:</x:t>
+          </x:r>
+        </x:is>
+      </x:c>
+      <x:c r="O6" s="11" t="inlineStr">
+        <x:is>
+          <x:r>
+            <x:rPr>
+              <x:sz val="8.0" />
+            </x:rPr>
+            <x:t xml:space="preserve">647196 FEF A JSY (HOMBRE) / YEAH +mola</x:t>
+          </x:r>
+        </x:is>
+      </x:c>
+      <x:c r="P6" s="1" t="inlineStr" />
+      <x:c r="Q6" s="9" t="inlineStr">
+        <x:is>
+          <x:r>
+            <x:rPr>
+              <x:sz val="8.0" />
+            </x:rPr>
+            <x:t xml:space="preserve">Lineal:</x:t>
+          </x:r>
+        </x:is>
+      </x:c>
+      <x:c r="R6" s="11" t="inlineStr">
+        <x:is>
+          <x:r>
+            <x:rPr>
+              <x:sz val="8.0" />
+            </x:rPr>
+            <x:t xml:space="preserve">NO ASIGNADO</x:t>
+          </x:r>
+        </x:is>
+      </x:c>
+      <x:c r="S6" s="1" t="inlineStr" />
+      <x:c r="T6" s="9" t="inlineStr">
+        <x:is>
+          <x:r>
+            <x:rPr>
+              <x:sz val="8.0" />
+            </x:rPr>
+            <x:t xml:space="preserve">PMay:</x:t>
+          </x:r>
+        </x:is>
+      </x:c>
+      <x:c r="U6" s="9" t="inlineStr">
+        <x:is>
+          <x:r>
+            <x:rPr>
+              <x:sz val="8.0" />
+            </x:rPr>
+            <x:t xml:space="preserve">0.00</x:t>
+          </x:r>
+        </x:is>
+      </x:c>
+      <x:c r="V6" s="1" t="inlineStr" />
+      <x:c r="W6" s="9" t="inlineStr">
+        <x:is>
+          <x:r>
+            <x:rPr>
+              <x:sz val="8.0" />
+            </x:rPr>
+            <x:t xml:space="preserve">PVP:</x:t>
+          </x:r>
+        </x:is>
+      </x:c>
+      <x:c r="X6" s="10" t="inlineStr" />
+      <x:c r="Y6" s="9" t="inlineStr">
+        <x:is>
+          <x:r>
+            <x:rPr>
+              <x:sz val="8.0" />
+            </x:rPr>
+            <x:t xml:space="preserve">19.90 €</x:t>
+          </x:r>
+        </x:is>
+      </x:c>
+      <x:c r="Z6" s="10" t="inlineStr" />
+      <x:c r="AA6" s="10" t="inlineStr" />
+      <x:c r="AB6" s="1" t="inlineStr" />
+    </x:row>
+    <x:row r="7" ht="15" customHeight="1">
+      <x:c r="A7" s="1" t="inlineStr" />
+      <x:c r="B7" s="1" t="inlineStr" />
+      <x:c r="C7" s="1" t="inlineStr" />
+      <x:c r="D7" s="1" t="inlineStr" />
+      <x:c r="E7" s="1" t="inlineStr" />
+      <x:c r="F7" s="9" t="inlineStr">
+        <x:is>
+          <x:r>
+            <x:rPr>
+              <x:sz val="8.0" />
+            </x:rPr>
+            <x:t xml:space="preserve">Referencia:</x:t>
+          </x:r>
+        </x:is>
+      </x:c>
+      <x:c r="G7" s="10" t="inlineStr" />
+      <x:c r="H7" s="10" t="inlineStr" />
+      <x:c r="I7" s="11" t="inlineStr">
+        <x:is>
+          <x:r>
+            <x:rPr>
+              <x:sz val="8.0" />
+            </x:rPr>
+            <x:t xml:space="preserve">02924303</x:t>
+          </x:r>
+        </x:is>
+      </x:c>
+      <x:c r="J7" s="12" t="inlineStr" />
+      <x:c r="K7" s="12" t="inlineStr" />
+      <x:c r="L7" s="12" t="inlineStr" />
+      <x:c r="M7" s="12" t="inlineStr" />
+      <x:c r="N7" s="9" t="inlineStr">
+        <x:is>
+          <x:r>
+            <x:rPr>
+              <x:sz val="8.0" />
+            </x:rPr>
+            <x:t xml:space="preserve">Sección:</x:t>
+          </x:r>
+        </x:is>
+      </x:c>
+      <x:c r="O7" s="11" t="inlineStr">
+        <x:is>
+          <x:r>
+            <x:rPr>
+              <x:sz val="8.0" />
+            </x:rPr>
+            <x:t xml:space="preserve">TEXTIL</x:t>
+          </x:r>
+        </x:is>
+      </x:c>
+      <x:c r="P7" s="1" t="inlineStr" />
+      <x:c r="Q7" s="9" t="inlineStr">
+        <x:is>
+          <x:r>
+            <x:rPr>
+              <x:sz val="8.0" />
+            </x:rPr>
+            <x:t xml:space="preserve">Tempo:</x:t>
+          </x:r>
+        </x:is>
+      </x:c>
+      <x:c r="R7" s="11" t="inlineStr">
+        <x:is>
+          <x:r>
+            <x:rPr>
+              <x:sz val="8.0" />
+            </x:rPr>
+            <x:t xml:space="preserve">2009 O/I</x:t>
+          </x:r>
+        </x:is>
+      </x:c>
+      <x:c r="S7" s="1" t="inlineStr" />
+      <x:c r="T7" s="9" t="inlineStr">
+        <x:is>
+          <x:r>
+            <x:rPr>
+              <x:sz val="8.0" />
+            </x:rPr>
+            <x:t xml:space="preserve">PCost:</x:t>
+          </x:r>
+        </x:is>
+      </x:c>
+      <x:c r="U7" s="9" t="inlineStr">
+        <x:is>
+          <x:r>
+            <x:rPr>
+              <x:sz val="8.0" />
+            </x:rPr>
+            <x:t xml:space="preserve">5.65 €</x:t>
+          </x:r>
+        </x:is>
+      </x:c>
+      <x:c r="V7" s="1" t="inlineStr" />
+      <x:c r="W7" s="9" t="inlineStr">
+        <x:is>
+          <x:r>
+            <x:rPr>
+              <x:sz val="8.0" />
+            </x:rPr>
+            <x:t xml:space="preserve">GenB:</x:t>
+          </x:r>
+        </x:is>
+      </x:c>
+      <x:c r="X7" s="10" t="inlineStr" />
+      <x:c r="Y7" s="9" t="inlineStr">
+        <x:is>
+          <x:r>
+            <x:rPr>
+              <x:sz val="8.0" />
+            </x:rPr>
+            <x:t xml:space="preserve">10.00 €</x:t>
+          </x:r>
+        </x:is>
+      </x:c>
+      <x:c r="Z7" s="10" t="inlineStr" />
+      <x:c r="AA7" s="10" t="inlineStr" />
+      <x:c r="AB7" s="1" t="inlineStr" />
+    </x:row>
+    <x:row r="8" ht="15" customHeight="1">
+      <x:c r="A8" s="1" t="inlineStr" />
+      <x:c r="B8" s="1" t="inlineStr" />
+      <x:c r="C8" s="1" t="inlineStr" />
+      <x:c r="D8" s="1" t="inlineStr" />
+      <x:c r="E8" s="1" t="inlineStr" />
+      <x:c r="F8" s="9" t="inlineStr">
+        <x:is>
+          <x:r>
+            <x:rPr>
+              <x:sz val="8.0" />
+            </x:rPr>
+            <x:t xml:space="preserve">Cod. Prov:</x:t>
+          </x:r>
+        </x:is>
+      </x:c>
+      <x:c r="G8" s="10" t="inlineStr" />
+      <x:c r="H8" s="10" t="inlineStr" />
+      <x:c r="I8" s="11" t="inlineStr">
+        <x:is>
+          <x:r>
+            <x:rPr>
+              <x:sz val="8.0" />
+            </x:rPr>
+            <x:t xml:space="preserve">647196/MOLA</x:t>
+          </x:r>
+        </x:is>
+      </x:c>
+      <x:c r="J8" s="12" t="inlineStr" />
+      <x:c r="K8" s="12" t="inlineStr" />
+      <x:c r="L8" s="12" t="inlineStr" />
+      <x:c r="M8" s="12" t="inlineStr" />
+      <x:c r="N8" s="9" t="inlineStr">
+        <x:is>
+          <x:r>
+            <x:rPr>
+              <x:sz val="8.0" />
+            </x:rPr>
+            <x:t xml:space="preserve">Familia:</x:t>
+          </x:r>
+        </x:is>
+      </x:c>
+      <x:c r="O8" s="11" t="inlineStr">
+        <x:is>
+          <x:r>
+            <x:rPr>
+              <x:sz val="8.0" />
+            </x:rPr>
+            <x:t xml:space="preserve">REPLICAS</x:t>
+          </x:r>
+        </x:is>
+      </x:c>
+      <x:c r="P8" s="1" t="inlineStr" />
+      <x:c r="Q8" s="9" t="inlineStr">
+        <x:is>
+          <x:r>
+            <x:rPr>
+              <x:sz val="8.0" />
+            </x:rPr>
+            <x:t xml:space="preserve">Género:</x:t>
+          </x:r>
+        </x:is>
+      </x:c>
+      <x:c r="R8" s="11" t="inlineStr">
+        <x:is>
+          <x:r>
+            <x:rPr>
+              <x:sz val="8.0" />
+            </x:rPr>
+            <x:t xml:space="preserve">HOMBRE</x:t>
+          </x:r>
+        </x:is>
+      </x:c>
+      <x:c r="S8" s="1" t="inlineStr" />
+      <x:c r="T8" s="9" t="inlineStr">
+        <x:is>
+          <x:r>
+            <x:rPr>
+              <x:sz val="8.0" />
+            </x:rPr>
+            <x:t xml:space="preserve">PmC:</x:t>
+          </x:r>
+        </x:is>
+      </x:c>
+      <x:c r="U8" s="9" t="inlineStr">
+        <x:is>
+          <x:r>
+            <x:rPr>
+              <x:sz val="8.0" />
+            </x:rPr>
+            <x:t xml:space="preserve">5.65 €</x:t>
+          </x:r>
+        </x:is>
+      </x:c>
+      <x:c r="V8" s="1" t="inlineStr" />
+      <x:c r="W8" s="9" t="inlineStr">
+        <x:is>
+          <x:r>
+            <x:rPr>
+              <x:sz val="8.0" />
+            </x:rPr>
+            <x:t xml:space="preserve">Reb:</x:t>
+          </x:r>
+        </x:is>
+      </x:c>
+      <x:c r="X8" s="10" t="inlineStr" />
+      <x:c r="Y8" s="9" t="inlineStr">
+        <x:is />
+      </x:c>
+      <x:c r="Z8" s="10" t="inlineStr" />
+      <x:c r="AA8" s="10" t="inlineStr" />
+      <x:c r="AB8" s="1" t="inlineStr" />
+    </x:row>
+    <x:row r="9" ht="13" customHeight="1">
+      <x:c r="A9" s="1" t="inlineStr" />
+      <x:c r="B9" s="1" t="inlineStr" />
+      <x:c r="C9" s="1" t="inlineStr" />
+      <x:c r="D9" s="1" t="inlineStr" />
+      <x:c r="E9" s="1" t="inlineStr" />
+      <x:c r="F9" s="9" t="inlineStr">
+        <x:is>
+          <x:r>
+            <x:rPr>
+              <x:sz val="8.0" />
+            </x:rPr>
+            <x:t xml:space="preserve">Color:</x:t>
+          </x:r>
+        </x:is>
+      </x:c>
+      <x:c r="G9" s="10" t="inlineStr" />
+      <x:c r="H9" s="10" t="inlineStr" />
+      <x:c r="I9" s="11" t="inlineStr">
+        <x:is>
+          <x:r>
+            <x:rPr>
+              <x:sz val="8.0" />
+            </x:rPr>
+            <x:t xml:space="preserve">mola/mogollón+yeah</x:t>
+          </x:r>
+        </x:is>
+      </x:c>
+      <x:c r="J9" s="12" t="inlineStr" />
+      <x:c r="K9" s="12" t="inlineStr" />
+      <x:c r="L9" s="12" t="inlineStr" />
+      <x:c r="M9" s="12" t="inlineStr" />
+      <x:c r="N9" s="9" t="inlineStr">
+        <x:is>
+          <x:r>
+            <x:rPr>
+              <x:sz val="8.0" />
+            </x:rPr>
+            <x:t xml:space="preserve">Subfamilia:</x:t>
+          </x:r>
+        </x:is>
+      </x:c>
+      <x:c r="O9" s="11" t="inlineStr">
+        <x:is>
+          <x:r>
+            <x:rPr>
+              <x:sz val="8.0" />
+            </x:rPr>
+            <x:t xml:space="preserve">CAM. OFICIAL.HOMBRE </x:t>
+          </x:r>
+        </x:is>
+      </x:c>
+      <x:c r="P9" s="12" t="inlineStr" />
+      <x:c r="Q9" s="12" t="inlineStr" />
+      <x:c r="R9" s="12" t="inlineStr" />
+      <x:c r="S9" s="1" t="inlineStr" />
+      <x:c r="T9" s="9" t="inlineStr">
+        <x:is>
+          <x:r>
+            <x:rPr>
+              <x:sz val="8.0" />
+            </x:rPr>
+            <x:t xml:space="preserve">PmV:</x:t>
+          </x:r>
+        </x:is>
+      </x:c>
+      <x:c r="U9" s="9" t="inlineStr">
+        <x:is>
+          <x:r>
+            <x:rPr>
+              <x:sz val="8.0" />
+            </x:rPr>
+            <x:t xml:space="preserve">14.06 €</x:t>
+          </x:r>
+        </x:is>
+      </x:c>
+      <x:c r="V9" s="1" t="inlineStr" />
+      <x:c r="W9" s="9" t="inlineStr">
+        <x:is>
+          <x:r>
+            <x:rPr>
+              <x:sz val="8.0" />
+            </x:rPr>
+            <x:t xml:space="preserve">Margen:</x:t>
+          </x:r>
+        </x:is>
+      </x:c>
+      <x:c r="X9" s="10" t="inlineStr" />
+      <x:c r="Y9" s="9" t="inlineStr">
+        <x:is>
+          <x:r>
+            <x:rPr>
+              <x:sz val="8.0" />
+            </x:rPr>
+            <x:t xml:space="preserve">51.37 %</x:t>
+          </x:r>
+        </x:is>
+      </x:c>
+      <x:c r="Z9" s="10" t="inlineStr" />
+      <x:c r="AA9" s="10" t="inlineStr" />
+      <x:c r="AB9" s="1" t="inlineStr" />
+    </x:row>
+    <x:row r="10" ht="2" customHeight="1">
+      <x:c r="A10" s="1" t="inlineStr" />
+      <x:c r="B10" s="1" t="inlineStr" />
+      <x:c r="C10" s="1" t="inlineStr" />
+      <x:c r="D10" s="1" t="inlineStr" />
+      <x:c r="E10" s="1" t="inlineStr" />
+      <x:c r="F10" s="10" t="inlineStr" />
+      <x:c r="G10" s="10" t="inlineStr" />
+      <x:c r="H10" s="10" t="inlineStr" />
+      <x:c r="I10" s="12" t="inlineStr" />
+      <x:c r="J10" s="12" t="inlineStr" />
+      <x:c r="K10" s="12" t="inlineStr" />
+      <x:c r="L10" s="12" t="inlineStr" />
+      <x:c r="M10" s="12" t="inlineStr" />
+      <x:c r="N10" s="10" t="inlineStr" />
+      <x:c r="O10" s="12" t="inlineStr" />
+      <x:c r="P10" s="12" t="inlineStr" />
+      <x:c r="Q10" s="12" t="inlineStr" />
+      <x:c r="R10" s="12" t="inlineStr" />
+      <x:c r="S10" s="1" t="inlineStr" />
+      <x:c r="T10" s="10" t="inlineStr" />
+      <x:c r="U10" s="10" t="inlineStr" />
+      <x:c r="V10" s="1" t="inlineStr" />
+      <x:c r="W10" s="10" t="inlineStr" />
+      <x:c r="X10" s="10" t="inlineStr" />
+      <x:c r="Y10" s="10" t="inlineStr" />
+      <x:c r="Z10" s="10" t="inlineStr" />
+      <x:c r="AA10" s="10" t="inlineStr" />
+      <x:c r="AB10" s="1" t="inlineStr" />
+    </x:row>
+    <x:row r="11" ht="2" customHeight="1">
+      <x:c r="A11" s="1" t="inlineStr" />
+      <x:c r="B11" s="1" t="inlineStr" />
+      <x:c r="C11" s="1" t="inlineStr" />
+      <x:c r="D11" s="1" t="inlineStr" />
+      <x:c r="E11" s="1" t="inlineStr" />
+      <x:c r="F11" s="1" t="inlineStr" />
+      <x:c r="G11" s="1" t="inlineStr" />
+      <x:c r="H11" s="1" t="inlineStr" />
+      <x:c r="I11" s="1" t="inlineStr" />
+      <x:c r="J11" s="1" t="inlineStr" />
+      <x:c r="K11" s="1" t="inlineStr" />
+      <x:c r="L11" s="1" t="inlineStr" />
+      <x:c r="M11" s="1" t="inlineStr" />
+      <x:c r="N11" s="1" t="inlineStr" />
+      <x:c r="O11" s="1" t="inlineStr" />
+      <x:c r="P11" s="1" t="inlineStr" />
+      <x:c r="Q11" s="1" t="inlineStr" />
+      <x:c r="R11" s="1" t="inlineStr" />
+      <x:c r="S11" s="1" t="inlineStr" />
+      <x:c r="T11" s="1" t="inlineStr" />
+      <x:c r="U11" s="1" t="inlineStr" />
+      <x:c r="V11" s="1" t="inlineStr" />
+      <x:c r="W11" s="1" t="inlineStr" />
+      <x:c r="X11" s="1" t="inlineStr" />
+      <x:c r="Y11" s="1" t="inlineStr" />
+      <x:c r="Z11" s="1" t="inlineStr" />
+      <x:c r="AA11" s="1" t="inlineStr" />
+      <x:c r="AB11" s="1" t="inlineStr" />
+    </x:row>
+    <x:row r="12" ht="12" customHeight="1">
+      <x:c r="A12" s="1" t="inlineStr" />
+      <x:c r="B12" s="13" t="inlineStr" />
+      <x:c r="C12" s="13" t="inlineStr" />
+      <x:c r="D12" s="13" t="inlineStr" />
+      <x:c r="E12" s="14" t="inlineStr">
+        <x:is>
+          <x:r>
+            <x:rPr>
+              <x:sz val="6.0" />
+            </x:rPr>
+            <x:t xml:space="preserve">S</x:t>
+          </x:r>
+        </x:is>
+      </x:c>
+      <x:c r="F12" s="15" t="inlineStr" />
+      <x:c r="G12" s="14" t="inlineStr">
+        <x:is>
+          <x:r>
+            <x:rPr>
+              <x:sz val="6.0" />
+            </x:rPr>
+            <x:t xml:space="preserve">M</x:t>
+          </x:r>
+        </x:is>
+      </x:c>
+      <x:c r="H12" s="14" t="inlineStr">
+        <x:is>
+          <x:r>
+            <x:rPr>
+              <x:sz val="6.0" />
+            </x:rPr>
+            <x:t xml:space="preserve">L</x:t>
+          </x:r>
+        </x:is>
+      </x:c>
+      <x:c r="I12" s="15" t="inlineStr" />
+      <x:c r="J12" s="14" t="inlineStr">
+        <x:is>
+          <x:r>
+            <x:rPr>
+              <x:sz val="6.0" />
+            </x:rPr>
+            <x:t xml:space="preserve">XL</x:t>
+          </x:r>
+        </x:is>
+      </x:c>
+      <x:c r="K12" s="16" t="inlineStr">
+        <x:is>
+          <x:r>
+            <x:rPr>
+              <x:sz val="6.0" />
+            </x:rPr>
+            <x:t xml:space="preserve">Total</x:t>
+          </x:r>
+        </x:is>
+      </x:c>
+      <x:c r="L12" s="17" t="inlineStr" />
+      <x:c r="M12" s="1" t="inlineStr" />
+      <x:c r="N12" s="1" t="inlineStr" />
+      <x:c r="O12" s="1" t="inlineStr" />
+      <x:c r="P12" s="1" t="inlineStr" />
+      <x:c r="Q12" s="1" t="inlineStr" />
+      <x:c r="R12" s="1" t="inlineStr" />
+      <x:c r="S12" s="1" t="inlineStr" />
+      <x:c r="T12" s="1" t="inlineStr" />
+      <x:c r="U12" s="18" t="inlineStr">
+        <x:is>
+          <x:r>
+            <x:rPr>
+              <x:sz val="6.0" />
+            </x:rPr>
+            <x:t xml:space="preserve">Descripción</x:t>
+          </x:r>
+        </x:is>
+      </x:c>
+      <x:c r="V12" s="19" t="inlineStr" />
+      <x:c r="W12" s="19" t="inlineStr" />
+      <x:c r="X12" s="20" t="inlineStr">
+        <x:is>
+          <x:r>
+            <x:rPr>
+              <x:sz val="6.0" />
+            </x:rPr>
+            <x:t xml:space="preserve">Precio</x:t>
+          </x:r>
+        </x:is>
+      </x:c>
+      <x:c r="Y12" s="21" t="inlineStr" />
+      <x:c r="Z12" s="22" t="inlineStr">
+        <x:is>
+          <x:r>
+            <x:rPr>
+              <x:sz val="6.0" />
+            </x:rPr>
+            <x:t xml:space="preserve">Uni</x:t>
+          </x:r>
+        </x:is>
+      </x:c>
+      <x:c r="AA12" s="23" t="inlineStr" />
+      <x:c r="AB12" s="1" t="inlineStr" />
+    </x:row>
+    <x:row r="13" ht="12" customHeight="1">
+      <x:c r="A13" s="1" t="inlineStr" />
+      <x:c r="B13" s="24" t="inlineStr">
+        <x:is>
+          <x:r>
+            <x:rPr>
+              <x:sz val="6.0" />
+            </x:rPr>
+            <x:t xml:space="preserve">011 TIENDA ID 11</x:t>
+          </x:r>
+        </x:is>
+      </x:c>
+      <x:c r="C13" s="25" t="inlineStr">
+        <x:is>
+          <x:r>
+            <x:rPr>
+              <x:sz val="6.0" />
+            </x:rPr>
+            <x:t xml:space="preserve">Stock:</x:t>
+          </x:r>
+        </x:is>
+      </x:c>
+      <x:c r="D13" s="26" t="inlineStr" />
+      <x:c r="E13" s="27" t="inlineStr">
+        <x:is>
+          <x:r>
+            <x:rPr>
+              <x:sz val="6.0" />
+            </x:rPr>
+            <x:t xml:space="preserve">-1</x:t>
+          </x:r>
+        </x:is>
+      </x:c>
+      <x:c r="F13" s="28" t="inlineStr" />
+      <x:c r="G13" s="27" t="inlineStr">
+        <x:is />
+      </x:c>
+      <x:c r="H13" s="27" t="inlineStr">
+        <x:is />
+      </x:c>
+      <x:c r="I13" s="28" t="inlineStr" />
+      <x:c r="J13" s="27" t="inlineStr">
+        <x:is />
+      </x:c>
+      <x:c r="K13" s="29" t="inlineStr">
+        <x:is>
+          <x:r>
+            <x:rPr>
+              <x:sz val="6.0" />
+            </x:rPr>
+            <x:t xml:space="preserve">-1</x:t>
+          </x:r>
+        </x:is>
+      </x:c>
+      <x:c r="L13" s="30" t="inlineStr" />
+      <x:c r="M13" s="1" t="inlineStr" />
+      <x:c r="N13" s="1" t="inlineStr" />
+      <x:c r="O13" s="1" t="inlineStr" />
+      <x:c r="P13" s="1" t="inlineStr" />
+      <x:c r="Q13" s="1" t="inlineStr" />
+      <x:c r="R13" s="1" t="inlineStr" />
+      <x:c r="S13" s="1" t="inlineStr" />
+      <x:c r="T13" s="1" t="inlineStr" />
+      <x:c r="U13" s="31" t="inlineStr">
+        <x:is>
+          <x:r>
+            <x:rPr>
+              <x:sz val="5.0" />
+            </x:rPr>
+            <x:t xml:space="preserve">Ofe 23150 10% DESCUENTO</x:t>
+          </x:r>
+        </x:is>
+      </x:c>
+      <x:c r="V13" s="32" t="inlineStr" />
+      <x:c r="W13" s="32" t="inlineStr" />
+      <x:c r="X13" s="16" t="inlineStr">
+        <x:is>
+          <x:r>
+            <x:rPr>
+              <x:sz val="6.0" />
+            </x:rPr>
+            <x:t xml:space="preserve">18.00 €</x:t>
+          </x:r>
+        </x:is>
+      </x:c>
+      <x:c r="Y13" s="17" t="inlineStr" />
+      <x:c r="Z13" s="33" t="inlineStr">
+        <x:is>
+          <x:r>
+            <x:rPr>
+              <x:sz val="6.0" />
+            </x:rPr>
+            <x:t xml:space="preserve">3</x:t>
+          </x:r>
+        </x:is>
+      </x:c>
+      <x:c r="AA13" s="34" t="inlineStr" />
+      <x:c r="AB13" s="1" t="inlineStr" />
+    </x:row>
+    <x:row r="14" ht="3" customHeight="1">
+      <x:c r="A14" s="1" t="inlineStr" />
+      <x:c r="B14" s="35" t="inlineStr" />
+      <x:c r="C14" s="25" t="inlineStr">
+        <x:is>
+          <x:r>
+            <x:rPr>
+              <x:sz val="6.0" />
+            </x:rPr>
+            <x:t xml:space="preserve">Transito:</x:t>
+          </x:r>
+        </x:is>
+      </x:c>
+      <x:c r="D14" s="26" t="inlineStr" />
+      <x:c r="E14" s="27" t="inlineStr">
+        <x:is />
+      </x:c>
+      <x:c r="F14" s="28" t="inlineStr" />
+      <x:c r="G14" s="27" t="inlineStr">
+        <x:is />
+      </x:c>
+      <x:c r="H14" s="27" t="inlineStr">
+        <x:is />
+      </x:c>
+      <x:c r="I14" s="28" t="inlineStr" />
+      <x:c r="J14" s="27" t="inlineStr">
+        <x:is />
+      </x:c>
+      <x:c r="K14" s="29" t="inlineStr">
+        <x:is />
+      </x:c>
+      <x:c r="L14" s="30" t="inlineStr" />
+      <x:c r="M14" s="1" t="inlineStr" />
+      <x:c r="N14" s="1" t="inlineStr" />
+      <x:c r="O14" s="1" t="inlineStr" />
+      <x:c r="P14" s="1" t="inlineStr" />
+      <x:c r="Q14" s="1" t="inlineStr" />
+      <x:c r="R14" s="1" t="inlineStr" />
+      <x:c r="S14" s="1" t="inlineStr" />
+      <x:c r="T14" s="1" t="inlineStr" />
+      <x:c r="U14" s="32" t="inlineStr" />
+      <x:c r="V14" s="32" t="inlineStr" />
+      <x:c r="W14" s="32" t="inlineStr" />
+      <x:c r="X14" s="17" t="inlineStr" />
+      <x:c r="Y14" s="17" t="inlineStr" />
+      <x:c r="Z14" s="34" t="inlineStr" />
+      <x:c r="AA14" s="34" t="inlineStr" />
+      <x:c r="AB14" s="1" t="inlineStr" />
+    </x:row>
+    <x:row r="15" ht="9" customHeight="1">
+      <x:c r="A15" s="1" t="inlineStr" />
+      <x:c r="B15" s="35" t="inlineStr" />
+      <x:c r="C15" s="26" t="inlineStr" />
+      <x:c r="D15" s="26" t="inlineStr" />
+      <x:c r="E15" s="28" t="inlineStr" />
+      <x:c r="F15" s="28" t="inlineStr" />
+      <x:c r="G15" s="28" t="inlineStr" />
+      <x:c r="H15" s="28" t="inlineStr" />
+      <x:c r="I15" s="28" t="inlineStr" />
+      <x:c r="J15" s="28" t="inlineStr" />
+      <x:c r="K15" s="30" t="inlineStr" />
+      <x:c r="L15" s="30" t="inlineStr" />
+      <x:c r="M15" s="1" t="inlineStr" />
+      <x:c r="N15" s="1" t="inlineStr" />
+      <x:c r="O15" s="1" t="inlineStr" />
+      <x:c r="P15" s="1" t="inlineStr" />
+      <x:c r="Q15" s="1" t="inlineStr" />
+      <x:c r="R15" s="1" t="inlineStr" />
+      <x:c r="S15" s="1" t="inlineStr" />
+      <x:c r="T15" s="1" t="inlineStr" />
+      <x:c r="U15" s="31" t="inlineStr">
+        <x:is>
+          <x:r>
+            <x:rPr>
+              <x:sz val="5.0" />
+            </x:rPr>
+            <x:t xml:space="preserve">Tari PVP_RECOMENDADO</x:t>
+          </x:r>
+        </x:is>
+      </x:c>
+      <x:c r="V15" s="32" t="inlineStr" />
+      <x:c r="W15" s="32" t="inlineStr" />
+      <x:c r="X15" s="16" t="inlineStr">
+        <x:is>
+          <x:r>
+            <x:rPr>
+              <x:sz val="6.0" />
+            </x:rPr>
+            <x:t xml:space="preserve">17.41 €</x:t>
+          </x:r>
+        </x:is>
+      </x:c>
+      <x:c r="Y15" s="17" t="inlineStr" />
+      <x:c r="Z15" s="33" t="inlineStr">
+        <x:is>
+          <x:r>
+            <x:rPr>
+              <x:sz val="6.0" />
+            </x:rPr>
+            <x:t xml:space="preserve">4</x:t>
+          </x:r>
+        </x:is>
+      </x:c>
+      <x:c r="AA15" s="34" t="inlineStr" />
+      <x:c r="AB15" s="1" t="inlineStr" />
+    </x:row>
+    <x:row r="16" ht="6" customHeight="1">
+      <x:c r="A16" s="1" t="inlineStr" />
+      <x:c r="B16" s="35" t="inlineStr" />
+      <x:c r="C16" s="25" t="inlineStr">
+        <x:is>
+          <x:r>
+            <x:rPr>
+              <x:sz val="6.0" />
+            </x:rPr>
+            <x:t xml:space="preserve">Ventas:</x:t>
+          </x:r>
+        </x:is>
+      </x:c>
+      <x:c r="D16" s="26" t="inlineStr" />
+      <x:c r="E16" s="27" t="inlineStr">
+        <x:is>
+          <x:r>
+            <x:rPr>
+              <x:sz val="6.0" />
+            </x:rPr>
+            <x:t xml:space="preserve">1</x:t>
+          </x:r>
+        </x:is>
+      </x:c>
+      <x:c r="F16" s="28" t="inlineStr" />
+      <x:c r="G16" s="27" t="inlineStr">
+        <x:is />
+      </x:c>
+      <x:c r="H16" s="27" t="inlineStr">
+        <x:is />
+      </x:c>
+      <x:c r="I16" s="28" t="inlineStr" />
+      <x:c r="J16" s="27" t="inlineStr">
+        <x:is />
+      </x:c>
+      <x:c r="K16" s="29" t="inlineStr">
+        <x:is>
+          <x:r>
+            <x:rPr>
+              <x:sz val="6.0" />
+            </x:rPr>
+            <x:t xml:space="preserve">1</x:t>
+          </x:r>
+        </x:is>
+      </x:c>
+      <x:c r="L16" s="30" t="inlineStr" />
+      <x:c r="M16" s="1" t="inlineStr" />
+      <x:c r="N16" s="1" t="inlineStr" />
+      <x:c r="O16" s="1" t="inlineStr" />
+      <x:c r="P16" s="1" t="inlineStr" />
+      <x:c r="Q16" s="1" t="inlineStr" />
+      <x:c r="R16" s="1" t="inlineStr" />
+      <x:c r="S16" s="1" t="inlineStr" />
+      <x:c r="T16" s="1" t="inlineStr" />
+      <x:c r="U16" s="32" t="inlineStr" />
+      <x:c r="V16" s="32" t="inlineStr" />
+      <x:c r="W16" s="32" t="inlineStr" />
+      <x:c r="X16" s="17" t="inlineStr" />
+      <x:c r="Y16" s="17" t="inlineStr" />
+      <x:c r="Z16" s="34" t="inlineStr" />
+      <x:c r="AA16" s="34" t="inlineStr" />
+      <x:c r="AB16" s="1" t="inlineStr" />
+    </x:row>
+    <x:row r="17" ht="6" customHeight="1">
+      <x:c r="A17" s="1" t="inlineStr" />
+      <x:c r="B17" s="36" t="inlineStr" />
+      <x:c r="C17" s="26" t="inlineStr" />
+      <x:c r="D17" s="26" t="inlineStr" />
+      <x:c r="E17" s="28" t="inlineStr" />
+      <x:c r="F17" s="28" t="inlineStr" />
+      <x:c r="G17" s="28" t="inlineStr" />
+      <x:c r="H17" s="28" t="inlineStr" />
+      <x:c r="I17" s="28" t="inlineStr" />
+      <x:c r="J17" s="28" t="inlineStr" />
+      <x:c r="K17" s="30" t="inlineStr" />
+      <x:c r="L17" s="30" t="inlineStr" />
+      <x:c r="M17" s="1" t="inlineStr" />
+      <x:c r="N17" s="1" t="inlineStr" />
+      <x:c r="O17" s="1" t="inlineStr" />
+      <x:c r="P17" s="1" t="inlineStr" />
+      <x:c r="Q17" s="1" t="inlineStr" />
+      <x:c r="R17" s="1" t="inlineStr" />
+      <x:c r="S17" s="1" t="inlineStr" />
+      <x:c r="T17" s="1" t="inlineStr" />
+      <x:c r="U17" s="31" t="inlineStr">
+        <x:is>
+          <x:r>
+            <x:rPr>
+              <x:sz val="5.0" />
+            </x:rPr>
+            <x:t xml:space="preserve">Tari PVP_ACTUAL</x:t>
+          </x:r>
+        </x:is>
+      </x:c>
+      <x:c r="V17" s="32" t="inlineStr" />
+      <x:c r="W17" s="32" t="inlineStr" />
+      <x:c r="X17" s="16" t="inlineStr">
+        <x:is>
+          <x:r>
+            <x:rPr>
+              <x:sz val="6.0" />
+            </x:rPr>
+            <x:t xml:space="preserve">9.91 €</x:t>
+          </x:r>
+        </x:is>
+      </x:c>
+      <x:c r="Y17" s="17" t="inlineStr" />
+      <x:c r="Z17" s="33" t="inlineStr">
+        <x:is>
+          <x:r>
+            <x:rPr>
+              <x:sz val="6.0" />
+            </x:rPr>
+            <x:t xml:space="preserve">11</x:t>
+          </x:r>
+        </x:is>
+      </x:c>
+      <x:c r="AA17" s="34" t="inlineStr" />
+      <x:c r="AB17" s="1" t="inlineStr" />
+    </x:row>
+    <x:row r="18" ht="9" customHeight="1">
+      <x:c r="A18" s="1" t="inlineStr" />
+      <x:c r="B18" s="24" t="inlineStr">
+        <x:is>
+          <x:r>
+            <x:rPr>
+              <x:sz val="6.0" />
+            </x:rPr>
+            <x:t xml:space="preserve">109 TIENDA ID 109</x:t>
+          </x:r>
+        </x:is>
+      </x:c>
+      <x:c r="C18" s="25" t="inlineStr">
+        <x:is>
+          <x:r>
+            <x:rPr>
+              <x:sz val="6.0" />
+            </x:rPr>
+            <x:t xml:space="preserve">Stock:</x:t>
+          </x:r>
+        </x:is>
+      </x:c>
+      <x:c r="D18" s="26" t="inlineStr" />
+      <x:c r="E18" s="27" t="inlineStr">
+        <x:is>
+          <x:r>
+            <x:rPr>
+              <x:sz val="6.0" />
+            </x:rPr>
+            <x:t xml:space="preserve">-13</x:t>
+          </x:r>
+        </x:is>
+      </x:c>
+      <x:c r="F18" s="28" t="inlineStr" />
+      <x:c r="G18" s="27" t="inlineStr">
+        <x:is>
+          <x:r>
+            <x:rPr>
+              <x:sz val="6.0" />
+            </x:rPr>
+            <x:t xml:space="preserve">8</x:t>
+          </x:r>
+        </x:is>
+      </x:c>
+      <x:c r="H18" s="27" t="inlineStr">
+        <x:is />
+      </x:c>
+      <x:c r="I18" s="28" t="inlineStr" />
+      <x:c r="J18" s="27" t="inlineStr">
+        <x:is />
+      </x:c>
+      <x:c r="K18" s="29" t="inlineStr">
+        <x:is>
+          <x:r>
+            <x:rPr>
+              <x:sz val="6.0" />
+            </x:rPr>
+            <x:t xml:space="preserve">-5</x:t>
+          </x:r>
+        </x:is>
+      </x:c>
+      <x:c r="L18" s="30" t="inlineStr" />
+      <x:c r="M18" s="1" t="inlineStr" />
+      <x:c r="N18" s="1" t="inlineStr" />
+      <x:c r="O18" s="1" t="inlineStr" />
+      <x:c r="P18" s="1" t="inlineStr" />
+      <x:c r="Q18" s="1" t="inlineStr" />
+      <x:c r="R18" s="1" t="inlineStr" />
+      <x:c r="S18" s="1" t="inlineStr" />
+      <x:c r="T18" s="1" t="inlineStr" />
+      <x:c r="U18" s="32" t="inlineStr" />
+      <x:c r="V18" s="32" t="inlineStr" />
+      <x:c r="W18" s="32" t="inlineStr" />
+      <x:c r="X18" s="17" t="inlineStr" />
+      <x:c r="Y18" s="17" t="inlineStr" />
+      <x:c r="Z18" s="34" t="inlineStr" />
+      <x:c r="AA18" s="34" t="inlineStr" />
+      <x:c r="AB18" s="1" t="inlineStr" />
+    </x:row>
+    <x:row r="19" ht="3" customHeight="1">
+      <x:c r="A19" s="1" t="inlineStr" />
+      <x:c r="B19" s="37" t="inlineStr" />
+      <x:c r="C19" s="26" t="inlineStr" />
+      <x:c r="D19" s="26" t="inlineStr" />
+      <x:c r="E19" s="28" t="inlineStr" />
+      <x:c r="F19" s="28" t="inlineStr" />
+      <x:c r="G19" s="28" t="inlineStr" />
+      <x:c r="H19" s="28" t="inlineStr" />
+      <x:c r="I19" s="28" t="inlineStr" />
+      <x:c r="J19" s="28" t="inlineStr" />
+      <x:c r="K19" s="30" t="inlineStr" />
+      <x:c r="L19" s="30" t="inlineStr" />
+      <x:c r="M19" s="1" t="inlineStr" />
+      <x:c r="N19" s="1" t="inlineStr" />
+      <x:c r="O19" s="1" t="inlineStr" />
+      <x:c r="P19" s="1" t="inlineStr" />
+      <x:c r="Q19" s="1" t="inlineStr" />
+      <x:c r="R19" s="1" t="inlineStr" />
+      <x:c r="S19" s="1" t="inlineStr" />
+      <x:c r="T19" s="1" t="inlineStr" />
+      <x:c r="U19" s="38" t="inlineStr">
+        <x:is>
+          <x:r>
+            <x:rPr>
+              <x:sz val="5.0" />
+            </x:rPr>
+            <x:t xml:space="preserve">Pre. Medio y Tot Uni:</x:t>
+          </x:r>
+        </x:is>
+      </x:c>
+      <x:c r="V19" s="39" t="inlineStr" />
+      <x:c r="W19" s="39" t="inlineStr" />
+      <x:c r="X19" s="40" t="inlineStr">
+        <x:is>
+          <x:r>
+            <x:rPr>
+              <x:sz val="6.0" />
+            </x:rPr>
+            <x:t xml:space="preserve">12.92 €</x:t>
+          </x:r>
+        </x:is>
+      </x:c>
+      <x:c r="Y19" s="41" t="inlineStr" />
+      <x:c r="Z19" s="42" t="inlineStr">
+        <x:is>
+          <x:r>
+            <x:rPr>
+              <x:sz val="6.0" />
+            </x:rPr>
+            <x:t xml:space="preserve">18</x:t>
+          </x:r>
+        </x:is>
+      </x:c>
+      <x:c r="AA19" s="43" t="inlineStr" />
+      <x:c r="AB19" s="1" t="inlineStr" />
+    </x:row>
+    <x:row r="20" ht="9" customHeight="1">
+      <x:c r="A20" s="1" t="inlineStr" />
+      <x:c r="B20" s="35" t="inlineStr" />
+      <x:c r="C20" s="25" t="inlineStr">
+        <x:is>
+          <x:r>
+            <x:rPr>
+              <x:sz val="6.0" />
+            </x:rPr>
+            <x:t xml:space="preserve">Transito:</x:t>
+          </x:r>
+        </x:is>
+      </x:c>
+      <x:c r="D20" s="26" t="inlineStr" />
+      <x:c r="E20" s="27" t="inlineStr">
+        <x:is />
+      </x:c>
+      <x:c r="F20" s="28" t="inlineStr" />
+      <x:c r="G20" s="27" t="inlineStr">
+        <x:is />
+      </x:c>
+      <x:c r="H20" s="27" t="inlineStr">
+        <x:is />
+      </x:c>
+      <x:c r="I20" s="28" t="inlineStr" />
+      <x:c r="J20" s="27" t="inlineStr">
+        <x:is />
+      </x:c>
+      <x:c r="K20" s="29" t="inlineStr">
+        <x:is />
+      </x:c>
+      <x:c r="L20" s="30" t="inlineStr" />
+      <x:c r="M20" s="1" t="inlineStr" />
+      <x:c r="N20" s="1" t="inlineStr" />
+      <x:c r="O20" s="1" t="inlineStr" />
+      <x:c r="P20" s="1" t="inlineStr" />
+      <x:c r="Q20" s="1" t="inlineStr" />
+      <x:c r="R20" s="1" t="inlineStr" />
+      <x:c r="S20" s="1" t="inlineStr" />
+      <x:c r="T20" s="1" t="inlineStr" />
+      <x:c r="U20" s="39" t="inlineStr" />
+      <x:c r="V20" s="39" t="inlineStr" />
+      <x:c r="W20" s="39" t="inlineStr" />
+      <x:c r="X20" s="41" t="inlineStr" />
+      <x:c r="Y20" s="41" t="inlineStr" />
+      <x:c r="Z20" s="43" t="inlineStr" />
+      <x:c r="AA20" s="43" t="inlineStr" />
+      <x:c r="AB20" s="1" t="inlineStr" />
+    </x:row>
+    <x:row r="21" ht="3" customHeight="1">
+      <x:c r="A21" s="1" t="inlineStr" />
+      <x:c r="B21" s="35" t="inlineStr" />
+      <x:c r="C21" s="26" t="inlineStr" />
+      <x:c r="D21" s="26" t="inlineStr" />
+      <x:c r="E21" s="28" t="inlineStr" />
+      <x:c r="F21" s="28" t="inlineStr" />
+      <x:c r="G21" s="28" t="inlineStr" />
+      <x:c r="H21" s="28" t="inlineStr" />
+      <x:c r="I21" s="28" t="inlineStr" />
+      <x:c r="J21" s="28" t="inlineStr" />
+      <x:c r="K21" s="30" t="inlineStr" />
+      <x:c r="L21" s="30" t="inlineStr" />
+      <x:c r="M21" s="1" t="inlineStr" />
+      <x:c r="N21" s="1" t="inlineStr" />
+      <x:c r="O21" s="1" t="inlineStr" />
+      <x:c r="P21" s="1" t="inlineStr" />
+      <x:c r="Q21" s="1" t="inlineStr" />
+      <x:c r="R21" s="1" t="inlineStr" />
+      <x:c r="S21" s="1" t="inlineStr" />
+      <x:c r="T21" s="1" t="inlineStr" />
+      <x:c r="U21" s="1" t="inlineStr" />
+      <x:c r="V21" s="1" t="inlineStr" />
+      <x:c r="W21" s="1" t="inlineStr" />
+      <x:c r="X21" s="1" t="inlineStr" />
+      <x:c r="Y21" s="1" t="inlineStr" />
+      <x:c r="Z21" s="1" t="inlineStr" />
+      <x:c r="AA21" s="1" t="inlineStr" />
+      <x:c r="AB21" s="1" t="inlineStr" />
+    </x:row>
+    <x:row r="22" ht="12" customHeight="1">
+      <x:c r="A22" s="1" t="inlineStr" />
+      <x:c r="B22" s="36" t="inlineStr" />
+      <x:c r="C22" s="25" t="inlineStr">
+        <x:is>
+          <x:r>
+            <x:rPr>
+              <x:sz val="6.0" />
+            </x:rPr>
+            <x:t xml:space="preserve">Ventas:</x:t>
+          </x:r>
+        </x:is>
+      </x:c>
+      <x:c r="D22" s="26" t="inlineStr" />
+      <x:c r="E22" s="27" t="inlineStr">
+        <x:is>
+          <x:r>
+            <x:rPr>
+              <x:sz val="6.0" />
+            </x:rPr>
+            <x:t xml:space="preserve">10</x:t>
+          </x:r>
+        </x:is>
+      </x:c>
+      <x:c r="F22" s="28" t="inlineStr" />
+      <x:c r="G22" s="27" t="inlineStr">
+        <x:is>
+          <x:r>
+            <x:rPr>
+              <x:sz val="6.0" />
+            </x:rPr>
+            <x:t xml:space="preserve">7</x:t>
+          </x:r>
+        </x:is>
+      </x:c>
+      <x:c r="H22" s="27" t="inlineStr">
+        <x:is />
+      </x:c>
+      <x:c r="I22" s="28" t="inlineStr" />
+      <x:c r="J22" s="27" t="inlineStr">
+        <x:is />
+      </x:c>
+      <x:c r="K22" s="29" t="inlineStr">
+        <x:is>
+          <x:r>
+            <x:rPr>
+              <x:sz val="6.0" />
+            </x:rPr>
+            <x:t xml:space="preserve">17</x:t>
+          </x:r>
+        </x:is>
+      </x:c>
+      <x:c r="L22" s="30" t="inlineStr" />
+      <x:c r="M22" s="1" t="inlineStr" />
+      <x:c r="N22" s="1" t="inlineStr" />
+      <x:c r="O22" s="1" t="inlineStr" />
+      <x:c r="P22" s="1" t="inlineStr" />
+      <x:c r="Q22" s="1" t="inlineStr" />
+      <x:c r="R22" s="1" t="inlineStr" />
+      <x:c r="S22" s="1" t="inlineStr" />
+      <x:c r="T22" s="1" t="inlineStr" />
+      <x:c r="U22" s="1" t="inlineStr" />
+      <x:c r="V22" s="1" t="inlineStr" />
+      <x:c r="W22" s="1" t="inlineStr" />
+      <x:c r="X22" s="1" t="inlineStr" />
+      <x:c r="Y22" s="1" t="inlineStr" />
+      <x:c r="Z22" s="1" t="inlineStr" />
+      <x:c r="AA22" s="1" t="inlineStr" />
+      <x:c r="AB22" s="1" t="inlineStr" />
+    </x:row>
+    <x:row r="23" ht="12" customHeight="1">
+      <x:c r="A23" s="1" t="inlineStr" />
+      <x:c r="B23" s="24" t="inlineStr">
+        <x:is>
+          <x:r>
+            <x:rPr>
+              <x:sz val="6.0" />
+            </x:rPr>
+            <x:t xml:space="preserve">200 ALMACEN ID 2</x:t>
+          </x:r>
+        </x:is>
+      </x:c>
+      <x:c r="C23" s="25" t="inlineStr">
+        <x:is>
+          <x:r>
+            <x:rPr>
+              <x:sz val="6.0" />
+            </x:rPr>
+            <x:t xml:space="preserve">Stock:</x:t>
+          </x:r>
+        </x:is>
+      </x:c>
+      <x:c r="D23" s="26" t="inlineStr" />
+      <x:c r="E23" s="27" t="inlineStr">
+        <x:is>
+          <x:r>
+            <x:rPr>
+              <x:sz val="6.0" />
+            </x:rPr>
+            <x:t xml:space="preserve">100</x:t>
+          </x:r>
+        </x:is>
+      </x:c>
+      <x:c r="F23" s="28" t="inlineStr" />
+      <x:c r="G23" s="27" t="inlineStr">
+        <x:is>
+          <x:r>
+            <x:rPr>
+              <x:sz val="6.0" />
+            </x:rPr>
+            <x:t xml:space="preserve">5</x:t>
+          </x:r>
+        </x:is>
+      </x:c>
+      <x:c r="H23" s="27" t="inlineStr">
+        <x:is>
+          <x:r>
+            <x:rPr>
+              <x:sz val="6.0" />
+            </x:rPr>
+            <x:t xml:space="preserve">5</x:t>
+          </x:r>
+        </x:is>
+      </x:c>
+      <x:c r="I23" s="28" t="inlineStr" />
+      <x:c r="J23" s="27" t="inlineStr">
+        <x:is>
+          <x:r>
+            <x:rPr>
+              <x:sz val="6.0" />
+            </x:rPr>
+            <x:t xml:space="preserve">5</x:t>
+          </x:r>
+        </x:is>
+      </x:c>
+      <x:c r="K23" s="29" t="inlineStr">
+        <x:is>
+          <x:r>
+            <x:rPr>
+              <x:sz val="6.0" />
+            </x:rPr>
+            <x:t xml:space="preserve">115</x:t>
+          </x:r>
+        </x:is>
+      </x:c>
+      <x:c r="L23" s="30" t="inlineStr" />
+      <x:c r="M23" s="1" t="inlineStr" />
+      <x:c r="N23" s="1" t="inlineStr" />
+      <x:c r="O23" s="1" t="inlineStr" />
+      <x:c r="P23" s="1" t="inlineStr" />
+      <x:c r="Q23" s="1" t="inlineStr" />
+      <x:c r="R23" s="1" t="inlineStr" />
+      <x:c r="S23" s="1" t="inlineStr" />
+      <x:c r="T23" s="1" t="inlineStr" />
+      <x:c r="U23" s="1" t="inlineStr" />
+      <x:c r="V23" s="1" t="inlineStr" />
+      <x:c r="W23" s="1" t="inlineStr" />
+      <x:c r="X23" s="1" t="inlineStr" />
+      <x:c r="Y23" s="1" t="inlineStr" />
+      <x:c r="Z23" s="1" t="inlineStr" />
+      <x:c r="AA23" s="1" t="inlineStr" />
+      <x:c r="AB23" s="1" t="inlineStr" />
+    </x:row>
+    <x:row r="24" ht="12" customHeight="1">
+      <x:c r="A24" s="1" t="inlineStr" />
+      <x:c r="B24" s="35" t="inlineStr" />
+      <x:c r="C24" s="25" t="inlineStr">
+        <x:is>
+          <x:r>
+            <x:rPr>
+              <x:sz val="6.0" />
+            </x:rPr>
+            <x:t xml:space="preserve">Transito:</x:t>
+          </x:r>
+        </x:is>
+      </x:c>
+      <x:c r="D24" s="26" t="inlineStr" />
+      <x:c r="E24" s="27" t="inlineStr">
+        <x:is />
+      </x:c>
+      <x:c r="F24" s="28" t="inlineStr" />
+      <x:c r="G24" s="27" t="inlineStr">
+        <x:is />
+      </x:c>
+      <x:c r="H24" s="27" t="inlineStr">
+        <x:is />
+      </x:c>
+      <x:c r="I24" s="28" t="inlineStr" />
+      <x:c r="J24" s="27" t="inlineStr">
+        <x:is />
+      </x:c>
+      <x:c r="K24" s="29" t="inlineStr">
+        <x:is />
+      </x:c>
+      <x:c r="L24" s="30" t="inlineStr" />
+      <x:c r="M24" s="1" t="inlineStr" />
+      <x:c r="N24" s="1" t="inlineStr" />
+      <x:c r="O24" s="1" t="inlineStr" />
+      <x:c r="P24" s="1" t="inlineStr" />
+      <x:c r="Q24" s="1" t="inlineStr" />
+      <x:c r="R24" s="1" t="inlineStr" />
+      <x:c r="S24" s="1" t="inlineStr" />
+      <x:c r="T24" s="1" t="inlineStr" />
+      <x:c r="U24" s="1" t="inlineStr" />
+      <x:c r="V24" s="1" t="inlineStr" />
+      <x:c r="W24" s="1" t="inlineStr" />
+      <x:c r="X24" s="1" t="inlineStr" />
+      <x:c r="Y24" s="1" t="inlineStr" />
+      <x:c r="Z24" s="1" t="inlineStr" />
+      <x:c r="AA24" s="1" t="inlineStr" />
+      <x:c r="AB24" s="1" t="inlineStr" />
+    </x:row>
+    <x:row r="25" ht="12" customHeight="1">
+      <x:c r="A25" s="1" t="inlineStr" />
+      <x:c r="B25" s="36" t="inlineStr" />
+      <x:c r="C25" s="25" t="inlineStr">
+        <x:is>
+          <x:r>
+            <x:rPr>
+              <x:sz val="6.0" />
+            </x:rPr>
+            <x:t xml:space="preserve">Ventas:</x:t>
+          </x:r>
+        </x:is>
+      </x:c>
+      <x:c r="D25" s="26" t="inlineStr" />
+      <x:c r="E25" s="27" t="inlineStr">
+        <x:is />
+      </x:c>
+      <x:c r="F25" s="28" t="inlineStr" />
+      <x:c r="G25" s="27" t="inlineStr">
+        <x:is />
+      </x:c>
+      <x:c r="H25" s="27" t="inlineStr">
+        <x:is />
+      </x:c>
+      <x:c r="I25" s="28" t="inlineStr" />
+      <x:c r="J25" s="27" t="inlineStr">
+        <x:is />
+      </x:c>
+      <x:c r="K25" s="29" t="inlineStr">
+        <x:is />
+      </x:c>
+      <x:c r="L25" s="30" t="inlineStr" />
+      <x:c r="M25" s="1" t="inlineStr" />
+      <x:c r="N25" s="1" t="inlineStr" />
+      <x:c r="O25" s="1" t="inlineStr" />
+      <x:c r="P25" s="1" t="inlineStr" />
+      <x:c r="Q25" s="1" t="inlineStr" />
+      <x:c r="R25" s="1" t="inlineStr" />
+      <x:c r="S25" s="1" t="inlineStr" />
+      <x:c r="T25" s="1" t="inlineStr" />
+      <x:c r="U25" s="1" t="inlineStr" />
+      <x:c r="V25" s="1" t="inlineStr" />
+      <x:c r="W25" s="1" t="inlineStr" />
+      <x:c r="X25" s="1" t="inlineStr" />
+      <x:c r="Y25" s="1" t="inlineStr" />
+      <x:c r="Z25" s="1" t="inlineStr" />
+      <x:c r="AA25" s="1" t="inlineStr" />
+      <x:c r="AB25" s="1" t="inlineStr" />
+    </x:row>
+    <x:row r="26" ht="12" customHeight="1">
+      <x:c r="A26" s="1" t="inlineStr" />
+      <x:c r="B26" s="24" t="inlineStr">
+        <x:is>
+          <x:r>
+            <x:rPr>
+              <x:sz val="6.0" />
+            </x:rPr>
+            <x:t xml:space="preserve">210 ALMACEN ID 2</x:t>
+          </x:r>
+        </x:is>
+      </x:c>
+      <x:c r="C26" s="25" t="inlineStr">
+        <x:is>
+          <x:r>
+            <x:rPr>
+              <x:sz val="6.0" />
+            </x:rPr>
+            <x:t xml:space="preserve">Stock:</x:t>
+          </x:r>
+        </x:is>
+      </x:c>
+      <x:c r="D26" s="26" t="inlineStr" />
+      <x:c r="E26" s="27" t="inlineStr">
+        <x:is>
+          <x:r>
+            <x:rPr>
+              <x:sz val="6.0" />
+            </x:rPr>
+            <x:t xml:space="preserve">100</x:t>
+          </x:r>
+        </x:is>
+      </x:c>
+      <x:c r="F26" s="28" t="inlineStr" />
+      <x:c r="G26" s="27" t="inlineStr">
+        <x:is />
+      </x:c>
+      <x:c r="H26" s="27" t="inlineStr">
+        <x:is />
+      </x:c>
+      <x:c r="I26" s="28" t="inlineStr" />
+      <x:c r="J26" s="27" t="inlineStr">
+        <x:is />
+      </x:c>
+      <x:c r="K26" s="29" t="inlineStr">
+        <x:is>
+          <x:r>
+            <x:rPr>
+              <x:sz val="6.0" />
+            </x:rPr>
+            <x:t xml:space="preserve">100</x:t>
+          </x:r>
+        </x:is>
+      </x:c>
+      <x:c r="L26" s="30" t="inlineStr" />
+      <x:c r="M26" s="1" t="inlineStr" />
+      <x:c r="N26" s="1" t="inlineStr" />
+      <x:c r="O26" s="1" t="inlineStr" />
+      <x:c r="P26" s="1" t="inlineStr" />
+      <x:c r="Q26" s="1" t="inlineStr" />
+      <x:c r="R26" s="1" t="inlineStr" />
+      <x:c r="S26" s="1" t="inlineStr" />
+      <x:c r="T26" s="1" t="inlineStr" />
+      <x:c r="U26" s="1" t="inlineStr" />
+      <x:c r="V26" s="1" t="inlineStr" />
+      <x:c r="W26" s="1" t="inlineStr" />
+      <x:c r="X26" s="1" t="inlineStr" />
+      <x:c r="Y26" s="1" t="inlineStr" />
+      <x:c r="Z26" s="1" t="inlineStr" />
+      <x:c r="AA26" s="1" t="inlineStr" />
+      <x:c r="AB26" s="1" t="inlineStr" />
+    </x:row>
+    <x:row r="27" ht="12" customHeight="1">
+      <x:c r="A27" s="1" t="inlineStr" />
+      <x:c r="B27" s="35" t="inlineStr" />
+      <x:c r="C27" s="25" t="inlineStr">
+        <x:is>
+          <x:r>
+            <x:rPr>
+              <x:sz val="6.0" />
+            </x:rPr>
+            <x:t xml:space="preserve">Transito:</x:t>
+          </x:r>
+        </x:is>
+      </x:c>
+      <x:c r="D27" s="26" t="inlineStr" />
+      <x:c r="E27" s="27" t="inlineStr">
+        <x:is />
+      </x:c>
+      <x:c r="F27" s="28" t="inlineStr" />
+      <x:c r="G27" s="27" t="inlineStr">
+        <x:is />
+      </x:c>
+      <x:c r="H27" s="27" t="inlineStr">
+        <x:is />
+      </x:c>
+      <x:c r="I27" s="28" t="inlineStr" />
+      <x:c r="J27" s="27" t="inlineStr">
+        <x:is />
+      </x:c>
+      <x:c r="K27" s="29" t="inlineStr">
+        <x:is />
+      </x:c>
+      <x:c r="L27" s="30" t="inlineStr" />
+      <x:c r="M27" s="1" t="inlineStr" />
+      <x:c r="N27" s="1" t="inlineStr" />
+      <x:c r="O27" s="1" t="inlineStr" />
+      <x:c r="P27" s="1" t="inlineStr" />
+      <x:c r="Q27" s="1" t="inlineStr" />
+      <x:c r="R27" s="1" t="inlineStr" />
+      <x:c r="S27" s="1" t="inlineStr" />
+      <x:c r="T27" s="1" t="inlineStr" />
+      <x:c r="U27" s="1" t="inlineStr" />
+      <x:c r="V27" s="1" t="inlineStr" />
+      <x:c r="W27" s="1" t="inlineStr" />
+      <x:c r="X27" s="1" t="inlineStr" />
+      <x:c r="Y27" s="1" t="inlineStr" />
+      <x:c r="Z27" s="1" t="inlineStr" />
+      <x:c r="AA27" s="1" t="inlineStr" />
+      <x:c r="AB27" s="1" t="inlineStr" />
+    </x:row>
+    <x:row r="28" ht="12" customHeight="1">
+      <x:c r="A28" s="1" t="inlineStr" />
+      <x:c r="B28" s="36" t="inlineStr" />
+      <x:c r="C28" s="25" t="inlineStr">
+        <x:is>
+          <x:r>
+            <x:rPr>
+              <x:sz val="6.0" />
+            </x:rPr>
+            <x:t xml:space="preserve">Ventas:</x:t>
+          </x:r>
+        </x:is>
+      </x:c>
+      <x:c r="D28" s="26" t="inlineStr" />
+      <x:c r="E28" s="27" t="inlineStr">
+        <x:is />
+      </x:c>
+      <x:c r="F28" s="28" t="inlineStr" />
+      <x:c r="G28" s="27" t="inlineStr">
+        <x:is />
+      </x:c>
+      <x:c r="H28" s="27" t="inlineStr">
+        <x:is />
+      </x:c>
+      <x:c r="I28" s="28" t="inlineStr" />
+      <x:c r="J28" s="27" t="inlineStr">
+        <x:is />
+      </x:c>
+      <x:c r="K28" s="29" t="inlineStr">
+        <x:is />
+      </x:c>
+      <x:c r="L28" s="30" t="inlineStr" />
+      <x:c r="M28" s="1" t="inlineStr" />
+      <x:c r="N28" s="1" t="inlineStr" />
+      <x:c r="O28" s="1" t="inlineStr" />
+      <x:c r="P28" s="1" t="inlineStr" />
+      <x:c r="Q28" s="1" t="inlineStr" />
+      <x:c r="R28" s="1" t="inlineStr" />
+      <x:c r="S28" s="1" t="inlineStr" />
+      <x:c r="T28" s="1" t="inlineStr" />
+      <x:c r="U28" s="1" t="inlineStr" />
+      <x:c r="V28" s="1" t="inlineStr" />
+      <x:c r="W28" s="1" t="inlineStr" />
+      <x:c r="X28" s="1" t="inlineStr" />
+      <x:c r="Y28" s="1" t="inlineStr" />
+      <x:c r="Z28" s="1" t="inlineStr" />
+      <x:c r="AA28" s="1" t="inlineStr" />
+      <x:c r="AB28" s="1" t="inlineStr" />
+    </x:row>
+    <x:row r="29" ht="12" customHeight="1">
+      <x:c r="A29" s="1" t="inlineStr" />
+      <x:c r="B29" s="44" t="inlineStr">
+        <x:is>
+          <x:r>
+            <x:rPr>
+              <x:sz val="6.0" />
+            </x:rPr>
+            <x:t xml:space="preserve">Total Stock:</x:t>
+          </x:r>
+        </x:is>
+      </x:c>
+      <x:c r="C29" s="45" t="inlineStr" />
+      <x:c r="D29" s="45" t="inlineStr" />
+      <x:c r="E29" s="29" t="inlineStr">
+        <x:is>
+          <x:r>
+            <x:rPr>
+              <x:sz val="6.0" />
+            </x:rPr>
+            <x:t xml:space="preserve">186</x:t>
+          </x:r>
+        </x:is>
+      </x:c>
+      <x:c r="F29" s="30" t="inlineStr" />
+      <x:c r="G29" s="29" t="inlineStr">
+        <x:is>
+          <x:r>
+            <x:rPr>
+              <x:sz val="6.0" />
+            </x:rPr>
+            <x:t xml:space="preserve">13</x:t>
+          </x:r>
+        </x:is>
+      </x:c>
+      <x:c r="H29" s="29" t="inlineStr">
+        <x:is>
+          <x:r>
+            <x:rPr>
+              <x:sz val="6.0" />
+            </x:rPr>
+            <x:t xml:space="preserve">5</x:t>
+          </x:r>
+        </x:is>
+      </x:c>
+      <x:c r="I29" s="30" t="inlineStr" />
+      <x:c r="J29" s="29" t="inlineStr">
+        <x:is>
+          <x:r>
+            <x:rPr>
+              <x:sz val="6.0" />
+            </x:rPr>
+            <x:t xml:space="preserve">5</x:t>
+          </x:r>
+        </x:is>
+      </x:c>
+      <x:c r="K29" s="46" t="inlineStr">
+        <x:is>
+          <x:r>
+            <x:rPr>
+              <x:sz val="6.0" />
+            </x:rPr>
+            <x:t xml:space="preserve">209</x:t>
+          </x:r>
+        </x:is>
+      </x:c>
+      <x:c r="L29" s="47" t="inlineStr" />
+      <x:c r="M29" s="1" t="inlineStr" />
+      <x:c r="N29" s="1" t="inlineStr" />
+      <x:c r="O29" s="1" t="inlineStr" />
+      <x:c r="P29" s="1" t="inlineStr" />
+      <x:c r="Q29" s="1" t="inlineStr" />
+      <x:c r="R29" s="1" t="inlineStr" />
+      <x:c r="S29" s="1" t="inlineStr" />
+      <x:c r="T29" s="1" t="inlineStr" />
+      <x:c r="U29" s="1" t="inlineStr" />
+      <x:c r="V29" s="1" t="inlineStr" />
+      <x:c r="W29" s="1" t="inlineStr" />
+      <x:c r="X29" s="1" t="inlineStr" />
+      <x:c r="Y29" s="1" t="inlineStr" />
+      <x:c r="Z29" s="1" t="inlineStr" />
+      <x:c r="AA29" s="1" t="inlineStr" />
+      <x:c r="AB29" s="1" t="inlineStr" />
+    </x:row>
+    <x:row r="30" ht="12" customHeight="1">
+      <x:c r="A30" s="1" t="inlineStr" />
+      <x:c r="B30" s="48" t="inlineStr">
+        <x:is>
+          <x:r>
+            <x:rPr>
+              <x:sz val="6.0" />
+            </x:rPr>
+            <x:t xml:space="preserve">Total Ventas:</x:t>
+          </x:r>
+        </x:is>
+      </x:c>
+      <x:c r="C30" s="49" t="inlineStr" />
+      <x:c r="D30" s="49" t="inlineStr" />
+      <x:c r="E30" s="50" t="inlineStr">
+        <x:is>
+          <x:r>
+            <x:rPr>
+              <x:sz val="6.0" />
+            </x:rPr>
+            <x:t xml:space="preserve">11</x:t>
+          </x:r>
+        </x:is>
+      </x:c>
+      <x:c r="F30" s="51" t="inlineStr" />
+      <x:c r="G30" s="50" t="inlineStr">
+        <x:is>
+          <x:r>
+            <x:rPr>
+              <x:sz val="6.0" />
+            </x:rPr>
+            <x:t xml:space="preserve">7</x:t>
+          </x:r>
+        </x:is>
+      </x:c>
+      <x:c r="H30" s="50" t="inlineStr">
+        <x:is />
+      </x:c>
+      <x:c r="I30" s="51" t="inlineStr" />
+      <x:c r="J30" s="50" t="inlineStr">
+        <x:is />
+      </x:c>
+      <x:c r="K30" s="52" t="inlineStr">
+        <x:is>
+          <x:r>
+            <x:rPr>
+              <x:sz val="6.0" />
+            </x:rPr>
+            <x:t xml:space="preserve">18</x:t>
+          </x:r>
+        </x:is>
+      </x:c>
+      <x:c r="L30" s="53" t="inlineStr" />
+      <x:c r="M30" s="1" t="inlineStr" />
+      <x:c r="N30" s="1" t="inlineStr" />
+      <x:c r="O30" s="1" t="inlineStr" />
+      <x:c r="P30" s="1" t="inlineStr" />
+      <x:c r="Q30" s="1" t="inlineStr" />
+      <x:c r="R30" s="1" t="inlineStr" />
+      <x:c r="S30" s="1" t="inlineStr" />
+      <x:c r="T30" s="1" t="inlineStr" />
+      <x:c r="U30" s="1" t="inlineStr" />
+      <x:c r="V30" s="1" t="inlineStr" />
+      <x:c r="W30" s="1" t="inlineStr" />
+      <x:c r="X30" s="1" t="inlineStr" />
+      <x:c r="Y30" s="1" t="inlineStr" />
+      <x:c r="Z30" s="1" t="inlineStr" />
+      <x:c r="AA30" s="1" t="inlineStr" />
+      <x:c r="AB30" s="1" t="inlineStr" />
+    </x:row>
+    <x:row r="31" ht="12" customHeight="1">
+      <x:c r="A31" s="1" t="inlineStr" />
+      <x:c r="B31" s="14" t="inlineStr">
+        <x:is>
+          <x:r>
+            <x:rPr>
+              <x:sz val="6.0" />
+            </x:rPr>
+            <x:t xml:space="preserve">109 TIENDA ID 109</x:t>
+          </x:r>
+        </x:is>
+      </x:c>
+      <x:c r="C31" s="25" t="inlineStr">
+        <x:is>
+          <x:r>
+            <x:rPr>
+              <x:sz val="6.0" />
+            </x:rPr>
+            <x:t xml:space="preserve">null</x:t>
+          </x:r>
+        </x:is>
+      </x:c>
+      <x:c r="D31" s="26" t="inlineStr" />
+      <x:c r="E31" s="54" t="inlineStr">
+        <x:is>
+          <x:r>
+            <x:rPr>
+              <x:sz val="6.0" />
+            </x:rPr>
+            <x:t xml:space="preserve">1</x:t>
+          </x:r>
+        </x:is>
+      </x:c>
+      <x:c r="F31" s="55" t="inlineStr" />
+      <x:c r="G31" s="54" t="inlineStr">
+        <x:is />
+      </x:c>
+      <x:c r="H31" s="54" t="inlineStr">
+        <x:is />
+      </x:c>
+      <x:c r="I31" s="55" t="inlineStr" />
+      <x:c r="J31" s="54" t="inlineStr">
+        <x:is />
+      </x:c>
+      <x:c r="K31" s="29" t="inlineStr">
+        <x:is>
+          <x:r>
+            <x:rPr>
+              <x:sz val="6.0" />
+            </x:rPr>
+            <x:t xml:space="preserve">1</x:t>
+          </x:r>
+        </x:is>
+      </x:c>
+      <x:c r="L31" s="30" t="inlineStr" />
+      <x:c r="M31" s="1" t="inlineStr" />
+      <x:c r="N31" s="1" t="inlineStr" />
+      <x:c r="O31" s="1" t="inlineStr" />
+      <x:c r="P31" s="1" t="inlineStr" />
+      <x:c r="Q31" s="1" t="inlineStr" />
+      <x:c r="R31" s="1" t="inlineStr" />
+      <x:c r="S31" s="1" t="inlineStr" />
+      <x:c r="T31" s="1" t="inlineStr" />
+      <x:c r="U31" s="1" t="inlineStr" />
+      <x:c r="V31" s="1" t="inlineStr" />
+      <x:c r="W31" s="1" t="inlineStr" />
+      <x:c r="X31" s="1" t="inlineStr" />
+      <x:c r="Y31" s="1" t="inlineStr" />
+      <x:c r="Z31" s="1" t="inlineStr" />
+      <x:c r="AA31" s="1" t="inlineStr" />
+      <x:c r="AB31" s="1" t="inlineStr" />
+    </x:row>
+    <x:row r="32" ht="12" customHeight="1">
+      <x:c r="A32" s="1" t="inlineStr" />
+      <x:c r="B32" s="56" t="inlineStr">
+        <x:is>
+          <x:r>
+            <x:rPr>
+              <x:sz val="6.0" />
+            </x:rPr>
+            <x:t xml:space="preserve">Total Recepciones:</x:t>
+          </x:r>
+        </x:is>
+      </x:c>
+      <x:c r="C32" s="57" t="inlineStr" />
+      <x:c r="D32" s="57" t="inlineStr" />
+      <x:c r="E32" s="58" t="inlineStr">
+        <x:is>
+          <x:r>
+            <x:rPr>
+              <x:sz val="6.0" />
+            </x:rPr>
+            <x:t xml:space="preserve">1</x:t>
+          </x:r>
+        </x:is>
+      </x:c>
+      <x:c r="F32" s="59" t="inlineStr" />
+      <x:c r="G32" s="58" t="inlineStr">
+        <x:is />
+      </x:c>
+      <x:c r="H32" s="58" t="inlineStr">
+        <x:is />
+      </x:c>
+      <x:c r="I32" s="59" t="inlineStr" />
+      <x:c r="J32" s="58" t="inlineStr">
+        <x:is />
+      </x:c>
+      <x:c r="K32" s="60" t="inlineStr">
+        <x:is>
+          <x:r>
+            <x:rPr>
+              <x:sz val="6.0" />
+            </x:rPr>
+            <x:t xml:space="preserve">1</x:t>
+          </x:r>
+        </x:is>
+      </x:c>
+      <x:c r="L32" s="61" t="inlineStr" />
+      <x:c r="M32" s="1" t="inlineStr" />
+      <x:c r="N32" s="1" t="inlineStr" />
+      <x:c r="O32" s="1" t="inlineStr" />
+      <x:c r="P32" s="1" t="inlineStr" />
+      <x:c r="Q32" s="1" t="inlineStr" />
+      <x:c r="R32" s="1" t="inlineStr" />
+      <x:c r="S32" s="1" t="inlineStr" />
+      <x:c r="T32" s="1" t="inlineStr" />
+      <x:c r="U32" s="1" t="inlineStr" />
+      <x:c r="V32" s="1" t="inlineStr" />
+      <x:c r="W32" s="1" t="inlineStr" />
+      <x:c r="X32" s="1" t="inlineStr" />
+      <x:c r="Y32" s="1" t="inlineStr" />
+      <x:c r="Z32" s="1" t="inlineStr" />
+      <x:c r="AA32" s="1" t="inlineStr" />
+      <x:c r="AB32" s="1" t="inlineStr" />
+    </x:row>
+    <x:row r="33" ht="248" customHeight="1">
+      <x:c r="A33" s="1" t="inlineStr" />
+      <x:c r="B33" s="1" t="inlineStr" />
+      <x:c r="C33" s="1" t="inlineStr" />
+      <x:c r="D33" s="1" t="inlineStr" />
+      <x:c r="E33" s="1" t="inlineStr" />
+      <x:c r="F33" s="1" t="inlineStr" />
+      <x:c r="G33" s="1" t="inlineStr" />
+      <x:c r="H33" s="1" t="inlineStr" />
+      <x:c r="I33" s="1" t="inlineStr" />
+      <x:c r="J33" s="1" t="inlineStr" />
+      <x:c r="K33" s="1" t="inlineStr" />
+      <x:c r="L33" s="1" t="inlineStr" />
+      <x:c r="M33" s="1" t="inlineStr" />
+      <x:c r="N33" s="1" t="inlineStr" />
+      <x:c r="O33" s="1" t="inlineStr" />
+      <x:c r="P33" s="1" t="inlineStr" />
+      <x:c r="Q33" s="1" t="inlineStr" />
+      <x:c r="R33" s="1" t="inlineStr" />
+      <x:c r="S33" s="1" t="inlineStr" />
+      <x:c r="T33" s="1" t="inlineStr" />
+      <x:c r="U33" s="1" t="inlineStr" />
+      <x:c r="V33" s="1" t="inlineStr" />
+      <x:c r="W33" s="1" t="inlineStr" />
+      <x:c r="X33" s="1" t="inlineStr" />
+      <x:c r="Y33" s="1" t="inlineStr" />
+      <x:c r="Z33" s="1" t="inlineStr" />
+      <x:c r="AA33" s="1" t="inlineStr" />
+      <x:c r="AB33" s="1" t="inlineStr" />
+    </x:row>
+    <x:row r="34" ht="13" customHeight="1">
+      <x:c r="A34" s="1" t="inlineStr" />
+      <x:c r="B34" s="62" t="inlineStr">
+        <x:is>
+          <x:r>
+            <x:rPr>
+              <x:sz val="8.0" />
+            </x:rPr>
+            <x:t xml:space="preserve">Página 1 de </x:t>
+          </x:r>
+        </x:is>
+      </x:c>
+      <x:c r="C34" s="63" t="inlineStr" />
+      <x:c r="D34" s="63" t="inlineStr" />
+      <x:c r="E34" s="63" t="inlineStr" />
+      <x:c r="F34" s="63" t="inlineStr" />
+      <x:c r="G34" s="63" t="inlineStr" />
+      <x:c r="H34" s="63" t="inlineStr" />
+      <x:c r="I34" s="63" t="inlineStr" />
+      <x:c r="J34" s="63" t="inlineStr" />
+      <x:c r="K34" s="63" t="inlineStr" />
+      <x:c r="L34" s="63" t="inlineStr" />
+      <x:c r="M34" s="63" t="inlineStr" />
+      <x:c r="N34" s="63" t="inlineStr" />
+      <x:c r="O34" s="63" t="inlineStr" />
+      <x:c r="P34" s="63" t="inlineStr" />
+      <x:c r="Q34" s="63" t="inlineStr" />
+      <x:c r="R34" s="63" t="inlineStr" />
+      <x:c r="S34" s="63" t="inlineStr" />
+      <x:c r="T34" s="63" t="inlineStr" />
+      <x:c r="U34" s="63" t="inlineStr" />
+      <x:c r="V34" s="63" t="inlineStr" />
+      <x:c r="W34" s="63" t="inlineStr" />
+      <x:c r="X34" s="63" t="inlineStr" />
+      <x:c r="Y34" s="63" t="inlineStr" />
+      <x:c r="Z34" s="63" t="inlineStr" />
+      <x:c r="AA34" s="62" t="inlineStr">
+        <x:is>
+          <x:r>
+            <x:rPr>
+              <x:sz val="8.0" />
+            </x:rPr>
+            <x:t xml:space="preserve">1</x:t>
+          </x:r>
+        </x:is>
+      </x:c>
+      <x:c r="AB34" s="1" t="inlineStr" />
+    </x:row>
+    <x:row r="35" ht="20" customHeight="1">
+      <x:c r="A35" s="1" t="inlineStr" />
+      <x:c r="B35" s="1" t="inlineStr" />
+      <x:c r="C35" s="1" t="inlineStr" />
+      <x:c r="D35" s="1" t="inlineStr" />
+      <x:c r="E35" s="1" t="inlineStr" />
+      <x:c r="F35" s="1" t="inlineStr" />
+      <x:c r="G35" s="1" t="inlineStr" />
+      <x:c r="H35" s="1" t="inlineStr" />
+      <x:c r="I35" s="1" t="inlineStr" />
+      <x:c r="J35" s="1" t="inlineStr" />
+      <x:c r="K35" s="1" t="inlineStr" />
+      <x:c r="L35" s="1" t="inlineStr" />
+      <x:c r="M35" s="1" t="inlineStr" />
+      <x:c r="N35" s="1" t="inlineStr" />
+      <x:c r="O35" s="1" t="inlineStr" />
+      <x:c r="P35" s="1" t="inlineStr" />
+      <x:c r="Q35" s="1" t="inlineStr" />
+      <x:c r="R35" s="1" t="inlineStr" />
+      <x:c r="S35" s="1" t="inlineStr" />
+      <x:c r="T35" s="1" t="inlineStr" />
+      <x:c r="U35" s="1" t="inlineStr" />
+      <x:c r="V35" s="1" t="inlineStr" />
+      <x:c r="W35" s="1" t="inlineStr" />
+      <x:c r="X35" s="1" t="inlineStr" />
+      <x:c r="Y35" s="1" t="inlineStr" />
+      <x:c r="Z35" s="1" t="inlineStr" />
+      <x:c r="AA35" s="1" t="inlineStr" />
+      <x:c r="AB35" s="1" t="inlineStr" />
+    </x:row>
+  </x:sheetData>
+  <x:mergeCells>
+    <x:mergeCell ref="B2:K2" />
+    <x:mergeCell ref="N2:Q2" />
+    <x:mergeCell ref="R2:AA2" />
+    <x:mergeCell ref="B4:AA4" />
+    <x:mergeCell ref="F6:H6" />
+    <x:mergeCell ref="I6:M6" />
+    <x:mergeCell ref="W6:X6" />
+    <x:mergeCell ref="Y6:AA6" />
+    <x:mergeCell ref="F7:H7" />
+    <x:mergeCell ref="I7:M7" />
+    <x:mergeCell ref="W7:X7" />
+    <x:mergeCell ref="Y7:AA7" />
+    <x:mergeCell ref="F8:H8" />
+    <x:mergeCell ref="I8:M8" />
+    <x:mergeCell ref="W8:X8" />
+    <x:mergeCell ref="Y8:AA8" />
+    <x:mergeCell ref="F9:H10" />
+    <x:mergeCell ref="I9:M10" />
+    <x:mergeCell ref="N9:N10" />
+    <x:mergeCell ref="O9:R10" />
+    <x:mergeCell ref="T9:T10" />
+    <x:mergeCell ref="U9:U10" />
+    <x:mergeCell ref="W9:X10" />
+    <x:mergeCell ref="Y9:AA10" />
+    <x:mergeCell ref="E12:F12" />
+    <x:mergeCell ref="H12:I12" />
+    <x:mergeCell ref="K12:L12" />
+    <x:mergeCell ref="U12:W12" />
+    <x:mergeCell ref="X12:Y12" />
+    <x:mergeCell ref="Z12:AA12" />
+    <x:mergeCell ref="C13:D13" />
+    <x:mergeCell ref="E13:F13" />
+    <x:mergeCell ref="H13:I13" />
+    <x:mergeCell ref="K13:L13" />
+    <x:mergeCell ref="U13:W14" />
+    <x:mergeCell ref="X13:Y14" />
+    <x:mergeCell ref="Z13:AA14" />
+    <x:mergeCell ref="C14:D15" />
+    <x:mergeCell ref="E14:F15" />
+    <x:mergeCell ref="G14:G15" />
+    <x:mergeCell ref="H14:I15" />
+    <x:mergeCell ref="J14:J15" />
+    <x:mergeCell ref="K14:L15" />
+    <x:mergeCell ref="U15:W16" />
+    <x:mergeCell ref="X15:Y16" />
+    <x:mergeCell ref="Z15:AA16" />
+    <x:mergeCell ref="C16:D17" />
+    <x:mergeCell ref="E16:F17" />
+    <x:mergeCell ref="G16:G17" />
+    <x:mergeCell ref="H16:I17" />
+    <x:mergeCell ref="J16:J17" />
+    <x:mergeCell ref="K16:L17" />
+    <x:mergeCell ref="U17:W18" />
+    <x:mergeCell ref="X17:Y18" />
+    <x:mergeCell ref="Z17:AA18" />
+    <x:mergeCell ref="B18:B19" />
+    <x:mergeCell ref="C18:D19" />
+    <x:mergeCell ref="E18:F19" />
+    <x:mergeCell ref="G18:G19" />
+    <x:mergeCell ref="H18:I19" />
+    <x:mergeCell ref="J18:J19" />
+    <x:mergeCell ref="K18:L19" />
+    <x:mergeCell ref="U19:W20" />
+    <x:mergeCell ref="X19:Y20" />
+    <x:mergeCell ref="Z19:AA20" />
+    <x:mergeCell ref="C20:D21" />
+    <x:mergeCell ref="E20:F21" />
+    <x:mergeCell ref="G20:G21" />
+    <x:mergeCell ref="H20:I21" />
+    <x:mergeCell ref="J20:J21" />
+    <x:mergeCell ref="K20:L21" />
+    <x:mergeCell ref="C22:D22" />
+    <x:mergeCell ref="E22:F22" />
+    <x:mergeCell ref="H22:I22" />
+    <x:mergeCell ref="K22:L22" />
+    <x:mergeCell ref="C23:D23" />
+    <x:mergeCell ref="E23:F23" />
+    <x:mergeCell ref="H23:I23" />
+    <x:mergeCell ref="K23:L23" />
+    <x:mergeCell ref="C24:D24" />
+    <x:mergeCell ref="E24:F24" />
+    <x:mergeCell ref="H24:I24" />
+    <x:mergeCell ref="K24:L24" />
+    <x:mergeCell ref="C25:D25" />
+    <x:mergeCell ref="E25:F25" />
+    <x:mergeCell ref="H25:I25" />
+    <x:mergeCell ref="K25:L25" />
+    <x:mergeCell ref="C26:D26" />
+    <x:mergeCell ref="E26:F26" />
+    <x:mergeCell ref="H26:I26" />
+    <x:mergeCell ref="K26:L26" />
+    <x:mergeCell ref="C27:D27" />
+    <x:mergeCell ref="E27:F27" />
+    <x:mergeCell ref="H27:I27" />
+    <x:mergeCell ref="K27:L27" />
+    <x:mergeCell ref="C28:D28" />
+    <x:mergeCell ref="E28:F28" />
+    <x:mergeCell ref="H28:I28" />
+    <x:mergeCell ref="K28:L28" />
+    <x:mergeCell ref="B29:D29" />
+    <x:mergeCell ref="E29:F29" />
+    <x:mergeCell ref="H29:I29" />
+    <x:mergeCell ref="K29:L29" />
+    <x:mergeCell ref="B30:D30" />
+    <x:mergeCell ref="E30:F30" />
+    <x:mergeCell ref="H30:I30" />
+    <x:mergeCell ref="K30:L30" />
+    <x:mergeCell ref="C31:D31" />
+    <x:mergeCell ref="E31:F31" />
+    <x:mergeCell ref="H31:I31" />
+    <x:mergeCell ref="K31:L31" />
+    <x:mergeCell ref="B32:D32" />
+    <x:mergeCell ref="E32:F32" />
+    <x:mergeCell ref="H32:I32" />
+    <x:mergeCell ref="K32:L32" />
+    <x:mergeCell ref="B34:Z34" />
+  </x:mergeCells>
+  <x:pageMargins left="0.2777777777777778" right="0.2777777777777778" top="0.2777777777777778" bottom="0.2777777777777778" header="0.0" footer="0.0" />
+  <x:pageSetup paperSize="9" orientation="landscape" />
+  <x:drawing r:id="rIdDr1" />
+</x:worksheet>
