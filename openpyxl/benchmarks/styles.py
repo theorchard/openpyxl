@@ -1,3 +1,4 @@
+from __future__ import print_function
 from itertools import product
 from random import Random
 from tempfile import TemporaryFile
@@ -61,7 +62,7 @@ def to_profile(wb, f, n):
     print('took %.4fs for %d styles' % (t + time.time(), n))
 
 for func in (optimized_workbook, non_optimized_workbook):
-    print '%s: ' % func.__name__,
+    print('%s: ' % func.__name__,)
     wb = func(styles)
     f = TemporaryFile()
     to_profile(wb, f, n)
