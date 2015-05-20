@@ -123,7 +123,7 @@ class TestPageSetup:
         page_setup.fitToWidth = True
         xml = tostring(page_setup.write_xml_element())
         expected = """
-        <pageSetup xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main" orientation="landscape" paperSize="3" fitToHeight="0" fitToWidth="1"/>
+        <pageSetup orientation="landscape" paperSize="3" fitToHeight="0" fitToWidth="1"/>
         """
         diff = compare_xml(xml, expected)
         assert diff is None, diff

@@ -20,7 +20,7 @@ from openpyxl.compat import deprecated
 class PageSetup(Strict):
     """ Worksheet page setup """
 
-    tag = "{%s}pageSetup" % SHEET_MAIN_NS
+    tag = "pageSetup"
 
     orientation = NoneSet(values=("default", "portrait", "landscape"))
     paperSize = Integer(allow_none=True)
