@@ -7,6 +7,7 @@ Bug fixes
 * `#451 <https://bitbucket.org/openpyxl/openpyxl/issue/451>`_ fitToPage setting ignored
 * `#458 <https://bitbucket.org/openpyxl/openpyxl/issue/458>`_ Trailing spaces lost when saving files.
 * `#459 <https://bitbucket.org/openpyxl/openpyxl/issue/459>`_ setup.py install fails with Python 3
+* `#462 <https://bitbucket.org/openpyxl/openpyxl/issue/462>`_ Vestigial rId conflicts when adding charts, images or comments
 
 
 2.2.2 (2015-04-28)
