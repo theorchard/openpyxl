@@ -175,7 +175,7 @@ class ExcelWriter(object):
 
     def save(self, filename, as_template=False):
         """Write data into the archive."""
-        archive = ZipFile(filename, 'w', ZIP_DEFLATED)
+        archive = ZipFile(filename, 'w', ZIP_DEFLATED, allowZip64=True)
         self.write_data(archive, as_template=as_template)
         archive.close()
 
@@ -202,7 +202,7 @@ def save_virtual_workbook(workbook, as_template=False):
     writer = ExcelWriter(workbook)
     temp_buffer = BytesIO()
     try:
-        archive = ZipFile(temp_buffer, 'w', ZIP_DEFLATED)
+        archive = ZipFile(temp_buffer, 'w', ZIP_DEFLATED, allowZip64=True)
         writer.write_data(archive, as_template=as_template)
     finally:
         archive.close()
