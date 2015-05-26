@@ -52,7 +52,7 @@ from .dimensions import ColumnDimension, RowDimension, DimensionHolder
 from .protection import SheetProtection
 from .filters import AutoFilter
 from .views import SheetView, Pane, Selection
-from .properties import WorksheetProperties, Outline, PageSetupPr
+from .properties import WorksheetProperties, Outline, PageSetupProperties
 
 
 def flatten(results):
@@ -117,7 +117,7 @@ class Worksheet(object):
         self.relationships = []
         self._data_validations = []
         self.sheet_state = self.SHEETSTATE_VISIBLE
-        self.page_setup = PageSetup()
+        self.page_setup = PageSetup(self)
         self.print_options = PrintOptions()
         self.page_margins = PageMargins()
         self.header_footer = HeaderFooter()
@@ -306,9 +306,9 @@ class Worksheet(object):
         """ Print Titles are rows or columns that are repeated on each printed sheet.
         This adds n rows or columns at the top or left of the sheet
         """
-        
+
         scope = self.parent.get_index(self)
-        
+
         if rows_or_cols == 'cols':
             r = '$A:$%s' % get_column_letter(n)
         else:

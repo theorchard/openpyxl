@@ -22,11 +22,11 @@ def test_ctor():
 
 @pytest.fixture
 def SimpleTestProps():
-    from .. properties import WorksheetProperties, PageSetupPr
+    from .. properties import WorksheetProperties, PageSetupProperties
     wsp = WorksheetProperties()
     wsp.filterMode = False
     wsp.tabColor = 'FF123456'
-    wsp.pageSetUpPr = PageSetupPr(fitToPage=False)
+    wsp.pageSetUpPr = PageSetupProperties(fitToPage=False)
     return wsp
 
 

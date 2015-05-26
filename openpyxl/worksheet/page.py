@@ -20,7 +20,7 @@ from openpyxl.compat import deprecated
 class PageSetup(Strict):
     """ Worksheet page setup """
 
-    tag = "{%s}pageSetup" % SHEET_MAIN_NS
+    tag = "pageSetup"
 
     orientation = NoneSet(values=("default", "portrait", "landscape"))
     paperSize = Integer(allow_none=True)
@@ -42,7 +42,9 @@ class PageSetup(Strict):
     copies = Integer(allow_none=True)
     id = String(allow_none=True)
 
-    def __init__(self, orientation=None,
+    def __init__(self,
+                 worksheet=None,
+                 orientation=None,
                  paperSize=None,
                  scale=None,
                  fitToHeight=None,
@@ -61,6 +63,7 @@ class PageSetup(Strict):
                  verticalDpi=None,
                  copies=None,
                  id=None):
+        self._parent = worksheet
         self.orientation = orientation
         self.paperSize = paperSize
         self.scale = scale
@@ -97,9 +100,33 @@ class PageSetup(Strict):
     def verticalCentered(self):
         pass
 
-    @deprecated("this property has to be called via sheet_properties")
+    @property
+    def sheet_properties(self):
+        """
+        Proxy property
+        """
+        return self._parent.sheet_properties.pageSetUpPr
+
+
+    @property
     def fitToPage(self):
-        pass
+        return self.sheet_properties.fitToPage
+
+
+    @fitToPage.setter
+    def fitToPage(self, value):
+        self.sheet_properties.fitToPage = value
+
+
+    @property
+    def autoPageBreaks(self):
+        return self.sheet_properties.autoPageBreaks
+
+
+    @autoPageBreaks.setter
+    def autoPageBreaks(self, value):
+        self.sheet_properties.autoPageBreaks = value
+
 
     def __iter__(self):
         for attr in ("orientation", "paperSize", "scale", "fitToHeight",

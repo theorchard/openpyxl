@@ -4,7 +4,7 @@ wb = Workbook()
 # grab the active worksheet
 ws = wb.active
 
-# Data can be directly to cells
+# Data can be assigned directly to cells
 ws['A1'] = 42
 
 # Rows can also be appended
