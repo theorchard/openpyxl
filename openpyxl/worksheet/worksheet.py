@@ -352,12 +352,10 @@ class Worksheet(object):
         else:
             coordinate = coordinate.upper().replace('$', '')
 
-        if coordinate not in self._cells:
-            if row is None or column is None:
-                column, row = coordinate_from_string(coordinate)
-            self._new_cell(column, row, value)
-
-        return self._cells[coordinate]
+        cell = self._get_cell(coordinate)
+        if value is not None:
+            cell.value = value
+        return cell
 
 
     def _get_cell(self, coordinate):
