@@ -5,7 +5,7 @@
 Bug fixes
 ---------
 
-* ws.cell() returns an empty cell on read-only workbooks
+* `#465 <https://bitbucket.org/openpyxl/openpyxl/issue/465>`_ ws.cell() returns an empty cell on read-only workbooks
 
 
 2.2.3 (2015-05-26)

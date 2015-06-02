@@ -154,9 +154,10 @@ def test_read_single_cell_range(sample_workbook):
 def test_read_single_cell(sample_workbook):
     wb = sample_workbook
     ws = wb['Sheet1 - Text']
-    cell = ws['A1']
-    cell = ws.cell('A1')
-    assert cell.value == 'This is cell A1 in Sheet 1'
+    c1 = ws['A1']
+    c2 = ws.cell('A1')
+    assert c1 == c2
+    assert c1.value == c2.value == 'This is cell A1 in Sheet 1'
 
 
 def test_read_fast_integrated_numbers(sample_workbook):
