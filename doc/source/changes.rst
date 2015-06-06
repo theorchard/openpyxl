@@ -6,6 +6,7 @@ Bug fixes
 ---------
 
 * `#465 <https://bitbucket.org/openpyxl/openpyxl/issue/465>`_ ws.cell() returns an empty cell on read-only workbooks
+* `#471 <https://bitbucket.org/openpyxl/openpyxl/issue/471>`_ Sheet properties elements must be in order
 
 
 2.2.3 (2015-05-26)
