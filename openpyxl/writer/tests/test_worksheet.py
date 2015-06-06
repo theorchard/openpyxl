@@ -783,9 +783,9 @@ def test_write_with_tab_color(worksheet, write_worksheet):
     expected = """
     <worksheet xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main" xmlns:r="http://schemas.openxmlformats.org/officeDocument/2006/relationships">
       <sheetPr>
+        <tabColor rgb="00F0F0F0"/>
         <outlinePr summaryRight="1" summaryBelow="1"/>
         <pageSetUpPr/>
-       <tabColor rgb="00F0F0F0"/>
       </sheetPr>
       <dimension ref="A1:A1"/>
       <sheetViews>
