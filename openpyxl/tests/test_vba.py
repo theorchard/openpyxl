@@ -24,15 +24,11 @@ def test_write_content_types(datadir):
         diff = compare_xml(content, expected.read())
         assert diff is None, diff
 
-def test_comments(datadir):
+def test_content_types(datadir):
     datadir.join('reader').chdir()
     fname = 'vba+comments.xlsm'
     wb = load_workbook(fname, keep_vba=True)
     buf = save_virtual_workbook(wb)
-    sheet = fromstring(zipfile.ZipFile(BytesIO(buf), 'r').open('xl/worksheets/sheet1.xml').read())
-    els = sheet.findall('{%s}legacyDrawing' % SHEET_MAIN_NS)
-    assert len(els) == 1, "Wrong number of legacyDrawing elements %d" % len(els)
-    assert els[0].get('{%s}id' % REL_NS) == 'vbaControlId'
     ct = fromstring(zipfile.ZipFile(BytesIO(buf), 'r').open('[Content_Types].xml').read())
     s = set()
     for el in ct.findall("{%s}Override" % CONTYPES_NS):
@@ -40,6 +36,19 @@ def test_comments(datadir):
         assert pn not in s, 'duplicate PartName in [Content_Types].xml'
         s.add(pn)
 
+
+def test_save_with_vba(datadir):
+    datadir.join('reader').chdir()
+    fname = 'vba-test.xlsm'
+    wb = load_workbook(fname, keep_vba=True)
+    buf = save_virtual_workbook(wb)
+    files = set(zipfile.ZipFile(BytesIO(buf), 'r').namelist())
+    expected = set(['xl/drawings/_rels/vmlDrawing1.vml.rels', 'xl/worksheets/_rels/sheet1.xml.rels', '[Content_Types].xml',
+                    'xl/drawings/vmlDrawing1.vml', 'xl/ctrlProps/ctrlProp1.xml', 'xl/vbaProject.bin', 'docProps/core.xml',
+                    '_rels/.rels', 'xl/theme/theme1.xml', 'xl/_rels/workbook.xml.rels', 'customUI/customUI.xml',
+                    'xl/styles.xml', 'xl/worksheets/sheet1.xml', 'xl/sharedStrings.xml', 'docProps/app.xml',
+                    'xl/ctrlProps/ctrlProp2.xml', 'xl/workbook.xml'])
+    assert files == expected
 
 def test_save_without_vba(datadir):
     datadir.join('reader').chdir()

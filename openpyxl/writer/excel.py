@@ -18,7 +18,6 @@ from openpyxl.xml.constants import (
     ARC_THEME,
     ARC_STYLE,
     ARC_WORKBOOK,
-    ARC_VBA,
     PACKAGE_WORKSHEETS,
     PACKAGE_DRAWINGS,
     PACKAGE_CHARTS,
@@ -48,6 +47,7 @@ from openpyxl.workbook.names.external import (
 
 from openpyxl.writer.comments import CommentWriter
 
+ARC_VBA = ('xl/vba', r'xl/drawings/.*\.vml', 'xl/ctrlProps', 'customUI')
 
 class ExcelWriter(object):
     """Write a workbook object to an Excel file."""
