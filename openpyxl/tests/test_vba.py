@@ -12,7 +12,7 @@ from openpyxl.reader.excel import load_workbook
 from openpyxl.writer.excel import save_virtual_workbook
 from openpyxl.writer.workbook import write_content_types
 from openpyxl.xml.functions import fromstring
-from openpyxl.xml.constants import SHEET_MAIN_NS, REL_NS
+from openpyxl.xml.constants import SHEET_MAIN_NS, REL_NS, CONTYPES_NS
 
 def test_write_content_types(datadir):
     datadir.join('reader').chdir()
@@ -24,24 +24,21 @@ def test_write_content_types(datadir):
         diff = compare_xml(content, expected.read())
         assert diff is None, diff
 
-def test_save_vba(datadir):
+def test_comments(datadir):
     datadir.join('reader').chdir()
-    fname = 'vba-test.xlsm'
-    wb = load_workbook(fname, keep_vba=True)
-    buf = save_virtual_workbook(wb)
-    files1 = set(zipfile.ZipFile(fname, 'r').namelist())
-    files2 = set(zipfile.ZipFile(BytesIO(buf), 'r').namelist())
-    assert files1.issubset(files2), "Missing files: %s" % ', '.join(files1 - files2)
-
-def test_legacy_controls(datadir):
-    datadir.join('reader').chdir()
-    fname = 'vba-test.xlsm'
+    fname = 'vba+comments.xlsm'
     wb = load_workbook(fname, keep_vba=True)
     buf = save_virtual_workbook(wb)
     sheet = fromstring(zipfile.ZipFile(BytesIO(buf), 'r').open('xl/worksheets/sheet1.xml').read())
-    el = sheet.find('{%s}legacyDrawing' % SHEET_MAIN_NS)
-    assert el is not None, "Missing legacyDrawing tag"
-    assert el.get('{%s}id' % REL_NS) == 'vbaControlId'
+    els = sheet.findall('{%s}legacyDrawing' % SHEET_MAIN_NS)
+    assert len(els) == 1, "Wrong number of legacyDrawing elements %d" % len(els)
+    assert els[0].get('{%s}id' % REL_NS) == 'vbaControlId'
+    ct = fromstring(zipfile.ZipFile(BytesIO(buf), 'r').open('[Content_Types].xml').read())
+    s = set()
+    for el in ct.findall("{%s}Override" % CONTYPES_NS):
+        pn = el.get('PartName')
+        assert pn not in s, 'duplicate PartName in [Content_Types].xml'
+        s.add(pn)
 
 
 def test_save_without_vba(datadir):

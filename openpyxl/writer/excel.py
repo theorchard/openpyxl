@@ -5,6 +5,7 @@ from __future__ import absolute_import
 
 # Python stdlib imports
 from io import BytesIO
+from re import match
 from zipfile import ZipFile, ZIP_DEFLATED
 
 # package imports
@@ -75,7 +76,7 @@ class ExcelWriter(object):
             vba_archive = self.workbook.vba_archive
             for name in vba_archive.namelist():
                 for s in ARC_VBA:
-                    if name.startswith(s):
+                    if match(s, name):
                         archive.writestr(name, vba_archive.read(name))
                         break
 
