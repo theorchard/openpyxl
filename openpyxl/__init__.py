@@ -11,7 +11,7 @@ from openpyxl.reader.excel import load_workbook
 
 
 # constants
-__version__ = '2.2.3'
+__version__ = '2.2.4'
 
 __author__ = 'Eric Gazoni'
 __license__ = 'MIT/Expat'
