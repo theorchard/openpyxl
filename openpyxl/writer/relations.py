@@ -24,6 +24,12 @@ def write_rels(worksheet, drawing_id, comments_id, vba_controls_id):
                  'Type': '%s/drawing' % REL_NS,
                  'Target': '../drawings/drawing%s.xml' % drawing_id}
         SubElement(root, '{%s}Relationship' % PKG_REL_NS, attrs)
+
+    if worksheet.vba_controls is not None:
+        attrs = {'Id': worksheet.vba_controls,
+                 'Type': VML_NS,
+                 'Target': '../drawings/vmlDrawing%s.vml' % vba_controls_id}
+        SubElement(root, '{%s}Relationship' % PKG_REL_NS, attrs)
     if worksheet._comment_count > 0:
         # there's only one comments sheet per worksheet,
         # so there's no reason to call the Id rIdx
@@ -31,13 +37,9 @@ def write_rels(worksheet, drawing_id, comments_id, vba_controls_id):
                  'Type': COMMENTS_NS,
                  'Target': '../comments%s.xml' % comments_id}
         SubElement(root, '{%s}Relationship' % PKG_REL_NS, attrs)
-        attrs = {'Id': 'commentsvml',
-                 'Type': VML_NS,
-                 'Target': '../drawings/commentsDrawing%s.vml' % comments_id}
-        SubElement(root, '{%s}Relationship' % PKG_REL_NS, attrs)
-    if worksheet.vba_controls is not None:
-        attrs = {'Id': worksheet.vba_controls,
-                 'Type': VML_NS,
-                 'Target': '../drawings/vmlDrawing%s.vml' % vba_controls_id}
-        SubElement(root, '{%s}Relationship' % PKG_REL_NS, attrs)
+        if worksheet.vba_controls is None:
+            attrs = {'Id': 'commentsvml',
+                     'Type': VML_NS,
+                     'Target': '../drawings/commentsDrawing%s.vml' % comments_id}
+            SubElement(root, '{%s}Relationship' % PKG_REL_NS, attrs)
     return root

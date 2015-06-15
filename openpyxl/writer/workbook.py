@@ -156,10 +156,12 @@ def write_content_types(workbook, as_template=False):
                     drawing_id += 1
 
         if sheet._comment_count > 0:
-            SubElement(root, '{%s}Override' % CONTYPES_NS, {
-                'PartName': '/xl/comments%d.xml' % comments_id,
-                'ContentType': COMMENTS_TYPE
-            })
+            name = '/xl/comments%d.xml' % comments_id
+            if name not in seen:
+                SubElement(root, '{%s}Override' % CONTYPES_NS, {
+                    'PartName': name,
+                    'ContentType': COMMENTS_TYPE
+                })
             comments_id += 1
 
     for idx, _ in enumerate(workbook._external_links, 1):

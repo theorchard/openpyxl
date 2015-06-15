@@ -5,6 +5,7 @@ from __future__ import absolute_import
 
 # Python stdlib imports
 from io import BytesIO
+from re import match
 from zipfile import ZipFile, ZIP_DEFLATED
 
 # package imports
@@ -17,7 +18,6 @@ from openpyxl.xml.constants import (
     ARC_THEME,
     ARC_STYLE,
     ARC_WORKBOOK,
-    ARC_VBA,
     PACKAGE_WORKSHEETS,
     PACKAGE_DRAWINGS,
     PACKAGE_CHARTS,
@@ -47,6 +47,7 @@ from openpyxl.workbook.names.external import (
 
 from openpyxl.writer.comments import CommentWriter
 
+ARC_VBA = ('xl/vba', r'xl/drawings/.*\.vml', 'xl/ctrlProps', 'customUI')
 
 class ExcelWriter(object):
     """Write a workbook object to an Excel file."""
@@ -75,7 +76,7 @@ class ExcelWriter(object):
             vba_archive = self.workbook.vba_archive
             for name in vba_archive.namelist():
                 for s in ARC_VBA:
-                    if name.startswith(s):
+                    if match(s, name):
                         archive.writestr(name, vba_archive.read(name))
                         break
 

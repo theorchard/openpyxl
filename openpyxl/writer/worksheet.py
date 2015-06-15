@@ -282,19 +282,21 @@ def write_worksheet(worksheet, shared_strings):
                 xf.write(drawing)
                 del drawing
 
+            pb = write_pagebreaks(worksheet)
+            if pb is not None:
+                xf.write(pb)
+
             # If vba is being preserved then add a legacyDrawing element so
             # that any controls can be drawn.
             if worksheet.vba_controls is not None:
                 xml = Element("{%s}legacyDrawing" % SHEET_MAIN_NS,
                               {"{%s}id" % REL_NS : worksheet.vba_controls})
                 xf.write(xml)
-
-            pb = write_pagebreaks(worksheet)
-            if pb is not None:
-                xf.write(pb)
-
-            # add a legacyDrawing so that excel can draw comments
-            if worksheet._comment_count > 0:
+            elif worksheet._comment_count > 0:
+                # add a legacyDrawing so that excel can draw comments
+                # If a legacyDrawing element has already been added then
+                # we have to hope it already contains the vml for
+                # comments because we cannot add another.
                 comments = Element('{%s}legacyDrawing' % SHEET_MAIN_NS,
                                 {'{%s}id' % REL_NS: 'commentsvml'})
                 xf.write(comments)
