@@ -5,6 +5,7 @@
 Bug fixes
 ---------
 
+* `#464 <https://bitbucket.org/openpyxl/openpyxl/issue/464>`_ Cannot use images when preserving macros
 * `#465 <https://bitbucket.org/openpyxl/openpyxl/issue/465>`_ ws.cell() returns an empty cell on read-only workbooks
 * `#471 <https://bitbucket.org/openpyxl/openpyxl/issue/471>`_ Sheet properties elements must be in order
 
