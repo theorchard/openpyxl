@@ -10,6 +10,7 @@ Bug fixes
 * `#467 <https://bitbucket.org/openpyxl/openpyxl/issue/467>`_ Cannot edit a file with ActiveX components
 * `#471 <https://bitbucket.org/openpyxl/openpyxl/issue/471>`_ Sheet properties elements must be in order
 * `#475 <https://bitbucket.org/openpyxl/openpyxl/issue/475>`_ Do not redefine class __slots__ in subclasses
+* `#477 <https://bitbucket.org/openpyxl/openpyxl/issue/477>`_ Write-only support for SheetProtection
 
 
 2.2.3 (2015-05-26)
