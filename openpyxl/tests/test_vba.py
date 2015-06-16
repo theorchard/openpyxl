@@ -12,7 +12,7 @@ from openpyxl.reader.excel import load_workbook
 from openpyxl.writer.excel import save_virtual_workbook
 from openpyxl.writer.workbook import write_content_types
 from openpyxl.xml.functions import fromstring
-from openpyxl.xml.constants import SHEET_MAIN_NS, REL_NS
+from openpyxl.xml.constants import SHEET_MAIN_NS, REL_NS, CONTYPES_NS
 
 def test_write_content_types(datadir):
     datadir.join('reader').chdir()
@@ -24,34 +24,64 @@ def test_write_content_types(datadir):
         diff = compare_xml(content, expected.read())
         assert diff is None, diff
 
-def test_save_vba(datadir):
+def test_content_types(datadir):
+    datadir.join('reader').chdir()
+    fname = 'vba+comments.xlsm'
+    wb = load_workbook(fname, keep_vba=True)
+    buf = save_virtual_workbook(wb)
+    ct = fromstring(zipfile.ZipFile(BytesIO(buf), 'r').open('[Content_Types].xml').read())
+    s = set()
+    for el in ct.findall("{%s}Override" % CONTYPES_NS):
+        pn = el.get('PartName')
+        assert pn not in s, 'duplicate PartName in [Content_Types].xml'
+        s.add(pn)
+
+
+def test_save_with_vba(datadir):
     datadir.join('reader').chdir()
     fname = 'vba-test.xlsm'
     wb = load_workbook(fname, keep_vba=True)
     buf = save_virtual_workbook(wb)
-    files1 = set(zipfile.ZipFile(fname, 'r').namelist())
-    files2 = set(zipfile.ZipFile(BytesIO(buf), 'r').namelist())
-    assert files1.issubset(files2), "Missing files: %s" % ', '.join(files1 - files2)
-
-def test_legacy_controls(datadir):
-    datadir.join('reader').chdir()
-    fname = 'vba-test.xlsm'
-    wb = load_workbook(fname, keep_vba=True)
-    buf = save_virtual_workbook(wb)
-    sheet = fromstring(zipfile.ZipFile(BytesIO(buf), 'r').open('xl/worksheets/sheet1.xml').read())
-    el = sheet.find('{%s}legacyDrawing' % SHEET_MAIN_NS)
-    assert el is not None, "Missing legacyDrawing tag"
-    assert el.get('{%s}id' % REL_NS) == 'vbaControlId'
-
+    files = set(zipfile.ZipFile(BytesIO(buf), 'r').namelist())
+    expected = set(['xl/drawings/_rels/vmlDrawing1.vml.rels',
+                    'xl/worksheets/_rels/sheet1.xml.rels',
+                    '[Content_Types].xml',
+                    'xl/drawings/vmlDrawing1.vml',
+                    'xl/ctrlProps/ctrlProp1.xml',
+                    'xl/vbaProject.bin',
+                    'docProps/core.xml',
+                    '_rels/.rels',
+                    'xl/theme/theme1.xml',
+                    'xl/_rels/workbook.xml.rels',
+                    'customUI/customUI.xml',
+                    'xl/styles.xml',
+                    'xl/worksheets/sheet1.xml',
+                    'xl/sharedStrings.xml',
+                    'docProps/app.xml',
+                    'xl/ctrlProps/ctrlProp2.xml',
+                    'xl/workbook.xml',
+                    'xl/activeX/activeX2.bin',
+                    'xl/activeX/activeX1.bin',
+                    'xl/media/image2.emf',
+                    'xl/activeX/activeX1.xml',
+                    'xl/activeX/_rels/activeX2.xml.rels',
+                    'xl/media/image1.emf',
+                    'xl/activeX/_rels/activeX1.xml.rels',
+                    'xl/activeX/activeX2.xml',
+                    ])
+    assert files == expected
 
 def test_save_without_vba(datadir):
     datadir.join('reader').chdir()
     fname = 'vba-test.xlsm'
-    vbFiles = set(['xl/activeX/activeX2.xml', 'xl/drawings/_rels/vmlDrawing1.vml.rels',
-                   'xl/activeX/_rels/activeX1.xml.rels', 'xl/drawings/vmlDrawing1.vml', 'xl/activeX/activeX1.bin',
-                   'xl/media/image1.emf', 'xl/vbaProject.bin', 'xl/activeX/_rels/activeX2.xml.rels',
-                   'xl/worksheets/_rels/sheet1.xml.rels', 'customUI/customUI.xml', 'xl/media/image2.emf',
-                   'xl/ctrlProps/ctrlProp1.xml', 'xl/activeX/activeX2.bin', 'xl/activeX/activeX1.xml',
+    vbFiles = set(['xl/activeX/activeX2.xml',
+                   'xl/drawings/_rels/vmlDrawing1.vml.rels',
+                   'xl/activeX/_rels/activeX1.xml.rels', 'xl/drawings/vmlDrawing1.vml',
+                   'xl/activeX/activeX1.bin', 'xl/media/image1.emf', 'xl/vbaProject.bin',
+                   'xl/activeX/_rels/activeX2.xml.rels',
+                   'xl/worksheets/_rels/sheet1.xml.rels', 'customUI/customUI.xml',
+                   'xl/media/image2.emf', 'xl/ctrlProps/ctrlProp1.xml',
+                   'xl/activeX/activeX2.bin', 'xl/activeX/activeX1.xml',
                    'xl/ctrlProps/ctrlProp2.xml', 'xl/drawings/drawing1.xml'])
 
     wb = load_workbook(fname, keep_vba=False)

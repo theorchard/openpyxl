@@ -39,7 +39,7 @@ class Outline(Strict):
                 yield attr, safe_string(value)
 
 
-class PageSetupPr(Strict):
+class PageSetupProperties(Strict):
 
     tag = "{%s}pageSetUpPr" % SHEET_MAIN_NS
 
@@ -72,7 +72,7 @@ class WorksheetProperties(Strict):
     transitionEntry = Bool(allow_none=True)
     tabColor = ColorDescriptor(allow_none=True)
     outlinePr = Typed(expected_type=Outline, allow_none=True)
-    pageSetUpPr = Typed(expected_type=PageSetupPr, allow_none=True)
+    pageSetUpPr = Typed(expected_type=PageSetupProperties, allow_none=True)
 
 
     def __init__(self,
@@ -101,8 +101,13 @@ class WorksheetProperties(Strict):
         self.transitionEntry = transitionEntry
         """ Elements """
         self.tabColor = tabColor
+        if outlinePr is None:
+            outline = Outline(summaryBelow=True, summaryRight=True)
         self.outlinePr = outlinePr
+        if pageSetUpPr is None:
+            pageSetUpPr = PageSetupProperties()
         self.pageSetUpPr = pageSetUpPr
+
 
 
     def __iter__(self):
@@ -121,9 +126,9 @@ def parse_sheetPr(node):
     if outline is not None:
         props.outlinePr = Outline(**outline.attrib)
 
-    page_setup = node.find(PageSetupPr.tag)
+    page_setup = node.find(PageSetupProperties.tag)
     if page_setup is not None:
-        props.pageSetUpPr = PageSetupPr(**page_setup.attrib)
+        props.pageSetUpPr = PageSetupProperties(**page_setup.attrib)
 
     tab_color = node.find('{%s}tabColor' % SHEET_MAIN_NS)
     if tab_color is not None:
@@ -141,6 +146,10 @@ def write_sheetPr(props):
 
     el = Element(props.tag, attributes)
 
+    tab_color = props.tabColor
+    if tab_color:
+        el.append(Element('{%s}tabColor' % SHEET_MAIN_NS, rgb=tab_color.value))
+
     outline = props.outlinePr
     if outline:
         el.append(Element(outline.tag, dict(outline)))
@@ -149,7 +158,5 @@ def write_sheetPr(props):
     if page_setup:
         el.append(Element(page_setup.tag, dict(page_setup)))
 
-    if props.tabColor:
-        el.append(Element('{%s}tabColor' % SHEET_MAIN_NS, rgb=props.tabColor.value))
 
     return el

@@ -22,11 +22,11 @@ def test_ctor():
 
 @pytest.fixture
 def SimpleTestProps():
-    from .. properties import WorksheetProperties, PageSetupPr
+    from .. properties import WorksheetProperties, PageSetupProperties
     wsp = WorksheetProperties()
     wsp.filterMode = False
     wsp.tabColor = 'FF123456'
-    wsp.pageSetUpPr = PageSetupPr(fitToPage=False)
+    wsp.pageSetUpPr = PageSetupProperties(fitToPage=False)
     return wsp
 
 
@@ -34,7 +34,10 @@ def test_write_properties(SimpleTestProps):
     from .. properties import write_sheetPr
 
     content = write_sheetPr(SimpleTestProps)
-    expected = """ <s:sheetPr xmlns:s="http://schemas.openxmlformats.org/spreadsheetml/2006/main" filterMode="0"><s:pageSetUpPr fitToPage="0" /><s:tabColor rgb="FF123456"/></s:sheetPr>"""
+    expected = """ <s:sheetPr xmlns:s="http://schemas.openxmlformats.org/spreadsheetml/2006/main" filterMode="0">
+    <s:tabColor rgb="FF123456" />
+    <s:pageSetUpPr fitToPage="0" />
+    </s:sheetPr>"""
     diff = compare_xml(tostring(content), expected)
     assert diff is None, diff
 

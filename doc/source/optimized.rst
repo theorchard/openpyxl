@@ -3,7 +3,7 @@ Optimized reader
 
 Sometimes, you will need to open or write extremely large XLSX files,
 and the common routines in openpyxl won't be able to handle that load.
-Hopefully, there are two modes that enable you to read and write unlimited
+Fortunately, there are two modes that enable you to read and write unlimited
 amounts of data with (near) constant memory consumption.
 
 Introducing :class:`openpyxl.worksheet.iter_worksheet.IterableWorksheet`::

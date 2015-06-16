@@ -19,10 +19,10 @@ def write_string_table(string_table):
 
             for key in string_table:
                 el = Element('si')
-                if key.strip() != key:
-                    el.set(PRESERVE_SPACE, 'preserve')
                 text = SubElement(el, 't')
                 text.text = key
+                if key.strip() != key:
+                    text.set(PRESERVE_SPACE, 'preserve')
                 xf.write(el)
 
     return  out.getvalue()

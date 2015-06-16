@@ -197,7 +197,7 @@ class WorkSheetParser(object):
     def parse_page_setup(self, element):
         id_key = '{%s}id' % REL_NS
         if id_key in element.attrib.keys():
-            element.attrib['id'] = element.attrib.pop(id_key)
+            element.attrib.pop(id_key)
 
         self.ws.page_setup = PageSetup(**element.attrib)
 

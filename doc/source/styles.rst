@@ -145,7 +145,7 @@ yourself. This is a restriction of the file format::
 >>> col = ws.column_dimensions['A']
 >>> col.font = Font(bold=True)
 >>> row = ws.row_dimensions[1]
->>> row.style = Font(underline="single")
+>>> row.font = Font(underline="single")
 
 
 Edit Page Setup
@@ -226,7 +226,7 @@ see http://msdn.microsoft.com/en-us/library/documentformat.openxml.spreadsheet.s
 .. :: doctest
 
 >>> from openpyxl.workbook import Workbook
->>> from openpyxl.worksheet.properties import WorksheetProperties, PageSetupPr
+>>> from openpyxl.worksheet.properties import WorksheetProperties, PageSetupProperties
 >>>
 >>> wb = Workbook()
 >>> ws = wb.active
@@ -234,7 +234,7 @@ see http://msdn.microsoft.com/en-us/library/documentformat.openxml.spreadsheet.s
 >>> wsprops = ws.sheet_properties
 >>> wsprops.tabColor = "1072BA"
 >>> wsprops.filterMode = False
->>> wsprops.pageSetUpPr = PageSetupPr(fitToPage=True, autoPageBreaks=False)
+>>> wsprops.PageSetupProperties = PageSetupProperties(fitToPage=True, autoPageBreaks=False)
 >>> wsprops.outlinePr.summaryBelow = False
 >>> wsprops.outlinePr.applyStyles = True
->>> wsprops.pageSetUpPr.autoPageBreaks = True
+>>> wsprops.PageSetupProperties.autoPageBreaks = True

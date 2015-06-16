@@ -1,3 +1,42 @@
+2.2.4 (unreleased)
+==================
+
+
+Bug fixes
+---------
+
+* `#464 <https://bitbucket.org/openpyxl/openpyxl/issue/464>`_ Cannot use images when preserving macros
+* `#465 <https://bitbucket.org/openpyxl/openpyxl/issue/465>`_ ws.cell() returns an empty cell on read-only workbooks
+* `#467 <https://bitbucket.org/openpyxl/openpyxl/issue/467>`_ Cannot edit a file with ActiveX components
+* `#471 <https://bitbucket.org/openpyxl/openpyxl/issue/471>`_ Sheet properties elements must be in order
+* `#475 <https://bitbucket.org/openpyxl/openpyxl/issue/475>`_ Do not redefine class __slots__ in subclasses
+
+
+2.2.3 (2015-05-26)
+==================
+
+
+Bug fixes
+---------
+
+* `#451 <https://bitbucket.org/openpyxl/openpyxl/issue/451>`_ fitToPage setting ignored
+* `#458 <https://bitbucket.org/openpyxl/openpyxl/issue/458>`_ Trailing spaces lost when saving files.
+* `#459 <https://bitbucket.org/openpyxl/openpyxl/issue/459>`_ setup.py install fails with Python 3
+* `#462 <https://bitbucket.org/openpyxl/openpyxl/issue/462>`_ Vestigial rId conflicts when adding charts, images or comments
+* `#455 <https://bitbucket.org/openpyxl/openpyxl/issue/455>`_ Enable Zip64 extensions for all versions of Python
+
+
+2.2.2 (2015-04-28)
+==================
+
+
+Bug fixes
+---------
+
+* `#447 <https://bitbucket.org/openpyxl/openpyxl/issue/447>`_ Uppercase datetime number formats not recognised.
+* `#453 <https://bitbucket.org/openpyxl/openpyxl/issue/453>`_ Borders broken in shared_styles.
+
+
 2.2.1 (2015-03-31)
 ==================
 

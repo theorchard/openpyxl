@@ -30,7 +30,7 @@ class StyleId(Serialisable):
     fillId = Integer()
     fill = Alias("fillId")
     borderId = Integer()
-    border = Alias("border")
+    border = Alias("borderId")
     xfId = Integer()
     named_style = Alias("xfId")
     alignmentId = Integer()

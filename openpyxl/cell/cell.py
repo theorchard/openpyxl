@@ -81,7 +81,7 @@ class Cell(StyleableObject):
     Properties of interest include style, type, value, and address.
 
     """
-    __slots__ =  StyleableObject.__slots__ + (
+    __slots__ =  (
         'column',
         'row',
         'coordinate',

@@ -7,13 +7,16 @@ from io import BytesIO
 
 import pytest
 
-from openpyxl.xml.functions import tostring, xmlfile
+from openpyxl.xml.functions import fromstring, tostring, xmlfile
+from openpyxl.reader.excel import load_workbook
 from openpyxl import Workbook
 
 from .. worksheet import write_worksheet
+from .. relations import write_rels
 
 from openpyxl.tests.helper import compare_xml
-from openpyxl.worksheet.properties import PageSetupPr
+from openpyxl.worksheet.properties import PageSetupProperties
+from openpyxl.xml.constants import SHEET_MAIN_NS, REL_NS
 
 
 @pytest.fixture
@@ -338,6 +341,7 @@ def test_auto_filter_worksheet(worksheet, write_worksheet):
     <worksheet xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main">
       <sheetPr>
         <outlinePr summaryBelow="1" summaryRight="1"/>
+        <pageSetUpPr/>
       </sheetPr>
       <dimension ref="A1:A1"/>
       <sheetViews>
@@ -592,6 +596,7 @@ def test_write_empty(worksheet, write_worksheet):
     <worksheet xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main" xmlns:r="http://schemas.openxmlformats.org/officeDocument/2006/relationships">
       <sheetPr>
         <outlinePr summaryRight="1" summaryBelow="1"/>
+        <pageSetUpPr/>
       </sheetPr>
       <dimension ref="A1:A1"/>
       <sheetViews>
@@ -621,6 +626,7 @@ def test_page_margins(worksheet, write_worksheet):
     <worksheet xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main" xmlns:r="http://schemas.openxmlformats.org/officeDocument/2006/relationships">
       <sheetPr>
         <outlinePr summaryRight="1" summaryBelow="1"/>
+        <pageSetUpPr/>
       </sheetPr>
       <dimension ref="A1:A1"/>
       <sheetViews>
@@ -645,7 +651,7 @@ def test_printer_settings(worksheet, write_worksheet):
     ws.page_setup.fitToWidth = 1
     ws.print_options.horizontalCentered = True
     ws.print_options.verticalCentered = True
-    page_setup_prop = PageSetupPr(fitToPage=True)
+    page_setup_prop = PageSetupProperties(fitToPage=True)
     ws.sheet_properties.pageSetUpPr = page_setup_prop
     xml = write_worksheet(ws, None)
     expected = """
@@ -703,6 +709,7 @@ def test_vba(worksheet, write_worksheet):
     xmlns:r="http://schemas.openxmlformats.org/officeDocument/2006/relationships">
       <sheetPr codeName="Sheet1">
         <outlinePr summaryBelow="1" summaryRight="1"/>
+        <pageSetUpPr/>
       </sheetPr>
       <dimension ref="A1:A1"/>
       <sheetViews>
@@ -719,6 +726,30 @@ def test_vba(worksheet, write_worksheet):
     diff = compare_xml(xml, expected)
     assert diff is None, diff
 
+def test_vba_comments(datadir, write_worksheet):
+    datadir.chdir()
+    fname = 'vba+comments.xlsm'
+    wb = load_workbook(fname, keep_vba=True)
+    ws = wb['Form Controls']
+    sheet = fromstring(write_worksheet(ws, None))
+    els = sheet.findall('{%s}legacyDrawing' % SHEET_MAIN_NS)
+    assert len(els) == 1, "Wrong number of legacyDrawing elements %d" % len(els)
+    assert els[0].get('{%s}id' % REL_NS) == 'vbaControlId'
+
+def test_vba_rels(datadir, write_worksheet):
+    datadir.chdir()
+    fname = 'vba+comments.xlsm'
+    wb = load_workbook(fname, keep_vba=True)
+    ws = wb['Form Controls']
+    xml = tostring(write_rels(ws, 1, 1, 1))
+    expected = """
+    <ns0:Relationships xmlns:ns0="http://schemas.openxmlformats.org/package/2006/relationships">
+        <ns0:Relationship Id="vbaControlId" Target="../drawings/vmlDrawing1.vml" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/vmlDrawing"/>
+        <ns0:Relationship Id="comments" Target="../comments1.xml" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/comments"/>
+    </ns0:Relationships>
+    """
+    diff = compare_xml(xml, expected)
+    assert diff is None, diff
 
 def test_protection(worksheet, write_worksheet):
     ws = worksheet
@@ -728,6 +759,7 @@ def test_protection(worksheet, write_worksheet):
     <worksheet xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main">
       <sheetPr>
         <outlinePr summaryBelow="1" summaryRight="1"/>
+        <pageSetUpPr/>
       </sheetPr>
       <dimension ref="A1:A1"/>
       <sheetViews>
@@ -754,6 +786,7 @@ def test_write_comments(worksheet, write_worksheet):
     xmlns:r="http://schemas.openxmlformats.org/officeDocument/2006/relationships">
       <sheetPr>
         <outlinePr summaryBelow="1" summaryRight="1"/>
+        <pageSetUpPr/>
       </sheetPr>
       <dimension ref="A1:A1"/>
       <sheetViews>
@@ -777,8 +810,9 @@ def test_write_with_tab_color(worksheet, write_worksheet):
     expected = """
     <worksheet xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main" xmlns:r="http://schemas.openxmlformats.org/officeDocument/2006/relationships">
       <sheetPr>
-        <outlinePr summaryRight="1" summaryBelow="1"/>
         <tabColor rgb="00F0F0F0"/>
+        <outlinePr summaryRight="1" summaryBelow="1"/>
+        <pageSetUpPr/>
       </sheetPr>
       <dimension ref="A1:A1"/>
       <sheetViews>
@@ -794,3 +828,28 @@ def test_write_with_tab_color(worksheet, write_worksheet):
     diff = compare_xml(xml, expected)
     assert diff is None, diff
 
+
+def test_write_with_fit_to_page(worksheet, write_worksheet):
+    ws = worksheet
+    ws.page_setup.fitToPage = True
+    ws.page_setup.autoPageBreaks = False
+    xml = write_worksheet(ws, None)
+    expected = """
+    <worksheet xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main" xmlns:r="http://schemas.openxmlformats.org/officeDocument/2006/relationships">
+      <sheetPr>
+        <outlinePr summaryRight="1" summaryBelow="1"/>
+        <pageSetUpPr fitToPage="1" autoPageBreaks="0"/>
+      </sheetPr>
+      <dimension ref="A1:A1"/>
+      <sheetViews>
+        <sheetView workbookViewId="0">
+          <selection sqref="A1" activeCell="A1"/>
+        </sheetView>
+      </sheetViews>
+      <sheetFormatPr baseColWidth="10" defaultRowHeight="15"/>
+      <sheetData/>
+      <pageMargins left="0.75" right="0.75" top="1" bottom="1" header="0.5" footer="0.5"/>
+    </worksheet>
+    """
+    diff = compare_xml(xml, expected)
+    assert diff is None, diff
