@@ -29,9 +29,25 @@ def test_number_descriptor():
 @pytest.mark.parametrize("format, result",
                          [
                              ("DD/MM/YY", True),
-                             ("H:MM:SS;@", True)
+                             ("H:MM:SS;@", True),
+                             ("H:MM:SS;@", True),
+                             (u'#,##0\\ [$\u20bd-46D]', False)
                          ]
                          )
 def test_is_date_format(format, result):
     from ..numbers import is_date_format
     assert is_date_format(format) is result
+
+
+@pytest.mark.parametrize("fmt, result",
+                         [
+                             ("[h]:mm:ss", False),
+                             ("[hh]:mm:ss", False),
+                             (u'#,##0\\ [$\u20bd-46D]', True),
+                             ('"$"#,##0_);[Red]("$"#,##0)', True)
+                         ]
+                         )
+def test_datetime_regex(fmt, result):
+    from ..numbers import BAD_DATE_RE
+    match = BAD_DATE_RE.search(fmt.lower()) is not None
+    assert match is result
