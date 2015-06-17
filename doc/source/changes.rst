@@ -12,6 +12,7 @@ Bug fixes
 * `#475 <https://bitbucket.org/openpyxl/openpyxl/issue/475>`_ Do not redefine class __slots__ in subclasses
 * `#477 <https://bitbucket.org/openpyxl/openpyxl/issue/477>`_ Write-only support for SheetProtection
 * `#478 <https://bitbucket.org/openpyxl/openpyxl/issue/477>`_ Write-only support for DataValidation
+* Improved regex when checking for datetime formats
 
 
 2.2.3 (2015-05-26)
