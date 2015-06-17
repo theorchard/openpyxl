@@ -41,8 +41,8 @@ def test_is_date_format(format, result):
 
 @pytest.mark.parametrize("fmt, result",
                          [
-                             ("[h]:mm:ss", False),
-                             ("[hh]:mm:ss", False),
+                             ("[h]:mm:ss", True),
+                             ("[hh]:mm:ss", True),
                              (u'#,##0\\ [$\u20bd-46D]', True),
                              ('"$"#,##0_);[Red]("$"#,##0)', True)
                          ]
