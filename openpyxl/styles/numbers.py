@@ -161,12 +161,13 @@ class NumberFormat(HashableObject):
 
 
 DATE_INDICATORS = 'dmyhs'
-BAD_DATE_RE = re.compile(r'(\[|").*[dmhys].*(\]|")')
+BAD_DATE_RE = re.compile(r'((?<=\[)|").*[dmhys]+.*(\]|")', re.UNICODE)
 
 def is_date_format(fmt):
     if fmt is None:
         return False
-    if any([x in fmt.lower() for x in DATE_INDICATORS]):
+    fmt = fmt.lower()
+    if any([x in fmt for x in DATE_INDICATORS]):
         return not BAD_DATE_RE.search(fmt)
     return False
 

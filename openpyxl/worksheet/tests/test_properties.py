@@ -34,7 +34,10 @@ def test_write_properties(SimpleTestProps):
     from .. properties import write_sheetPr
 
     content = write_sheetPr(SimpleTestProps)
-    expected = """ <s:sheetPr xmlns:s="http://schemas.openxmlformats.org/spreadsheetml/2006/main" filterMode="0"><s:pageSetUpPr fitToPage="0" /><s:tabColor rgb="FF123456"/></s:sheetPr>"""
+    expected = """ <s:sheetPr xmlns:s="http://schemas.openxmlformats.org/spreadsheetml/2006/main" filterMode="0">
+    <s:tabColor rgb="FF123456" />
+    <s:pageSetUpPr fitToPage="0" />
+    </s:sheetPr>"""
     diff = compare_xml(tostring(content), expected)
     assert diff is None, diff
 

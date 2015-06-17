@@ -30,3 +30,61 @@ def test_write_hyperlink_rels(datadir):
     with open('sheet1_hyperlink.xml.rels') as expected:
         diff = compare_xml(xml, expected.read())
         assert diff is None, diff
+
+import pytest
+
+class Worksheet:
+
+    _comment_count = 0
+    vba_controls = None
+    relationships = ()
+    _charts = ()
+    _images = ()
+
+
+@pytest.fixture
+def writer():
+    from ..relations import write_rels
+    return write_rels
+
+
+class TestRels:
+
+    def test_comments(self, writer):
+        ws = Worksheet()
+        ws._comment_count = 1
+        expected = """
+        <Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships">
+         <Relationship Id="comments" Target="../comments1.xml" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/comments" />
+          <Relationship Id="commentsvml" Target="../drawings/commentsDrawing1.vml" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/vmlDrawing"/>
+        </Relationships>
+        """
+        xml = tostring(writer(ws, None, 1, None))
+        diff = compare_xml(xml, expected)
+        assert diff is None, diff
+
+
+    def test_vba(self, writer):
+        ws = Worksheet()
+        ws.vba_controls = "vba"
+        expected = """
+        <Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships">
+          <Relationship Id="vba" Target="../drawings/vmlDrawing1.vml" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/vmlDrawing"/>
+        </Relationships>
+            """
+        xml = tostring(writer(ws, None, None, 1))
+        diff = compare_xml(xml, expected)
+        assert diff is None, diff
+
+
+    def test_drawing(self, writer):
+        ws = Worksheet()
+        ws._charts = [None]
+        expected = """
+            <Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships">
+              <Relationship Id="rId1" Target="../drawings/drawing1.xml" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/drawing"/>
+            </Relationships>
+                """
+        xml = tostring(writer(ws, 1, None, None))
+        diff = compare_xml(xml, expected)
+        assert diff is None, diff

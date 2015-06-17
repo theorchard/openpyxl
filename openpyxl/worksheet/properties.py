@@ -146,6 +146,10 @@ def write_sheetPr(props):
 
     el = Element(props.tag, attributes)
 
+    tab_color = props.tabColor
+    if tab_color:
+        el.append(Element('{%s}tabColor' % SHEET_MAIN_NS, rgb=tab_color.value))
+
     outline = props.outlinePr
     if outline:
         el.append(Element(outline.tag, dict(outline)))
@@ -154,7 +158,5 @@ def write_sheetPr(props):
     if page_setup:
         el.append(Element(page_setup.tag, dict(page_setup)))
 
-    if props.tabColor:
-        el.append(Element('{%s}tabColor' % SHEET_MAIN_NS, rgb=props.tabColor.value))
 
     return el

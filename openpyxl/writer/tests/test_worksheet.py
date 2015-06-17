@@ -7,13 +7,16 @@ from io import BytesIO
 
 import pytest
 
-from openpyxl.xml.functions import tostring, xmlfile
+from openpyxl.xml.functions import fromstring, tostring, xmlfile
+from openpyxl.reader.excel import load_workbook
 from openpyxl import Workbook
 
 from .. worksheet import write_worksheet
+from .. relations import write_rels
 
 from openpyxl.tests.helper import compare_xml
 from openpyxl.worksheet.properties import PageSetupProperties
+from openpyxl.xml.constants import SHEET_MAIN_NS, REL_NS
 
 
 @pytest.fixture
@@ -723,6 +726,30 @@ def test_vba(worksheet, write_worksheet):
     diff = compare_xml(xml, expected)
     assert diff is None, diff
 
+def test_vba_comments(datadir, write_worksheet):
+    datadir.chdir()
+    fname = 'vba+comments.xlsm'
+    wb = load_workbook(fname, keep_vba=True)
+    ws = wb['Form Controls']
+    sheet = fromstring(write_worksheet(ws, None))
+    els = sheet.findall('{%s}legacyDrawing' % SHEET_MAIN_NS)
+    assert len(els) == 1, "Wrong number of legacyDrawing elements %d" % len(els)
+    assert els[0].get('{%s}id' % REL_NS) == 'vbaControlId'
+
+def test_vba_rels(datadir, write_worksheet):
+    datadir.chdir()
+    fname = 'vba+comments.xlsm'
+    wb = load_workbook(fname, keep_vba=True)
+    ws = wb['Form Controls']
+    xml = tostring(write_rels(ws, 1, 1, 1))
+    expected = """
+    <ns0:Relationships xmlns:ns0="http://schemas.openxmlformats.org/package/2006/relationships">
+        <ns0:Relationship Id="vbaControlId" Target="../drawings/vmlDrawing1.vml" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/vmlDrawing"/>
+        <ns0:Relationship Id="comments" Target="../comments1.xml" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/comments"/>
+    </ns0:Relationships>
+    """
+    diff = compare_xml(xml, expected)
+    assert diff is None, diff
 
 def test_protection(worksheet, write_worksheet):
     ws = worksheet
@@ -783,9 +810,9 @@ def test_write_with_tab_color(worksheet, write_worksheet):
     expected = """
     <worksheet xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main" xmlns:r="http://schemas.openxmlformats.org/officeDocument/2006/relationships">
       <sheetPr>
+        <tabColor rgb="00F0F0F0"/>
         <outlinePr summaryRight="1" summaryBelow="1"/>
         <pageSetUpPr/>
-       <tabColor rgb="00F0F0F0"/>
       </sheetPr>
       <dimension ref="A1:A1"/>
       <sheetViews>
