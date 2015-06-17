@@ -1,4 +1,5 @@
 \.tox
+\.ve
 syntax: regexp
 \.pyc$
 .coverage
