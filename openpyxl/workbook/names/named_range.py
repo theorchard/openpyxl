@@ -22,7 +22,7 @@ SPLIT_NAMED_RANGE_RE = re.compile(r"((?:[^,']|'(?:[^']|'')*')+)")
 EXTERNAL_RE = re.compile(r"(?P<external>\[\d+\])?(?P<range_string>.*)")
 FORMULA_REGEX = re.compile(r"^[a-zA-Z]+[(]+.*[)]$")
 DISCARDED_RANGES = re.compile("^[_xnlm.]")
-ALLOWED_RESERVED_RANGES = ['_xlnm ._FilterDatabase']
+ALLOWED_RESERVED_RANGES = ['_xlnm._FilterDatabase']
 
 
 class NamedValue(object):
