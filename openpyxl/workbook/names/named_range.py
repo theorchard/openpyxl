@@ -22,6 +22,7 @@ SPLIT_NAMED_RANGE_RE = re.compile(r"((?:[^,']|'(?:[^']|'')*')+)")
 EXTERNAL_RE = re.compile(r"(?P<external>\[\d+\])?(?P<range_string>.*)")
 FORMULA_REGEX = re.compile(r"^[a-zA-Z]+[(]+.*[)]$")
 DISCARDED_RANGES = re.compile("^[_xnlm.]")
+ALLOWED_RESERVED_RANGES = ['_xlnm._FilterDatabase']
 
 
 class NamedValue(object):
@@ -117,8 +118,8 @@ def read_named_ranges(xml_source, workbook):
     for name_node in safe_iterator(root, '{%s}definedName' %SHEET_MAIN_NS):
 
         range_name = name_node.get('name')
-        if DISCARDED_RANGES.match(range_name):
-            warnings.warn("Discarded range with reserved name")
+        if DISCARDED_RANGES.match(range_name) and range_name not in ALLOWED_RESERVED_RANGES:
+            warnings.warn("Discarded range with reserved name: '" + named_range + "'")
             continue
 
         node_text = name_node.text
