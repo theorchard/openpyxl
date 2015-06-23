@@ -119,7 +119,7 @@ def read_named_ranges(xml_source, workbook):
 
         range_name = name_node.get('name')
         if DISCARDED_RANGES.match(range_name) and range_name not in ALLOWED_RESERVED_RANGES:
-            warnings.warn("Discarded range with reserved name: '" + named_range + "'")
+            warnings.warn("Discarded range with reserved name: '" + range_name + "'")
             continue
 
         node_text = name_node.text
